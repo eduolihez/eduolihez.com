@@ -1,6 +1,13 @@
 ---
 /**
  * <Certifications /> - Isla dinamica (MySQL via PHP). Contador animado + grid.
+ *
+ * La vista "Todas" NO lista las certificaciones una a una: son demasiadas y
+ * saturaban la seccion. Muestra una tarjeta por emisor con su nombre y cuantas
+ * credenciales tiene ("Trend Micro · 10"); al pulsarla se entra al detalle de
+ * ese emisor. Los filtros por tema (Ciberseguridad, IA & Cloud...) siguen
+ * mostrando las certificaciones sueltas, porque ahi el conjunto ya es pequeno.
+ *
  * Script PROCESADO (externo, CSP-safe). safeUrl() sanea las URLs de la BD (S3).
  */
 import { useTranslations } from '../i18n/utils';
@@ -15,28 +22,34 @@ const { lang } = Astro.props;
 const t = useTranslations(lang);
 
 const apiUrl = api(`/api/certifications.php?lang=${lang}`);
+
+const pick = <T,>(es: T, ca: T, en: T): T => (lang === 'es' ? es : lang === 'ca' ? ca : en);
+
 const labels = {
   loading: t('certs.loading'),
   error: t('certs.error'),
   empty: t('certs.empty'),
   countLabel: t('certs.count.label'),
-  showMore: lang === 'es' ? 'Mostrar {count} más' : lang === 'ca' ? 'Mostra {count} més' : 'Show {count} more',
-  showLess: lang === 'es' ? 'Ocultar' : lang === 'ca' ? 'Amaga' : 'Hide',
+  showMore: pick('Mostrar {count} más', 'Mostra {count} més', 'Show {count} more'),
+  // Texto de la tarjeta de emisor: "10 credenciales"
+  credentials: pick('credenciales', 'credencials', 'credentials'),
+  credential: pick('credencial', 'credencial', 'credential'),
+  back: pick('Todas', 'Totes', 'All'),
+  // Se anuncia a los lectores de pantalla al pulsar una tarjeta de emisor.
+  viewIssuer: pick('Ver certificaciones de', 'Veure certificacions de', 'View certifications from'),
 };
 ---
 
 <section id="certificaciones" class="border-b border-bg-border py-20 sm:py-28">
   <div class="container-page">
-    <div
-      class="reveal mb-12 flex flex-col gap-6 md:flex-row md:items-end md:justify-between"
-    >
+    <div class="reveal mb-10 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
       <div>
         <p class="section-kicker">{t('kicker.certs')}</p>
         <h2 class="section-title">{t('certs.title')}</h2>
         <p class="section-subtitle">{t('certs.subtitle')}</p>
       </div>
 
-      <div class="flex items-center gap-3">
+      <div class="flex shrink-0 items-center gap-3">
         <Icon name="award" class="h-8 w-8 text-accent" />
         <div>
           <div
@@ -51,7 +64,7 @@ const labels = {
       </div>
     </div>
 
-    <div id="certs-status" class="flex items-center gap-3 text-sm text-text-muted">
+    <div id="certs-status" class="mb-6 flex flex-wrap items-center gap-3 text-sm text-text-muted">
       <span
         id="certs-spinner"
         class="h-4 w-4 animate-spin rounded-full border-2 border-bg-border border-t-accent"
@@ -59,71 +72,94 @@ const labels = {
       <span id="certs-status-text">{t('certs.loading')}</span>
       <button
         id="certs-retry-btn"
-        class="hidden px-2.5 py-1 text-xs font-semibold text-accent rounded-md border border-accent/20 bg-accent/5 hover:bg-accent hover:text-bg transition duration-150 cursor-pointer"
+        class="hidden cursor-pointer rounded-md border border-accent/20 bg-accent/5 px-2.5 py-1 text-xs font-semibold text-accent transition duration-150 hover:bg-accent hover:text-bg"
         type="button"
       >
-        Volver a intentar
+        {pick('Volver a intentar', 'Tornar-ho a provar', 'Try again')}
       </button>
     </div>
 
-    <!-- Buscador y Filtros -->
-    <div class="reveal mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-      <!-- Buscador -->
-      <div class="relative flex-1 max-w-md w-full">
-        <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-text-muted">
-          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+    <!-- Buscador y filtros -->
+    <div class="reveal mb-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+      <div class="relative w-full lg:max-w-xs">
+        <span
+          class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-text-muted"
+        >
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
           </svg>
         </span>
         <input
           type="search"
           id="certs-search"
-          class="w-full pl-9 pr-4 py-2 text-sm rounded-lg border border-bg-border bg-bg-card text-text placeholder-text-muted/60 focus:border-accent focus:ring-1 focus:ring-accent focus:outline-none transition"
-          placeholder={lang === 'es' ? 'Buscar certificación o emisor...' : lang === 'ca' ? 'Cercar certificació o emissor...' : 'Search certification or issuer...'}
+          aria-label={pick('Buscar certificación', 'Cercar certificació', 'Search certification')}
+          class="w-full rounded-lg border border-bg-border bg-bg-card py-2 pl-9 pr-3 text-sm text-text placeholder-text-muted/60 transition focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+          placeholder={pick(
+            'Buscar certificación o emisor...',
+            'Cercar certificació o emissor...',
+            'Search certification or issuer...'
+          )}
         />
       </div>
 
-      <!-- Filtros -->
-      <div class="flex flex-wrap gap-1.5" id="certs-filter-container">
-        <button type="button" data-filter="all" class="cert-filter-btn active-filter px-3 py-1.5 text-xs font-semibold rounded-lg border border-accent bg-accent/10 text-accent transition cursor-pointer">
-          {lang === 'es' ? 'Todas' : lang === 'ca' ? 'Totes' : 'All'}
+      {/* Scroll horizontal en movil: seis filtros no caben y apilarlos comia
+          media pantalla. En pantallas grandes vuelven a fluir en varias lineas. */}
+      <div
+        id="certs-filter-container"
+        role="group"
+        aria-label={pick('Filtrar por categoría', 'Filtrar per categoria', 'Filter by category')}
+        class="-mx-4 flex snap-x gap-1.5 overflow-x-auto px-4 pb-1 lg:mx-0 lg:flex-wrap lg:justify-end lg:overflow-visible lg:px-0"
+      >
+        <button type="button" data-filter="all" class="cert-filter-btn is-active">
+          {pick('Todas', 'Totes', 'All')}
         </button>
-        <button type="button" data-filter="cyber" class="cert-filter-btn px-3 py-1.5 text-xs font-semibold rounded-lg border border-bg-border bg-bg-card text-text-muted hover:text-text hover:border-text-faint/40 transition cursor-pointer">
-          {lang === 'es' ? 'Ciberseguridad' : lang === 'ca' ? 'Ciberseguretat' : 'Cybersecurity'}
+        <button type="button" data-filter="cyber" class="cert-filter-btn">
+          {pick('Ciberseguridad', 'Ciberseguretat', 'Cybersecurity')}
         </button>
-        <button type="button" data-filter="ai-cloud" class="cert-filter-btn px-3 py-1.5 text-xs font-semibold rounded-lg border border-bg-border bg-bg-card text-text-muted hover:text-text hover:border-text-faint/40 transition cursor-pointer">
-          {lang === 'es' ? 'IA & Cloud' : lang === 'ca' ? 'IA & Cloud' : 'AI & Cloud'}
-        </button>
-        <button type="button" data-filter="cisco" class="cert-filter-btn px-3 py-1.5 text-xs font-semibold rounded-lg border border-bg-border bg-bg-card text-text-muted hover:text-text hover:border-text-faint/40 transition cursor-pointer">
-          Cisco
-        </button>
-        <button type="button" data-filter="tryhackme" class="cert-filter-btn px-3 py-1.5 text-xs font-semibold rounded-lg border border-bg-border bg-bg-card text-text-muted hover:text-text hover:border-text-faint/40 transition cursor-pointer">
-          TryHackMe
-        </button>
-        <button type="button" data-filter="sys-dev" class="cert-filter-btn px-3 py-1.5 text-xs font-semibold rounded-lg border border-bg-border bg-bg-card text-text-muted hover:text-text hover:border-text-faint/40 transition cursor-pointer">
-          {lang === 'es' ? 'Sistemas & Dev' : lang === 'ca' ? 'Sistemes & Dev' : 'Systems & Dev'}
+        <button type="button" data-filter="ai-cloud" class="cert-filter-btn">IA &amp; Cloud</button>
+        <button type="button" data-filter="cisco" class="cert-filter-btn">Cisco</button>
+        <button type="button" data-filter="tryhackme" class="cert-filter-btn">TryHackMe</button>
+        <button type="button" data-filter="sys-dev" class="cert-filter-btn">
+          {pick('Sistemas & Dev', 'Sistemes & Dev', 'Systems & Dev')}
         </button>
       </div>
     </div>
 
+    <!-- Migas: solo aparecen al entrar en un emisor concreto -->
+    <div id="certs-breadcrumb" class="reveal mb-5 hidden items-center gap-2 text-sm">
+      <button
+        id="certs-back-btn"
+        type="button"
+        class="inline-flex cursor-pointer items-center gap-1.5 rounded-md px-2 py-1 font-medium text-text-muted transition hover:bg-bg-soft hover:text-accent"
+      >
+        <span aria-hidden="true">&larr;</span>
+        <span>{labels.back}</span>
+      </button>
+      <span class="text-text-faint" aria-hidden="true">/</span>
+      <span id="certs-breadcrumb-current" class="truncate font-semibold text-text"></span>
+    </div>
+
     <div
       id="certs-grid"
-      class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
+      class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"
       data-api={apiUrl}
       data-labels={JSON.stringify(labels)}
     >
     </div>
 
-    <!-- Botón Ver más global para el Grid -->
     <div id="certs-load-more-container" class="reveal mt-6 hidden justify-center">
       <button
         id="certs-load-more-btn"
         type="button"
-        class="inline-flex items-center gap-2 rounded-lg border border-bg-border bg-bg-soft/40 px-4 py-2 text-xs font-semibold text-text-muted hover:border-accent hover:text-accent hover:bg-bg-card transition duration-200 cursor-pointer shadow-sm"
+        class="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-bg-border bg-bg-soft/40 px-4 py-2 text-xs font-semibold text-text-muted shadow-sm transition duration-200 hover:border-accent hover:bg-bg-card hover:text-accent"
       >
-        <span>{lang === 'es' ? 'Ver más certificaciones' : lang === 'ca' ? 'Veure más certificacions' : 'Show more certifications'}</span>
-        <svg class="h-3.5 w-3.5 transform transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+        <span>{pick('Ver más', 'Veure més', 'Show more')}</span>
+        <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path>
         </svg>
       </button>
     </div>
@@ -142,6 +178,44 @@ const labels = {
   </div>
 </section>
 
+<style>
+  /* Los botones de filtro se estilan aqui y no con clases sueltas repetidas
+     seis veces en el marcado. Ademas el JS solo tiene que alternar .is-active
+     en vez de reescribir el className entero, que era lo que hacia antes y
+     borraba de paso los atributos de accesibilidad. */
+  .cert-filter-btn {
+    flex-shrink: 0;
+    scroll-snap-align: start;
+    border-radius: 0.5rem;
+    border: 1px solid theme('colors.bg.border');
+    background-color: theme('colors.bg.card');
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: theme('colors.text.muted');
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s, background-color 0.15s;
+    /* 40px de alto minimo: objetivo tactil comodo en movil. */
+    min-height: 2.5rem;
+  }
+  .cert-filter-btn:hover {
+    color: theme('colors.text.DEFAULT');
+    border-color: theme('colors.text.faint');
+  }
+  .cert-filter-btn.is-active {
+    border-color: theme('colors.accent.DEFAULT');
+    background-color: rgb(74 222 128 / 0.1);
+    color: theme('colors.accent.DEFAULT');
+  }
+  /* Oculta la barra de scroll de los filtros sin impedir el desplazamiento. */
+  #certs-filter-container {
+    scrollbar-width: none;
+  }
+  #certs-filter-container::-webkit-scrollbar {
+    display: none;
+  }
+</style>
+
 <script>
   function initCerts() {
     const grid = document.getElementById('certs-grid');
@@ -152,6 +226,11 @@ const labels = {
     const counter = document.getElementById('certs-counter');
     const searchInput = document.getElementById('certs-search');
     const filterButtons = document.querySelectorAll('.cert-filter-btn');
+    const breadcrumb = document.getElementById('certs-breadcrumb');
+    const breadcrumbCurrent = document.getElementById('certs-breadcrumb-current');
+    const backBtn = document.getElementById('certs-back-btn');
+    const loadMoreContainer = document.getElementById('certs-load-more-container');
+    const loadMoreBtn = document.getElementById('certs-load-more-btn');
     if (!grid || grid.dataset.loaded) return;
 
     const apiUrl = grid.dataset.api || '';
@@ -159,10 +238,11 @@ const labels = {
 
     let allCerts = [];
     let activeFilter = 'all';
+    let activeIssuer = null; // emisor abierto desde la vista "Todas"
     let searchQuery = '';
     let animationFrameId = null;
     let hasAnimatedOnce = false;
-    let limit = 6;
+    let limit = 12; // multiplo de 2 y 3: no parte la ultima fila del grid
 
     function safeUrl(url) {
       if (typeof url !== 'string') return '';
@@ -171,13 +251,68 @@ const labels = {
       return '';
     }
 
+    /**
+     * Color estable por emisor. Antes el hueco del logo mostraba la primera
+     * LETRA del emisor, que quedaba pobre y no distinguia nada. Ahora se usa
+     * siempre el mismo sello de credencial, y lo que cambia es el color: son
+     * reconocibles de un vistazo sin inventar logotipos de marcas ajenas.
+     * Va en estilo en linea a proposito: una clase compuesta en tiempo de
+     * ejecucion no la veria Tailwind al compilar y se perderia.
+     */
+    const PALETTE = ['#4ade80', '#22d3ee', '#a78bfa', '#f59e0b', '#f472b6', '#60a5fa', '#34d399'];
+    function issuerColor(name) {
+      let h = 0;
+      for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
+      return PALETTE[h % PALETTE.length];
+    }
+
+    /** Sello de credencial en SVG (mismo icono que el contador de la seccion). */
+    function sealIcon(color, size) {
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('viewBox', '0 0 24 24');
+      svg.setAttribute('class', size);
+      svg.setAttribute('aria-hidden', 'true');
+      svg.style.color = color;
+      const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      p.setAttribute('fill', 'currentColor');
+      p.setAttribute(
+        'd',
+        'M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V22l-4-2-4 2v-7.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7m0 2a5 5 0 0 0-5 5 5 5 0 0 0 5 5 5 5 0 0 0 5-5 5 5 0 0 0-5-5Z'
+      );
+      svg.appendChild(p);
+      return svg;
+    }
+
+    /** Recuadro del logo: imagen real si la hay, si no el sello coloreado. */
+    function logoBox(logoUrl, altText, color) {
+      const box = document.createElement('div');
+      box.className =
+        'flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-md border border-bg-border';
+      const logo = safeUrl(logoUrl);
+      if (logo) {
+        box.classList.add('bg-bg-soft');
+        const img = document.createElement('img');
+        img.src = logo;
+        img.alt = altText || '';
+        img.loading = 'lazy';
+        img.decoding = 'async';
+        img.className = 'h-full w-full object-contain p-1.5';
+        box.appendChild(img);
+      } else {
+        // Fondo tenue del mismo color, para que el sello no flote suelto.
+        box.style.backgroundColor = color + '1a'; // ~10% de opacidad
+        box.style.borderColor = color + '33';
+        box.appendChild(sealIcon(color, 'h-5 w-5'));
+      }
+      return box;
+    }
+
     function animateCounter(target) {
       if (!counter) return;
       if (animationFrameId) cancelAnimationFrame(animationFrameId);
 
       const run = () => {
-        const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        if (reduce) {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
           counter.textContent = String(target);
           return;
         }
@@ -189,11 +324,7 @@ const labels = {
           const p = Math.min((now - start) / dur, 1);
           const eased = 1 - Math.pow(1 - p, 3);
           counter.textContent = String(Math.round(startVal + eased * diff));
-          if (p < 1) {
-            animationFrameId = requestAnimationFrame(tick);
-          } else {
-            animationFrameId = null;
-          }
+          animationFrameId = p < 1 ? requestAnimationFrame(tick) : null;
         }
         animationFrameId = requestAnimationFrame(tick);
       };
@@ -209,7 +340,7 @@ const labels = {
               }
             });
           },
-          { threshold: 0.4 },
+          { threshold: 0.4 }
         );
         obs.observe(counter);
       } else {
@@ -217,99 +348,152 @@ const labels = {
       }
     }
 
-    function renderCerts() {
-      grid.innerHTML = '';
-
-      const filtered = allCerts.filter(c => {
-        // Filtrar por término de búsqueda
-        let matchesSearch = true;
+    /** Aplica busqueda + filtro de categoria + emisor abierto. */
+    function getFiltered() {
+      return allCerts.filter((c) => {
         if (searchQuery) {
           const term = searchQuery.toLowerCase();
-          const name = (c.name || '').toLowerCase();
-          const issuer = (c.issuer || '').toLowerCase();
-          const cat = (c.category || '').toLowerCase();
-          matchesSearch = name.includes(term) || issuer.includes(term) || cat.includes(term);
+          const hay = [c.name, c.issuer, c.category].map((v) => (v || '').toLowerCase());
+          if (!hay.some((v) => v.includes(term))) return false;
         }
 
-        // Filtrar por categoría
-        let matchesCat = true;
-        if (activeFilter !== 'all') {
-          const cat = (c.category || '').toLowerCase();
-          const issuer = (c.issuer || '').toLowerCase();
-
-          if (activeFilter === 'cyber') {
-            matchesCat = cat.includes('security') || cat.includes('secops') || cat.includes('intel') || cat.includes('cyber') || issuer.includes('tryhackme');
-          } else if (activeFilter === 'ai-cloud') {
-            matchesCat = cat.includes('ai') || cat.includes('cloud');
-          } else if (activeFilter === 'cisco') {
-            matchesCat = issuer.includes('cisco');
-          } else if (activeFilter === 'tryhackme') {
-            matchesCat = issuer.includes('tryhackme');
-          } else if (activeFilter === 'sys-dev') {
-            matchesCat = cat.includes('sistemas') || cat.includes('desarrollo') || cat.includes('system') || cat.includes('dev');
-          } else {
-            matchesCat = false;
-          }
+        if (activeIssuer) {
+          return (c.issuer || 'Otros').trim() === activeIssuer;
         }
 
-        return matchesSearch && matchesCat;
+        if (activeFilter === 'all') return true;
+
+        const cat = (c.category || '').toLowerCase();
+        const issuer = (c.issuer || '').toLowerCase();
+        if (activeFilter === 'cyber') {
+          return (
+            cat.includes('security') || cat.includes('secops') || cat.includes('intel') ||
+            cat.includes('cyber') || issuer.includes('tryhackme')
+          );
+        }
+        if (activeFilter === 'ai-cloud') return cat.includes('ai') || cat.includes('cloud');
+        if (activeFilter === 'cisco') return issuer.includes('cisco');
+        if (activeFilter === 'tryhackme') return issuer.includes('tryhackme');
+        if (activeFilter === 'sys-dev') {
+          return (
+            cat.includes('sistemas') || cat.includes('desarrollo') ||
+            cat.includes('system') || cat.includes('dev')
+          );
+        }
+        return false;
       });
+    }
 
+    function render() {
+      grid.innerHTML = '';
+      const filtered = getFiltered();
       animateCounter(filtered.length);
 
+      // Migas visibles solo dentro de un emisor.
+      if (breadcrumb) {
+        breadcrumb.classList.toggle('hidden', !activeIssuer);
+        breadcrumb.classList.toggle('flex', !!activeIssuer);
+        if (activeIssuer && breadcrumbCurrent) breadcrumbCurrent.textContent = activeIssuer;
+      }
+
       if (!filtered.length) {
-        // Ocultar botón Ver más si no hay resultados
-        const loadMoreContainer = document.getElementById('certs-load-more-container');
-        if (loadMoreContainer) {
-          loadMoreContainer.classList.remove('flex');
-          loadMoreContainer.classList.add('hidden');
-        }
+        hideLoadMore();
         return message(labels.empty);
       }
 
-      const issuersOrder = [];
-      const grouped = {};
-      filtered.forEach((c) => {
-        const issuer = c.issuer ? c.issuer.trim() : 'Otros';
-        if (!grouped[issuer]) {
-          grouped[issuer] = [];
-          issuersOrder.push(issuer);
-        }
-        grouped[issuer].push(c);
-      });
+      // Vista "Todas" sin busqueda: resumen por emisor, no la lista completa.
+      const summaryView = activeFilter === 'all' && !activeIssuer && !searchQuery;
+      const items = summaryView ? buildIssuerCards(filtered) : filtered.map(makeCertCard);
 
-      // Lista de grupos para limitar el renderizado inicial y evitar sobrecarga visual
-      const groupsList = issuersOrder.map(issuer => {
-        return { issuer, certs: grouped[issuer] };
-      });
+      // El resumen se muestra ENTERO: son una decena de filas compactas y su
+      // razon de ser es dar el panorama de un vistazo. Paginarlo escondia
+      // emisores detras de un boton, que es justo lo que se queria evitar.
+      const pageSize = summaryView ? items.length : limit;
+      items.slice(0, pageSize).forEach((el) => grid.appendChild(el));
 
-      const loadMoreContainer = document.getElementById('certs-load-more-container');
-      const visibleGroups = groupsList.slice(0, limit);
-
-      visibleGroups.forEach((group) => {
-        if (group.certs.length === 1) {
-          grid.appendChild(makeSingleCard(group.certs[0]));
-        } else {
-          grid.appendChild(makeGroupedCard(group.issuer, group.certs));
-        }
-      });
-
-      if (groupsList.length > limit) {
-        if (loadMoreContainer) {
-          loadMoreContainer.classList.remove('hidden');
-          loadMoreContainer.classList.add('flex');
-        }
+      if (items.length > pageSize) {
+        loadMoreContainer?.classList.remove('hidden');
+        loadMoreContainer?.classList.add('flex');
       } else {
-        if (loadMoreContainer) {
-          loadMoreContainer.classList.remove('flex');
-          loadMoreContainer.classList.add('hidden');
-        }
+        hideLoadMore();
       }
     }
 
-    function makeSingleCard(c) {
+    function hideLoadMore() {
+      loadMoreContainer?.classList.remove('flex');
+      loadMoreContainer?.classList.add('hidden');
+    }
+
+    /** Una tarjeta por emisor: nombre + numero de credenciales. */
+    function buildIssuerCards(certs) {
+      const order = [];
+      const groups = {};
+      certs.forEach((c) => {
+        const key = (c.issuer || 'Otros').trim();
+        if (!groups[key]) {
+          groups[key] = [];
+          order.push(key);
+        }
+        groups[key].push(c);
+      });
+      // De mas a menos credenciales: los bloques grandes primero.
+      order.sort((a, b) => groups[b].length - groups[a].length);
+      return order.map((issuer) => makeIssuerCard(issuer, groups[issuer]));
+    }
+
+    function makeIssuerCard(issuer, certs) {
+      const color = issuerColor(issuer);
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className =
+        'reveal is-visible group flex w-full cursor-pointer items-center gap-3 rounded-lg border border-bg-border bg-bg-card p-4 text-left transition hover:border-accent/40 hover:bg-bg-soft/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent';
+      btn.setAttribute('aria-label', `${labels.viewIssuer} ${issuer} (${certs.length})`);
+
+      let logo = '';
+      for (const c of certs) {
+        const l = safeUrl(c.logo_url);
+        if (l) { logo = l; break; }
+      }
+      btn.appendChild(logoBox(logo, issuer, color));
+
+      const info = document.createElement('div');
+      info.className = 'min-w-0 flex-1';
+
+      const name = document.createElement('p');
+      name.className = 'truncate text-sm font-semibold text-text';
+      name.textContent = issuer;
+      info.appendChild(name);
+
+      const sub = document.createElement('p');
+      sub.className = 'mt-0.5 text-xs text-text-muted';
+      sub.textContent = `${certs.length} ${certs.length === 1 ? labels.credential : labels.credentials}`;
+      info.appendChild(sub);
+      btn.appendChild(info);
+
+      // Numero grande a la derecha: es el dato que se busca de un vistazo.
+      const count = document.createElement('span');
+      count.className =
+        'shrink-0 rounded-full px-2 py-0.5 font-mono text-sm font-bold tabular-nums';
+      count.style.color = color;
+      count.style.backgroundColor = color + '1a';
+      count.textContent = String(certs.length);
+      btn.appendChild(count);
+
+      btn.addEventListener('click', () => {
+        activeIssuer = issuer;
+        limit = 12;
+        render();
+        // Devuelve el foco al principio de la lista para quien navega con teclado.
+        grid.querySelector('a, button')?.focus({ preventScroll: true });
+      });
+
+      return btn;
+    }
+
+    /** Tarjeta de UNA certificacion. */
+    function makeCertCard(c) {
       const href = safeUrl(c.credential_url);
-      const wrap = href ? document.createElement('a') : document.createElement('div');
+      const wrap = document.createElement(href ? 'a' : 'div');
       wrap.className =
         'reveal is-visible group flex items-center gap-3 rounded-lg border border-bg-border bg-bg-card p-4 transition hover:border-text-faint/40';
       if (href) {
@@ -318,33 +502,16 @@ const labels = {
         wrap.rel = 'noopener noreferrer';
       }
 
-      const logoBox = document.createElement('div');
-      logoBox.className =
-        'flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-md border border-bg-border bg-bg-soft';
-      const logo = safeUrl(c.logo_url);
-      if (logo) {
-        const img = document.createElement('img');
-        img.src = logo;
-        img.alt = c.issuer || c.name || '';
-        img.loading = 'lazy';
-        img.className = 'h-full w-full object-contain p-1.5';
-        logoBox.appendChild(img);
-      } else {
-        const s = document.createElement('span');
-        s.className = 'font-mono text-base font-bold text-accent';
-        s.textContent = (c.issuer || c.name || '?').charAt(0).toUpperCase();
-        logoBox.appendChild(s);
-      }
-      wrap.appendChild(logoBox);
+      wrap.appendChild(logoBox(c.logo_url, c.issuer || c.name, issuerColor((c.issuer || c.name || '?').trim())));
 
       const info = document.createElement('div');
       info.className = 'min-w-0 flex-1';
       const name = document.createElement('p');
-      name.className = 'truncate text-sm font-medium text-text';
+      name.className = 'line-clamp-2 text-sm font-medium text-text';
       name.textContent = c.name || '';
       info.appendChild(name);
       const meta = document.createElement('p');
-      meta.className = 'truncate text-xs text-text-muted';
+      meta.className = 'mt-0.5 truncate text-xs text-text-muted';
       meta.textContent = [c.issuer, c.issue_date].filter(Boolean).join(' · ');
       info.appendChild(meta);
       wrap.appendChild(info);
@@ -359,162 +526,9 @@ const labels = {
       return wrap;
     }
 
-    function makeListItem(c) {
-      const href = safeUrl(c.credential_url);
-      const item = href ? document.createElement('a') : document.createElement('div');
-      item.className = 'group/item flex items-center justify-between gap-2 rounded-md bg-bg-soft/30 px-3 py-2 text-xs border border-bg-border/20 transition-all hover:bg-bg-soft/60 hover:border-bg-border/60 hover:text-accent w-full min-w-0';
-      if (href) {
-        item.href = href;
-        item.target = '_blank';
-        item.rel = 'noopener noreferrer';
-      }
-
-      const certName = document.createElement('span');
-      certName.className = 'truncate font-medium text-text group-hover/item:text-accent min-w-0 flex-1 text-left';
-      certName.textContent = c.name || '';
-      item.appendChild(certName);
-
-      const meta = document.createElement('span');
-      meta.className = 'shrink-0 text-[10px] text-text-faint font-mono mr-1';
-      meta.textContent = c.issue_date || '';
-      item.appendChild(meta);
-
-      if (href) {
-        const arrow = document.createElement('span');
-        arrow.className = 'shrink-0 text-text-faint font-mono transition group-hover/item:text-accent';
-        arrow.setAttribute('aria-hidden', 'true');
-        arrow.textContent = '↗';
-        item.appendChild(arrow);
-      }
-
-      return item;
-    }
-
-    function makeGroupedCard(issuerName, certs) {
-      const card = document.createElement('div');
-      card.className =
-        'reveal is-visible flex flex-col justify-between rounded-lg border border-bg-border bg-bg-card p-4 transition-all duration-200 hover:border-bg-border/80';
-
-      const header = document.createElement('div');
-      header.className = 'flex items-center gap-3 mb-3';
-
-      const logoBox = document.createElement('div');
-      logoBox.className =
-        'flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-md border border-bg-border bg-bg-soft';
-      
-      let logo = '';
-      for (const c of certs) {
-        const l = safeUrl(c.logo_url);
-        if (l) {
-          logo = l;
-          break;
-        }
-      }
-
-      if (logo) {
-        const img = document.createElement('img');
-        img.src = logo;
-        img.alt = issuerName;
-        img.loading = 'lazy';
-        img.className = 'h-full w-full object-contain p-1.5';
-        logoBox.appendChild(img);
-      } else {
-        const s = document.createElement('span');
-        s.className = 'font-mono text-base font-bold text-accent';
-        s.textContent = issuerName.charAt(0).toUpperCase();
-        logoBox.appendChild(s);
-      }
-      header.appendChild(logoBox);
-
-      const info = document.createElement('div');
-      info.className = 'min-w-0 flex-1';
-      
-      const titleWrapper = document.createElement('div');
-      titleWrapper.className = 'flex items-center gap-2';
-      
-      const name = document.createElement('h3');
-      name.className = 'truncate text-sm font-semibold text-text';
-      name.textContent = issuerName;
-      titleWrapper.appendChild(name);
-
-      const badge = document.createElement('span');
-      badge.className = 'inline-flex items-center rounded-full bg-accent/10 px-1.5 py-0.5 text-[10px] font-semibold text-accent';
-      badge.textContent = String(certs.length);
-      titleWrapper.appendChild(badge);
-      
-      info.appendChild(titleWrapper);
-
-      const sub = document.createElement('p');
-      sub.className = 'text-[11px] text-text-muted mt-0.5';
-      const dates = certs.map(c => c.issue_date).filter(Boolean);
-      sub.textContent = dates.length ? [...new Set(dates)].join(', ') : 'Credenciales';
-      info.appendChild(sub);
-      
-      header.appendChild(info);
-      card.appendChild(header);
-
-      const listContainer = document.createElement('div');
-      listContainer.className = 'flex flex-col gap-2 w-full mt-1';
-
-      listContainer.appendChild(makeListItem(certs[0]));
-
-      const collapsableContainer = document.createElement('div');
-      collapsableContainer.className = 'hidden flex-col gap-2 w-full transition-all duration-300';
-      for (let i = 1; i < certs.length; i++) {
-        collapsableContainer.appendChild(makeListItem(certs[i]));
-      }
-      listContainer.appendChild(collapsableContainer);
-      card.appendChild(listContainer);
-
-      const toggleBtn = document.createElement('button');
-      toggleBtn.type = 'button';
-      toggleBtn.className = 'mt-3 text-center text-[11px] font-semibold text-text-muted hover:text-accent transition duration-150 flex items-center justify-center gap-1 cursor-pointer w-full py-1.5 rounded bg-bg-soft/20 hover:bg-bg-soft/40 border border-bg-border/30';
-      
-      const remainingCount = certs.length - 1;
-      const showMoreText = labels.showMore.replace('{count}', String(remainingCount));
-      const showLessText = labels.showLess;
-      
-      const btnText = document.createElement('span');
-      btnText.textContent = showMoreText;
-      toggleBtn.appendChild(btnText);
-
-      const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      icon.setAttribute('class', 'h-3 w-3 transform transition-transform duration-200 text-text-faint');
-      icon.setAttribute('fill', 'none');
-      icon.setAttribute('viewBox', '0 0 24 24');
-      icon.setAttribute('stroke', 'currentColor');
-      
-      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      path.setAttribute('stroke-linecap', 'round');
-      path.setAttribute('stroke-linejoin', 'round');
-      path.setAttribute('stroke-width', '2.5');
-      path.setAttribute('d', 'M19 9l-7 7-7-7');
-      icon.appendChild(path);
-      toggleBtn.appendChild(icon);
-      card.appendChild(toggleBtn);
-
-      toggleBtn.addEventListener('click', () => {
-        const isCollapsed = collapsableContainer.classList.contains('hidden');
-        if (isCollapsed) {
-          collapsableContainer.classList.remove('hidden');
-          collapsableContainer.classList.add('flex');
-          btnText.textContent = showLessText;
-          icon.classList.add('rotate-180');
-        } else {
-          collapsableContainer.classList.remove('flex');
-          collapsableContainer.classList.add('hidden');
-          btnText.textContent = showMoreText;
-          icon.classList.remove('rotate-180');
-        }
-      });
-
-      return card;
-    }
-
     function message(text) {
-      if (status) status.classList.add('hidden');
       const p = document.createElement('p');
-      p.className = 'text-sm text-text-muted';
+      p.className = 'col-span-full text-sm text-text-muted';
       p.textContent = text;
       grid.appendChild(p);
     }
@@ -524,8 +538,9 @@ const labels = {
         .then((res) => {
           if (!res.ok) {
             if (retries > 0) {
-              return new Promise((resolve) => setTimeout(resolve, delay))
-                .then(() => fetchWithRetry(url, options, retries - 1, delay * 1.5));
+              return new Promise((r) => setTimeout(r, delay)).then(() =>
+                fetchWithRetry(url, options, retries - 1, delay * 1.5)
+              );
             }
             throw new Error('HTTP ' + res.status);
           }
@@ -533,67 +548,69 @@ const labels = {
         })
         .catch((err) => {
           if (retries > 0) {
-            return new Promise((resolve) => setTimeout(resolve, delay))
-              .then(() => fetchWithRetry(url, options, retries - 1, delay * 1.5));
+            return new Promise((r) => setTimeout(r, delay)).then(() =>
+              fetchWithRetry(url, options, retries - 1, delay * 1.5)
+            );
           }
           throw err;
         });
     }
 
     function loadData() {
-      if (status) status.classList.remove('hidden');
-      if (spinner) spinner.classList.add('animate-spin');
+      status?.classList.remove('hidden');
+      spinner?.classList.add('animate-spin');
       if (statusText) statusText.textContent = labels.loading;
-      if (retryBtn) retryBtn.classList.add('hidden');
+      retryBtn?.classList.add('hidden');
       grid.innerHTML = '';
 
       fetchWithRetry(apiUrl, { headers: { Accept: 'application/json' } })
         .then((data) => {
           grid.dataset.loaded = '1';
           allCerts = Array.isArray(data) ? data : data.items || [];
-          if (status) status.classList.add('hidden');
-          renderCerts();
+          status?.classList.add('hidden');
+          render();
         })
         .catch(() => {
           if (statusText) statusText.textContent = labels.error;
-          if (spinner) spinner.classList.remove('animate-spin');
-          if (retryBtn) retryBtn.classList.remove('hidden');
+          spinner?.classList.remove('animate-spin');
+          retryBtn?.classList.remove('hidden');
         });
     }
 
-    if (retryBtn) {
-      retryBtn.addEventListener('click', loadData);
-    }
+    retryBtn?.addEventListener('click', loadData);
 
-    if (searchInput) {
-      searchInput.addEventListener('input', (e) => {
-        searchQuery = e.target.value;
-        limit = 6;
-        renderCerts();
-      });
-    }
+    searchInput?.addEventListener('input', (e) => {
+      searchQuery = e.target.value;
+      activeIssuer = null; // buscar sale del detalle de un emisor
+      limit = 12;
+      render();
+    });
 
-    filterButtons.forEach(btn => {
+    filterButtons.forEach((btn) => {
       btn.addEventListener('click', () => {
-        filterButtons.forEach(b => {
-          b.classList.remove('active-filter');
-          b.className = 'cert-filter-btn px-3 py-1.5 text-xs font-semibold rounded-lg border border-bg-border bg-bg-card text-text-muted hover:text-text hover:border-text-faint/40 transition cursor-pointer';
+        filterButtons.forEach((b) => {
+          b.classList.remove('is-active');
+          b.removeAttribute('aria-pressed');
         });
-        btn.classList.add('active-filter');
-        btn.className = 'cert-filter-btn active-filter px-3 py-1.5 text-xs font-semibold rounded-lg border border-accent bg-accent/10 text-accent transition cursor-pointer';
+        btn.classList.add('is-active');
+        btn.setAttribute('aria-pressed', 'true');
         activeFilter = btn.dataset.filter;
-        limit = 6;
-        renderCerts();
+        activeIssuer = null;
+        limit = 12;
+        render();
       });
     });
 
-    const loadMoreBtn = document.getElementById('certs-load-more-btn');
-    if (loadMoreBtn) {
-      loadMoreBtn.addEventListener('click', () => {
-        limit = 999;
-        renderCerts();
-      });
-    }
+    backBtn?.addEventListener('click', () => {
+      activeIssuer = null;
+      limit = 12;
+      render();
+    });
+
+    loadMoreBtn?.addEventListener('click', () => {
+      limit = 1299;
+      render();
+    });
 
     loadData();
   }

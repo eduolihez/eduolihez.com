@@ -13,7 +13,10 @@ import PortfolioSections from '../components/PortfolioSections.astro';
 const lang = 'es';
 const title = 'Eduardo Olivares | Analista SOC en Badalona, Barcelona';
 const description =
-  'Analista SOC y Blue Team en Badalona (Barcelona). Deteccion de amenazas, respuesta a incidentes, XDR/SIEM y automatizacion con Python. Certificado Fortinet NSE, Microsoft y Trend Micro.';
+  // 160 caracteres es donde Google corta: lo que sobra no se llega a leer.
+  // Se recorta la lista de certificaciones, que es lo menos decisivo para
+  // que alguien haga clic desde el resultado de busqueda.
+  'Analista SOC y Blue Team en Badalona (Barcelona). Deteccion de amenazas, respuesta a incidentes, XDR/SIEM y automatizacion de seguridad con Python.';
 
 /** Las tres portadas SI son traducciones entre si: hreflang explicito.
  *  Ya no se hereda por defecto para no ponerselo a paginas sin traducir. */

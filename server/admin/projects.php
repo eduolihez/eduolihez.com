@@ -56,9 +56,12 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
                     // comparten el mismo sort_order (p.ej. los dos a 0), el
                     // intercambio no cambiaria nada visible.
                     normalize_sort_order('projects');
-                    $cur = (int) db()->query(
-                        'SELECT sort_order FROM projects WHERE id = ' . (int) $id
-                    )->fetchColumn();
+                    // Con placeholder, como el resto del archivo. El cast a
+                    // entero que habia antes ya impedia la inyeccion, pero era
+                    // el unico sitio que concatenaba dentro del SQL.
+                    $stCur = db()->prepare('SELECT sort_order FROM projects WHERE id = ?');
+                    $stCur->execute([$id]);
+                    $cur = (int) $stCur->fetchColumn();
 
                     $up  = $action === 'move_up';
                     $nb  = db()->prepare(

@@ -42,9 +42,12 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
                 case 'move_up':
                 case 'move_down':
                     normalize_sort_order('certifications');
-                    $cur = (int) db()->query(
-                        'SELECT sort_order FROM certifications WHERE id = ' . (int) $id
-                    )->fetchColumn();
+                    // Con placeholder, como el resto del archivo. El cast a
+                    // entero que habia antes ya impedia la inyeccion, pero era
+                    // el unico sitio que concatenaba dentro del SQL.
+                    $stCur = db()->prepare('SELECT sort_order FROM certifications WHERE id = ?');
+                    $stCur->execute([$id]);
+                    $cur = (int) $stCur->fetchColumn();
 
                     $up = $action === 'move_up';
                     $nb = db()->prepare(

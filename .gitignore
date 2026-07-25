@@ -1,23 +1,22 @@
-# build output
-dist/
-.astro/
-dist-ssr/
+# ===========================================================================
+#  .gitignore · eduolihez.com
+#
+#  Este repositorio es PUBLICO y el backend PHP habla con una base de datos
+#  real, asi que las reglas estan ordenadas por lo que peor pasaria si se
+#  colase: primero credenciales, despues datos personales, y al final ruido.
+# ===========================================================================
 
-# dependencies
-node_modules/
-
-# logs
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-*.log
-
-# environment / secrets (NUNCA subir credenciales al repo)
+# ---------------------------------------------------------------------------
+# 1. CREDENCIALES  ·  lo unico que no tiene arreglo si se sube
+# ---------------------------------------------------------------------------
 .env
 .env.*
 !.env.example
+
+# Configuracion real del backend (usuario y contrasena de MySQL, sal de las
+# IPs, clave secreta de Turnstile). La plantilla config.example.php SI se sube.
 server/config.php
+server/config.local.php
 
 # Copias sueltas de credenciales en la RAIZ del repo.
 # Las reglas de arriba son rutas exactas: una copia de db.php o config.php en
@@ -28,12 +27,84 @@ server/config.php
 /db.php
 /config.php
 
-# uploads (keep folder structures but ignore uploaded files)
+# Claves y certificados (FTP, SSH, SSL). Nunca deben vivir en el repo.
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+id_rsa*
+
+# Credenciales de cliente FTP: FileZilla guarda aqui host, usuario y
+# contrasena del hosting, en texto plano o en base64.
+sitemanager.xml
+filezilla.xml
+*.ftpconfig
+.ftpconfig
+deployment-config.json
+
+# ---------------------------------------------------------------------------
+# 2. DATOS PERSONALES Y VOLCADOS DE BASE DE DATOS
+#    Un export de phpMyAdmin o del panel lleva dentro los mensajes del
+#    formulario de contacto (nombres, emails, IPs) y el hash de tu contrasena
+#    de admin. Los .sql del proyecto se salvan con la excepcion de abajo.
+# ---------------------------------------------------------------------------
+*.sql
+*.sql.gz
+*.sql.zip
+!database/schema.sql
+!database/clean.sql
+
+# Copias de seguridad que genera /admin/backup.php
+portfolio-backup-*.json
+
+# Exportaciones CSV del buzon y de la analitica
+mensajes-*.csv
+visitas-*.csv
+
+# Contenido subido desde el panel (se conserva la carpeta y sus protecciones)
 server/uploads/*
 !server/uploads/.htaccess
 !server/uploads/index.html
 
-# editor / OS
+# ---------------------------------------------------------------------------
+# 3. SALIDA DE COMPILACION Y DEPENDENCIAS
+#    dist/ se reconstruye con "npm run build" y se sube por FTP; versionarlo
+#    solo genera conflictos y multiplica el peso del repositorio.
+# ---------------------------------------------------------------------------
+dist/
+dist-ssr/
+.astro/
+node_modules/
+.cache/
+.temp/
+.vite/
+
+# ---------------------------------------------------------------------------
+# 4. INFORMES DE HERRAMIENTAS DE SEGURIDAD Y CALIDAD
+#    Los genera el workflow de GitHub Actions en cada analisis; el resultado
+#    vive en la pestana Security, no en el repositorio.
+# ---------------------------------------------------------------------------
+*.sarif
+.semgrep/
+coverage/
+.php-cs-fixer.cache
+.phpunit.result.cache
+
+# ---------------------------------------------------------------------------
+# 5. LOGS
+# ---------------------------------------------------------------------------
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+error_log
+php_errorlog
+
+# ---------------------------------------------------------------------------
+# 6. EDITOR Y SISTEMA OPERATIVO
+# ---------------------------------------------------------------------------
 .vscode/
 .idea/
 *.suo
@@ -43,8 +114,14 @@ server/uploads/*
 *.sw?
 .DS_Store
 Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
 
-# setup documentation (guias locales)
+# ---------------------------------------------------------------------------
+# 7. DOCUMENTACION DE INSTALACION (guias locales, no publicas)
+#    Describen paso a paso el hosting, el panel y la configuracion de
+#    Cloudflare. Utiles para ti, un mapa del backend para cualquier otro.
+# ---------------------------------------------------------------------------
 DEPLOY.md
 GUIA.md
 SEO.md

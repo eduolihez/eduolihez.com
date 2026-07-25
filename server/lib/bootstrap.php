@@ -63,12 +63,17 @@ function send_security_headers(bool $noindex = true): void
 }
 
 /**
- * Comprueba si falta aplicar la migracion v2 de la base de datos.
+ * Comprueba si la base de datos esta al dia con lo que espera el codigo.
  *
- * El panel usa columnas y tablas que solo existen despues de importar
- * `database/migration-v2.sql`. Sin esta comprobacion, entrar al buzon con la
- * base de datos antigua daria una pagina en blanco (error fatal de SQL) sin
- * ninguna pista de que hacer.
+ * El panel usa tablas y columnas que solo existen despues de importar
+ * `database/schema.sql`. Sin esta comprobacion, entrar al buzon o al blog con
+ * una base de datos antigua daria una pagina en blanco (error fatal de SQL)
+ * sin ninguna pista de que hacer.
+ *
+ * IMPORTANTE: de `posts` se comprueban las COLUMNAS, no solo que la tabla
+ * exista. Una version antigua del esquema creaba una tabla `posts` con otra
+ * forma (title_es, body_es...) que el codigo no sabe leer; comprobar solo el
+ * nombre daba por buena esa tabla y el blog fallaba igualmente.
  *
  * @return string[] Lista de lo que falta. Array vacio = todo correcto.
  */
@@ -83,24 +88,23 @@ function migration_pending(): array
     try {
         $pdo = db();
 
-        // Tabla de auditoria.
-        $t = $pdo->query("SHOW TABLES LIKE 'activity_log'")->fetchColumn();
-        if (!$t) {
-            $missing[] = 'tabla activity_log';
+        // Tablas que deben existir.
+        foreach (['activity_log', 'posts'] as $table) {
+            if (!$pdo->query("SHOW TABLES LIKE " . $pdo->quote($table))->fetchColumn()) {
+                $missing[] = "tabla $table";
+            }
         }
 
-        // Tabla de posts (blog).
-        $t2 = $pdo->query("SHOW TABLES LIKE 'posts'")->fetchColumn();
-        if (!$t2) {
-            $missing[] = 'tabla posts';
-        }
-
-        // Columnas nuevas de messages y visits.
+        // Columnas que deben existir en tablas que ya estaban.
         $need = [
             'messages' => ['is_starred', 'is_archived'],
             'visits'   => ['device', 'browser', 'os', 'lang', 'is_bot'],
+            'posts'    => ['title', 'slug', 'summary', 'content', 'lang', 'visible'],
         ];
         foreach ($need as $table => $columns) {
+            if (in_array("tabla $table", $missing, true)) {
+                continue; // la tabla entera falta: no hace falta listar sus columnas
+            }
             $have = $pdo->query("SHOW COLUMNS FROM `$table`")->fetchAll(PDO::FETCH_COLUMN);
             foreach ($columns as $col) {
                 if (!in_array($col, $have, true)) {

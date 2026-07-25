@@ -9,13 +9,13 @@ El sitio web está diseñado con un enfoque moderno, minimalista y de alto rendi
 El proyecto está estructurado en dos partes principales, garantizando una separación limpia entre la presentación estática y la administración de contenidos:
 
 ### Frontend
-- **Astro 5**: Generación de sitio estático (SSG), lo que permite que las páginas web se carguen casi instantáneamente al no depender de ejecución en el servidor para las vistas principales.
+- **Astro 7**: Generación de sitio estático (SSG), lo que permite que las páginas web se carguen casi instantáneamente al no depender de ejecución en el servidor para las vistas principales.
 - **Tailwind CSS**: Estilos responsivos con un diseño oscuro pulido y moderno adaptado a la temática de ciberseguridad.
 - **TypeScript & JavaScript (Vanilla)**: Lógica interactiva en cliente (animaciones de entrada, filtrado dinámico de contenido, etc.).
 - **Soporte Trilingüe nativo**: Traducción completa al español (`/`), inglés (`/en/`) y catalán (`/ca/`).
 
 ### Backend (Gestión interna)
-- **PHP 8 (PDO)**: Un panel de administración propio (`/admin`) desarrollado a medida para gestionar el contenido dinámico del portfolio (proyectos, certificaciones), gestionar mensajes recibidos y monitorizar las analíticas del sitio.
+- **PHP 8 (PDO)**: Un panel de administración propio (`/admin`) desarrollado a medida para gestionar el contenido dinámico del portfolio (proyectos, certificaciones y blog), gestionar mensajes recibidos y monitorizar las analíticas del sitio.
 - **Base de Datos MySQL / MariaDB**: Almacenamiento estructurado del contenido dinámico y logs de seguridad.
 - **Formspree**: Sistema de contacto seguro de respaldo para recepción de emails.
 - **Analítica de Privacidad**: Analíticas integradas propias que registran visitas generales hasheando la dirección IP (GDPR friendly), evitando el uso de cookies de seguimiento o scripts de terceros (como Google Analytics).
@@ -25,7 +25,7 @@ El proyecto está estructurado en dos partes principales, garantizando una separ
 - `src/`: Componentes, layouts, datos estáticos y lógica de internacionalización de la aplicación web en Astro.
 - `public/`: Recursos estáticos de la web, imágenes, favicons y archivos de soporte.
 - `server/`: Backend en PHP que contiene la API para cargar datos dinámicamente y el panel de administración seguro `/admin`.
-- `database/`: Esquemas SQL para la base de datos MySQL (estructura y migraciones).
+- `database/`: SQL de la base de datos MySQL. `schema.sql` es idempotente y hace de esquema y de migración a la vez; `clean.sql` vacía el contenido conservando la estructura.
 - `LICENSE`: Licencia MIT del proyecto.
 
 ## 🔒 Características de Seguridad

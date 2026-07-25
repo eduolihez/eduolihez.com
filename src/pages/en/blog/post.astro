@@ -1,19 +1,24 @@
 ---
 /**
- * /en/blog/post — Blog post detail view (English).
- * 
- * Dynamically loads the blog post content in English from the PHP API,
- * using the slug parameter from the URL (?slug=post-slug-name).
+ * /en/blog/post/ — Blog post detail (English).
+ *
+ * The article is selected with ?slug= and fetched from the API on page load.
+ *
+ * SEO: since every article shares this route, what gets compiled here is only
+ * the shell. On load, src/scripts/blog.ts rewrites the title, description,
+ * canonical, Open Graph tags and the BlogPosting block below with the real
+ * article data. Without that, every article would look like the same
+ * duplicated page to a search engine.
  */
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { useTranslations } from '../../../i18n/utils';
-import { api } from '../../../config';
+import { SITE, api } from '../../../config';
 
 const lang = 'en';
 const t = useTranslations(lang);
 
 const defaultTitle = 'Article | Blog | Eduardo Olivares';
-const defaultDesc = 'Detail of the cybersecurity blog article by Eduardo Olivares.';
+const defaultDesc = 'Article from the cybersecurity blog by Eduardo Olivares.';
 
 const apiUrl = api('/api/post.php');
 ---
@@ -24,12 +29,21 @@ const apiUrl = api('/api/post.php');
   lang={lang}
   path="/en/blog/post/"
   withFaq={false}
-  noindex={false}
+  breadcrumbs={[{ name: 'Blog', path: '/en/blog/' }]}
   breadcrumbName="Article"
 >
-  <article id="post-detail-wrapper" class="border-b border-bg-border bg-bg-soft py-20 sm:py-28" data-api={apiUrl}>
+  <article
+    id="post-detail-wrapper"
+    class="border-b border-bg-border bg-bg-soft py-20 sm:py-28"
+    data-api={apiUrl}
+    data-lang={lang}
+    data-site={SITE.shortName}
+    data-author={SITE.name}
+    data-error={t('blog.error')}
+    data-notfound={t('blog.notFound')}
+    data-missingslug={t('blog.noSlug')}
+  >
     <div class="container-page max-w-3xl">
-      <!-- Back button -->
       <a
         href="/en/blog/"
         class="group mb-8 inline-flex items-center gap-2 font-mono text-xs text-text-muted transition hover:text-accent"
@@ -37,164 +51,60 @@ const apiUrl = api('/api/post.php');
         <span class="transition-transform group-hover:-translate-x-1">&larr;</span> {t('blog.back')}
       </a>
 
-      <!-- Loading / Error -->
-      <div id="post-status" class="flex items-center gap-3 text-sm text-text-muted my-12">
-        <span class="h-4 w-4 animate-spin rounded-full border-2 border-bg-border border-t-accent"></span>
+      <!-- Loading / error -->
+      <div id="post-status" class="my-12 flex items-center gap-3 text-sm text-text-muted">
+        <span class="h-4 w-4 animate-spin rounded-full border-2 border-bg-border border-t-accent"
+        ></span>
         <span id="post-status-text">{t('blog.loading')}</span>
       </div>
 
-      <!-- Post content container -->
+      <!-- Content (filled in by blog.ts) -->
       <div id="post-content-container" class="hidden">
-        <!-- Article header -->
         <header class="mb-8">
-          <div class="flex items-center gap-3 mb-3">
-            <span class="font-mono text-xs text-text-muted" id="post-date"></span>
-            <span class="pill" style="text-transform: uppercase; font-family: 'JetBrains Mono', monospace; font-size: 10px;">EN</span>
+          <div class="mb-3 flex items-center gap-3">
+            <time id="post-date" class="font-mono text-xs text-text-muted"></time>
+            <span
+              class="rounded border border-bg-border px-1.5 py-0.5 font-mono text-[10px] uppercase text-text-faint"
+              >EN</span
+            >
           </div>
-          <h1 id="post-title" class="text-3xl sm:text-4xl font-bold leading-tight text-text-title mb-4"></h1>
-          <p id="post-summary" class="text-base text-text-muted border-l-2 border-accent pl-4 italic"></p>
+          <h1
+            id="post-title"
+            class="mb-4 text-3xl font-bold leading-tight text-text-title sm:text-4xl"
+          >
+          </h1>
+          <p
+            id="post-summary"
+            class="border-l-2 border-accent pl-4 text-base italic text-text-muted"
+          >
+          </p>
         </header>
 
-        <!-- Cover Image -->
         <div id="post-cover-wrapper" class="mb-10 hidden">
-          <img id="post-cover" src="" alt="" class="w-full h-auto max-h-[400px] object-cover rounded-xl border border-bg-border" />
+          <img
+            id="post-cover"
+            src=""
+            alt=""
+            class="max-h-[400px] w-full rounded-xl border border-bg-border object-cover"
+          />
         </div>
 
-        <!-- Article Body -->
-        <div id="post-body" class="prose prose-invert max-w-none text-text-base leading-relaxed space-y-4">
-        </div>
+        <div id="post-body" class="prose max-w-none leading-relaxed text-text"></div>
       </div>
     </div>
   </article>
+
+  <!--
+    Placeholder for the article's structured data. Deliberately empty; blog.ts
+    fills it in. This existing <script> is reused instead of creating a new one
+    because CSP is only evaluated when an element enters the document: a
+    <script> inserted later from JavaScript would be blocked for not carrying a
+    hash in the policy.
+  -->
+  <script type="application/ld+json" id="post-jsonld" is:inline>{}</script>
 </BaseLayout>
 
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    loadPost();
-  });
-
-  async function loadPost() {
-    const status = document.getElementById('post-status');
-    const statusText = document.getElementById('post-status-text');
-    const container = document.getElementById('post-content-container');
-
-    const titleEl = document.getElementById('post-title');
-    const summaryEl = document.getElementById('post-summary');
-    const dateEl = document.getElementById('post-date');
-    const coverEl = document.getElementById('post-cover') as HTMLImageElement;
-    const coverWrap = document.getElementById('post-cover-wrapper');
-    const bodyEl = document.getElementById('post-body');
-
-    const params = new URLSearchParams(window.location.search);
-    const slug = params.get('slug') || '';
-
-    if (!slug) {
-      showError('Missing slug parameter in URL.');
-      return;
-    }
-
-    const wrapper = document.getElementById('post-detail-wrapper');
-    const apiUrl = wrapper ? wrapper.getAttribute('data-api') || '' : '';
-
-    try {
-      const res = await fetch(`${apiUrl}?slug=${encodeURIComponent(slug)}`);
-      if (!res.ok) {
-        if (res.status === 404) {
-          throw new Error('The requested article does not exist or has not been published yet.');
-        }
-        throw new Error('Could not load the article.');
-      }
-      
-      const post = await res.json();
-
-      document.title = `${post.title} | Blog | Eduardo Olivares`;
-      const descMeta = document.querySelector('meta[name="description"]');
-      if (descMeta) descMeta.setAttribute('content', post.summary);
-
-      if (titleEl) titleEl.textContent = post.title;
-      if (summaryEl) summaryEl.textContent = post.summary;
-      
-      if (dateEl && post.created_at) {
-        const d = new Date(post.created_at.replace(' ', 'T'));
-        dateEl.textContent = d.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
-      }
-
-      if (post.cover_url) {
-        if (coverEl) coverEl.src = post.cover_url;
-        if (coverWrap) coverWrap.classList.remove('hidden');
-      }
-
-      if (bodyEl) {
-        bodyEl.innerHTML = post.content;
-      }
-
-      if (status) status.classList.add('hidden');
-      if (container) container.classList.remove('hidden');
-
-    } catch (e: any) {
-      showError(e.message || 'Error loading the article.');
-    }
-  }
-
-  function showError(msg: string) {
-    const statusText = document.getElementById('post-status-text');
-    const status = document.getElementById('post-status');
-    if (statusText) statusText.textContent = msg;
-    const spinner = status?.querySelector('.animate-spin');
-    if (spinner) spinner.classList.add('hidden');
-  }
+  import { initBlogPost } from '../../../scripts/blog';
+  initBlogPost();
 </script>
-
-<style is:global>
-  .prose h2 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin-top: 2rem;
-    margin-bottom: 1rem;
-    color: var(--color-text-title, #f0f3f6);
-  }
-  .prose h3 {
-    font-size: 1.2rem;
-    font-weight: 600;
-    margin-top: 1.5rem;
-    margin-bottom: 0.75rem;
-    color: var(--color-text-title, #f0f3f6);
-  }
-  .prose p {
-    margin-bottom: 1.25rem;
-  }
-  .prose ul, .prose ol {
-    margin-bottom: 1.25rem;
-    padding-left: 1.5rem;
-    list-style-type: unset;
-  }
-  .prose li {
-    margin-bottom: 0.5rem;
-  }
-  .prose code {
-    background: #161b22;
-    padding: 0.2rem 0.4rem;
-    border-radius: 0.25rem;
-    font-family: ui-monospace, monospace;
-    font-size: 0.9em;
-  }
-  .prose pre {
-    background: #161b22;
-    padding: 1rem;
-    border-radius: 0.5rem;
-    overflow-x: auto;
-    margin-bottom: 1.25rem;
-    border: 1px solid rgba(255,255,255,0.05);
-  }
-  .prose pre code {
-    background: transparent;
-    padding: 0;
-  }
-  .prose a {
-    color: var(--color-accent, #10b981);
-    text-decoration: underline;
-  }
-  .prose a:hover {
-    color: var(--color-accent-hover, #059669);
-  }
-</style>

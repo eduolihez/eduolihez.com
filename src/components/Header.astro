@@ -20,7 +20,11 @@ const nav = [
   { href: `${base}#habilidades`, label: t('nav.skills') },
   { href: `${base}#proyectos`, label: t('nav.projects') },
   { href: `${base}#certificaciones`, label: t('nav.certifications') },
-  { href: `${base}blog`, label: t('nav.blog') },
+  // Con la barra final: la web se compila con build.format 'directory', asi
+  // que la pagina real es /blog/. Sin la barra, Apache responde un 301 a
+  // /blog/ en cada clic (un salto de mas) y el enlace interno deja de
+  // coincidir con la canonica que declara la propia pagina.
+  { href: `${base}blog/`, label: t('nav.blog') },
   { href: `${base}#faq`, label: t('nav.faq') },
   { href: `${base}#contacto`, label: t('nav.contact') },
 ];

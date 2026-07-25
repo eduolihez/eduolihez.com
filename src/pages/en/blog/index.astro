@@ -1,9 +1,12 @@
 ---
 /**
  * /en/blog/ — Blog index in English.
- * 
- * Dynamically displays the list of blog posts in English from the PHP API,
- * ensuring immediate updates from the admin dashboard.
+ *
+ * The list is fetched from the PHP API on page load, so anything published in
+ * /admin shows up immediately without rebuilding the site.
+ *
+ * The logic lives in src/scripts/blog.ts, shared with the Spanish and Catalan
+ * versions.
  */
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { useTranslations } from '../../../i18n/utils';
@@ -13,7 +16,8 @@ const lang = 'en';
 const t = useTranslations(lang);
 
 const title = 'Cybersecurity Blog | Eduardo Olivares';
-const description = 'Articles, tutorials, and analysis on cybersecurity, incident response, malware, Blue Team, and Python automation.';
+const description =
+  'Articles, tutorials, and analysis on cybersecurity, incident response, malware, Blue Team, and Python automation.';
 
 const apiUrl = api(`/api/posts.php?lang=${lang}`);
 const alternates = { es: '/blog/', en: '/en/blog/', ca: '/ca/blog/' };
@@ -44,20 +48,22 @@ const alternates = { es: '/blog/', en: '/en/blog/', ca: '/ca/blog/' };
       </div>
 
       <!-- Loading state -->
-      <div id="blog-status" class="flex items-center gap-3 text-sm text-text-muted mb-8">
-        <span class="h-4 w-4 animate-spin rounded-full border-2 border-bg-border border-t-accent"></span>
+      <div id="blog-status" class="mb-8 flex items-center gap-3 text-sm text-text-muted">
+        <span class="h-4 w-4 animate-spin rounded-full border-2 border-bg-border border-t-accent"
+        ></span>
         <span id="blog-status-text">{t('blog.loading')}</span>
       </div>
 
-      <!-- Blog grid -->
+      <!-- Blog grid (filled in by blog.ts) -->
       <div
         id="blog-grid"
-        class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 hidden"
+        class="hidden grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
         data-api={apiUrl}
         data-empty={t('blog.empty')}
         data-error={t('blog.error')}
         data-readmore={t('blog.readMore')}
         data-lang={lang}
+        data-detail="/en/blog/post/"
       >
       </div>
     </div>
@@ -65,85 +71,6 @@ const alternates = { es: '/blog/', en: '/en/blog/', ca: '/ca/blog/' };
 </BaseLayout>
 
 <script>
-  import { initReveal } from '../../../scripts/reveal';
-
-  document.addEventListener('DOMContentLoaded', () => {
-    initBlog();
-  });
-
-  async function initBlog() {
-    const grid = document.getElementById('blog-grid');
-    const status = document.getElementById('blog-status');
-    const statusText = document.getElementById('blog-status-text');
-
-    if (!grid) return;
-
-    const apiUrl = grid.getAttribute('data-api') || '';
-    const emptyMsg = grid.getAttribute('data-empty') || '';
-    const errorMsg = grid.getAttribute('data-error') || '';
-    const readMoreText = grid.getAttribute('data-readmore') || '';
-    const lang = grid.getAttribute('data-lang') || 'en';
-
-    try {
-      const res = await fetch(apiUrl);
-      if (!res.ok) throw new Error();
-      const posts = await res.json();
-
-      if (status) status.classList.add('hidden');
-
-      if (!posts || posts.length === 0) {
-        grid.innerHTML = `<div class="col-span-full py-16 text-center text-text-muted italic">${emptyMsg}</div>`;
-        grid.classList.remove('hidden');
-        return;
-      }
-
-      grid.innerHTML = posts.map(post => {
-        const cover = post.cover_url 
-          ? `<img src="${post.cover_url}" alt="" class="h-48 w-full object-cover transition-transform duration-500 group-hover:scale-105" />`
-          : `<div class="h-48 w-full bg-bg-card border-b border-bg-border flex items-center justify-content-center text-text-muted text-xs font-mono font-bold">NO COVER</div>`;
-
-        const dateStr = post.created_at ? formatBlogDate(post.created_at, lang) : '';
-        const detailUrl = lang === 'es' ? `/blog/post/?slug=${post.slug}` : `/${lang}/blog/post/?slug=${post.slug}`;
-
-        return `
-          <article class="group reveal flex flex-col overflow-hidden rounded-xl border border-bg-border bg-bg-card shadow-sm transition hover:-translate-y-1 hover:border-bg-border-hover hover:shadow-md">
-            <a href="${detailUrl}" class="overflow-hidden block">
-              ${cover}
-            </a>
-            <div class="flex flex-1 flex-col p-5">
-              <span class="mb-2 font-mono text-xs text-text-muted">${dateStr}</span>
-              <h2 class="mb-3 text-lg font-bold leading-snug text-text-title transition group-hover:text-accent">
-                <a href="${detailUrl}">
-                  ${post.title}
-                </a>
-              </h2>
-              <p class="mb-5 text-sm text-text-muted line-clamp-3">${post.summary}</p>
-              <div class="mt-auto">
-                <a href="${detailUrl}" class="inline-flex items-center gap-1 text-sm font-semibold text-accent hover:text-accent-hover transition">
-                  ${readMoreText} &rarr;
-                </a>
-              </div>
-            </div>
-          </article>
-        `;
-      }).join('');
-
-      grid.classList.remove('hidden');
-      initReveal();
-    } catch (e) {
-      if (statusText) statusText.textContent = errorMsg;
-      const spinner = status?.querySelector('.animate-spin');
-      if (spinner) spinner.classList.add('hidden');
-    }
-  }
-
-  function formatBlogDate(dateStr: string, lang: string): string {
-    try {
-      const d = new Date(dateStr.replace(' ', 'T'));
-      const locale = lang === 'en' ? 'en-US' : lang === 'ca' ? 'ca-ES' : 'es-ES';
-      return d.toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' });
-    } catch(e) {
-      return dateStr;
-    }
-  }
+  import { initBlogList } from '../../../scripts/blog';
+  initBlogList();
 </script>

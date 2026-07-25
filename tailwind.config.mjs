@@ -12,6 +12,7 @@ export default {
           soft: '#0f141c', // fondo de secciones alternas
           card: '#141a24', // tarjetas
           border: '#1f2733', // bordes sutiles
+          'border-hover': '#2b3543', // borde al pasar el raton por una tarjeta
         },
         accent: {
           DEFAULT: '#4ade80', // verde principal (CTA, enlaces)
@@ -21,6 +22,7 @@ export default {
         },
         text: {
           DEFAULT: '#e6edf3', // texto principal
+          title: '#f0f3f6', // titulares (un punto por encima del cuerpo)
           muted: '#9aa7b8', // texto secundario
           faint: '#6b7688', // texto terciario / metadatos
         },

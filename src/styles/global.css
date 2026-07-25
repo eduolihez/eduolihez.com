@@ -244,3 +244,76 @@
     color: #000 !important;
   }
 }
+
+/* ===========================================================================
+   Contenido de un articulo del blog (#post-body).
+
+   El cuerpo llega como HTML desde el panel, asi que las etiquetas que se
+   escriben ahi (h2, listas, pre, code...) no llevan clases de Tailwind y sin
+   estas reglas saldrian sin ningun formato. Estaba repetido con <style
+   is:global> en las tres paginas de detalle; aqui esta una sola vez.
+   =========================================================================== */
+.prose h2 {
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: theme('colors.text.title');
+}
+.prose h3 {
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: theme('colors.text.title');
+}
+.prose p {
+  margin-bottom: 1.25rem;
+}
+.prose ul,
+.prose ol {
+  margin-bottom: 1.25rem;
+  padding-left: 1.5rem;
+  list-style: revert;
+}
+.prose li {
+  margin-bottom: 0.5rem;
+}
+.prose img {
+  height: auto;
+  max-width: 100%;
+  border-radius: 0.5rem;
+}
+.prose code {
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.25rem;
+  background: theme('colors.bg.card');
+  font-family: theme('fontFamily.mono');
+  font-size: 0.9em;
+}
+.prose pre {
+  margin-bottom: 1.25rem;
+  overflow-x: auto;
+  padding: 1rem;
+  border: 1px solid theme('colors.bg.border');
+  border-radius: 0.5rem;
+  background: theme('colors.bg.card');
+}
+.prose pre code {
+  padding: 0;
+  background: transparent;
+}
+.prose a {
+  color: theme('colors.accent.DEFAULT');
+  text-decoration: underline;
+}
+.prose a:hover {
+  color: theme('colors.accent.hover');
+}
+.prose blockquote {
+  margin-bottom: 1.25rem;
+  padding-left: 1rem;
+  border-left: 2px solid theme('colors.bg.border');
+  color: theme('colors.text.muted');
+  font-style: italic;
+}

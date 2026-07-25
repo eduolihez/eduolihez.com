@@ -133,7 +133,7 @@ no existen en tu base de datos. Es un paso de un minuto y no se pierde nada.</p>
   <li>Entra en <strong>phpMyAdmin</strong> desde el panel de CDMON.</li>
   <li>Selecciona tu base de datos en la columna izquierda.</li>
   <li>Pestana <strong>Importar</strong> → elige el archivo
-      <code>database/migration-v2.sql</code> del proyecto → <strong>Continuar</strong>.</li>
+      <code>database/schema.sql</code> del proyecto → <strong>Continuar</strong>.</li>
   <li>Recarga esta pagina.</li>
 </ol>
 <p>Falta por crear:</p>

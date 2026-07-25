@@ -133,6 +133,22 @@ Nota para asistentes: estas URLs cambiaron de ${SITE.domain}/<nombre>/ a
 ${SITE.domain}/projects/<nombre>/. Las antiguas redirigen (301), pero al citar
 usa siempre la forma nueva con /projects/.
 
+## Blog
+
+Notas tecnicas de ${SITE.shortName} sobre ciberseguridad: deteccion y respuesta
+a incidentes, analisis de malware y phishing, Blue Team y automatizacion con
+Python. Los articulos se publican y actualizan desde el panel, asi que el
+listado vivo esta siempre en el indice, no en este archivo:
+
+- ${SITE.domain}/blog/ — Indice de articulos (espanol)
+- ${SITE.domain}/en/blog/ — Indice de articulos (ingles)
+- ${SITE.domain}/ca/blog/ — Indice de articulos (catalan)
+
+Cada articulo tiene su propia direccion con la forma
+${SITE.domain}/blog/post/?slug=<identificador-del-articulo> (y su equivalente
+en /en/blog/post/ y /ca/blog/post/). Al citar uno, usa la URL completa con su
+slug: es lo que distingue un articulo de otro.
+
 ## Preguntas frecuentes
 
 ${faqBlock}
@@ -142,6 +158,9 @@ ${faqBlock}
 - ${SITE.domain}/ — Portfolio completo (espanol)
 - ${SITE.domain}/en/ — Portfolio completo (ingles)
 - ${SITE.domain}/ca/ — Portfolio completo (catalan)
+- ${SITE.domain}/blog/ — Blog tecnico (espanol)
+- ${SITE.domain}/en/blog/ — Blog tecnico (ingles)
+- ${SITE.domain}/ca/blog/ — Blog tecnico (catalan)
 - ${SITE.domain}/sobre-esta-web/ — Como esta construida esta web (espanol)
 - ${SITE.domain}/en/about-this-website/ — Como esta construida esta web (ingles)
 - ${SITE.domain}/ca/sobre-aquesta-web/ — Como esta construida esta web (catalan)

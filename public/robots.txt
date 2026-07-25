@@ -82,8 +82,12 @@ User-agent: Google-Extended
 Allow: /
 
 # Microsoft Copilot
-User-agent: bingbot
-Allow: /
+# No lleva grupo propio a proposito: Copilot rastrea con Bingbot, que ya tiene
+# el suyo mas arriba. Repetirlo aqui en minusculas creaba DOS grupos para el
+# mismo rastreador (el nombre no distingue mayusculas), y entonces cada parser
+# decide por su cuenta si los fusiona o se queda con el ultimo: el segundo
+# grupo era solo "Allow: /", asi que Bing podia acabar sin las reglas que
+# tapan /admin/ y /api/.
 
 # Apple Intelligence
 User-agent: Applebot

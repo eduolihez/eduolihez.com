@@ -30,6 +30,17 @@ const translatedGroups: { paths: Record<'es' | 'en' | 'ca', string>; priority: s
     priority: '1.0',
   },
   {
+    // Indice del blog. Es la puerta de entrada a los articulos: la lista se
+    // pinta desde el API, asi que estos son los enlaces por los que un
+    // rastreador llega a cada /blog/post/?slug=...
+    //
+    // La ficha de cada articulo NO va en el sitemap: los articulos se crean
+    // desde el panel y no existen en tiempo de compilacion, asi que no se
+    // pueden enumerar aqui sin inventarse URLs.
+    paths: { es: '/blog/', en: '/en/blog/', ca: '/ca/blog/' },
+    priority: '0.7',
+  },
+  {
     // "Sobre esta web": faltaba por completo en el sitemap anterior.
     paths: {
       es: '/sobre-esta-web/',

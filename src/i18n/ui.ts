@@ -121,6 +121,8 @@ export const ui = {
     'blog.loading': 'Cargando artículos...',
     'blog.error': 'No se pudieron cargar los artículos.',
     'blog.publishedAt': 'Publicado el',
+    'blog.notFound': 'El artículo solicitado no existe o aún no se ha publicado.',
+    'blog.noSlug': 'Falta indicar qué artículo quieres leer.',
   },
 
   en: {
@@ -222,6 +224,8 @@ export const ui = {
     'blog.loading': 'Loading articles...',
     'blog.error': 'Could not load articles.',
     'blog.publishedAt': 'Published on',
+    'blog.notFound': 'The requested article does not exist or has not been published yet.',
+    'blog.noSlug': 'No article was specified.',
   },
 
   ca: {
@@ -323,6 +327,8 @@ export const ui = {
     'blog.loading': 'Carregant articles...',
     'blog.error': 'No s’han pogut carregar els articles.',
     'blog.publishedAt': 'Publicat el',
+    'blog.notFound': 'L’article sol·licitat no existeix o encara no s’ha publicat.',
+    'blog.noSlug': 'Falta indicar quin article vols llegir.',
   },
 } as const;
 

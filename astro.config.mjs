@@ -27,7 +27,7 @@ export default defineConfig({
   // CSP estricta: Astro calcula automaticamente los hashes de los scripts
   // (en linea y externos) en cada build y genera la <meta> CSP. Asi tenemos
   // script-src sin 'unsafe-inline' sin mantener hashes a mano (S6).
-  experimental: {
+  security: {
     csp: {
       directives: [
         "default-src 'self'",

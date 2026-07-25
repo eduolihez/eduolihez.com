@@ -28,27 +28,35 @@
   # -------------------------------------------------------------------------
   # Proyectos: estructura ANTIGUA -> NUEVA  (301 permanente)
   #
-  # Hasta la reorganizacion, cada proyecto colgaba de la raiz (/badaveu/,
-  # /fluence/...). Ahora viven en /projects/<nombre>/. Sin estas redirecciones
+  # Hasta la reorganizacion, cada proyecto colgaba de la raiz (/fluence/,
+  # /zeora/...). Ahora viven en /projects/<nombre>/. Sin estas redirecciones
   # cualquier enlace antiguo daria 404: y algunos NO se pueden cambiar, como
   # la URL de politica de privacidad que figura en la ficha de las extensiones
   # de Chrome (PromptMaster, Password Sentinel) o los enlaces ya compartidos.
   #
   # El 301 traslada ademas el posicionamiento acumulado a la URL nueva.
   # -------------------------------------------------------------------------
-  RewriteRule ^(badaveu|fluence|followguard|mesbadalona|passwdcentinel|promptmaster|zeora)(/.*)?$ /projects/$1$2 [L,R=301]
-
-  # -------------------------------------------------------------------------
-  # Mes Badalona -> BadaVeu  (cambio de marca)
-  #
-  # /projects/mesbadalona/ solo contiene una pagina-puente que avisa del
-  # cambio de nombre. Un 301 de verdad es mejor que esa pagina: traslada a
-  # BadaVeu el posicionamiento que tuviera la marca antigua, en vez de
-  # dejarlo atrapado en una pagina intermedia sin contenido propio.
-  # El HTML se conserva como respaldo por si estas reglas no se aplicaran.
-  # -------------------------------------------------------------------------
-  RewriteRule ^projects/mesbadalona(/.*)?$ /projects/badaveu/ [L,R=301]
+  RewriteRule ^(fluence|followguard|passwdcentinel|promptmaster|zeora)(/.*)?$ /projects/$1$2 [L,R=301]
 </IfModule>
+
+# ---------------------------------------------------------------------------
+# BadaVeu y Mes Badalona: RETIRADOS
+#
+# Ambos proyectos se han eliminado del sitio. Sus URLs estaban indexadas, asi
+# que responden 410 Gone en vez de 404: el 410 le dice a Google que el
+# contenido se ha retirado a proposito y de forma permanente, y lo saca del
+# indice bastante mas rapido que un 404, que interpreta como algo que podria
+# volver.
+#
+# Cubre tanto la ruta antigua (/badaveu/) como la nueva (/projects/badaveu/).
+# Va FUERA del bloque mod_rewrite: Redirect no necesita ese modulo.
+# ---------------------------------------------------------------------------
+RedirectMatch 410 ^/(projects/)?badaveu(/.*)?$
+RedirectMatch 410 ^/(projects/)?mesbadalona(/.*)?$
+
+# Pagina propia para el 410, para que el visitante no vea la de Apache.
+# Con build.format 'directory', Astro la compila a /410/index.html.
+ErrorDocument 410 /410/index.html
 
 # --- Paginas de error personalizadas ---
 ErrorDocument 400 /400/index.html

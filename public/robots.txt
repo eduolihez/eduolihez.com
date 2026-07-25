@@ -15,15 +15,8 @@ Disallow: /admin/
 Disallow: /api/
 Disallow: /uploads/*.php$
 
-# Las webs de /projects/ SI se rastrean, pero cada aplicacion tiene sus propias
-# zonas privadas. "Disallow: /api/" solo tapa la raiz, no estas rutas: hay que
-# nombrarlas uno a uno porque la coincidencia es por prefijo.
-Disallow: /projects/badaveu/api/
-Disallow: /projects/badaveu/config/
-Disallow: /projects/badaveu/uploads/
-Disallow: /projects/badaveu/admin.html
-Disallow: /projects/badaveu/incident.html
-Disallow: /projects/badaveu/offline.html
+# Las webs de /projects/ SI se rastrean, salvo las paginas sin valor de
+# busqueda. La coincidencia es por prefijo, asi que hay que nombrarlas.
 Disallow: /projects/promptmaster/uninstall.html
 # Plantillas de demostracion de Zeora: negocios ficticios, no son contenido
 # real del portfolio y no deben competir en Google.
@@ -37,10 +30,6 @@ User-agent: Googlebot
 Allow: /
 Disallow: /admin/
 Disallow: /api/
-Disallow: /projects/badaveu/api/
-Disallow: /projects/badaveu/config/
-Disallow: /projects/badaveu/uploads/
-Disallow: /projects/badaveu/admin.html
 Disallow: /projects/zeora/templates/
 
 User-agent: Googlebot-Image
@@ -50,9 +39,6 @@ User-agent: Bingbot
 Allow: /
 Disallow: /admin/
 Disallow: /api/
-Disallow: /projects/badaveu/api/
-Disallow: /projects/badaveu/config/
-Disallow: /projects/badaveu/admin.html
 Disallow: /projects/zeora/templates/
 
 User-agent: DuckDuckBot

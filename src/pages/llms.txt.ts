@@ -111,11 +111,6 @@ Indice de todos ellos: ${SITE.domain}/projects/
 Estos son los proyectos con web propia publicada. Son desarrollos reales de
 ${SITE.shortName}, no encargos de terceros:
 
-- **BadaVeu** — ${SITE.domain}/projects/badaveu/
-  Plataforma civica para reportar y gestionar incidencias urbanas en Badalona.
-  PWA con API Open311, panel municipal y estadisticas en tiempo real.
-  Stack: PHP, MySQL, JavaScript, Leaflet. Idioma: catalan.
-
 - **Fluence** — ${SITE.domain}/projects/fluence/
   Asistente de crecimiento organico en Instagram, de escritorio. Procesado
   local, sin servidores propios: los datos no salen del equipo del usuario.

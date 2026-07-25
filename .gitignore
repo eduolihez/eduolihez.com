@@ -18,8 +18,6 @@ pnpm-debug.log*
 .env.*
 !.env.example
 server/config.php
-public/projects/badaveu/.env
-public/projects/badaveu/config/db.php
 
 # Copias sueltas de credenciales en la RAIZ del repo.
 # Las reglas de arriba son rutas exactas: una copia de db.php o config.php en
@@ -34,8 +32,6 @@ public/projects/badaveu/config/db.php
 server/uploads/*
 !server/uploads/.htaccess
 !server/uploads/index.html
-public/projects/badaveu/uploads/*
-!public/projects/badaveu/uploads/.htaccess
 
 # editor / OS
 .vscode/

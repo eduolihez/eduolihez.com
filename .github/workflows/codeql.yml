@@ -61,9 +61,9 @@ jobs:
           category: "/language:${{ matrix.language }}"
 
   # ---------------------------------------------------------------------------
-  # PHP: todo el backend (panel de administracion, API y BadaVeu) esta en PHP,
-  # que es justo la parte con acceso a la base de datos y a las subidas de
-  # archivos. Como CodeQL no lo analiza, se usa Semgrep, que si tiene reglas
+  # PHP: todo el backend (panel de administracion y API, en server/) esta en
+  # PHP, que es justo la parte con acceso a la base de datos y a las subidas
+  # de archivos. Como CodeQL no lo analiza, se usa Semgrep, que si tiene reglas
   # de seguridad para PHP y exporta SARIF, asi que los hallazgos aparecen en
   # la misma pestana "Security > Code scanning" que los de CodeQL.
   #

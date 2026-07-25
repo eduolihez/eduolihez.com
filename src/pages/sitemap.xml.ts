@@ -43,25 +43,15 @@ const translatedGroups: { paths: Record<'es' | 'en' | 'ca', string>; priority: s
 /**
  * Paginas de proyecto publicadas bajo /projects/.
  *
- * SOLO van URLs canonicas e indexables. Quedan fuera a proposito:
- *  - admin.html, incident.html, offline.html, uninstall.html y las plantillas
- *    de Zeora: marcadas noindex.
- *  - incidents.html y stats.html: vistas de la aplicacion que se rellenan por
- *    JavaScript desde el API. Para un rastreador son paginas casi vacias, asi
- *    que estan en noindex; enviarlas seria pedir que indexe contenido pobre.
- *  - landing.html: su canonical apunta a /projects/badaveu/, y el sitemap solo
- *    debe listar URLs canonicas.
- *  - mesbadalona: era solo una pagina-puente de cambio de marca; ahora
- *    redirige (301) a BadaVeu desde el .htaccess.
+ * SOLO van URLs canonicas e indexables. Quedan fuera a proposito
+ * uninstall.html y las plantillas de demostracion de Zeora, marcadas noindex.
+ *
+ * BadaVeu y Mes Badalona se retiraron del sitio: sus URLs responden 410 Gone
+ * desde el .htaccess.
  */
 const projectPages: { path: string; priority: string }[] = [
   // Indice de proyectos: concentrador de enlaces hacia los seis.
   { path: '/projects/', priority: '0.7' },
-  { path: '/projects/badaveu/', priority: '0.8' },
-  // about.html incluye la guia entera como pestana, asi que guia.html era un
-  // subconjunto exacto suyo: dos paginas indexables compitiendo por las
-  // mismas busquedas. guia.html pasa a noindex y solo se envia about.html.
-  { path: '/projects/badaveu/about.html', priority: '0.5' },
   { path: '/projects/fluence/', priority: '0.8' },
   { path: '/projects/fluence/privacy.html', priority: '0.3' },
   { path: '/projects/fluence/terms.html', priority: '0.3' },

@@ -38,3 +38,8 @@ public/projects/badaveu/uploads/*
 .DS_Store
 Thumbs.db
 
+# setup documentation (guias locales)
+DEPLOY.md
+GUIA.md
+SEO.md
+CLOUDFLARE.md

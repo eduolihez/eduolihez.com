@@ -1,161 +1,44 @@
-# Portfolio — Eduardo Olivares Hernández
+# Eduardo Olivares Hernández - Portfolio Profesional
 
-Portfolio profesional trilingüe (ES/EN/CA) orientado a reclutadores de ciberseguridad.
-Diseño oscuro, minimalista y rápido, pensado para **hosting compartido CDMON**
-(archivos estáticos + PHP/MySQL, sin Node en producción).
+Este repositorio contiene el código fuente de mi sitio web y portfolio profesional de ciberseguridad y sistemas, accesible públicamente en [eduolihez.com](https://eduolihez.com).
 
-> 👉 **¿Empiezas de cero? Sigue la guía paso a paso: [GUIA.md](GUIA.md)** — cubre
-> todo, desde instalarlo en tu ordenador hasta dejarlo online y gestionarlo.
+El sitio web está diseñado con un enfoque moderno, minimalista y de alto rendimiento, optimizado para ser rápido, seguro y adaptado a dispositivos móviles.
 
-## 🧱 Stack
+## 🧱 Arquitectura y Stack Tecnológico
 
-| Capa | Tecnología |
-|---|---|
-| Frontend | **Astro 5** (salida 100% estática) + **Tailwind CSS** + TypeScript |
-| Idiomas | i18n nativo — ES en `/`, EN en `/en/`, **CA** en `/ca/` |
-| Backend | **PHP 8** (procedural, PDO) + **MySQL/MariaDB** |
-| Contacto | PHP + MySQL con **respaldo Formspree** |
-| Analítica | Propia (tabla `visits`, IP hasheada, sin cookies ni terceros) |
-| Panel admin | PHP con login por sesión: contenido, buzón, analítica, seguridad, backup |
-| SEO | Schema.org (Person/ProfilePage/FAQPage), `hreflang`, sitemap generado, `llms.txt` |
+El proyecto está estructurado en dos partes principales, garantizando una separación limpia entre la presentación estática y la administración de contenidos:
 
-## 📂 Estructura
+### Frontend
+- **Astro 5**: Generación de sitio estático (SSG), lo que permite que las páginas web se carguen casi instantáneamente al no depender de ejecución en el servidor para las vistas principales.
+- **Tailwind CSS**: Estilos responsivos con un diseño oscuro pulido y moderno adaptado a la temática de ciberseguridad.
+- **TypeScript & JavaScript (Vanilla)**: Lógica interactiva en cliente (animaciones de entrada, filtrado dinámico de contenido, etc.).
+- **Soporte Trilingüe nativo**: Traducción completa al español (`/`), inglés (`/en/`) y catalán (`/ca/`).
 
-```
-NewPortfolio/
-├─ src/                       # Frontend Astro
-│  ├─ components/             # Hero, Experience, Projects, Certifications, Faq, Contact...
-│  ├─ data/
-│  │  ├─ experience.ts        # Experiencia (estática, se edita aquí)
-│  │  ├─ skills.ts            # Habilidades por categoría
-│  │  └─ faq.ts               # FAQ → sección visible + Schema.org + llms.txt
-│  ├─ i18n/                   # Traducciones ES/EN/CA
-│  ├─ layouts/                # BaseLayout (head, SEO, header, footer)
-│  ├─ pages/
-│  │  ├─ index.astro          # ES · en/ · ca/ · 400 · 403 · 404 · 500
-│  │  ├─ llms.txt.ts          # Resumen para IAs (generado al compilar)
-│  │  └─ sitemap.xml.ts       # Sitemap con hreflang y lastmod (generado)
-│  ├─ styles/global.css       # Tokens + estilos base
-│  └─ config.ts               # ⚙️ Datos personales, ubicación, enlaces, endpoints
-├─ public/                    # Imágenes, CV, favicon, robots.txt, humans.txt
-├─ server/                    # Backend PHP (se sube al hosting)
-│  ├─ config.example.php      # → copiar a config.php con tus credenciales
-│  ├─ db.php                  # Conexión PDO
-│  ├─ lib/
-│  │  ├─ bootstrap.php        # Arranque: errores, ajustes, auditoría
-│  │  ├─ http.php             # Helpers del API
-│  │  ├─ ua.php               # Navegador / SO / bots / países
-│  │  └─ upload.php           # Subida validada de imágenes
-│  ├─ api/                    # projects · certifications · contact · visit · settings
-│  ├─ admin/                  # Panel: contenido, mensajes, analítica, seguridad, backup
-│  └─ .htaccess               # → va a la raíz del hosting
-├─ database/
-│  ├─ schema.sql              # Tablas + datos de ejemplo (instalación nueva)
-│  └─ migration-v2.sql        # ⚠️ Actualización para bases de datos ya existentes
-├─ DEPLOY.md                  # 👉 Guía paso a paso para subir a CDMON
-├─ SEO.md                     # 🔎 Qué hace la web sola y qué tienes que hacer tú
-└─ CLOUDFLARE.md              # ☁️ CDN, WAF, IP real, Turnstile
-```
+### Backend (Gestión interna)
+- **PHP 8 (PDO)**: Un panel de administración propio (`/admin`) desarrollado a medida para gestionar el contenido dinámico del portfolio (proyectos, certificaciones), gestionar mensajes recibidos y monitorizar las analíticas del sitio.
+- **Base de Datos MySQL / MariaDB**: Almacenamiento estructurado del contenido dinámico y logs de seguridad.
+- **Formspree**: Sistema de contacto seguro de respaldo para recepción de emails.
+- **Analítica de Privacidad**: Analíticas integradas propias que registran visitas generales hasheando la dirección IP (GDPR friendly), evitando el uso de cookies de seguimiento o scripts de terceros (como Google Analytics).
 
-## 🚀 Desarrollo local
+## 📂 Estructura del Repositorio
 
-```bash
-npm install
-npm run dev      # http://localhost:4321
-```
+- `src/`: Componentes, layouts, datos estáticos y lógica de internacionalización de la aplicación web en Astro.
+- `public/`: Recursos estáticos de la web, imágenes, favicons y archivos de soporte.
+- `server/`: Backend en PHP que contiene la API para cargar datos dinámicamente y el panel de administración seguro `/admin`.
+- `database/`: Esquemas SQL para la base de datos MySQL (estructura y migraciones).
+- `LICENSE`: Licencia MIT del proyecto.
 
-> En local **no hay PHP**, así que Proyectos/Certificaciones mostrarán su mensaje
-> de error y el formulario usará el respaldo Formspree. Es lo esperado.
-> Para probar el backend completo necesitas PHP+MySQL (ver DEPLOY.md) o
-> [Laragon](https://laragon.org/)/XAMPP en local.
+## 🔒 Características de Seguridad
 
-## 🏗️ Compilar para producción
+El backend incluye medidas de seguridad avanzadas e integradas para garantizar la integridad del sitio:
+- **Protección contra Fuerza Bruta**: Bloqueo automático de logins fallidos de forma temporal.
+- **CSRF (Cross-Site Request Forgery)**: Implementación de tokens de seguridad en todas las solicitudes del panel de administración.
+- **Seguridad en Base de Datos**: Uso estricto de consultas preparadas (PDO) contra ataques de Inyección SQL.
+- **Seguridad de Archivos Subidos**: Validación exhaustiva de subida de imágenes (comprobación de MIME reales, dimensiones máximas, y deshabilitación de ejecución en directorios de subida).
+- **Cabeceras de Seguridad y CSP**: Content Security Policy estricta y cabeceras configuradas mediante `.htaccess`.
 
-```bash
-npm run build    # genera la carpeta dist/
-```
+## 💼 Perfil Profesional
+Soy analista de seguridad orientado a operaciones del Blue Team (análisis de logs, detección de amenazas, respuesta a incidentes y automatización). Puedes encontrar más información detallada y contactar conmigo a través de mi sitio web o en mi perfil de LinkedIn.
 
-Sube el contenido de `dist/` + la carpeta `server/` a tu hosting CDMON.
-**Todos los pasos detallados están en [DEPLOY.md](DEPLOY.md).**
-
-## ✏️ Tareas de mantenimiento habituales
-
-### Sin recompilar (desde `/admin`, se ve al recargar la web)
-
-| Quiero... | Dónde |
-|---|---|
-| Añadir/editar proyectos y certificaciones | Proyectos · Certificaciones |
-| Publicar, destacar, reordenar o duplicar | Botones de la propia lista |
-| Activar/desactivar "Disponible para trabajar" | Ajustes |
-| Encender/apagar el formulario de contacto | Ajustes |
-| Encender/apagar el registro de visitas | Ajustes |
-| Poner un aviso en la franja superior (ES/EN/CA) | Ajustes |
-| Leer, buscar, archivar y exportar mensajes | Mensajes |
-| Ver visitas, canales, navegadores, países, bots | Analítica |
-| Cambiar contraseña, ver accesos, desbloquear IPs | Seguridad |
-| Descargar o restaurar una copia de seguridad | Backup |
-
-### Recompilando (`npm run build` + subir `dist/`)
-
-| Quiero... | Dónde |
-|---|---|
-| Cambiar textos fijos (menú, botones...) | `src/i18n/ui.ts` (ES/EN/CA) |
-| Editar mi experiencia | `src/data/experience.ts` |
-| Editar mis habilidades (skills) | `src/data/skills.ts` |
-| Editar las preguntas frecuentes | `src/data/faq.ts` (afecta a web + SEO + IAs) |
-| Cambiar foto, CV, ubicación, enlaces | `src/config.ts` |
-| Cambiar títulos/descripciones de SEO | `src/pages/index.astro`, `en/`, `ca/` |
-| Regenerar iconos/favicon | `npm run icons` |
-
-## 🔒 Seguridad incluida
-
-- Contraseñas con `password_hash()` (bcrypt) + rehash automático; sesiones
-  seguras (HttpOnly, SameSite, `use_strict_mode`) con **caducidad** por
-  inactividad y absoluta.
-- **Bloqueo por fuerza bruta** en el login, con desbloqueo manual desde el panel.
-- **CSRF** en todo el panel, incluido el logout (que además es POST).
-- Consultas **preparadas** (PDO, sin emulación) → sin inyección SQL.
-- **CSP estricta** con hashes automáticos (sin `unsafe-inline` en scripts).
-- Escapado anti-XSS en el panel; render seguro + saneo de URLs en el frontend.
-- **Subida de imágenes** doblemente validada (MIME real + `getimagesize` + tope
-  de dimensiones) y carpeta `uploads/` sin ejecución de código.
-- **Exportaciones CSV** protegidas contra inyección de fórmulas en Excel.
-- Correo de contacto a prueba de **inyección de cabeceras**.
-- **IP real segura** por defecto (no se fía de cabeceras falsificables salvo con
-  Cloudflare); IPs de analítica **hasheadas** (RGPD-friendly, sin cookies).
-- Errores **nunca visibles** en producción (solo al log del hosting).
-- **Registro de auditoría**: cada cambio del panel queda anotado con usuario,
-  IP y fecha.
-- HSTS, `nosniff`, `X-Frame-Options`, `Referrer-Policy` y `X-Robots-Tag` en el
-  `.htaccess`; `.well-known/security.txt` (RFC 9116).
-
-Guía de Cloudflare (CDN, WAF, país del visitante, Turnstile): [CLOUDFLARE.md](CLOUDFLARE.md).
-
-## 🔎 SEO y visibilidad en IAs
-
-Datos estructurados de Schema.org (`Person`, `WebSite`, `ProfilePage`,
-`FAQPage`, `BreadcrumbList`) enlazados en un solo grafo, `hreflang` completo,
-señales geográficas de Badalona/Barcelona, sitemap generado con `lastmod`,
-FAQ visible y **`/llms.txt`** para que ChatGPT, Claude o Perplexity puedan
-responder con precisión sobre ti.
-
-**Lo que hace la web sola y lo que tienes que hacer tú: [SEO.md](SEO.md).**
-
-## 📌 Antes de publicar (checklist rápida)
-
-- [ ] Poner foto en `public/img/eduardo.webp` y una portada `og-cover.png` (1200×630).
-- [ ] `npm run icons` (genera favicon y iconos PWA).
-- [ ] Poner los CV en `public/cv/` (ES, EN y CA).
-- [ ] Revisar dominio en `src/config.ts` y `astro.config.mjs`.
-- [ ] `npm run build`.
-- [ ] Seguir [DEPLOY.md](DEPLOY.md): subir archivos, crear DB, `config.php`, permisos de `uploads/`, crear admin.
-- [ ] **Borrar `server/admin/setup.php`** tras crear tu usuario.
-- [ ] Revisar **Panel → Seguridad**: la tabla de comprobación debe salir en verde.
-- [ ] (Opcional) Configurar Cloudflare y Turnstile → [CLOUDFLARE.md](CLOUDFLARE.md).
-- [ ] Enviar el sitemap a Google y Bing → [SEO.md](SEO.md).
-
-## 🔄 ¿Ya lo tienes publicado y vas a actualizar?
-
-Aplica **`database/migration-v2.sql`** desde phpMyAdmin *antes* de subir los
-archivos nuevos. Pasos completos en
-[DEPLOY.md → Actualizar una web ya publicada](DEPLOY.md#-actualizar-una-web-ya-publicada-v2).
+---
+Licencia del código fuente: [MIT License](LICENSE).

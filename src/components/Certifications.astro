@@ -20,6 +20,8 @@ const labels = {
   error: t('certs.error'),
   empty: t('certs.empty'),
   countLabel: t('certs.count.label'),
+  showMore: lang === 'es' ? 'Mostrar {count} más' : lang === 'ca' ? 'Mostra {count} més' : 'Show {count} more',
+  showLess: lang === 'es' ? 'Ocultar' : lang === 'ca' ? 'Amaga' : 'Hide',
 };
 ---
 
@@ -146,7 +148,7 @@ const labels = {
       }
     }
 
-    function makeCard(c) {
+    function makeSingleCard(c) {
       const href = safeUrl(c.credential_url);
       const wrap = href ? document.createElement('a') : document.createElement('div');
       wrap.className =
@@ -198,6 +200,158 @@ const labels = {
       return wrap;
     }
 
+    function makeListItem(c) {
+      const href = safeUrl(c.credential_url);
+      const item = href ? document.createElement('a') : document.createElement('div');
+      item.className = 'group/item flex items-center justify-between gap-2 rounded-md bg-bg-soft/30 px-3 py-2 text-xs border border-bg-border/20 transition-all hover:bg-bg-soft/60 hover:border-bg-border/60 hover:text-accent w-full min-w-0';
+      if (href) {
+        item.href = href;
+        item.target = '_blank';
+        item.rel = 'noopener noreferrer';
+      }
+
+      const certName = document.createElement('span');
+      certName.className = 'truncate font-medium text-text group-hover/item:text-accent min-w-0 flex-1 text-left';
+      certName.textContent = c.name || '';
+      item.appendChild(certName);
+
+      const meta = document.createElement('span');
+      meta.className = 'shrink-0 text-[10px] text-text-faint font-mono mr-1';
+      meta.textContent = c.issue_date || '';
+      item.appendChild(meta);
+
+      if (href) {
+        const arrow = document.createElement('span');
+        arrow.className = 'shrink-0 text-text-faint font-mono transition group-hover/item:text-accent';
+        arrow.setAttribute('aria-hidden', 'true');
+        arrow.textContent = '↗';
+        item.appendChild(arrow);
+      }
+
+      return item;
+    }
+
+    function makeGroupedCard(issuerName, certs) {
+      const card = document.createElement('div');
+      card.className =
+        'reveal is-visible flex flex-col justify-between rounded-lg border border-bg-border bg-bg-card p-4 transition-all duration-200 hover:border-bg-border/80';
+
+      const header = document.createElement('div');
+      header.className = 'flex items-center gap-3 mb-3';
+
+      const logoBox = document.createElement('div');
+      logoBox.className =
+        'flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-md border border-bg-border bg-bg-soft';
+      
+      let logo = '';
+      for (const c of certs) {
+        const l = safeUrl(c.logo_url);
+        if (l) {
+          logo = l;
+          break;
+        }
+      }
+
+      if (logo) {
+        const img = document.createElement('img');
+        img.src = logo;
+        img.alt = issuerName;
+        img.loading = 'lazy';
+        img.className = 'h-full w-full object-contain p-1.5';
+        logoBox.appendChild(img);
+      } else {
+        const s = document.createElement('span');
+        s.className = 'font-mono text-base font-bold text-accent';
+        s.textContent = issuerName.charAt(0).toUpperCase();
+        logoBox.appendChild(s);
+      }
+      header.appendChild(logoBox);
+
+      const info = document.createElement('div');
+      info.className = 'min-w-0 flex-1';
+      
+      const titleWrapper = document.createElement('div');
+      titleWrapper.className = 'flex items-center gap-2';
+      
+      const name = document.createElement('h3');
+      name.className = 'truncate text-sm font-semibold text-text';
+      name.textContent = issuerName;
+      titleWrapper.appendChild(name);
+
+      const badge = document.createElement('span');
+      badge.className = 'inline-flex items-center rounded-full bg-accent/10 px-1.5 py-0.5 text-[10px] font-semibold text-accent';
+      badge.textContent = String(certs.length);
+      titleWrapper.appendChild(badge);
+      
+      info.appendChild(titleWrapper);
+
+      const sub = document.createElement('p');
+      sub.className = 'text-[11px] text-text-muted mt-0.5';
+      const dates = certs.map(c => c.issue_date).filter(Boolean);
+      sub.textContent = dates.length ? [...new Set(dates)].join(', ') : 'Credenciales';
+      info.appendChild(sub);
+      
+      header.appendChild(info);
+      card.appendChild(header);
+
+      const listContainer = document.createElement('div');
+      listContainer.className = 'flex flex-col gap-2 w-full mt-1';
+
+      listContainer.appendChild(makeListItem(certs[0]));
+
+      const collapsableContainer = document.createElement('div');
+      collapsableContainer.className = 'hidden flex-col gap-2 w-full transition-all duration-300';
+      for (let i = 1; i < certs.length; i++) {
+        collapsableContainer.appendChild(makeListItem(certs[i]));
+      }
+      listContainer.appendChild(collapsableContainer);
+      card.appendChild(listContainer);
+
+      const toggleBtn = document.createElement('button');
+      toggleBtn.type = 'button';
+      toggleBtn.className = 'mt-3 text-center text-[11px] font-semibold text-text-muted hover:text-accent transition duration-150 flex items-center justify-center gap-1 cursor-pointer w-full py-1.5 rounded bg-bg-soft/20 hover:bg-bg-soft/40 border border-bg-border/30';
+      
+      const remainingCount = certs.length - 1;
+      const showMoreText = labels.showMore.replace('{count}', String(remainingCount));
+      const showLessText = labels.showLess;
+      
+      const btnText = document.createElement('span');
+      btnText.textContent = showMoreText;
+      toggleBtn.appendChild(btnText);
+
+      const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      icon.setAttribute('class', 'h-3 w-3 transform transition-transform duration-200 text-text-faint');
+      icon.setAttribute('fill', 'none');
+      icon.setAttribute('viewBox', '0 0 24 24');
+      icon.setAttribute('stroke', 'currentColor');
+      
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('stroke-linecap', 'round');
+      path.setAttribute('stroke-linejoin', 'round');
+      path.setAttribute('stroke-width', '2.5');
+      path.setAttribute('d', 'M19 9l-7 7-7-7');
+      icon.appendChild(path);
+      toggleBtn.appendChild(icon);
+      card.appendChild(toggleBtn);
+
+      toggleBtn.addEventListener('click', () => {
+        const isCollapsed = collapsableContainer.classList.contains('hidden');
+        if (isCollapsed) {
+          collapsableContainer.classList.remove('hidden');
+          collapsableContainer.classList.add('flex');
+          btnText.textContent = showLessText;
+          icon.classList.add('rotate-180');
+        } else {
+          collapsableContainer.classList.remove('flex');
+          collapsableContainer.classList.add('hidden');
+          btnText.textContent = showMoreText;
+          icon.classList.remove('rotate-180');
+        }
+      });
+
+      return card;
+    }
+
     function message(text) {
       if (status) status.classList.add('hidden');
       const p = document.createElement('p');
@@ -242,7 +396,26 @@ const labels = {
           if (status) status.classList.add('hidden');
           animateCounter(items.length);
           if (!items.length) return message(labels.empty);
-          items.forEach((c) => grid.appendChild(makeCard(c)));
+          
+          const issuersOrder = [];
+          const grouped = {};
+          items.forEach((c) => {
+            const issuer = c.issuer ? c.issuer.trim() : 'Otros';
+            if (!grouped[issuer]) {
+              grouped[issuer] = [];
+              issuersOrder.push(issuer);
+            }
+            grouped[issuer].push(c);
+          });
+
+          issuersOrder.forEach((issuer) => {
+            const certs = grouped[issuer];
+            if (certs.length === 1) {
+              grid.appendChild(makeSingleCard(certs[0]));
+            } else {
+              grid.appendChild(makeGroupedCard(issuer, certs));
+            }
+          });
         })
         .catch(() => {
           if (statusText) statusText.textContent = labels.error;

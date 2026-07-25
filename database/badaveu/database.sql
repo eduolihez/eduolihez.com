@@ -134,18 +134,29 @@ CREATE TABLE `historial_incidencias` (
 
 
 -- ============================================================
---  USUARI ADMINISTRADOR PER DEFECTE
---  IMPORTANT: canvia la contrasenya immediatament en producció.
---  Per generar un nou hash: php -r "echo password_hash('NOVA_PASS', PASSWORD_BCRYPT, ['cost'=>12]);"
+--  USUARI ADMINISTRADOR
+--
+--  Aquest fitxer NO crea cap administrador, i és a propòsit.
+--
+--  Abans hi havia un INSERT amb l'usuari 'admin@badaveu.cat', rol
+--  'superadmin' i el seu hash bcrypt escrit aquí mateix. Aquest fitxer està
+--  versionat en un repositori PÚBLIC, així que aquell hash el podia
+--  descarregar qualsevol i provar de trencar-lo sense límit de temps ni
+--  intents. El nom d'usuari i el rol ja eren informació pública. Si el
+--  volcat s'importava sense canviar després la contrasenya, quedava un
+--  accés de superadministrador obert.
+--
+--  Crea l'administrador TU, amb una contrasenya que només sàpigues tu:
+--
+--    1) Genera el hash a la teva màquina (no el desis enlloc):
+--         php -r "echo password_hash('LA_TEVA_PASSWORD', PASSWORD_BCRYPT, ['cost' => 12]), PHP_EOL;"
+--
+--    2) Insereix-lo directament a phpMyAdmin, enganxant el hash del pas 1:
+--         INSERT INTO `admins` (`usuario`, `password`, `role`, `access_type`, `district_access`)
+--         VALUES ('el_teu_usuari', 'HASH_DEL_PAS_1', 'superadmin', 'all', NULL);
+--
+--  Mai enganxis la contrasenya en clar ni el hash en cap fitxer del projecte.
 -- ============================================================
-INSERT INTO `admins` (`usuario`, `password`, `role`, `access_type`, `district_access`)
-VALUES (
-    'admin@badaveu.cat',
-    '$2y$12$sIdt.HbcWJll/DqWQkkXouYd5rubESDIDgJfwPw5fFUfsmagWG3WC',
-    'superadmin',
-    'all',
-    NULL
-);
 
 
 -- ============================================================

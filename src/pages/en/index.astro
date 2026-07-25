@@ -9,8 +9,12 @@ const lang = 'en';
 const title = 'Eduardo Olivares | SOC Analyst in Badalona, Barcelona';
 const description =
   'SOC Analyst and Blue Team professional in Badalona (Barcelona, Spain). Threat detection, incident response, XDR/SIEM and Python automation. Fortinet NSE, Microsoft and Trend Micro certified.';
+
+/** Las tres portadas SI son traducciones entre si: hreflang explicito.
+ *  Ya no se hereda por defecto para no ponerselo a paginas sin traducir. */
+const alternates = { es: '/', en: '/en/', ca: '/ca/' };
 ---
 
-<BaseLayout title={title} description={description} lang={lang} path="/en/">
+<BaseLayout title={title} description={description} lang={lang} path="/en/" alternates={alternates}>
   <PortfolioSections lang={lang} />
 </BaseLayout>

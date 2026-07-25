@@ -58,8 +58,10 @@ const projectPages: { path: string; priority: string }[] = [
   // Indice de proyectos: concentrador de enlaces hacia los seis.
   { path: '/projects/', priority: '0.7' },
   { path: '/projects/badaveu/', priority: '0.8' },
+  // about.html incluye la guia entera como pestana, asi que guia.html era un
+  // subconjunto exacto suyo: dos paginas indexables compitiendo por las
+  // mismas busquedas. guia.html pasa a noindex y solo se envia about.html.
   { path: '/projects/badaveu/about.html', priority: '0.5' },
-  { path: '/projects/badaveu/guia.html', priority: '0.5' },
   { path: '/projects/fluence/', priority: '0.8' },
   { path: '/projects/fluence/privacy.html', priority: '0.3' },
   { path: '/projects/fluence/terms.html', priority: '0.3' },

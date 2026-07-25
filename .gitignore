@@ -1,0 +1,40 @@
+# build output
+dist/
+.astro/
+dist-ssr/
+
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# environment / secrets (NUNCA subir credenciales al repo)
+.env
+.env.*
+!.env.example
+server/config.php
+public/projects/badaveu/.env
+public/projects/badaveu/config/db.php
+
+# uploads (keep folder structures but ignore uploaded files)
+server/uploads/*
+!server/uploads/.htaccess
+!server/uploads/index.html
+public/projects/badaveu/uploads/*
+
+# editor / OS
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+Thumbs.db
+

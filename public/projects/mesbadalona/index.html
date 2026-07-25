@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Mes Badalona ha evolucionado a BadaVeu, la plataforma cívica de gestión de incidencias de Badalona creada por Eduardo Olivares.">
+    <title>Mes Badalona | Ahora BadaVeu — Eduardo Olivares</title>
+    <link rel="canonical" href="https://eduolihez.com/mesbadalona/">
+    
+    <meta http-equiv="refresh" content="10;url=https://badaveu.eduolihez.com">
+
+    <style>
+        :root {
+            --primary-blue: #002D5A;
+            --accent-gold: #FFC107;
+            --text-dark: #2c3e50;
+            --text-light: #7f8c8d;
+            --bg-color: #f4f7f9;
+            --white: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            background: var(--white);
+            max-width: 600px;
+            width: 90%;
+            padding: 3rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo-section {
+            margin-bottom: 2rem;
+        }
+
+        .logo-svg {
+            width: 80px;
+            height: 80px;
+            fill: var(--primary-blue);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .rebranding-box {
+            background-color: #fdfaf0;
+            border-left: 4px solid var(--accent-gold);
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+
+        .message {
+            margin-bottom: 2rem;
+            color: var(--text-dark);
+        }
+
+        .highlight {
+            font-weight: bold;
+            color: var(--primary-blue);
+        }
+
+        .cta-button {
+            display: inline-block;
+            background-color: var(--primary-blue);
+            color: var(--white);
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 45, 90, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 45, 90, 0.3);
+            background-color: #003a75;
+        }
+
+        .cta-button:active {
+            transform: translateY(-1px);
+        }
+
+        /* Animación sutil de pulso */
+        .pulse {
+            animation: pulse-animation 2s infinite;
+        }
+
+        @keyframes pulse-animation {
+            0% { box-shadow: 0 0 0 0 rgba(0, 45, 90, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(0, 45, 90, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 45, 90, 0); }
+        }
+
+        .countdown {
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        #seconds {
+            font-weight: bold;
+            color: var(--primary-blue);
+        }
+
+        footer {
+            margin-top: 3rem;
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        .contact-link {
+            color: var(--primary-blue);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: border 0.3s;
+        }
+
+        .contact-link:hover {
+            border-bottom: 1px solid var(--primary-blue);
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .container {
+                padding: 2rem 1.5rem;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="logo-section">
+            <svg class="logo-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20,2H4C2.9,2,2,2.9,2,4v18l4-4h14c1.1,0,2-0.9,2-2V4C22,2.9,21.1,2,20,2z M20,16H5.17L4,17.17V4h16V16z M12,10 c1.1,0,2-0.9,2-2s-0.9-2-2-2s-2,0.9-2,2S10.9,10,12,10z M12,11c-1.1,0-4,0.6-4,1.8V14h8v-1.2C16,11.6,13.1,11,12,11z"/>
+            </svg>
+        </div>
+
+        <h1>¡Nos hemos mudado!</h1>
+        
+        <div class="rebranding-box">
+            <strong>Nota de Rebranding:</strong> Por motivos de marca registrada (trademark) y para reflejar mejor nuestra identidad participativa, <strong>Mes Badalona</strong> ha pasado a llamarse oficialmente <span class="highlight">BadaVeu</span>.
+        </div>
+
+        <p class="message">
+            Nuestra plataforma ahora está disponible en una dirección más moderna y segura. No te preocupes, tus datos y la esencia del proyecto siguen siendo los mismos.
+        </p>
+
+        <a href="https://badaveu.eduolihez.com" class="cta-button pulse" id="redirect-btn">
+            Ir a badaveu.eduolihez.com
+        </a>
+
+        <p class="countdown">
+            Serás redirigido automáticamente en <span id="seconds">10</span> segundos...
+        </p>
+
+        <noscript>
+            <p style="margin-top: 10px; color: red;">JavaScript está desactivado. Por favor, haz clic en el botón superior para continuar.</p>
+        </noscript>
+
+        <footer>
+            <p>&copy; <span id="year"></span> Proyecto BadaVeu (Badalona)</p>
+            <p>¿Tienes dudas? Escríbenos a: <a href="mailto:privacy@eduolihez.com" class="contact-link">privacy@eduolihez.com</a></p>
+        </footer>
+    </div>
+
+    <script>
+        // Actualizar el año automáticamente
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // Configuración de la redirección
+        const targetURL = "https://badaveu.eduolihez.com";
+        let timeLeft = 10;
+        const countdownDisplay = document.getElementById('seconds');
+
+        const timer = setInterval(() => {
+            timeLeft--;
+            countdownDisplay.textContent = timeLeft;
+            
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                window.location.href = targetURL;
+            }
+        }, 1000);
+
+        // Asegurar que el botón funcione instantáneamente si se hace clic
+        document.getElementById('redirect-btn').addEventListener('click', function() {
+            clearInterval(timer);
+        });
+    </script>
+    <footer style="text-align:center; padding:1.5rem; font-size:0.8rem; color:#7f8c8d; border-top:1px solid rgba(0,45,90,0.1); background:var(--bg-color);">
+        <p>Un proyecto de <a href="https://eduolihez.com" style="color:inherit; text-decoration:underline;">Eduardo Olivares — Consultor de Ciberseguridad</a></p>
+    </footer>
+</body>
+</html>

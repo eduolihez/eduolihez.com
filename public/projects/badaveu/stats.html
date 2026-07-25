@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title data-i18n="stats_page_title">Estadístiques — BadaVeu</title>
+    <meta name="description" content="Estadístiques en temps real de les incidències de Badalona — BadaVeu.">
+    <meta name="theme-color" content="#002D5A">
+    <link rel="manifest" href="manifest.json">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css?v=3.0">
+    <style>
+        /* ── Stats Dashboard — Executive Look ── */
+        .stats-hero {
+            background: #fff;
+            padding: 20px 20px 16px;
+            margin: -20px -20px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        .stats-hero-inner {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .stats-hero h1 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            margin: 0 0 3px;
+            color: var(--text-dark);
+            letter-spacing: -0.02em;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .stats-hero h1 i { color: var(--primary); }
+        .stats-hero p { color: var(--text-light); font-size: 0.82rem; margin: 0; }
+        .live-dot {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 0.72rem; font-weight: 600; color: var(--success);
+            background: #f0fdf4; border: 1px solid #bbf7d0;
+            padding: 4px 10px; border-radius: 20px; white-space: nowrap;
+            align-self: flex-start;
+        }
+        .live-dot::before {
+            content: ''; width: 7px; height: 7px; border-radius: 50%;
+            background: var(--success); animation: pulse-dot 1.8s infinite;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.65); }
+        }
+
+        /* Stats filter bar */
+        .stats-filter-bar {
+            display: flex; gap: 8px; flex-wrap: wrap;
+            margin-bottom: 16px; align-items: center;
+        }
+
+        /* Counter cards — 2×2 grid */
+        .stats-counter-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .counter-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px 16px 14px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .counter-card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            border-radius: 14px 14px 0 0;
+        }
+        .counter-card.c-total::after   { background: var(--primary); }
+        .counter-card.c-pendent::after { background: var(--warning); }
+        .counter-card.c-process::after { background: var(--info); }
+        .counter-card.c-solved::after  { background: var(--success); }
+
+        .c-icon-badge {
+            width: 36px; height: 36px;
+            border-radius: 9px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem;
+            margin-bottom: 6px;
+            flex-shrink: 0;
+        }
+        .counter-card.c-total   .c-icon-badge { background: #EDF3FB; color: var(--primary); }
+        .counter-card.c-pendent .c-icon-badge { background: #fffbeb; color: #d97706; }
+        .counter-card.c-process .c-icon-badge { background: #eff6ff; color: #2563eb; }
+        .counter-card.c-solved  .c-icon-badge { background: #f0fdf4; color: #059669; }
+
+        .c-num {
+            font-size: 2rem; font-weight: 800; line-height: 1;
+            display: block; letter-spacing: -0.03em;
+        }
+        .counter-card.c-total   .c-num { color: var(--primary); }
+        .counter-card.c-pendent .c-num { color: #d97706; }
+        .counter-card.c-process .c-num { color: #2563eb; }
+        .counter-card.c-solved  .c-num { color: #059669; }
+        .c-label {
+            font-size: 0.72rem;
+            color: var(--text-light);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        /* Chart wrapper cards */
+        .chart-section { margin-bottom: 12px; }
+        .chart-card-pub {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .chart-title {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            color: var(--text-light);
+            margin-bottom: 14px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .chart-title i { color: var(--primary); font-size: 1rem; }
+        .sk-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+        .sk-stat { height: 88px; border-radius: 14px; }
+        .chart-container { position: relative; width: 100%; min-height: 180px; max-height: 280px; }
+        .chart-container--donut { max-width: min(300px, 100%); margin: 0 auto; aspect-ratio: 1 / 1; min-height: 200px; max-height: 280px; }
+
+        /* Most viewed card */
+        .most-viewed-card {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 16px;
+            cursor: pointer;
+            transition: box-shadow 0.18s, border-color 0.18s;
+            background: var(--bg-card);
+            border-left: 3px solid var(--accent);
+        }
+        .most-viewed-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.07); border-color: rgba(0,45,90,0.15); }
+    </style>
+</head>
+<body>
+    <nav class="top-bar" role="banner">
+        <div class="brand"><i class="ri-government-line" aria-hidden="true"></i> <span class="brand-bada">Bada</span><span class="brand-veu">Veu</span></div>
+        <div class="lang-toggles">
+            <a href="admin.html" class="top-admin-link" aria-label="Accés Administrador"><i class="ri-lock-2-line" aria-hidden="true"></i></a>
+            <div class="lang-toggles-group" role="group" aria-label="Selector d'idioma">
+                <span onclick="app.setLang('ca')" onkeydown="if(event.key==='Enter'||event.key===' '){app.setLang('ca')}" role="button" tabindex="0" class="active-lang" aria-pressed="true" aria-label="Canvia a Català">CA</span>
+                <span onclick="app.setLang('es')" onkeydown="if(event.key==='Enter'||event.key===' '){app.setLang('es')}" role="button" tabindex="0" aria-pressed="false" aria-label="Canvia a Castellà">ES</span>
+            </div>
+        </div>
+    </nav>
+    <main class="page-content">
+        <div class="stats-hero">
+            <div class="stats-hero-inner">
+                <div>
+                    <h1 data-i18n="stats_page_title"><i class="ri-bar-chart-2-line"></i> Estadístiques</h1>
+                    <p>Dades en temps real del mapa d'incidències de Badalona.</p>
+                </div>
+                <span class="live-dot">En viu</span>
+            </div>
+        </div>
+        <div id="stats-loading">
+            <div class="sk-stats-grid">
+                <div class="sk-stat skeleton"></div><div class="sk-stat skeleton"></div>
+                <div class="sk-stat skeleton"></div><div class="sk-stat skeleton"></div>
+            </div>
+            <div class="sk-card skeleton" style="height:180px;margin-bottom:16px;"></div>
+            <div class="sk-card skeleton" style="height:160px;"></div>
+        </div>
+        <div class="stats-filter-bar">
+            <select id="filter-stats-barri" class="filter-select" aria-label="Filtrar per barri">
+                <option value="all">Tots els barris</option>
+            </select>
+            <select id="filter-stats-period" class="filter-select" aria-label="Filtrar per període">
+                <option value="all">Tot el temps</option>
+                <option value="month">Últim mes</option>
+                <option value="week">Última setmana</option>
+            </select>
+        </div>
+        <div id="stats-content" class="hidden">
+            <section class="info-section" style="padding-top:0;">
+                <div class="stats-counter-grid">
+                    <div class="counter-card c-total">
+                        <div class="c-icon-badge"><i class="ri-map-pin-line"></i></div>
+                        <span class="c-num" id="stat-total">0</span>
+                        <span class="c-label" data-i18n="stats_incidents_total">Total reportades</span>
+                    </div>
+                    <div class="counter-card c-pendent">
+                        <div class="c-icon-badge"><i class="ri-time-line"></i></div>
+                        <span class="c-num" id="stat-pending">0</span>
+                        <span class="c-label" data-i18n="stats_incidents_pending">Pendents</span>
+                    </div>
+                    <div class="counter-card c-process">
+                        <div class="c-icon-badge"><i class="ri-refresh-line"></i></div>
+                        <span class="c-num" id="stat-process">0</span>
+                        <span class="c-label" data-i18n="stats_incidents_process">En Procés</span>
+                    </div>
+                    <div class="counter-card c-solved">
+                        <div class="c-icon-badge"><i class="ri-check-double-line"></i></div>
+                        <span class="c-num" id="stat-solved">0</span>
+                        <span class="c-label" data-i18n="stats_incidents_solved">Solucionades</span>
+                    </div>
+                </div>
+            </section>
+            <section class="info-section" id="most-viewed-section" style="display:none;">
+                <div class="chart-title"><i class="ri-eye-line"></i> <span data-i18n="stats_most_viewed">Incidència Més Vista</span></div>
+                <div class="most-viewed-card" id="most-viewed-card"></div>
+            </section>
+            <section class="info-section chart-section">
+                <div class="chart-card-pub">
+                    <div class="chart-title"><i class="ri-bar-chart-box-line"></i> <span data-i18n="stats_chart_category">Per Categoria</span></div>
+                    <div class="chart-container"><canvas id="categoryChart"></canvas></div>
+                </div>
+            </section>
+            <section class="info-section chart-section">
+                <div class="chart-card-pub">
+                    <div class="chart-title"><i class="ri-donut-chart-line"></i> <span data-i18n="stats_chart_status">Estat de les Incidències</span></div>
+                    <div class="chart-container chart-container--donut"><canvas id="statusChart"></canvas></div>
+                </div>
+            </section>
+            <section class="info-section chart-section">
+                <div class="chart-card-pub">
+                    <div class="chart-title"><i class="ri-map-pin-line"></i> <span data-i18n="stats_chart_barri">Top 5 Barris</span></div>
+                    <div class="chart-container"><canvas id="barriChart"></canvas></div>
+                </div>
+            </section>
+        </div>
+        <div id="no-stats-message" style="display:none;">
+            <div class="empty-state"><i class="ri-bar-chart-line"></i><h3>Sense dades</h3><p data-i18n="stats_empty">No hi ha prou dades per mostrar estadístiques.</p></div>
+        </div>
+    </main>
+    <nav class="bottom-nav" role="navigation" aria-label="Navegació principal">
+        <a href="index.html" class="nav-item">
+            <i class="ri-map-2-fill" aria-hidden="true"></i>
+            <span data-i18n="nav_map">Mapa</span>
+        </a>
+        <a href="incidents.html" class="nav-item">
+            <i class="ri-list-check-2" aria-hidden="true"></i>
+            <span data-i18n="nav_incidents">Incidències</span>
+        </a>
+        <div class="nav-fab-container">
+            <button class="fab-btn" onclick="window.location.href='index.html?action=new'" aria-label="Nova incidència">
+                <i class="ri-add-line" aria-hidden="true"></i>
+            </button>
+        </div>
+        <a href="stats.html" class="nav-item active" aria-current="page">
+            <i class="ri-pie-chart-2-fill" aria-hidden="true"></i>
+            <span data-i18n="nav_stats">Dades</span>
+        </a>
+        <a href="about.html" class="nav-item">
+            <i class="ri-information-line" aria-hidden="true"></i>
+            <span data-i18n="nav_about">Sobre</span>
+        </a>
+    </nav>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="assets/js/core.js?v=3.0"></script>
+    <script src="assets/js/app.js?v=3.0"></script>
+    <script>document.addEventListener('DOMContentLoaded', () => { app.init(); app.loadStats(); });</script>
+</body>
+</html>

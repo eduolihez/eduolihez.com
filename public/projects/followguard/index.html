@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>FollowGuard | Herramienta de Ciberinteligencia — Eduardo Olivares</title>
+    <meta name="description" content="FollowGuard analiza interacciones en redes sociales para detectar y prevenir perfiles falsos. Herramienta de ciberinteligencia desarrollada por Eduardo Olivares.">
+    <link rel="canonical" href="https://eduolihez.com/followguard/">
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://eduolihez.com/followguard/">
+    <meta property="og:title" content="FollowGuard | Herramienta de Ciberinteligencia — Eduardo Olivares">
+    <meta property="og:description" content="FollowGuard analiza interacciones en redes sociales para detectar y prevenir perfiles falsos. Herramienta de ciberinteligencia.">
+    <meta property="og:image" content="https://eduolihez.com/assets/og-followguard.jpg">
+    <meta property="og:locale" content="es_ES">
+    <meta property="og:site_name" content="Eduardo Olivares — Consultor de Ciberseguridad">
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="FollowGuard | Herramienta de Ciberinteligencia">
+    <meta name="twitter:description" content="FollowGuard analiza interacciones en redes sociales para detectar y prevenir perfiles falsos.">
+    <meta name="twitter:image" content="https://eduolihez.com/assets/og-followguard.jpg">
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230a0a0f'/><text y='.9em' font-size='70' x='15'>🛡️</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+
+    <style>
+        /* Variables CSS para facilitar la personalización */
+        :root {
+            --bg-dark: #0a0a0f;
+            --primary: #bf8aff;
+            --primary-dark: #6a2fff;
+            --text-main: #f2f2f7;
+            --text-muted: #a1a1aa;
+            --card-bg: rgba(20, 20, 25, 0.6);
+            --card-border: rgba(183, 138, 255, 0.15);
+            --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.5);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+            padding: 20px 16px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Efectos de fondo */
+        .ambient-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(circle at center, rgba(183, 138, 255, 0.08) 0%, transparent 60%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Tarjeta Principal (Glassmorphism) */
+        .maintenance-card {
+            max-width: 480px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 28px;
+            padding: 40px 36px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 0 60px rgba(183, 138, 255, 0.05), var(--shadow-card);
+            z-index: 1;
+        }
+
+        /* Badge */
+        .fg-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(183, 138, 255, 0.08);
+            border: 1px solid rgba(183, 138, 255, 0.25);
+            padding: 6px 16px;
+            border-radius: 100px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--primary);
+        }
+
+        /* Icono Animado */
+        .icon-wrap {
+            position: relative;
+            width: 90px;
+            height: 90px;
+        }
+
+        .icon-circle {
+            width: 100%;
+            height: 100%;
+            background: rgba(183, 138, 255, 0.07);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.4rem;
+            color: var(--primary);
+            border: 1px solid rgba(183, 138, 255, 0.22);
+            box-shadow: inset 0 0 20px rgba(183, 138, 255, 0.05);
+        }
+
+        .icon-ring {
+            position: absolute;
+            inset: -12px;
+            border-radius: 50%;
+            border: 1.5px dashed rgba(183, 138, 255, 0.3);
+            animation: spin 14s linear infinite;
+        }
+
+        /* Título y Texto */
+        .fg-title h1 {
+            font-size: clamp(1.8rem, 5vw, 2.4rem);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #ffffff 30%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .fg-title p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            max-width: 380px;
+            margin: 0 auto;
+        }
+
+        /* Características (Features) */
+        .fg-features {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .fg-feature {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 0.85rem;
+            color: rgba(242, 242, 247, 0.85);
+            text-align: left;
+            transition: var(--transition);
+        }
+
+        .fg-feature:hover {
+            background: rgba(183, 138, 255, 0.06);
+            border-color: rgba(183, 138, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .fg-feature i {
+            color: var(--primary);
+            font-size: 1rem;
+            width: 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        /* Barra de Progreso */
+        .fg-progress {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .fg-progress-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.07);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 40%;
+            background: linear-gradient(90deg, var(--primary-dark), var(--primary), #e0c8ff);
+            position: absolute;
+            border-radius: 4px;
+            animation: loading 2s ease-in-out infinite alternate;
+        }
+
+        /* Waitlist form */
+        .fg-waitlist {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .fg-waitlist-label {
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--primary);
+            margin-bottom: 2px;
+        }
+
+        .fg-email-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .fg-email-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 11px 14px;
+            font-size: 0.88rem;
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: var(--transition);
+            min-width: 0;
+        }
+
+        .fg-email-input::placeholder { color: var(--text-muted); }
+        .fg-email-input:focus {
+            border-color: rgba(183, 138, 255, 0.5);
+            background: rgba(183, 138, 255, 0.06);
+        }
+
+        .fg-notify-btn {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 11px 16px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+
+        .fg-notify-btn:hover { opacity: 0.85; transform: translateY(-1px); }
+        .fg-notify-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        .fg-waitlist-success {
+            font-size: 0.85rem;
+            color: var(--primary);
+            text-align: center;
+            padding: 4px 0;
+            display: none;
+        }
+
+        .fg-waitlist-legal {
+            font-size: 0.72rem;
+            color: rgba(161, 161, 170, 0.5);
+            text-align: center;
+        }
+
+        /* Botón de regreso */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .btn.secondary {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            font-size: 0.82rem;
+        }
+
+        .btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.15);
+            color: var(--text-main);
+        }
+
+        /* Animaciones */
+        @keyframes spin { 
+            100% { transform: rotate(360deg); } 
+        }
+        @keyframes loading { 
+            0% { left: -10%; width: 20%; } 
+            100% { left: 90%; width: 40%; } 
+        }
+
+        .maintenance-card {
+            margin: auto 0;
+        }
+
+        /* Responsivo */
+        @media (max-width: 480px) {
+            .maintenance-card {
+                padding: 30px 20px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            .icon-ring { animation: none; }
+            .progress-fill { animation: none; width: 40%; left: 0; }
+        }
+    </style>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "FollowGuard",
+      "applicationCategory": "SecurityApplication",
+      "description": "FollowGuard analiza interacciones en redes sociales para detectar y prevenir perfiles falsos. Herramienta de ciberinteligencia desarrollada por Eduardo Olivares.",
+      "operatingSystem": "Web",
+      "url": "https://eduolihez.com/followguard/",
+      "author": {
+        "@type": "Person",
+        "name": "Eduardo Olivares",
+        "url": "https://eduolihez.com"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "EUR"
+      }
+    }
+    </script>
+</head>
+<body>
+
+    <div class="ambient-glow"></div>
+
+    <main class="maintenance-card">
+
+        <span class="fg-badge">
+            <i class="fas fa-shield-alt" aria-hidden="true"></i> Cyber Intelligence
+        </span>
+
+        <div class="icon-wrap">
+            <div class="icon-circle">
+                <i class="fas fa-user-secret" aria-hidden="true"></i>
+            </div>
+            <div class="icon-ring"></div>
+        </div>
+
+        <div class="fg-title">
+            <h1>FollowGuard</h1>
+            <p>El motor de análisis está siendo reconstruido. Nueva arquitectura de detección, cobertura de señales ampliada y reducción de falsos positivos.</p>
+        </div>
+
+        <div class="fg-features">
+            <div class="fg-feature">
+                <i class="fas fa-robot" aria-hidden="true"></i>
+                <span>Detección de bots mediante análisis del grafo social de seguidores</span>
+            </div>
+            <div class="fg-feature">
+                <i class="fas fa-chart-line" aria-hidden="true"></i>
+                <span>Scoring de autenticidad basado en patrones de comportamiento real</span>
+            </div>
+            <div class="fg-feature">
+                <i class="fas fa-lock" aria-hidden="true"></i>
+                <span>Mapa de red completo: identifica cuentas coordinadas y manipuladas</span>
+            </div>
+        </div>
+
+        <div class="fg-progress">
+            <div class="fg-progress-meta">
+                <span>Actualizando sistema</span>
+                <span class="loading-text">En proceso...</span>
+            </div>
+            <div class="progress-bar" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100">
+                <div class="progress-fill"></div>
+            </div>
+        </div>
+
+        <div class="fg-waitlist">
+            <div class="fg-waitlist-label">Lista de acceso anticipado</div>
+            <form class="fg-email-row" id="fg-form" action="https://formspree.io/f/mdabwozw" method="POST">
+                <input type="hidden" name="_subject" value="FollowGuard — Waitlist">
+                <input type="email" name="email" class="fg-email-input" placeholder="tu@email.com" required autocomplete="email" aria-label="Tu email">
+                <button type="submit" class="fg-notify-btn" id="fg-submit">Notificarme</button>
+            </form>
+            <p class="fg-waitlist-success" id="fg-success">✓ ¡Apuntado! Te avisamos en el lanzamiento.</p>
+            <p class="fg-waitlist-legal">Sin spam · Solo avisamos cuando FollowGuard esté listo</p>
+        </div>
+
+        <a href="/" class="btn secondary fg-back">
+            <i class="fas fa-arrow-left" aria-hidden="true"></i> Regresar al Portfolio
+        </a>
+
+        <script>
+        document.getElementById('fg-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('fg-submit');
+            btn.textContent = '...'; btn.disabled = true;
+            try {
+                const r = await fetch(this.action, {
+                    method: 'POST',
+                    body: new FormData(this),
+                    headers: { Accept: 'application/json' }
+                });
+                if (r.ok) {
+                    this.style.display = 'none';
+                    document.getElementById('fg-success').style.display = 'block';
+                } else { btn.textContent = 'Error'; btn.disabled = false; }
+            } catch { btn.textContent = 'Error'; btn.disabled = false; }
+        });
+        </script>
+
+    </main>
+    <footer style="text-align:center; padding:1.5rem; font-size:0.8rem; color:#a1a1aa; border-top:1px solid rgba(183,138,255,0.1); width:100%; margin-top:auto;">
+        <p>Un proyecto de <a href="https://eduolihez.com" style="color:inherit; text-decoration:underline;">Eduardo Olivares — Consultor de Ciberseguridad</a></p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,24 @@
+/* EQUIPO */
+    Desarrollo y diseno: Eduardo Olivares Hernandez
+    Puesto: SOC Analyst · Blue Team
+    Ubicacion: Badalona, Barcelona, Espana
+    Contacto: eduardo [at] eduolihez.com
+    LinkedIn: https://www.linkedin.com/in/eduolihez/
+    GitHub: https://github.com/eduolihez
+
+/* SITIO */
+    Idiomas: Espanol, Ingles, Catalan
+    Doctype: HTML5
+    Estandares: HTML5, CSS3, ES2022, Schema.org, RFC 9116
+
+/* TECNOLOGIA */
+    Frontend: Astro (salida 100% estatica), Tailwind CSS, TypeScript
+    Backend: PHP 8 + MySQL (API propia, sin frameworks)
+    Analitica: propia, sin cookies y con las IPs hasheadas
+    Hosting: CDMON · CDN y WAF: Cloudflare
+    Tipografias: Inter y JetBrains Mono (autoalojadas, subset latino)
+
+/* NOTAS */
+    Sin cookies de seguimiento. Sin scripts de terceros.
+    Politica de seguridad: /.well-known/security.txt
+    Resumen para IAs: /llms.txt

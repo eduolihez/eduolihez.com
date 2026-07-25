@@ -1,0 +1,262 @@
+---
+/**
+ * <Certifications /> - Isla dinamica (MySQL via PHP). Contador animado + grid.
+ * Script PROCESADO (externo, CSP-safe). safeUrl() sanea las URLs de la BD (S3).
+ */
+import { useTranslations } from '../i18n/utils';
+import type { Lang } from '../i18n/ui';
+import { api } from '../config';
+import Icon from './Icon.astro';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const apiUrl = api(`/api/certifications.php?lang=${lang}`);
+const labels = {
+  loading: t('certs.loading'),
+  error: t('certs.error'),
+  empty: t('certs.empty'),
+  countLabel: t('certs.count.label'),
+};
+---
+
+<section id="certificaciones" class="border-b border-bg-border py-20 sm:py-28">
+  <div class="container-page">
+    <div
+      class="reveal mb-12 flex flex-col gap-6 md:flex-row md:items-end md:justify-between"
+    >
+      <div>
+        <p class="section-kicker">{t('kicker.certs')}</p>
+        <h2 class="section-title">{t('certs.title')}</h2>
+        <p class="section-subtitle">{t('certs.subtitle')}</p>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <Icon name="award" class="h-8 w-8 text-accent" />
+        <div>
+          <div
+            id="certs-counter"
+            class="font-mono text-3xl font-bold leading-none text-accent"
+            data-target="0"
+          >
+            0
+          </div>
+          <div class="mt-1 text-xs text-text-muted">{labels.countLabel}</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="certs-status" class="flex items-center gap-3 text-sm text-text-muted">
+      <span
+        id="certs-spinner"
+        class="h-4 w-4 animate-spin rounded-full border-2 border-bg-border border-t-accent"
+      ></span>
+      <span id="certs-status-text">{t('certs.loading')}</span>
+      <button
+        id="certs-retry-btn"
+        class="hidden px-2.5 py-1 text-xs font-semibold text-accent rounded-md border border-accent/20 bg-accent/5 hover:bg-accent hover:text-bg transition duration-150 cursor-pointer"
+        type="button"
+      >
+        Volver a intentar
+      </button>
+    </div>
+
+    <div
+      id="certs-grid"
+      class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
+      data-api={apiUrl}
+      data-labels={JSON.stringify(labels)}
+    >
+    </div>
+
+    <div class="reveal mt-8 flex justify-center">
+      <a
+        href="https://www.credly.com/users/eduolihez"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex items-center gap-2 rounded-lg border border-bg-border bg-bg-soft/40 px-3.5 py-1.5 text-xs font-semibold text-text-muted hover:border-accent hover:text-accent hover:bg-bg-card transition duration-200 hover:no-underline shadow-sm"
+      >
+        <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 fill-current transition-colors text-orange" style="color: #FF5A00;">
+          <title>Credly</title>
+          <path d="M23.8 13.154a.299.299 0 0 0-.101-.024.407.407 0 0 0-.202.048c-.06.028-.092.08-.127.136-.087.128-.15.268-.226.4-.107.187-.246.351-.38.515-.135.156-.286.291-.424.44-.028.027-.072.043-.107.027-.028-.016-.036-.056-.032-.088.04-.38.075-.763.123-1.138.02-.172.043-.336.063-.512.028-.247.056-.487.087-.735l.234-1.824c.02-.128.032-.372-.135-.52a.446.446 0 0 0-.233-.116.46.46 0 0 0-.254.06c-.226.16-.297.504-.365.76-.142.603-.178 1.241-.471 1.804a1.772 1.772 0 0 1-.202.316.668.668 0 0 1-.186.18.332.332 0 0 1-.246.051.365.365 0 0 1-.238-.207.871.87 0 0 1-.063-.324 4.499 4.499 0 0 1 .24-1.585c.045-.132.089-.252.104-.383.028-.156.028-.38-.114-.516-.131-.128-.337-.18-.504-.128-.194.056-.31.244-.372.392-.198.463-.25.95-.317 1.446-.044.327-.127.64-.293.926a2.717 2.717 0 0 1-.603.72c-.118.087-.222.123-.328.107a.376.376 0 0 1-.278-.208.875.875 0 0 1-.095-.315 3.361 3.36 0 0 1-.036-.616c.004-.223 0-.44.044-.658.075-.39.678-1.937.808-2.345.135-.407.262-.823.353-1.246.08-.38.123-.767.11-1.15-.007-.277-.07-.576-.288-.736a.611.61 0 0 0-.603-.048.968.968 0 0 0-.455.428 2.53 2.53 0 0 0-.226.59 12.01 12.01 0 0 0-.266 1.29c-.071.429-.138.848-.206 1.268-.06.355-.206 1.614-.261 1.88-.06.272-.175.54-.301.787-.131.268-.258.536-.408.791a.694.694 0 0 1-.175.224c-.08.06-.182.088-.27.048-.102-.048-.146-.176-.166-.292-.075-.435-.012-.875.072-1.302.083-.431.44-2.4.519-2.851.099-.532.24-1.05.285-1.59.028-.388.09-.88-.202-1.187-.115-.136-.31-.16-.44-.136-.174.036-.31.176-.388.296-.1.128-.186.28-.258.467-.115.284-.186.615-.261.91l-.032.129c-.083.383-.143.77-.186 1.162a16.95 16.948 0 0 0-.06.632c-.008.1-.016.203-.027.307 0 .08.007.168-.028.244a.304.304 0 0 1-.052.068c-.08.072-.202.06-.31.056-.557-.016-1.045.3-1.35.755-.18.252-.281.542-.39.834-.01.048-.034.1-.054.152-.051.143-.13.327-.222.511a3.037 3.037 0 0 1-.317.46 3.285 3.285 0 0 1-.384.41 1.123 1.123 0 0 1-.515.26c-.174.04-.384-.043-.543-.203a.916.916 0 0 1-.206-.54c-.004-.055-.004-.115.028-.163.05-.068.146-.072.23-.076a1.623 1.623 0 0 0 1.375-1.015c.138-.34.178-.698.122-1.046a1.193 1.193 0 0 0-.19-.48.9.9 0 0 0-.396-.323c-.293-.14-.658-.127-1.01.004-.575.232-.951.74-1.134 1.562l-.02.088c-.114.487-.23 1-.582 1.354-.127.12-.261.163-.368.143-.044-.004-.08-.04-.103-.075-.096-.16.003-.532.15-1a4.1 4.1 0 0 0 .1-.366.925.925 0 0 0-.108-.495.783.783 0 0 0-.372-.324c-.143-.064-.31-.06-.468-.06h-.047c-.044 0-.103 0-.151-.012a.215.215 0 0 1-.147-.127.485.485 0 0 1 .016-.232c.004-.02.012-.048.016-.072a.368.368 0 0 0-.162-.412.509.509 0 0 0-.468-.036.768.768 0 0 0-.364.348.769.769 0 0 0-.103.48c.04.13.07.32.043.475-.055.28-.222.51-.384.74-.04.05-.072.106-.107.16a4.96 4.96 0 0 1-.706.825c-.372.486-.693.993-1.026 1.488a.333.333 0 0 1-.294.13.313.313 0 0 1-.226-.142.617.617 0 0 1-.09-.32c-.004-.459-.004-.922 0-1.385l.004-1.28c-.004-.16-.083-.432-.266-.547a.465.465 0 0 0-.258-.088.468.468 0 0 0-.265.088c-.243.156-.298.543-.35 0.795l-.178 0.946c-.031 0.176-.043 0.355-.075 0.53-.131 0.695-.218 1.4-.412 2.083a2.316 2.316 0 0 1-.285 0.63.31.31 0 0 1-.266.14.331.331 0 0 1-.281-.132c-.08-.096-.135-.208-.187-.32a3.737 3.737 0 0 1-.242-.892c-.067-.38-.063-.767-.099-1.147-.036-.37-.099-.74-.182-1.1-.064-.28-.159-.616-.4-.799a.574.574 0 0 0-.693-.016c-.23.167-.32.535-.38.8a12.75 12.75 0 0 0-.223 1.49l-.043 0.44c-.052 0.4-.11 0.798-.187 1.19a4.877 4.877 0 0 1-.416 1.258.423.423 0 0 1-.368.224c-.167 0-.306-.112-.424-.228a2.532 2.532 0 0 1-.499-.746c-.27-.56-.476-1.146-.667-1.74l-.261-.8c-.143-.448-.337-.871-.563-1.28a.56.56 0 0 0-.5-.31.603.603 0 0 0-.51.298c-.147.228-.21.5-.275.76-.06.244-.095.49-.126.74-.076.603-.135 1.21-.19 1.815-.028.327-.107.647-.238.946-.11.256-.254.495-.404.727-.087.13-.19.223-.332.223h-.032a.382.382 0 0 1-.302-.191.956.956 0 0 1-.1-.315c-.06-.328-.068-.667-.083-1a22.25 22.25 0 0 0-.083-2.148 21.03 21.03 0 0 0-.246-2.1c-.08-.507-.206-1.02-.27-1.53a1.134 1.134 0 0 0-.28-.688.583.583 0 0 0-.71-.052.885.885 0 0 0-.34.499c-.16.48-.227.99-.27 1.498a12.355 12.355 0 0 0 0 2.21c.01.168.02.336.035.504.02.268.04.535.068.8a4.912 4.912 0 0 1-.1 1.554.437.437 0 0 1-.392.296.53.53 0 0 1-.448-.23c-.155-.22-.266-.46-.388-.7a6.275 6.275 0 0 1-.484-1.393c-.182-.71-.357-1.422-.59-2.113a.623.623 0 0 0-.583-.43.619.619 0 0 0-.583.42c-.08.232-.15.467-.222.7-.107.35-.202.7-.309 1.05a10.96 10.96 0 0 1-.508 1.442.336.336 0 0 1-.3.2.327.327 0 0 1-.234-.143.606.606 0 0 1-.09-.328 17.89 17.89 0 0 1-.013-1.85 10.65 10.65 0 0 1 .151-1.8c.032-.232.067-.468.107-.7a.497.497 0 0 0-.214-.52.548.548 0 0 0-.543-.023.774.774 0 0 0-.377.348 1.511 1.511 0 0 0-.155.57 26.687 26.687 0 0 0-.46 3.12 1.412 1.412 0 0 1-.222.755.334.334 0 0 1-.285.152.326.326 0 0 1-.274-.16c-.067-.104-.127-.216-.182-.328a6.37 6.37 0 0 1-.424-1.28c-.147-.568-.27-.723-.55-.747a.478.478 0 0 0-.512.247 1.416 1.416 0 0 0-.155.515 9.07 9.07 0 0 1-.369 1.954.341.341 0 0 1-.31.216.327.327 0 0 1-.242-.14.596.596 0 0 1-.09-.32c.004-.376.012-.756.031-1.134.02-.38.048-.755.076-1.134a.455.455 0 0 0-.195-.444.519.519 0 0 0-.48-.04.793.793 0 0 0-.376.328 1.138 1.138 0 0 0-.159.54c-.06.702-.123 1.405-.2 2.1-.035.32-.127.623-.27.91a2.383 2.383 0 0 1-.49.67.332.332 0 0 1-.258.12.336.336 0 0 1-.258-.12.871.871 0 0 1-.167-.32c-.08-.244-.127-.495-.17-.747-.076-.443-.131-.89-.187-1.333a1.47 1.47 0 0 0-.198-.564c-.167-.232-.38-.288-.583-.244a.63.63 0 0 0-.396.348 2.052 2.052 0 0 0-.147.747c-.024.475-.028.95-.04 1.425a1.85 1.85 0 0 1-.099.64.331.331 0 0 1-.302.211.332.332 0 0 1-.286-.176.993.993 0 0 1-.107-.32c-.04-.26-.067-.52-.087-.78l-.052-.73c-.04-.564-.095-1.127-.222-1.67a1.185 1.185 0 0 0-.258-.56.577.577 0 0 0-.714-.04c-.206.148-.285.46-.35.688a5.21 5.21 0 0 0-.226 1.442.27.27 0 0 0 .1.238c.072.043.147.051.215.027a1.59 1.59 0 0 0 1.257-1.44c.004-.048.004-.1 0-.147a.428.428 0 0 0-.4-.367.433.433 0 0 0-.44.335c-.072.372-.116.755-.131 1.134v0.32c-.012.392-.048 1.446-.076 1.74l-.067.732a1.826 1.826 0 0 1-.203.626c-.103.18-.246.223-.332.223-.174 0-.384-.043-.543-.203a.916.916 0 0 1-.206-.54c-.004-.055-.004-.115.028-.163.05-.068.146-.072.23-.076a1.623 1.623 0 0 0 1.375-1.015c.138-.34.178-.698.122-1.046a1.193 1.193 0 0 0-.19-.48.9.9 0 0 0-.396-.323c-.293-.14-.658-.127-1.01.004-.575.232-.951.74-1.134 1.562l-.02.088c-.114.487-.23 1-.582 1.354-.127.12-.261.163-.368.143-.044-.004-.08-.04-.103-.075-.096-.16.003-.532.15-1a4.1 4.1 0 0 0 .1-.366.925.925 0 0 0-.108-.495.783.783 0 0 0-.372-.324c-.143-.064-.31-.06-.468-.06h-.047c-.044 0-.103 0-.151-.012a.215.215 0 0 1-.147-.127.485.485 0 0 1 .016-.232c.004-.02.012-.048.016-.072a.368.368 0 0 0-.162-.412.509.509 0 0 0-.468-.036.768.768 0 0 0-.364.348.769.769 0 0 0-.103.48c.04.13.07.32.043.475-.055.28-.222.51-.384.74-.04.05-.072.106-.107.16a4.96 4.96 0 0 1-.706.825c-.372.486-.693.993-1.026 1.488a.333.333 0 0 1-.294.13.313.313 0 0 1-.226-.142.617.617 0 0 1-.09-.32c-.004-.459-.004-.922 0-1.385l.004-1.28c-.004-.16-.083-.432-.266-.547a.465.465 0 0 0-.258-.088.468.468 0 0 0-.265.088c-.243.156-.298.543-.35 0.795l-.178 0.946c-.031 0.176-.043 0.355-.075 0.53-.131 0.695-.218 1.4-.412 2.083a2.316 2.316 0 0 1-.285 0.63.31.31 0 0 1-.266.14.331.331 0 0 1-.281-.132c-.08-.096-.135-.208-.187-.32a3.737 3.737 0 0 1-.242-.892c-.067-.38-.063-.767-.099-1.147-.036-.37-.099-.74-.182-1.1-.064-.28-.159-.616-.4-.799a.574.574 0 0 0-.693-.016c-.23.167-.32.535-.38.8a12.75 12.75 0 0 0-.223 1.49l-.043 0.44c-.052 0.4-.11 0.798-.187 1.19a4.877 4.877 0 0 1-.416 1.258.423.423 0 0 1-.368.224c-.167 0-.306-.112-.424-.228a2.532 2.532 0 0 1-.499-.746c-.27-.56-.476-1.146-.667-1.74l-.261-.8c-.143-.448-.337-.871-.563-1.28a.56.56 0 0 0-.5-.31.603.603 0 0 0-.51.298c-.147.228-.21.5-.275.76-.06.244-.095.49-.126.74-.076.603-.135 1.21-.19 1.815-.028.327-.107.647-.238.946-.11.256-.254.495-.404.727-.087.13-.19.223-.332.223h-.032a.382.382 0 0 1-.302-.191.956.956 0 0 1-.1-.315c-.06-.328-.068-.667-.083-1a22.25 22.25 0 0 0-.083-2.148 21.03 21.03 0 0 0-.246-2.1c-.08-.507-.206-1.02-.27-1.53a1.134 1.134 0 0 0-.28-.688.583.583 0 0 0-.71-.052.885.885 0 0 0-.34.499c-.16.48-.227.99-.27 1.498a12.355 12.355 0 0 0 0 2.21c.01.168.02.336.035.504.02.268.04.535.068.8a4.912 4.912 0 0 1-.1 1.554.437.437 0 0 1-.392.296.53.53 0 0 1-.448-.23c-.155-.22-.266-.46-.388-.7a6.275 6.275 0 0 1-.484-1.393c-.182-.71-.357-1.422-.59-2.113a.623.623 0 0 0-.583-.43.619.619 0 0 0-.583.42c-.08.232-.15.467-.222.7-.107.35-.202.7-.309 1.05a10.96 10.96 0 0 1-.508 1.442.336.336 0 0 1-.3.2.327.327 0 0 1-.234-.143.606.606 0 0 1-.09-.328 17.89 17.89 0 0 1-.013-1.85 10.65 10.65 0 0 1 .151-1.8c.032-.232.067-.468.107-.7a.497.497 0 0 0-.214-.52.548.548 0 0 0-.543-.023.774.774 0 0 0-.377.348 1.511 1.511 0 0 0-.155.57 26.687 26.687 0 0 0-.46 3.12 1.412 1.412 0 0 1-.222.755.334.334 0 0 1-.285.152.326.326 0 0 1-.274-.16c-.067-.104-.127-.216-.182-.328a6.37 6.37 0 0 1-.424-1.28c-.147-.568-.27-.723-.55-.747a.478.478 0 0 0-.512.247 1.416 1.416 0 0 0-.155.515 9.07 9.07 0 0 1-.369 1.954.341.341 0 0 1-.31.216.327.327 0 0 1-.242-.14.596.596 0 0 1-.09-.32c.004-.376.012-.756.031-1.134.02-.38.048-.755.076-1.134a.455.455 0 0 0-.195-.444.519.519 0 0 0-.48-.04.793.793 0 0 0-.376.328 1.138 1.138 0 0 0-.159.54c-.06.702-.123 1.405-.2 2.1-.035.32-.127.623-.27.91a2.383 2.383 0 0 1-.49.67.332.332 0 0 1-.258.12.336.336 0 0 1-.258-.12.871.871 0 0 1-.167-.32c-.08-.244-.127-.495-.17-.747-.076-.443-.131-.89-.187-1.333a1.47 1.47 0 0 0-.198-.564c-.167-.232-.38-.288-.583-.244a.63.63 0 0 0-.396.348 2.052 2.052 0 0 0-.147.747c-.024.475-.028.95-.04 1.425a1.85 1.85 0 0 1-.099.64.331.331 0 0 1-.302.211.332.332 0 0 1-.286-.176.993.993 0 0 1-.107-.32c-.04-.26-.067-.52-.087-.78l-.052-.73c-.04-.564-.095-1.127-.222-1.67a1.185 1.185 0 0 0-.258-.56.577.577 0 0 0-.714-.04c-.206.148-.285.46-.35.688a5.21 5.21 0 0 0-.226 1.442.27.27 0 0 0 .1.238c.072.043.147.051.215.027a1.59 1.59 0 0 0 1.257-1.44c.004-.048.004-.1 0-.147a.428.428 0 0 0-.4-.367.433.433 0 0 0-.44.335c-.072.372-.116.755-.131 1.134v0.32c-.012.392-.048 1.446-.076 1.74l-.067.732a1.826 1.826 0 0 1-.203.626c-.103.18-.246.223-.332.223-.118 0-.222-.036-.328-.107a2.717 2.717 0 0 1-.603-.72 2.115 2.115 0 0 1-.293-.926c-.067-.496-.119-.983-.317-.146-.062-.148-.178-.336-.372-.392-.167-.052-.373 0-.504.128-.142.136-.142.36-.114.516.015.131.059.251.104.383a4.499 4.499 0 0 1 .24 1.585.871.871 0 0 1-.063.324.365.365 0 0 1-.238.207.332.332 0 0 1-.246-.051.668.668 0 0 1-.186-.18 1.772 1.772 0 0 1-.202-.316c-.293-.563-.329-1.201-.471-1.804-.068-.256-.139-.6-.365-.76a.46.46 0 0 0-.254-.06.446.446 0 0 0-.233.116c-.167.148-.155.392-.135.52l.234 1.824c.031.248.059.488.087.735.02.176.043.34.063.512.048.375.083.758.123 1.138.004.032-.004.072-.032.088-.035.016-.079 0-.107-.027-.138-.149-.289-.284-.424-.44a3.535 3.535 0 0 1-.38-.515c-.076-.132-.139-.272-.226-.4-.035-.056-.067-.108-.127-.136a.407.407 0 0 0-.202-.048c-.035 0-.071.008-.101.024Z" />
+        </svg>
+        {t('certs.credly')}
+      </a>
+    </div>
+  </div>
+</section>
+
+<script>
+  function initCerts() {
+    const grid = document.getElementById('certs-grid');
+    const status = document.getElementById('certs-status');
+    const statusText = document.getElementById('certs-status-text');
+    const spinner = document.getElementById('certs-spinner');
+    const retryBtn = document.getElementById('certs-retry-btn');
+    const counter = document.getElementById('certs-counter');
+    if (!grid || grid.dataset.loaded) return;
+
+    const apiUrl = grid.dataset.api || '';
+    const labels = JSON.parse(grid.dataset.labels || '{}');
+
+    function safeUrl(url) {
+      if (typeof url !== 'string') return '';
+      const u = url.trim();
+      if (/^(https?:\/\/|mailto:|\/)/i.test(u)) return u;
+      return '';
+    }
+
+    function animateCounter(target) {
+      if (!counter) return;
+      counter.setAttribute('data-target', String(target));
+      const run = () => {
+        const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (reduce || target <= 0) {
+          counter.textContent = String(target);
+          return;
+        }
+        const dur = 1100;
+        const start = performance.now();
+        function tick(now) {
+          const p = Math.min((now - start) / dur, 1);
+          const eased = 1 - Math.pow(1 - p, 3);
+          counter.textContent = String(Math.round(eased * target));
+          if (p < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      };
+      if ('IntersectionObserver' in window) {
+        const obs = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((e) => {
+              if (e.isIntersecting) {
+                run();
+                obs.disconnect();
+              }
+            });
+          },
+          { threshold: 0.4 },
+        );
+        obs.observe(counter);
+      } else {
+        run();
+      }
+    }
+
+    function makeCard(c) {
+      const href = safeUrl(c.credential_url);
+      const wrap = href ? document.createElement('a') : document.createElement('div');
+      wrap.className =
+        'reveal is-visible group flex items-center gap-3 rounded-lg border border-bg-border bg-bg-card p-4 transition hover:border-text-faint/40';
+      if (href) {
+        wrap.href = href;
+        wrap.target = '_blank';
+        wrap.rel = 'noopener noreferrer';
+      }
+
+      const logoBox = document.createElement('div');
+      logoBox.className =
+        'flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-md border border-bg-border bg-bg-soft';
+      const logo = safeUrl(c.logo_url);
+      if (logo) {
+        const img = document.createElement('img');
+        img.src = logo;
+        img.alt = c.issuer || c.name || '';
+        img.loading = 'lazy';
+        img.className = 'h-full w-full object-contain p-1.5';
+        logoBox.appendChild(img);
+      } else {
+        const s = document.createElement('span');
+        s.className = 'font-mono text-base font-bold text-accent';
+        s.textContent = (c.issuer || c.name || '?').charAt(0).toUpperCase();
+        logoBox.appendChild(s);
+      }
+      wrap.appendChild(logoBox);
+
+      const info = document.createElement('div');
+      info.className = 'min-w-0 flex-1';
+      const name = document.createElement('p');
+      name.className = 'truncate text-sm font-medium text-text';
+      name.textContent = c.name || '';
+      info.appendChild(name);
+      const meta = document.createElement('p');
+      meta.className = 'truncate text-xs text-text-muted';
+      meta.textContent = [c.issuer, c.issue_date].filter(Boolean).join(' · ');
+      info.appendChild(meta);
+      wrap.appendChild(info);
+
+      if (href) {
+        const a = document.createElement('span');
+        a.className = 'shrink-0 text-text-faint transition group-hover:text-accent';
+        a.setAttribute('aria-hidden', 'true');
+        a.textContent = '↗';
+        wrap.appendChild(a);
+      }
+      return wrap;
+    }
+
+    function message(text) {
+      if (status) status.classList.add('hidden');
+      const p = document.createElement('p');
+      p.className = 'text-sm text-text-muted';
+      p.textContent = text;
+      grid.appendChild(p);
+    }
+
+    function fetchWithRetry(url, options = {}, retries = 3, delay = 500) {
+      return fetch(url, options)
+        .then((res) => {
+          if (!res.ok) {
+            if (retries > 0) {
+              return new Promise((resolve) => setTimeout(resolve, delay))
+                .then(() => fetchWithRetry(url, options, retries - 1, delay * 1.5));
+            }
+            throw new Error('HTTP ' + res.status);
+          }
+          return res.json();
+        })
+        .catch((err) => {
+          if (retries > 0) {
+            return new Promise((resolve) => setTimeout(resolve, delay))
+              .then(() => fetchWithRetry(url, options, retries - 1, delay * 1.5));
+          }
+          throw err;
+        });
+    }
+
+    function loadData() {
+      // Estado de carga inicial
+      if (status) status.classList.remove('hidden');
+      if (spinner) spinner.classList.add('animate-spin');
+      if (statusText) statusText.textContent = labels.loading;
+      if (retryBtn) retryBtn.classList.add('hidden');
+      grid.innerHTML = '';
+
+      fetchWithRetry(apiUrl, { headers: { Accept: 'application/json' } })
+        .then((data) => {
+          grid.dataset.loaded = '1';
+          const items = Array.isArray(data) ? data : data.items || [];
+          if (status) status.classList.add('hidden');
+          animateCounter(items.length);
+          if (!items.length) return message(labels.empty);
+          items.forEach((c) => grid.appendChild(makeCard(c)));
+        })
+        .catch(() => {
+          if (statusText) statusText.textContent = labels.error;
+          if (spinner) spinner.classList.remove('animate-spin');
+          if (retryBtn) retryBtn.classList.remove('hidden');
+        });
+    }
+
+    if (retryBtn) {
+      retryBtn.addEventListener('click', loadData);
+    }
+
+    loadData();
+  }
+  initCerts();
+  document.addEventListener('astro:page-load', initCerts);
+</script>

@@ -1,0 +1,27 @@
+---
+/**
+ * <PortfolioSections /> - Ensambla todas las secciones del portfolio para un
+ * idioma. Lo usan las 3 paginas (ES/EN/CA) para no duplicar el marcado.
+ */
+import type { Lang } from '../i18n/ui';
+import Hero from './Hero.astro';
+import Experience from './Experience.astro';
+import Skills from './Skills.astro';
+import Projects from './Projects.astro';
+import Certifications from './Certifications.astro';
+import Faq from './Faq.astro';
+import Contact from './Contact.astro';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+---
+
+<Hero lang={lang} />
+<Experience lang={lang} />
+<Skills lang={lang} />
+<Projects lang={lang} />
+<Certifications lang={lang} />
+<Faq lang={lang} />
+<Contact lang={lang} />

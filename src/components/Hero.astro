@@ -1,0 +1,240 @@
+---
+/**
+ * <Hero /> - Perfil. Minimalista: sin adornos pesados, foco en el mensaje.
+ * El badge "Disponible" se oculta solo si en el panel pones open_to_work=0
+ * (lo comprueba availability.ts via /api/settings.php, sin recompilar).
+ */
+import { useTranslations } from '../i18n/utils';
+import type { Lang } from '../i18n/ui';
+import { SITE, api } from '../config';
+import Icon from './Icon.astro';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const cvHref = SITE.cv[lang] ?? SITE.cv.es;
+const settingsUrl = api('/api/settings.php');
+---
+
+<section id="perfil" class="relative overflow-hidden">
+  <div class="hero-fade pointer-events-none absolute inset-0" aria-hidden="true"></div>
+
+  <div
+    class="container-page relative grid gap-10 py-20 pt-28 sm:pt-32 lg:grid-cols-[1fr_auto] lg:items-center lg:gap-14"
+  >
+    <div class="max-w-2xl">
+      <h1 class="text-3xl font-semibold tracking-tight text-text sm:text-5xl">
+        {SITE.name}
+      </h1>
+
+      <p class="mt-4 font-mono text-sm text-accent sm:text-base">{t('hero.role')}</p>
+
+      <p class="mt-5 max-w-xl text-base leading-relaxed text-text-muted">
+        {t('hero.tagline')}
+      </p>
+
+      <div class="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-text-faint">
+        <span class="inline-flex items-center gap-2">
+          <Icon name="location" class="h-4 w-4 text-text-faint" />
+          {t('hero.location')}
+        </span>
+        <span class="inline-flex items-center gap-2">
+          <Icon name="languages" class="h-4 w-4 text-text-faint" />
+          {t('hero.languages')}
+        </span>
+      </div>
+
+      <div class="mt-8 flex flex-wrap gap-3">
+        <a href="#contacto" class="btn-primary">{t('hero.cta.contact')}</a>
+        <button id="cv-download-btn" class="btn-ghost">
+          <Icon name="download" class="h-4 w-4" />
+          {t('hero.cta.cv')}
+        </button>
+        <a
+          href={SITE.social.linkedin}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="btn-ghost"
+        >
+          <Icon name="linkedin" class="h-4 w-4" />
+          {t('hero.cta.linkedin')}
+        </a>
+      </div>
+    </div>
+
+    <!-- Foto con Frame de Disponibilidad -->
+    <div class="order-first lg:order-last">
+      <div
+        id="avatar-container"
+        data-settings={settingsUrl}
+        class="relative mx-auto w-40 sm:w-48 lg:w-56"
+      >
+        <!-- Glowing outline frame -->
+        <div
+          id="avatar-glow-ring"
+          class="absolute -inset-1 rounded-xl bg-accent opacity-20 blur-sm transition-opacity duration-300 hidden"
+        ></div>
+        <div
+          id="avatar-pulse-ring"
+          class="absolute -inset-1.5 rounded-[14px] border-2 border-accent/40 animate-pulse-dot transition-all duration-300 hidden"
+        ></div>
+        
+        <img
+          id="avatar-img"
+          src={SITE.avatar}
+          alt={`Foto de ${SITE.name}`}
+          width="224"
+          height="224"
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+          class="relative aspect-square w-full rounded-xl border border-bg-border object-cover transition-all duration-300 animate-fade-up"
+        />
+
+        <!-- Overlapping status badge -->
+        <div
+          id="avatar-badge"
+          class="absolute -bottom-2.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-accent px-3 py-1 font-mono text-[9px] font-semibold uppercase tracking-wider text-bg shadow-[0_0_15px_rgba(74,222,128,0.4)] hidden transition-all duration-300"
+        >
+          {t('hero.status')}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para CV en actualización -->
+  <div id="cv-modal" class="modal-backdrop" hidden role="dialog" aria-modal="true" aria-labelledby="cv-modal-title">
+    <div class="relative max-h-[85vh] w-full max-w-md overflow-y-auto rounded-xl border border-bg-border bg-bg-card p-6 shadow-2xl">
+      <button id="cv-modal-close" type="button" class="absolute right-3 top-3 rounded-md p-1.5 text-text-muted transition hover:bg-bg-soft hover:text-text" aria-label={t('projects.close')}>
+        <svg class="h-5 w-5" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="currentColor" d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12Z"></path>
+        </svg>
+      </button>
+      
+      <div class="flex flex-col items-center text-center mt-4 font-mono">
+        <span class="relative flex h-12 w-12 items-center justify-center rounded-full bg-accent/10 text-accent mb-4 border border-accent/20">
+          <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent/5 opacity-75"></span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16" class="text-accent animate-pulse">
+            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+            <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z"/>
+          </svg>
+        </span>
+        
+        <h3 class="text-lg font-bold text-text uppercase tracking-wider" id="cv-modal-title">{t('cv.modal.title')}</h3>
+        
+        <p class="mt-4 text-sm text-text-muted leading-relaxed" id="cv-modal-body">
+          {t('cv.modal.body')}
+        </p>
+        
+        <div class="mt-6 rounded border border-bg-border bg-bg-soft/50 p-3 text-xs text-text-faint w-full">
+          <span>Status: OPTIMIZING_CV // Severity: INFO</span>
+        </div>
+
+        <div class="mt-6 flex flex-col sm:flex-row gap-3 w-full">
+          <a href={SITE.social.linkedin} target="_blank" rel="noopener noreferrer" class="btn-primary flex-1 font-sans text-xs flex items-center justify-center gap-2">
+            <Icon name="linkedin" class="h-4 w-4" />
+            {t('cv.modal.linkedin')}
+          </a>
+          <button type="button" id="cv-modal-btn-close" class="btn-ghost flex-1 font-sans text-xs">
+            {t('cv.modal.close')}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Controla el frame de disponibilidad del avatar en función de open_to_work (desde panel)
+  function initAvailability() {
+    const container = document.getElementById('avatar-container');
+    if (!container) return;
+    const url = container.getAttribute('data-settings');
+    if (!url) return;
+
+    const glow = document.getElementById('avatar-glow-ring');
+    const pulse = document.getElementById('avatar-pulse-ring');
+    const badge = document.getElementById('avatar-badge');
+    const img = document.getElementById('avatar-img');
+
+    fetch(url, { headers: { Accept: 'application/json' } })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data && String(data.open_to_work) === '0') {
+          if (glow) glow.classList.add('hidden');
+          if (pulse) pulse.classList.add('hidden');
+          if (badge) badge.classList.add('hidden');
+          if (img) {
+            img.classList.remove('border-accent/40');
+            img.classList.add('border-bg-border');
+          }
+        } else {
+          if (glow) glow.classList.remove('hidden');
+          if (pulse) pulse.classList.remove('hidden');
+          if (badge) badge.classList.remove('hidden');
+          if (img) {
+            img.classList.remove('border-bg-border');
+            img.classList.add('border-accent/40');
+          }
+        }
+      })
+      .catch(() => {
+        // Fallback: mostrar disponible por defecto
+        if (glow) glow.classList.remove('hidden');
+        if (pulse) pulse.classList.remove('hidden');
+        if (badge) badge.classList.remove('hidden');
+        if (img) {
+          img.classList.remove('border-bg-border');
+          img.classList.add('border-accent/40');
+        }
+      });
+  }
+
+  // Lógica del modal de CV en actualización
+  function initCvModal() {
+    const btn = document.getElementById('cv-download-btn');
+    const modal = document.getElementById('cv-modal');
+    const closeBtn = document.getElementById('cv-modal-close');
+    const closeBtn2 = document.getElementById('cv-modal-btn-close');
+
+    if (!btn || !modal) return;
+
+    const showModal = () => {
+      modal.removeAttribute('hidden');
+      void modal.offsetWidth; // force reflow
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden'; // block scroll
+    };
+
+    const hideModal = () => {
+      modal.classList.remove('open');
+      setTimeout(() => {
+        if (!modal.classList.contains('open')) {
+          modal.setAttribute('hidden', '');
+          document.body.style.overflow = ''; // restore scroll
+        }
+      }, 200); // match transition speed
+    };
+
+    btn.addEventListener('click', showModal);
+    if (closeBtn) closeBtn.addEventListener('click', hideModal);
+    if (closeBtn2) closeBtn2.addEventListener('click', hideModal);
+
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        hideModal();
+      }
+    });
+  }
+
+  // Inicialización
+  function initAll() {
+    initAvailability();
+    initCvModal();
+  }
+
+  initAll();
+  document.addEventListener('astro:page-load', initAll);
+</script>

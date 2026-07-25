@@ -1,0 +1,34 @@
+IMAGENES QUE DEBES COLOCAR AQUI (/public/img/)
+================================================
+
+Coloca estos archivos con EXACTAMENTE estos nombres (o cambia las rutas
+en src/config.ts). Las imagenes de /public se sirven desde la raiz del
+sitio, por eso en el codigo se referencian como "/img/eduardo.webp".
+
+OBLIGATORIAS
+------------
+- eduardo.webp          -> Tu foto de perfil. Cuadrada, min. 512x512 px.
+                          Recomiendo exportarla como .webp para menos peso
+                          (y actualizar la ruta en src/config.ts).
+
+- og-image.jpg         -> Imagen para compartir en LinkedIn/redes.
+                          EXACTAMENTE 1200x630 px. Pon tu foto + nombre +
+                          "SOC Analyst". Es lo que se ve al pegar tu enlace.
+
+RECOMENDADAS (PWA / iconos)
+---------------------------
+- apple-touch-icon.png -> 180x180 px
+- icon-192.png         -> 192x192 px
+- icon-512.png         -> 512x512 px
+- favicon.ico          -> 32x32 (colocalo en /public, no aqui)
+
+LOGOS DE CERTIFICACIONES (opcional)
+-----------------------------------
+Puedes guardar aqui los logos (fortinet.png, trendmicro.png, microsoft.png...)
+y luego, desde el panel de administracion, poner la ruta en cada
+certificacion, p.ej.:  /img/certs/fortinet.png
+
+CONSEJO DE RENDIMIENTO
+----------------------
+Optimiza las imagenes antes de subir (https://squoosh.app). Objetivo:
+foto de perfil < 80 KB, og-image < 150 KB.

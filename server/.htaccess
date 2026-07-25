@@ -1,0 +1,135 @@
+# ===========================================================================
+#  .htaccess PRINCIPAL  (colocar en la RAIZ del sitio: public_html/.htaccess)
+#  Apache / CDMON
+#
+#  Hace: forzar HTTPS, cachear estaticos, proteger archivos sensibles,
+#  cabeceras de seguridad (incluida CSP estricta) y paginas de error.
+#
+#  NOTA: los clientes FTP ocultan los archivos que empiezan por punto.
+#  Activa "mostrar archivos ocultos" en FileZilla para verlo/subirlo.
+# ===========================================================================
+
+# --- Forzar HTTPS ---
+# ACTIVO por defecto. CDMON incluye certificado SSL gratuito (Let's Encrypt);
+# asegurate de que este emitido ANTES de subir esto. Si tu SSL aun NO esta
+# listo, comenta las 3 lineas del bloque HTTPS (pon # delante) y descomentalas
+# cuando el candado ya funcione.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # HTTP -> HTTPS
+  RewriteCond %{HTTPS} off
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  # www -> sin www  (comenta este bloque si prefieres usar www)
+  RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+  RewriteRule ^ https://%1%{REQUEST_URI} [L,R=301]
+</IfModule>
+
+# --- Paginas de error personalizadas ---
+ErrorDocument 400 /400/index.html
+ErrorDocument 403 /403/index.html
+ErrorDocument 404 /404.html
+ErrorDocument 500 /500.html
+
+# --- Proteger archivos sensibles del backend ---
+<FilesMatch "^(config\.php|config\.example\.php|db\.php|bootstrap\.php)$">
+  Require all denied
+</FilesMatch>
+
+# Bloquear el acceso web directo a fuentes de datos, docs y ficheros de build.
+# (No deberian llegar nunca al servidor, pero si un dia subes la carpeta
+#  entera por error, quedan tapados.)
+<FilesMatch "\.(sql|md|log|sh|bak|inc|ini|yml|yaml|lock|ts|mjs|env)$">
+  Require all denied
+</FilesMatch>
+<FilesMatch "^(package(-lock)?\.json|composer\.(json|lock)|tsconfig\.json|astro\.config\..*|tailwind\.config\..*)$">
+  Require all denied
+</FilesMatch>
+
+# Ocultar el propio .htaccess y archivos ocultos
+<FilesMatch "^\.">
+  Require all denied
+</FilesMatch>
+
+# ...pero /.well-known/security.txt SI debe ser publico (RFC 9116).
+# (<FilesMatch "^\."> solo mira el NOMBRE del archivo, no la carpeta, asi que
+#  security.txt no queda bloqueado; esto lo deja explicito por si tu hosting
+#  anade reglas globales para carpetas que empiezan por punto.)
+<Files "security.txt">
+  Require all granted
+</Files>
+
+# Desactivar el listado de directorios
+Options -Indexes
+
+# --- Cabeceras de seguridad ---
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "DENY"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "geolocation=(), microphone=(), camera=(), interest-cohort=()"
+  Header always set Cross-Origin-Opener-Policy "same-origin"
+
+  # HSTS: fuerza HTTPS durante 1 ano.
+  # ACTIVO: el sitio ya esta en produccion con SSL y Cloudflare delante.
+  # Si algun dia necesitas servir algo por HTTP puro, comenta esta linea Y
+  # limpia el HSTS del navegador (chrome://net-internals/#hsts).
+  # No incluimos "preload" a proposito: la lista de precarga es practicamente
+  # irreversible y no compensa para un portfolio.
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains" env=HTTPS
+
+  # Aisla el sitio de recursos de terceros que intenten incrustarlo.
+  Header always set Cross-Origin-Resource-Policy "same-origin"
+
+  # El panel y el API nunca deben indexarse (defensa extra al robots.txt).
+  <FilesMatch "\.php$">
+    Header always set X-Robots-Tag "noindex, nofollow, noarchive"
+  </FilesMatch>
+
+  # -------------------------------------------------------------------------
+  # Content-Security-Policy (CSP):
+  #  - Las paginas ESTATICAS (Astro) traen su propia CSP estricta en una <meta>,
+  #    con hashes calculados en cada build (script-src 'self' + sha256, SIN
+  #    'unsafe-inline'). Ver astro.config.mjs -> experimental.csp.
+  #  - El PANEL (PHP) fija su CSP por cabecera desde server/admin/auth.php.
+  #  Por eso NO ponemos aqui una CSP global: duplicarla bloquearia los scripts.
+  #  X-Frame-Options: DENY (arriba) cubre el clickjacking en todas las paginas.
+  # -------------------------------------------------------------------------
+</IfModule>
+
+# --- Compresion (gzip) ---
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/javascript application/javascript application/json image/svg+xml text/xml application/xml
+</IfModule>
+
+# --- Cache de estaticos ---
+<IfModule mod_expires.c>
+  ExpiresActive On
+
+  # Recursos con hash en el nombre (/_astro/...) -> cache larga e inmutable
+  <FilesMatch "\.(js|css|woff2|woff|ttf|eot)$">
+    ExpiresDefault "access plus 1 year"
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # Imagenes -> cache media
+  <FilesMatch "\.(jpg|jpeg|png|gif|webp|avif|svg|ico)$">
+    ExpiresDefault "access plus 30 days"
+    Header set Cache-Control "public, max-age=2592000"
+  </FilesMatch>
+
+  # HTML -> sin cache larga (para ver cambios al recompilar)
+  <FilesMatch "\.html$">
+    ExpiresDefault "access plus 0 seconds"
+    Header set Cache-Control "public, max-age=0, must-revalidate"
+  </FilesMatch>
+</IfModule>
+
+# --- Tipos MIME correctos ---
+<IfModule mod_mime.c>
+  AddType application/manifest+json .webmanifest
+  AddType image/svg+xml .svg
+  AddType font/woff2 .woff2
+  AddType text/vcard .vcf
+</IfModule>

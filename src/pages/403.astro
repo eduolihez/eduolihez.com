@@ -1,0 +1,83 @@
+---
+/**
+ * Página 403 (Acceso Denegado).
+ * Astro la compila a /403/index.html, que el .htaccess sirve como página de error.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="403 · Acceso denegado"
+  description="No tienes permisos para acceder a esta sección."
+  lang="es"
+  path="/403/"
+  withFaq={false}
+  noindex={true}
+>
+  <section class="container-page flex min-h-[75vh] flex-col items-center justify-center gap-10 py-12 lg:flex-row lg:gap-16">
+    <!-- Lado Izquierdo: Número de Error Gigante -->
+    <div class="text-center lg:text-left lg:w-1/3">
+      <h1 class="font-mono text-8xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-red-500 to-orange-500 drop-shadow-[0_0_35px_rgba(239,68,68,0.25)] md:text-9xl lg:text-[10rem]">
+        403
+      </h1>
+      <h2 class="mt-4 text-2xl font-bold tracking-tight text-text sm:text-3xl uppercase font-mono">
+        FORBIDDEN
+      </h2>
+      <p class="mt-2 text-sm leading-relaxed text-text-muted max-w-xs mx-auto lg:mx-0">
+        El acceso a este directorio o recurso ha sido explícitamente restringido.
+      </p>
+    </div>
+
+    <!-- Lado Derecho: Terminal -->
+    <div class="w-full max-w-lg lg:w-2/3">
+      <div class="rounded-lg border border-red-950/40 bg-bg-soft p-6 shadow-2xl md:p-8">
+        <div class="mb-6 flex items-center justify-between border-b border-bg-border pb-4">
+          <div class="flex items-center gap-2">
+            <span class="h-3.5 w-3.5 rounded-full bg-red-500 animate-pulse-dot" title="Alerta de Seguridad"></span>
+            <span class="font-mono text-xs font-semibold text-red-400">ACCESS_VIOLATION</span>
+          </div>
+          <span class="font-mono text-xs text-text-faint">waf_alert.log</span>
+        </div>
+
+        <div class="font-mono text-sm leading-relaxed">
+          <p class="text-text-muted">
+            <span class="text-red-400">$</span> access --verify-credentials
+          </p>
+          <p class="mt-2 text-red-500 font-bold">
+            STATUS: 403 FORBIDDEN (ACCESS DENIED)
+          </p>
+          <p class="mt-4 text-text">
+            <span class="text-red-400 font-bold">[!] ALERTA DE SEGURIDAD:</span>
+            No tienes los privilegios necesarios para acceder a esta ruta. El cortafuegos de la aplicación (WAF) ha interceptado y registrado este intento.
+          </p>
+          
+          <div class="mt-6 rounded border border-red-950/50 bg-red-950/20 p-4 text-xs text-red-300">
+            <div class="grid grid-cols-3 gap-y-1 font-semibold">
+              <span>IP Origen:</span>
+              <span class="col-span-2 text-text">Procesada por Cloudflare</span>
+              <span>Regla WAF:</span>
+              <span class="col-span-2 text-text">WAF_BLOCK_DIRECTORY_TRAVERSAL</span>
+              <span>Acción:</span>
+              <span class="col-span-2 text-text">REJECT (403 Forbidden)</span>
+            </div>
+          </div>
+
+          <div class="mt-6 flex flex-col gap-2">
+            <span class="text-xs text-text-faint"># ¿Qué puedes hacer?</span>
+            <span class="text-xs text-text-muted">1. Si eres el administrador, inicia sesión antes de acceder.</span>
+            <span class="text-xs text-text-muted">2. Si consideras que esto es un error, contacta con soporte.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-8 text-center lg:text-left">
+        <a href="/" class="btn-primary">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left mr-1 inline-block" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
+          </svg>
+          Volver al inicio
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

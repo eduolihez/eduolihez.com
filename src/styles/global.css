@@ -1,0 +1,246 @@
+/* ==========================================================================
+   Estilos globales — estetica minimalista, tema oscuro.
+   Tailwind aporta el grueso de los estilos (clases utilitarias en los .astro).
+   Aqui: fuentes (solo subset latino), base, reveal on scroll, modal e impresion.
+   ========================================================================== */
+
+/* --- Fuentes self-hosted: SOLO subconjuntos latin y latin-ext (B3) ---
+   Declaramos las @font-face a mano para no arrastrar cirilico/griego/vietnamita.
+   El navegador solo descarga el archivo cuyo unicode-range usa la pagina. */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('../../node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2')
+    format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('../../node_modules/@fontsource-variable/inter/files/inter-latin-ext-wght-normal.woff2')
+    format('woff2-variations');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+    U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020,
+    U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 800;
+  src: url('../../node_modules/@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2')
+    format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 800;
+  src: url('../../node_modules/@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-ext-wght-normal.woff2')
+    format('woff2-variations');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+    U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020,
+    U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-bg text-text font-sans antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-accent ring-offset-2 ring-offset-bg;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0a0e14;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #1f2733;
+    border-radius: 6px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #2b3543;
+  }
+
+  ::selection {
+    background: rgba(74, 222, 128, 0.22);
+    color: #e6edf3;
+  }
+}
+
+@layer components {
+  /* Contenedor centrado, mas estrecho para un aire mas minimalista. */
+  .container-page {
+    @apply mx-auto w-full max-w-5xl px-5 sm:px-6 lg:px-8;
+  }
+
+  /* Encabezados de seccion (minimalistas: kicker discreto + titulo limpio). */
+  .section-kicker {
+    @apply mb-3 font-mono text-xs font-medium uppercase tracking-[0.2em] text-accent;
+  }
+  .section-title {
+    @apply text-2xl font-semibold tracking-tight text-text sm:text-3xl;
+  }
+  .section-subtitle {
+    @apply mt-3 max-w-2xl text-[15px] leading-relaxed text-text-muted;
+  }
+
+  /* Boton primario. */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-md bg-accent px-4 py-2.5
+           text-sm font-medium text-bg transition-colors hover:bg-accent-hover
+           focus-visible:ring-2 focus-visible:ring-accent;
+  }
+
+  /* Boton secundario (borde). */
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-md border border-bg-border
+           px-4 py-2.5 text-sm font-medium text-text-muted transition-colors
+           hover:border-text-faint hover:text-text;
+  }
+
+  /* Chip para tecnologias (mas sobrio). */
+  .badge {
+    @apply inline-flex items-center rounded border border-bg-border px-2 py-0.5
+           font-mono text-xs text-text-muted;
+  }
+
+  .link-accent {
+    @apply text-accent underline-offset-4 transition hover:underline;
+  }
+
+  /* Tarjeta base minimalista. */
+  .card {
+    @apply rounded-lg border border-bg-border bg-bg-card transition-colors hover:border-text-faint/40;
+  }
+}
+
+@layer utilities {
+  /* Reveal on scroll — CON GATE .js-reveal (B1):
+     el ocultado SOLO se aplica si el JS de reveal se ejecuta (anade .js-reveal
+     a <html>). Sin JS o si el script falla, el contenido queda SIEMPRE visible. */
+  .js-reveal .reveal {
+    opacity: 0;
+    transform: translateY(18px);
+    transition:
+      opacity 0.5s ease-out,
+      transform 0.5s ease-out;
+  }
+  .js-reveal .reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .js-reveal .reveal {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* Degradado sutil superior del hero (sustituye a la rejilla marcada). */
+  .hero-fade {
+    background:
+      radial-gradient(60% 50% at 50% 0%, rgba(74, 222, 128, 0.06), transparent 70%);
+  }
+}
+
+/* --- Modal de detalle de proyecto --- */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(3, 5, 8, 0.7);
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.modal-backdrop.open {
+  opacity: 1;
+}
+.modal-backdrop[hidden] {
+  display: none;
+}
+
+/* --- Estilos de impresion: la web se convierte en un CV limpio (F10) --- */
+@media print {
+  header,
+  footer,
+  #contacto form,
+  .no-print {
+    display: none !important;
+  }
+  html,
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+  .container-page {
+    max-width: 100%;
+  }
+  section {
+    border: none !important;
+    padding: 0.75rem 0 !important;
+    break-inside: avoid;
+  }
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  a {
+    color: #000 !important;
+    text-decoration: underline;
+  }
+  .card,
+  .badge {
+    border-color: #ccc !important;
+    background: #fff !important;
+    color: #000 !important;
+  }
+  .section-kicker,
+  .section-title,
+  .section-subtitle {
+    color: #000 !important;
+  }
+}

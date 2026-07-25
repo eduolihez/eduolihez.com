@@ -1,0 +1,21 @@
+---
+/**
+ * Pagina principal en ESPANOL (ruta "/").
+ *
+ * SEO: el titulo lleva el puesto Y la ciudad. Es lo que hace que la pagina
+ * pueda salir al buscar "analista SOC Badalona" o "ciberseguridad Barcelona",
+ * no solo al buscar el nombre. Longitud ~60 caracteres para que Google no lo
+ * corte; la descripcion, ~155.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PortfolioSections from '../components/PortfolioSections.astro';
+
+const lang = 'es';
+const title = 'Eduardo Olivares | Analista SOC en Badalona, Barcelona';
+const description =
+  'Analista SOC y Blue Team en Badalona (Barcelona). Deteccion de amenazas, respuesta a incidentes, XDR/SIEM y automatizacion con Python. Certificado Fortinet NSE, Microsoft y Trend Micro.';
+---
+
+<BaseLayout title={title} description={description} lang={lang} path="/">
+  <PortfolioSections lang={lang} />
+</BaseLayout>

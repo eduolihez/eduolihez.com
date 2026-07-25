@@ -1,0 +1,199 @@
+---
+/**
+ * Header - Cabecera fija minimalista con navegacion por anclas, selector
+ * de idioma (ES/EN/CA) y menu movil. El JS va en un script externo procesado
+ * por Astro (compatible con la CSP estricta).
+ */
+import { useTranslations, localeBase } from '../i18n/utils';
+import { languages, type Lang } from '../i18n/ui';
+import Announcement from './Announcement.astro';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const base = localeBase(lang);
+
+const nav = [
+  { href: `${base}#experiencia`, label: t('nav.experience') },
+  { href: `${base}#habilidades`, label: t('nav.skills') },
+  { href: `${base}#proyectos`, label: t('nav.projects') },
+  { href: `${base}#certificaciones`, label: t('nav.certifications') },
+  { href: `${base}#faq`, label: t('nav.faq') },
+  { href: `${base}#contacto`, label: t('nav.contact') },
+];
+
+// Enlaces de idioma (a la home de cada idioma).
+const langLinks: { code: Lang; href: string }[] = [
+  { code: 'es', href: '/' },
+  { code: 'en', href: '/en/' },
+  { code: 'ca', href: '/ca/' },
+];
+
+const flagSvgs = {
+  es: `<svg class="h-3 w-4 rounded-sm" viewBox="0 0 750 500" aria-hidden="true" fill="none"><rect width="750" height="500" fill="#c60b1e"/><rect y="125" width="750" height="250" fill="#f1bf00"/></svg>`,
+  en: `<svg class="h-3 w-4 rounded-sm" viewBox="0 0 60 30" aria-hidden="true" fill="none"><rect width="60" height="30" fill="#012169"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#C8102E" stroke-width="4"/><path d="M30,0 V30 M0,15 H60" stroke="#fff" stroke-width="10"/><path d="M30,0 V30 M0,15 H60" stroke="#C8102E" stroke-width="6"/></svg>`,
+  ca: `<svg class="h-3 w-4 rounded-sm" viewBox="0 0 9 6" aria-hidden="true" fill="none"><rect width="9" height="6" fill="#FCDD09"/><rect y="0.67" width="9" height="0.67" fill="#DA121A"/><rect y="2" width="9" height="0.67" fill="#DA121A"/><rect y="3.33" width="9" height="0.67" fill="#DA121A"/><rect y="4.67" width="9" height="0.67" fill="#DA121A"/></svg>`,
+};
+---
+
+<header
+  class="fixed inset-x-0 top-0 z-50 border-b border-bg-border/60 bg-bg/80 backdrop-blur-md"
+>
+  <!-- Aviso opcional, controlado desde /admin -> Ajustes. Va DENTRO de la
+       cabecera fija: si estuviera fuera, la cabecera lo taparia al estar
+       posicionada sobre el. Cuando no hay aviso, no ocupa nada. -->
+  <Announcement lang={lang} />
+
+  <nav
+    class="container-page flex h-14 items-center justify-between"
+    aria-label="Principal"
+  >
+    <a
+      href={base}
+      class="font-mono text-sm font-semibold text-text transition hover:text-accent"
+    >
+      <span class="text-accent">&gt;_</span> eduolihez
+    </a>
+
+    <ul class="hidden items-center gap-1 md:flex">
+      {
+        nav.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              class="rounded-md px-3 py-2 text-sm text-text-muted transition hover:text-text"
+            >
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="flex items-center gap-1">
+      <!-- Selector de idioma (dropdown) -->
+      <div class="relative">
+        <button
+          id="lang-toggle"
+          type="button"
+          class="flex items-center gap-2 rounded-md border border-bg-border px-2.5 py-1.5 font-mono text-xs font-medium text-text-muted transition hover:border-text-faint hover:text-text"
+          aria-haspopup="true"
+          aria-expanded="false"
+          aria-controls="lang-menu"
+          aria-label={t('nav.language')}
+        >
+          <span class="flex items-center shrink-0 select-none" set:html={flagSvgs[lang]} />
+          <span>{lang.toUpperCase()}</span>
+          <svg class="h-3 w-3 text-text-faint" viewBox="0 0 24 24" aria-hidden="true"
+            ><path fill="currentColor" d="m7 10 5 5 5-5Z"></path></svg
+          >
+        </button>
+        <ul
+          id="lang-menu"
+          class="absolute right-0 mt-1 hidden min-w-[9rem] overflow-hidden rounded-md border border-bg-border bg-bg-card py-1 shadow-xl"
+          role="menu"
+        >
+          {
+            langLinks.map((l) => (
+              <li role="none">
+                <a
+                  role="menuitem"
+                  href={l.href}
+                  class={`flex items-center px-3 py-2 text-sm transition hover:bg-bg-soft ${
+                    l.code === lang ? 'text-accent' : 'text-text-muted hover:text-text'
+                  }`}
+                >
+                  <span class="flex items-center shrink-0 select-none" set:html={flagSvgs[l.code]} />
+                  <span class="font-mono text-xs ml-2">{l.code.toUpperCase()}</span>
+                  <span class="ml-2">{languages[l.code]}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <!-- Boton menu movil -->
+      <button
+        id="menu-toggle"
+        type="button"
+        class="inline-flex items-center justify-center rounded-md p-2 text-text-muted transition hover:text-text md:hidden"
+        aria-label={t('nav.menu')}
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+      >
+        <svg class="h-5 w-5" viewBox="0 0 24 24" aria-hidden="true"
+          ><path fill="currentColor" d="M3 6h18v2H3m0 5h18v-2H3m0 7h18v-2H3Z"></path></svg
+        >
+      </button>
+    </div>
+  </nav>
+
+  <!-- Menu movil -->
+  <div id="mobile-menu" class="hidden border-t border-bg-border bg-bg md:hidden">
+    <ul class="container-page space-y-1 py-4">
+      {
+        nav.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              class="mobile-link block rounded-md px-3 py-2.5 text-base text-text-muted transition hover:bg-bg-soft hover:text-text"
+            >
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</header>
+
+<script>
+  // Menu movil + dropdown de idioma (procesado por Astro -> externo, CSP 'self').
+  function initHeader() {
+    const menuToggle = document.getElementById('menu-toggle');
+    const menu = document.getElementById('mobile-menu');
+    if (menuToggle && menu) {
+      const close = () => {
+        menu.classList.add('hidden');
+        menuToggle.setAttribute('aria-expanded', 'false');
+      };
+      menuToggle.addEventListener('click', () => {
+        const open = !menu.classList.contains('hidden');
+        if (open) close();
+        else {
+          menu.classList.remove('hidden');
+          menuToggle.setAttribute('aria-expanded', 'true');
+        }
+      });
+      menu.querySelectorAll('.mobile-link').forEach((l) => l.addEventListener('click', close));
+    }
+
+    const langToggle = document.getElementById('lang-toggle');
+    const langMenu = document.getElementById('lang-menu');
+    if (langToggle && langMenu) {
+      const closeLang = () => {
+        langMenu.classList.add('hidden');
+        langToggle.setAttribute('aria-expanded', 'false');
+      };
+      langToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const open = !langMenu.classList.contains('hidden');
+        if (open) closeLang();
+        else {
+          langMenu.classList.remove('hidden');
+          langToggle.setAttribute('aria-expanded', 'true');
+        }
+      });
+      // Cierra al hacer clic fuera o con Escape.
+      document.addEventListener('click', closeLang);
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeLang();
+      });
+    }
+  }
+  initHeader();
+  document.addEventListener('astro:page-load', initHeader);
+</script>

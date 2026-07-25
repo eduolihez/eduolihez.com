@@ -1,0 +1,3 @@
+# Bloquea el acceso web directo a las plantillas internas del panel.
+# Solo se incluyen desde el codigo, nunca se abren por URL.
+Require all denied

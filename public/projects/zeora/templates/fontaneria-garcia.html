@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fontanería García — Fontanero urgente Barcelona 24h</title>
+<meta name="description" content="Fontanero urgente en Barcelona. Reparamos averías en 60 minutos. Servicio 24h, presupuesto siempre gratis. 12 años atendiendo el Eixample y toda Barcelona.">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0b1f3a;--blue:#1d6fa4;--sky:#e8f4fd;--text:#1a1a1a;--mid:#5a6472;--light:#9aa3ad;--line:#e4e8ec;--r:6px;--rx:12px}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:#fff;color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img,svg{display:block}
+a{text-decoration:none;color:inherit}
+
+/* TYPOGRAPHY */
+.label{font-size:.68rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--blue)}
+h1{font-family:'Instrument Serif',serif;font-size:clamp(2.8rem,5.5vw,4.6rem);line-height:1.02;font-weight:400;color:#fff}
+h2{font-family:'Instrument Serif',serif;font-size:clamp(1.9rem,3vw,2.8rem);line-height:1.1;font-weight:400;color:var(--navy)}
+h3{font-size:1rem;font-weight:600;color:var(--navy);line-height:1.3}
+p{color:var(--mid);line-height:1.75}
+.wrap{max-width:1060px;margin:0 auto;padding:0 2rem}
+
+/* NAV */
+nav{position:fixed;top:0;width:100%;z-index:100;background:rgba(11,31,58,.95);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,.07)}
+.nav-i{max-width:1060px;margin:0 auto;padding:.85rem 2rem;display:flex;justify-content:space-between;align-items:center}
+.logo{font-family:'Instrument Serif',serif;font-size:1.25rem;color:#fff;letter-spacing:.01em}
+.logo span{color:#5bb3e4}
+.nav-r{display:flex;align-items:center;gap:2rem}
+.nav-r a{font-size:.82rem;color:rgba(255,255,255,.5);transition:color .18s}
+.nav-r a:hover{color:#fff}
+.nav-phone{font-size:.88rem;font-weight:600;color:#fff;display:flex;align-items:center;gap:.45rem}
+.nav-phone::before{content:'';width:7px;height:7px;border-radius:50%;background:#34d399;flex-shrink:0}
+
+/* HERO — dark photo feel */
+#hero{min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;padding:0 0 5rem;position:relative;overflow:hidden;background:
+  linear-gradient(to bottom, rgba(11,31,58,0.1) 0%, rgba(11,31,58,0.55) 50%, rgba(11,31,58,0.88) 100%),
+  linear-gradient(145deg, #0d2744 0%, #1a3f62 25%, #0e2236 55%, #071525 100%)}
+.hero-photo-detail{position:absolute;inset:0;background-image:radial-gradient(ellipse at 70% 30%, rgba(91,179,228,.08) 0%, transparent 50%),radial-gradient(ellipse at 20% 80%, rgba(29,111,164,.06) 0%, transparent 40%);pointer-events:none}
+.hero-content{position:relative;z-index:1}
+.hero-tag{display:flex;align-items:center;gap:.7rem;margin-bottom:1.6rem}
+.ht-dot{width:8px;height:8px;border-radius:50%;background:#34d399}
+.ht-text{font-size:.72rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.5)}
+h1{max-width:620px;margin-bottom:.5rem}
+h1 em{font-style:italic;color:#5bb3e4}
+.hero-claim{font-size:1.05rem;color:rgba(255,255,255,.5);font-weight:300;margin-bottom:2.5rem;max-width:480px}
+.hero-bottom{display:flex;align-items:center;gap:2.5rem;flex-wrap:wrap}
+.cta-phone{display:flex;align-items:center;gap:1rem;background:var(--blue);color:#fff;padding:.9rem 1.8rem;border-radius:var(--r);font-weight:600;font-size:.9rem;transition:background .18s}
+.cta-phone:hover{background:#1558834}
+.cta-phone svg{width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;flex-shrink:0}
+.hero-trust{display:flex;gap:1.8rem}
+.ht2{font-size:.76rem;color:rgba(255,255,255,.35);display:flex;align-items:center;gap:.4rem}
+.ht2::before{content:'✓';color:#34d399;font-weight:700}
+
+/* STATS BAR */
+.stats{background:var(--navy);padding:1.6rem 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.stats-row{display:flex;justify-content:center;gap:0;flex-wrap:wrap}
+.st{padding:0 3rem;text-align:center;border-right:1px solid rgba(255,255,255,.08)}
+.st:last-child{border-right:none}
+.st-n{font-family:'Instrument Serif',serif;font-size:2.2rem;color:#fff;line-height:1}
+.st-l{font-size:.7rem;color:rgba(255,255,255,.35);margin-top:.2rem;letter-spacing:.04em}
+
+/* SERVICES */
+#servicios{padding:6rem 0;background:#fff}
+.services-header{margin-bottom:3rem}
+.services-header .label{margin-bottom:.7rem}
+.services-header h2{margin-bottom:.6rem}
+.services-header p{max-width:520px;font-size:.93rem}
+.svc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--rx);overflow:hidden}
+.svc{background:#fff;padding:2rem;transition:background .18s;display:flex;gap:1.4rem}
+.svc:hover{background:var(--sky)}
+.svc-left{flex-shrink:0;padding-top:.15rem}
+.svc-num{font-family:'Instrument Serif',serif;font-size:1.6rem;color:var(--line);line-height:1;user-select:none}
+.svc h3{margin-bottom:.4rem}
+.svc p{font-size:.82rem;line-height:1.7}
+.svc-meta{margin-top:.7rem;font-size:.76rem;color:var(--blue);font-weight:500}
+
+/* ABOUT STRIP */
+#sobre{padding:5rem 0;background:var(--sky);border-top:1px solid var(--line)}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center}
+.about-img{border-radius:var(--rx);overflow:hidden;aspect-ratio:4/3;background:
+  linear-gradient(rgba(11,31,58,.2) 0%, rgba(11,31,58,.5) 100%),
+  linear-gradient(155deg, #1a3f62 0%, #0d2744 40%, #0a1e35 100%);
+  position:relative;display:flex;align-items:flex-end;padding:1.5rem}
+.about-img::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 40%, rgba(91,179,228,.12) 0%, transparent 55%)}
+.ai-caption{position:relative;z-index:1;font-size:.74rem;color:rgba(255,255,255,.45);font-style:italic}
+.about-text .label{margin-bottom:.8rem}
+.about-text h2{margin-bottom:.9rem}
+.about-text p{font-size:.9rem;margin-bottom:1rem}
+.about-list{display:flex;flex-direction:column;gap:.5rem;margin-top:1.2rem}
+.al{font-size:.84rem;color:var(--mid);display:flex;align-items:center;gap:.6rem}
+.al::before{content:'';width:1.2rem;height:1px;background:var(--blue);flex-shrink:0}
+
+/* REVIEWS */
+#opiniones{padding:6rem 0;border-top:1px solid var(--line)}
+.reviews-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:3rem;gap:1rem;flex-wrap:wrap}
+.rev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem}
+.rv{background:#fff;border:1px solid var(--line);border-radius:var(--rx);padding:1.8rem;transition:box-shadow .18s}
+.rv:hover{box-shadow:0 4px 24px rgba(0,0,0,.07)}
+.rv-stars{font-size:.8rem;letter-spacing:.06em;color:#f59e0b;margin-bottom:1rem}
+.rv-text{font-size:.84rem;color:var(--text);line-height:1.8;margin-bottom:1.3rem;font-weight:300}
+.rv-text::before{content:'"';font-family:'Instrument Serif',serif;font-size:1.8rem;color:var(--line);line-height:0;vertical-align:-.35em;margin-right:.1em}
+.rv-a{display:flex;align-items:center;gap:.7rem}
+.rv-av{width:34px;height:34px;border-radius:50%;background:var(--sky);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:var(--blue);flex-shrink:0;border:1px solid var(--line)}
+.rv-name{font-size:.82rem;font-weight:600;color:var(--navy)}
+.rv-loc{font-size:.7rem;color:var(--light)}
+
+/* CTA */
+#cta{background:var(--navy);padding:6rem 0}
+.cta-inner{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:start}
+.cta-left{}
+.cta-left .label{color:rgba(255,255,255,.3);margin-bottom:.8rem}
+.cta-left h2{color:#fff;margin-bottom:.9rem}
+.cta-left p{color:rgba(255,255,255,.4);font-size:.9rem;margin-bottom:1.8rem}
+.cta-feat{font-size:.82rem;color:rgba(255,255,255,.35);display:flex;align-items:center;gap:.55rem;padding:.25rem 0}
+.cta-feat::before{content:'✓';color:#34d399;font-weight:700;font-size:.75rem;flex-shrink:0}
+.cform{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:var(--rx);padding:2rem}
+.fg{margin-bottom:.9rem}
+.fg label{display:block;font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.25);margin-bottom:.38rem}
+.fg input,.fg textarea,.fg select{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:var(--r);padding:.7rem .9rem;font-size:.84rem;color:#fff;font-family:'Inter',sans-serif;outline:none;transition:border-color .18s;-webkit-appearance:none}
+.fg input::placeholder,.fg textarea::placeholder{color:rgba(255,255,255,.2)}
+.fg input:focus,.fg textarea:focus,.fg select:focus{border-color:rgba(91,179,228,.5)}
+.fg select option{background:#0b1f3a}
+.fg textarea{resize:vertical;min-height:80px}
+.fg2{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+.fsub{width:100%;padding:.88rem;background:var(--blue);color:#fff;border:none;border-radius:var(--r);font-size:.85rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:.02em;transition:background .18s}
+.fsub:hover{background:#155c8a}
+
+footer{background:#060f1c;padding:2rem 0}
+.foot{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.8rem}
+.foot-logo{font-family:'Instrument Serif',serif;font-size:1rem;color:rgba(255,255,255,.3)}
+.foot-logo span{color:rgba(91,179,228,.6)}
+footer p{font-size:.7rem;color:rgba(255,255,255,.16)}
+.foot-z{font-size:.7rem;color:rgba(255,255,255,.16)}
+.foot-z a{color:rgba(255,255,255,.28);transition:color .18s}
+.foot-z a:hover{color:rgba(255,255,255,.55)}
+
+@media(max-width:860px){
+  .about-grid,.cta-inner{grid-template-columns:1fr}
+  .about-img{display:none}
+  .svc-grid{grid-template-columns:1fr}
+  .rev-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:580px){
+  .rev-grid{grid-template-columns:1fr}
+  .stats-row .st{padding:1rem 1.5rem;width:50%;border-right:none;border-bottom:1px solid rgba(255,255,255,.08)}
+  .stats-row .st:nth-child(odd){border-right:1px solid rgba(255,255,255,.08)}
+  .wrap{padding:0 1.3rem}
+  .hero-trust{flex-wrap:wrap;gap:1rem}
+  .fg2{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-i">
+    <div class="logo">Fontanería <span>García</span></div>
+    <div class="nav-r">
+      <a href="#servicios">Servicios</a>
+      <a href="#sobre">Quiénes somos</a>
+      <a href="#opiniones">Opiniones</a>
+      <span class="nav-phone">
+        <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.15 10.8a19.79 19.79 0 01-3-8.57A2 2 0 012.12 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+        93 456 78 90
+      </span>
+    </div>
+  </div>
+</nav>
+
+<section id="hero">
+  <div class="hero-photo-detail"></div>
+  <div class="wrap">
+    <div class="hero-content">
+      <div class="hero-tag"><div class="ht-dot"></div><span class="ht-text">Disponible 24h · Barcelona y área</span></div>
+      <h1>Fontanero urgente<br>en <em>Barcelona</em>.<br>En 60 minutos.</h1>
+      <p class="hero-claim">Averías, fugas, calderas y desatascos. Doce años siendo el fontanero de confianza del Eixample y todo Barcelona.</p>
+      <div class="hero-bottom">
+        <a href="tel:934567890" class="cta-phone">
+          <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.15 10.8a19.79 19.79 0 01-3-8.57A2 2 0 012.12 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+          Llamar ahora: 93 456 78 90
+        </a>
+        <div class="hero-trust">
+          <span class="ht2">Sin cargo por desplazamiento</span>
+          <span class="ht2">Precio cerrado antes de empezar</span>
+          <span class="ht2">Garantía en todos los trabajos</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="stats">
+  <div class="wrap">
+    <div class="stats-row">
+      <div class="st"><div class="st-n">350+</div><div class="st-l">Clientes en Barcelona</div></div>
+      <div class="st"><div class="st-n">60'</div><div class="st-l">Tiempo máximo de llegada</div></div>
+      <div class="st"><div class="st-n">12</div><div class="st-l">Años de experiencia</div></div>
+      <div class="st"><div class="st-n">24h</div><div class="st-l">Siempre disponibles</div></div>
+    </div>
+  </div>
+</div>
+
+<section id="servicios">
+  <div class="wrap">
+    <div class="services-header">
+      <div class="label">Servicios</div>
+      <h2>Todo lo que necesitas,<br>a cualquier hora.</h2>
+      <p>Cubrimos cualquier avería de fontanería. Si es urgente, llama directamente. Para trabajos planificados, pídenos presupuesto sin compromiso.</p>
+    </div>
+    <div class="svc-grid">
+      <div class="svc"><div class="svc-left"><div class="svc-num">01</div></div><div><h3>Fugas y averías urgentes</h3><p>Localización y reparación de fugas en paredes, techos y suelos. Mínimo impacto en la obra. Respuesta en menos de 60 minutos en Barcelona.</p><div class="svc-meta">Urgencia desde 65 € · Disponible 24h</div></div></div>
+      <div class="svc"><div class="svc-left"><div class="svc-num">02</div></div><div><h3>Calderas y calentadores</h3><p>Mantenimiento anual, reparación de averías y sustitución. Trabajamos con todas las marcas: Junkers, Baxi, Vaillant, Roca, Ferroli.</p><div class="svc-meta">Mantenimiento desde 85 €/año</div></div></div>
+      <div class="svc"><div class="svc-left"><div class="svc-num">03</div></div><div><h3>Desatascos</h3><p>Inodoros, duchas, fregaderos y bajantes. Maquinaria de presión profesional. Servicio de urgencia disponible cualquier día.</p><div class="svc-meta">Desatasco desde 55 € · 24h</div></div></div>
+      <div class="svc"><div class="svc-left"><div class="svc-num">04</div></div><div><h3>Instalaciones y reformas</h3><p>Cambio de grifería y sanitarios, instalaciones para obra nueva y reformas integrales de baño y cocina. Presupuesto gratuito con visita.</p><div class="svc-meta">Presupuesto según proyecto</div></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="sobre">
+  <div class="wrap">
+    <div class="about-grid">
+      <div class="about-img">
+        <span class="ai-caption">Equipo trabajando en el Eixample, Barcelona</span>
+      </div>
+      <div class="about-text">
+        <div class="label">Quiénes somos</div>
+        <h2>Fontaneros de<br>Barcelona, para Barcelona.</h2>
+        <p>Llevamos 12 años resolviendo urgencias y reformas en Barcelona. Conocemos los edificios del Eixample, las instalaciones antiguas del Gòtic y las necesidades de las nuevas construcciones de Poblenou.</p>
+        <p>No somos una central que deriva llamadas. Cuando llamas, coges a quien va a tu casa. Sin intermediarios, sin sorpresas.</p>
+        <div class="about-list">
+          <div class="al">Precio siempre cerrado antes de empezar</div>
+          <div class="al">Sin desplazamiento extra en Barcelona</div>
+          <div class="al">Garantía de 2 años en materiales y mano de obra</div>
+          <div class="al">Factura oficial en todos los trabajos</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="opiniones">
+  <div class="wrap">
+    <div class="reviews-header">
+      <div>
+        <div class="label">Opiniones</div>
+        <h2>Lo que dicen nuestros clientes.</h2>
+      </div>
+      <span style="font-size:.82rem;color:var(--light)">4.9 / 5 · 127 valoraciones en Google</span>
+    </div>
+    <div class="rev-grid">
+      <div class="rv"><div class="rv-stars">★★★★★</div><p class="rv-text">A las 11 de la noche con una fuga en la cocina. Llegaron en 40 minutos, arreglaron el problema limpio y sin destrozar nada. El precio fue el que dijeron por teléfono. Sin más.</p><div class="rv-a"><div class="rv-av">CR</div><div><div class="rv-name">Carmen Rodríguez</div><div class="rv-loc">Eixample Esquerra</div></div></div></div>
+      <div class="rv"><div class="rv-stars">★★★★★</div><p class="rv-text">Cambiaron la caldera vieja en un día. Me explicaron las opciones, no intentaron venderme nada innecesario y el trabajo quedó perfecto. Ahora también les encargo el mantenimiento anual.</p><div class="rv-a"><div class="rv-av">JL</div><div><div class="rv-name">Jordi López</div><div class="rv-loc">Gràcia</div></div></div></div>
+      <div class="rv"><div class="rv-stars">★★★★★</div><p class="rv-text">Desatasco de urgencia un domingo por la mañana. Puntualísimos, en 20 minutos resolvieron algo que llevaba días dando problemas. Precio justo y factura al momento.</p><div class="rv-a"><div class="rv-av">MP</div><div><div class="rv-name">Marta Puig</div><div class="rv-loc">Sarrià – Sant Gervasi</div></div></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="cta">
+  <div class="wrap">
+    <div class="cta-inner">
+      <div class="cta-left">
+        <div class="label">Contacto</div>
+        <h2>¿Tienes una avería<br>o necesitas presupuesto?</h2>
+        <p>Cuéntanos qué necesitas. Respondemos en menos de 2 horas en horario de oficina, y en menos de 60 minutos si es urgente.</p>
+        <div class="cta-feat">Presupuesto gratuito y sin compromiso</div>
+        <div class="cta-feat">Sin desplazamiento en Barcelona</div>
+        <div class="cta-feat">Garantía de 2 años en todos los trabajos</div>
+        <div class="cta-feat">Factura oficial siempre</div>
+      </div>
+      <div class="cform">
+        <div class="fg2">
+          <div class="fg"><label>Nombre</label><input type="text" placeholder="Tu nombre" autocomplete="name"></div>
+          <div class="fg"><label>Teléfono</label><input type="tel" placeholder="612 345 678" autocomplete="tel"></div>
+        </div>
+        <div class="fg"><label>Email</label><input type="email" placeholder="tu@email.com" autocomplete="email"></div>
+        <div class="fg">
+          <label>Tipo de avería</label>
+          <select>
+            <option value="">¿Qué necesitas?</option>
+            <option>Fuga o avería urgente</option>
+            <option>Caldera o calentador</option>
+            <option>Desatasco</option>
+            <option>Grifería o sanitarios</option>
+            <option>Instalación nueva</option>
+            <option>Otro</option>
+          </select>
+        </div>
+        <div class="fg"><label>Cuéntanos</label><textarea placeholder="Describe brevemente el problema y el barrio donde estás…"></textarea></div>
+        <button class="fsub">Enviar consulta</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot">
+      <div class="foot-logo">Fontanería <span>García</span></div>
+      <p>© 2026 · Barcelona · fontaneriagarciabarcelona.es</p>
+      <div class="foot-z">Web por <a href="../index.html">Zéora</a></div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

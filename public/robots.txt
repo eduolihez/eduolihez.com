@@ -1,0 +1,132 @@
+# ===========================================================================
+#  robots.txt · eduolihez.com
+#
+#  Le dice a los rastreadores que pueden leer. Aqui la politica es sencilla:
+#  TODO el contenido publico es rastreable, incluidos los rastreadores de IA
+#  (GPTBot, ClaudeBot, PerplexityBot...). Es un portfolio: que las IAs sepan
+#  quien eres es exactamente lo que interesa. Solo se bloquea el panel de
+#  administracion y los endpoints del API, que no aportan nada en una busqueda.
+# ===========================================================================
+
+# --- Regla general para cualquier rastreador -------------------------------
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /uploads/*.php$
+
+# El resumen en texto plano para modelos de lenguaje.
+Allow: /llms.txt
+
+# --- Buscadores tradicionales ----------------------------------------------
+User-agent: Googlebot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+User-agent: Googlebot-Image
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+User-agent: DuckDuckBot
+Allow: /
+
+# --- Rastreadores de IA: PERMITIDOS a proposito -----------------------------
+# Cada uno de estos alimenta un asistente distinto. Si los bloqueas, esa IA
+# deja de poder citarte cuando alguien pregunta por un analista SOC en
+# Barcelona. Bloquea solo si algun dia publicas contenido que no quieras que
+# se use para entrenar modelos.
+
+# OpenAI — ChatGPT (rastreo general y busqueda en vivo)
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+# Anthropic — Claude
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+# Perplexity
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+# Google — Gemini y AI Overviews
+User-agent: Google-Extended
+Allow: /
+
+# Microsoft Copilot
+User-agent: bingbot
+Allow: /
+
+# Apple Intelligence
+User-agent: Applebot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+# Common Crawl (base de datos que usan muchos modelos)
+User-agent: CCBot
+Allow: /
+
+# Meta AI
+User-agent: meta-externalagent
+Allow: /
+
+# Mistral
+User-agent: MistralAI-User
+Allow: /
+
+# --- Redes sociales (para que las tarjetas de enlace se generen bien) -------
+User-agent: LinkedInBot
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: WhatsApp
+Allow: /
+
+User-agent: TelegramBot
+Allow: /
+
+# --- Rastreadores agresivos de SEO comercial --------------------------------
+# No aportan visitas, solo consumen ancho de banda del hosting compartido.
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+User-agent: PetalBot
+Disallow: /
+
+# --- Mapa del sitio ---------------------------------------------------------
+Sitemap: https://eduolihez.com/sitemap.xml

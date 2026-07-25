@@ -1,0 +1,11 @@
+api/sessions/
+api/rate_cache/
+
+# Environment — mai pujar credencials al repositori
+.env
+.env.*
+!.env.example
+
+# Fitxers de configuració amb credencials — mai al repositori
+config/db.php
+config/*.local.php

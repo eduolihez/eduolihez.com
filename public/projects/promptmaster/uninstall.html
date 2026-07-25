@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Goodbye — PromptMaster</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:           #09090b;
+      --glass:        rgba(255,255,255,0.035);
+      --glass-hover:  rgba(255,255,255,0.06);
+      --border:       rgba(255,255,255,0.08);
+      --accent:       #8b5cf6;
+      --gradient:     linear-gradient(135deg,#8b5cf6,#6366f1);
+      --gold:         linear-gradient(135deg,#f59e0b,#d97706);
+      --glow:         rgba(139,92,246,0.35);
+      --text:         #f8fafc;
+      --muted:        #94a3b8;
+      --subtle:       #64748b;
+      --radius:       12px;
+      --radius-lg:    18px;
+      --blur:         blur(16px);
+    }
+
+    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+
+    body {
+      font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      padding:32px 20px;
+      -webkit-font-smoothing:antialiased;
+      background:
+        radial-gradient(ellipse 70% 50% at 50% 0%, rgba(139,92,246,0.12) 0%, transparent 65%),
+        #09090b;
+    }
+
+    ::-webkit-scrollbar { width:5px; }
+    ::-webkit-scrollbar-thumb { background:rgba(139,92,246,0.3); border-radius:99px; }
+
+    .card {
+      width:100%; max-width:580px;
+      background:var(--glass);
+      backdrop-filter:var(--blur); -webkit-backdrop-filter:var(--blur);
+      border:1px solid var(--border);
+      border-radius:24px;
+      padding:48px 40px;
+      display:flex; flex-direction:column; gap:32px;
+      box-shadow:0 32px 80px rgba(0,0,0,0.4);
+    }
+
+    .card-header { text-align:center; }
+
+    .emoji {
+      font-size:56px; display:block; margin-bottom:20px;
+      animation:wave 2.5s ease-in-out infinite;
+      transform-origin:70% 70%;
+    }
+
+    @keyframes wave {
+      0%,100% { transform:rotate(0deg); }
+      15%      { transform:rotate(-18deg); }
+      30%      { transform:rotate(14deg); }
+      45%      { transform:rotate(-12deg); }
+      60%      { transform:rotate(8deg); }
+      75%      { transform:rotate(-4deg); }
+    }
+
+    .card-title {
+      font-size:28px; font-weight:900; letter-spacing:-0.03em; margin-bottom:12px;
+    }
+
+    .card-sub {
+      font-size:15px; color:var(--muted); line-height:1.65;
+    }
+
+    .feedback-label {
+      font-size:13px; font-weight:700; text-transform:uppercase;
+      letter-spacing:0.07em; color:var(--subtle); margin-bottom:14px;
+    }
+
+    .reasons {
+      display:flex; flex-direction:column; gap:8px;
+    }
+
+    .reason-btn {
+      display:flex; align-items:center; gap:12px;
+      padding:13px 16px;
+      background:rgba(255,255,255,0.025);
+      border:1.5px solid var(--border);
+      border-radius:var(--radius); cursor:pointer;
+      font-family:inherit; font-size:14px; color:var(--muted);
+      text-align:left; transition:all 0.2s;
+    }
+
+    .reason-btn:hover {
+      background:rgba(139,92,246,0.08);
+      border-color:rgba(139,92,246,0.3);
+      color:var(--text);
+    }
+
+    .reason-btn.selected {
+      background:rgba(139,92,246,0.12);
+      border-color:rgba(139,92,246,0.4);
+      color:var(--text);
+    }
+
+    .reason-btn.selected .reason-icon { filter:none; }
+
+    .reason-icon { font-size:18px; flex-shrink:0; }
+
+    .comment-wrap { display:flex; flex-direction:column; gap:8px; }
+
+    .comment-label {
+      font-size:13px; color:var(--subtle);
+    }
+
+    textarea {
+      width:100%; font-family:inherit; font-size:13.5px;
+      color:var(--text); background:rgba(255,255,255,0.04);
+      border:1.5px solid var(--border); border-radius:var(--radius);
+      padding:12px 14px; outline:none; resize:vertical;
+      min-height:90px; line-height:1.6;
+      transition:border-color 0.2s, box-shadow 0.2s;
+    }
+
+    textarea::placeholder { color:var(--subtle); }
+
+    textarea:focus {
+      border-color:rgba(139,92,246,0.5);
+      box-shadow:0 0 0 3px rgba(139,92,246,0.1);
+    }
+
+    .actions { display:flex; flex-direction:column; gap:10px; }
+
+    .btn {
+      font-family:inherit; font-size:14px; font-weight:700;
+      padding:13px 20px; border-radius:var(--radius); border:none;
+      cursor:pointer; transition:all 0.2s;
+      text-align:center; text-decoration:none;
+      display:flex; align-items:center; justify-content:center; gap:8px;
+    }
+
+    .btn-primary {
+      background:var(--gradient); color:#fff;
+      box-shadow:0 3px 16px rgba(139,92,246,0.4);
+    }
+
+    .btn-primary:hover {
+      box-shadow:0 5px 26px rgba(139,92,246,0.58);
+      transform:translateY(-1px);
+    }
+
+    .btn-ghost {
+      background:transparent; color:var(--muted);
+      border:1.5px solid var(--border);
+    }
+
+    .btn-ghost:hover { color:var(--text); border-color:rgba(255,255,255,0.2); }
+
+    .btn-send {
+      background:rgba(139,92,246,0.1);
+      border:1px solid rgba(139,92,246,0.25);
+      color:var(--accent); font-size:13px;
+      padding:10px 18px; border-radius:9px;
+      align-self:flex-end;
+      transition:all 0.2s;
+    }
+
+    .btn-send:hover {
+      background:rgba(139,92,246,0.18);
+    }
+
+    .pro-banner {
+      background:rgba(139,92,246,0.07);
+      border:1px solid rgba(139,92,246,0.2);
+      border-radius:var(--radius-lg);
+      padding:22px 24px;
+      display:flex; flex-direction:column; gap:12px;
+    }
+
+    .pro-banner-title {
+      font-size:15px; font-weight:800; letter-spacing:-0.01em;
+    }
+
+    .pro-banner-title span {
+      background:var(--gradient);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+
+    .pro-banner-desc {
+      font-size:13px; color:var(--muted); line-height:1.6;
+    }
+
+    .btn-gold {
+      background:var(--gold); color:#fff;
+      box-shadow:0 2px 12px rgba(245,158,11,0.35);
+      font-size:13px; padding:10px 18px; border-radius:9px;
+    }
+
+    .btn-gold:hover {
+      box-shadow:0 4px 20px rgba(245,158,11,0.55);
+      transform:translateY(-1px);
+    }
+
+    .footer-note {
+      text-align:center; font-size:12px; color:var(--subtle);
+      margin-top:24px; line-height:1.6;
+    }
+
+    .footer-note a { color:var(--accent); text-decoration:underline; }
+
+    .confirm-msg {
+      display:none;
+      text-align:center; padding:20px;
+      font-size:15px; color:var(--muted);
+    }
+
+    .confirm-msg .big { font-size:36px; margin-bottom:12px; display:block; }
+
+    @media(max-width:480px) {
+      .card { padding:32px 22px; }
+      .card-title { font-size:24px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+
+  <!-- Header -->
+  <div class="card-header">
+    <span class="emoji">👋</span>
+    <h1 class="card-title">Goodbye</h1>
+    <p class="card-sub">
+      Sorry to see you go. If you have 30 seconds, your feedback helps us improve PromptMaster for everyone.
+    </p>
+  </div>
+
+  <!-- Feedback -->
+  <div id="feedback-section">
+    <div class="feedback-label">Why did you uninstall?</div>
+    <div class="reasons" id="reasons">
+      <button class="reason-btn" onclick="selectReason(this)">
+        <span class="reason-icon">🤔</span>
+        <span>I didn't understand how to use it</span>
+      </button>
+      <button class="reason-btn" onclick="selectReason(this)">
+        <span class="reason-icon">🐛</span>
+        <span>I found a bug or it didn't work properly</span>
+      </button>
+      <button class="reason-btn" onclick="selectReason(this)">
+        <span class="reason-icon">💰</span>
+        <span>The Free plan is too limited</span>
+      </button>
+      <button class="reason-btn" onclick="selectReason(this)">
+        <span class="reason-icon">🔄</span>
+        <span>I found a better alternative</span>
+      </button>
+      <button class="reason-btn" onclick="selectReason(this)">
+        <span class="reason-icon">🧹</span>
+        <span>I was just cleaning up my browser</span>
+      </button>
+    </div>
+
+    <div class="comment-wrap" style="margin-top:16px;">
+      <div class="comment-label">Anything else you'd like to tell us? (optional)</div>
+      <textarea id="comment" placeholder="Your feedback, no matter how small, helps us a lot..."></textarea>
+      <button class="btn btn-send" onclick="sendFeedback()">Send feedback →</button>
+    </div>
+  </div>
+
+  <!-- Confirmation (shown after send) -->
+  <div class="confirm-msg" id="confirm-msg">
+    <span class="big">🙏</span>
+    Thanks for your feedback. We read everything and it helps us keep improving.
+  </div>
+
+  <!-- PRO last chance -->
+  <div class="pro-banner">
+    <div class="pro-banner-title">Leaving because the Free plan is limited? <span>PRO fixes everything.</span></div>
+    <div class="pro-banner-desc">
+      Unlimited enhancements, 20 high-converting PRO prompts, 20 Elite AI Roles, and lifetime access — for a one-time payment.
+    </div>
+    <a href="https://eduolihez.gumroad.com/l/oofmvr" class="btn btn-gold" target="_blank" rel="noopener">👑 Get PRO for €27 (one-time payment)</a>
+  </div>
+
+  <!-- Actions -->
+  <div class="actions">
+    <a href="#" class="btn btn-primary">⚡ Reinstall PromptMaster</a>
+    <a href="mailto:eduolihez@gmail.com?subject=PromptMaster Feedback" class="btn btn-ghost">✉️ Contact support</a>
+  </div>
+
+</div>
+
+<p class="footer-note">
+  Have a technical problem we can fix? Write to us at <a href="mailto:eduolihez@gmail.com">eduolihez@gmail.com</a><br>
+  We reply within 24 hours.
+</p>
+
+<script>
+  function selectReason(btn) {
+    document.querySelectorAll('.reason-btn').forEach(function(b) {
+      b.classList.remove('selected');
+    });
+    btn.classList.add('selected');
+  }
+
+  function sendFeedback() {
+    var selected = document.querySelector('.reason-btn.selected');
+    var reason   = selected ? selected.querySelector('span:last-child').textContent : 'Not specified';
+    var comment  = document.getElementById('comment').value.trim();
+
+    var subject = encodeURIComponent('PromptMaster Uninstall Feedback');
+    var body    = encodeURIComponent(
+      'Reason: ' + reason + '\n\n' +
+      (comment ? 'Additional comment:\n' + comment : '')
+    );
+    window.location.href = 'mailto:eduolihez@gmail.com?subject=' + subject + '&body=' + body;
+
+    document.getElementById('feedback-section').style.display = 'none';
+    document.getElementById('confirm-msg').style.display      = 'block';
+  }
+</script>
+
+</body>
+</html>

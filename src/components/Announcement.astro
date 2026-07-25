@@ -1,0 +1,111 @@
+---
+/**
+ * <Announcement /> - Franja de aviso en la parte superior.
+ *
+ * El texto NO esta en el HTML compilado: se pide a /api/settings.php al cargar.
+ * Asi puedes poner o quitar un aviso desde /admin -> Ajustes sin recompilar ni
+ * subir nada por FTP.
+ *
+ * Si el aviso esta desactivado (o el API no responde), la franja no aparece
+ * y no ocupa espacio: la web se ve exactamente igual que sin este componente.
+ * Una vez cerrado, se recuerda en sessionStorage para no volver a molestar
+ * durante esa sesion.
+ */
+import { useTranslations } from '../i18n/utils';
+import type { Lang } from '../i18n/ui';
+import { api } from '../config';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const settingsUrl = api(`/api/settings.php?lang=${lang}`);
+---
+
+<div
+  id="site-announcement"
+  class="hidden border-b border-accent/25 bg-accent/10 text-sm"
+  data-settings={settingsUrl}
+  role="status"
+>
+  <div class="container-page flex items-center justify-between gap-4 py-2">
+    <p class="min-w-0 flex-1 text-center text-accent">
+      <a id="ann-link" class="hover:underline" href="#"><span id="ann-text"></span></a>
+    </p>
+    <button
+      id="ann-close"
+      type="button"
+      class="shrink-0 rounded p-1 text-accent/70 transition hover:text-accent"
+      aria-label={t('announcement.close')}
+    >
+      <svg class="h-4 w-4" viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          fill="currentColor"
+          d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12Z"
+        ></path>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<script>
+  function initAnnouncement() {
+    const box = document.getElementById('site-announcement');
+    if (!box || box.dataset.loaded) return;
+    box.dataset.loaded = '1';
+
+    // Ya lo cerro en esta sesion: ni siquiera preguntamos al servidor.
+    try {
+      if (sessionStorage.getItem('ann-dismissed') === '1') return;
+    } catch {
+      /* sessionStorage bloqueado (modo privado estricto): seguimos igual */
+    }
+
+    const url = box.dataset.settings || '';
+    const textEl = document.getElementById('ann-text');
+    const linkEl = document.getElementById('ann-link');
+    const closeEl = document.getElementById('ann-close');
+
+    closeEl?.addEventListener('click', () => {
+      box.classList.add('hidden');
+      try {
+        sessionStorage.setItem('ann-dismissed', '1');
+      } catch {
+        /* ignorado */
+      }
+    });
+
+    fetch(url, { headers: { Accept: 'application/json' } })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        const ann = data && data.announcement;
+        if (!ann || String(ann.on) !== '1' || !ann.text) return;
+
+        textEl.textContent = ann.text;
+
+        // Solo aceptamos https:// o rutas internas. Sin esto, un valor
+        // manipulado en la base de datos podria colar un javascript:.
+        const href = typeof ann.url === 'string' ? ann.url.trim() : '';
+        if (href && /^(https:\/\/|\/)/i.test(href)) {
+          linkEl.setAttribute('href', href);
+          if (href.startsWith('http')) {
+            linkEl.setAttribute('target', '_blank');
+            linkEl.setAttribute('rel', 'noopener noreferrer');
+          }
+        } else {
+          // Sin enlace valido: se muestra como texto plano.
+          linkEl.removeAttribute('href');
+          linkEl.classList.remove('hover:underline');
+        }
+
+        box.classList.remove('hidden');
+      })
+      .catch(() => {
+        /* silencioso: un aviso que no carga no debe romper nada */
+      });
+  }
+
+  initAnnouncement();
+  document.addEventListener('astro:page-load', initAnnouncement);
+</script>

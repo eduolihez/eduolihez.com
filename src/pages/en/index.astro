@@ -1,0 +1,16 @@
+---
+/**
+ * Main page in ENGLISH (route "/en/").
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PortfolioSections from '../../components/PortfolioSections.astro';
+
+const lang = 'en';
+const title = 'Eduardo Olivares | SOC Analyst in Badalona, Barcelona';
+const description =
+  'SOC Analyst and Blue Team professional in Badalona (Barcelona, Spain). Threat detection, incident response, XDR/SIEM and Python automation. Fortinet NSE, Microsoft and Trend Micro certified.';
+---
+
+<BaseLayout title={title} description={description} lang={lang} path="/en/">
+  <PortfolioSections lang={lang} />
+</BaseLayout>

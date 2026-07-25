@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title data-i18n="nav_incidents">Incidències — BadaVeu</title>
+    <meta name="description" content="Totes les incidències actives i resoltes de Badalona — BadaVeu.">
+    <meta name="theme-color" content="#002D5A">
+    <link rel="manifest" href="manifest.json">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css?v=3.0">
+</head>
+<body>
+    <nav class="top-bar" role="banner">
+        <div class="brand"><i class="ri-government-line" aria-hidden="true"></i> <span class="brand-bada">Bada</span><span class="brand-veu">Veu</span></div>
+        <div class="lang-toggles">
+            <a href="admin.html" class="top-admin-link" aria-label="Accés Administrador"><i class="ri-lock-2-line" aria-hidden="true"></i></a>
+            <div class="lang-toggles-group" role="group" aria-label="Selector d'idioma">
+                <span onclick="app.setLang('ca')" onkeydown="if(event.key==='Enter'||event.key===' '){app.setLang('ca')}" role="button" tabindex="0" class="active-lang" aria-pressed="true" aria-label="Canvia a Català">CA</span>
+                <span onclick="app.setLang('es')" onkeydown="if(event.key==='Enter'||event.key===' '){app.setLang('es')}" role="button" tabindex="0" aria-pressed="false" aria-label="Canvia a Castellà">ES</span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="page-content">
+        <div class="incidents-hero">
+            <h1 data-i18n="nav_incidents">
+                <i class="ri-list-check-2" style="color:var(--primary);" aria-hidden="true"></i> Incidències
+            </h1>
+            <p>Incidències actives i actuacions recents a Badalona.</p>
+        </div>
+
+        <!-- Filtres -->
+        <div class="incidents-filter-bar" role="toolbar" aria-label="Filtres d'incidències">
+            <select id="incidents-filter-barri" class="filter-select"
+                    onchange="app.filterIncidentsList(this.value)"
+                    aria-label="Filtrar per barri">
+                <option value="all" data-i18n="filter_barri_all">Tots els Barris</option>
+            </select>
+        </div>
+
+        <!-- Tabs: Actives | Resoltes -->
+        <div class="sheet-tabs-bar" role="tablist" aria-label="Vista d'incidències">
+            <button class="sheet-tab-btn active" data-tab="incidents"
+                    id="tab-btn-incidents" role="tab"
+                    aria-selected="true" aria-controls="sheet-tab-incidents"
+                    onclick="app.switchSheetTab('incidents')">
+                <i class="ri-map-pin-line" aria-hidden="true"></i> Incidències
+            </button>
+            <button class="sheet-tab-btn" data-tab="logros"
+                    id="tab-btn-logros" role="tab"
+                    aria-selected="false" aria-controls="sheet-tab-logros"
+                    onclick="app.switchSheetTab('logros')">
+                <i class="ri-trophy-line" aria-hidden="true"></i> Últimes Actuacions
+            </button>
+        </div>
+
+        <!-- Panel: Incidències actives -->
+        <div id="sheet-tab-incidents" class="incidents-tab-panel active"
+             role="tabpanel" tabindex="0" aria-labelledby="tab-btn-incidents">
+            <div id="incidents-list-container" aria-live="polite" aria-label="Llista d'incidències">
+                <div class="sheet-placeholder">
+                    <i class="ri-loader-4-line ri-spin" aria-hidden="true"></i>
+                    Carregant incidències...
+                </div>
+            </div>
+            <div id="sheet-load-more-wrapper" style="display:none;">
+                <button id="btn-load-more" class="btn-load-more"
+                        onclick="app.loadMoreIncidents()"
+                        aria-label="Carrega més incidències">
+                    <i class="ri-refresh-line" aria-hidden="true"></i>
+                    <span id="load-more-label">Carrega més incidències</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Panel: Últimes actuacions (resoltes) -->
+        <div id="sheet-tab-logros" class="incidents-tab-panel"
+             role="tabpanel" tabindex="0" aria-labelledby="tab-btn-logros">
+            <div id="logros-list-container" aria-live="polite">
+                <div class="sheet-placeholder">
+                    <i class="ri-trophy-line" aria-hidden="true"></i>
+                    Cap actuació recent.
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Trigger per a app.init() — detecta que estem a incidents.html -->
+    <div id="incidents-page-container" style="display:none;" aria-hidden="true"></div>
+
+    <!-- BOTTOM NAV (navegació) — 5 items amb FAB central -->
+    <nav class="bottom-nav" role="navigation" aria-label="Navegació principal">
+        <a href="index.html" class="nav-item">
+            <i class="ri-map-2-fill" aria-hidden="true"></i>
+            <span data-i18n="nav_map">Mapa</span>
+        </a>
+        <a href="incidents.html" class="nav-item active" aria-current="page">
+            <i class="ri-list-check-2" aria-hidden="true"></i>
+            <span data-i18n="nav_incidents">Incidències</span>
+        </a>
+        <div class="nav-fab-container">
+            <button class="fab-btn"
+                    onclick="window.location.href='index.html?action=new'"
+                    aria-label="Nova incidència">
+                <i class="ri-add-line" aria-hidden="true"></i>
+            </button>
+        </div>
+        <a href="stats.html" class="nav-item">
+            <i class="ri-pie-chart-2-fill" aria-hidden="true"></i>
+            <span data-i18n="nav_stats">Dades</span>
+        </a>
+        <a href="about.html" class="nav-item">
+            <i class="ri-information-line" aria-hidden="true"></i>
+            <span data-i18n="nav_about">Sobre</span>
+        </a>
+    </nav>
+
+    <div id="toast-container"></div>
+
+    <script src="assets/js/core.js?v=3.0"></script>
+    <script src="assets/js/app.js?v=3.0"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => { app.init(); });
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(() => {});
+        }
+    </script>
+</body>
+</html>

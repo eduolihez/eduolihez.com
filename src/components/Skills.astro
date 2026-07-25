@@ -1,0 +1,41 @@
+---
+/**
+ * <Skills /> - Habilidades agrupadas por categoria (estatico, minimalista).
+ */
+import { useTranslations, pick } from '../i18n/utils';
+import type { Lang } from '../i18n/ui';
+import { skillGroups } from '../data/skills';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<section id="habilidades" class="border-b border-bg-border py-20 sm:py-28">
+  <div class="container-page">
+    <div class="reveal mb-12">
+      <p class="section-kicker">{t('kicker.skills')}</p>
+      <h2 class="section-title">{t('skills.title')}</h2>
+      <p class="section-subtitle">{t('skills.subtitle')}</p>
+    </div>
+
+    <div class="grid gap-x-10 gap-y-8 sm:grid-cols-2">
+      {
+        skillGroups.map((group) => (
+          <div class="reveal">
+            <h3 class="mb-3 font-mono text-sm text-accent-cyan">
+              {pick(group.category, lang)}
+            </h3>
+            <ul class="flex flex-wrap gap-2">
+              {group.items.map((item) => (
+                <li class="badge">{item}</li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>

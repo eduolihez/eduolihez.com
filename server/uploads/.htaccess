@@ -1,0 +1,29 @@
+# ===========================================================================
+#  Carpeta de subidas (imagenes del panel).
+#  SEGURIDAD CRITICA: aqui se guardan archivos subidos por el admin, asi que
+#  DESACTIVAMOS por completo la ejecucion de codigo. Aunque alguien lograse
+#  subir un .php, este NUNCA se ejecutaria: se serviria como texto plano.
+# ===========================================================================
+
+# Desactiva cualquier handler de scripts en esta carpeta.
+<IfModule mod_php.c>
+  php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+  php_flag engine off
+</IfModule>
+<IfModule mod_php8.c>
+  php_flag engine off
+</IfModule>
+
+# Quita los handlers que podrian ejecutar codigo.
+RemoveHandler .php .phtml .php3 .php4 .php5 .php7 .php8 .pl .py .cgi .asp .sh
+RemoveType .php .phtml .php3 .php4 .php5 .php7 .php8
+
+# Fuerza a que todo se sirva como descarga/texto, nunca como script.
+<FilesMatch "\.(php|phtml|php3|php4|php5|php7|php8|pl|py|cgi|asp|sh|htaccess)$">
+  Require all denied
+</FilesMatch>
+
+# Sin listado de directorio.
+Options -Indexes -ExecCGI

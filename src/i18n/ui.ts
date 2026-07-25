@@ -1,0 +1,300 @@
+/**
+ * Diccionario de traducciones ES / EN / CA.
+ * ---------------------------------------------------------------------------
+ * COMO ANADIR/EDITAR TEXTOS:
+ *   1. Localiza la clave (ej. "hero.title").
+ *   2. Edita el valor en "es", "en" y "ca".
+ *   3. Guarda y recompila (npm run build).
+ *
+ * El contenido dinamico (proyectos, certificaciones) NO esta aqui: vive en la
+ * base de datos y se edita desde el panel. En catalan, esos textos dinamicos
+ * se muestran en espanol (el mas cercano) como respaldo.
+ */
+
+export const languages = {
+  es: 'Espanol',
+  en: 'English',
+  ca: 'Catala',
+} as const;
+
+export const defaultLang = 'es';
+
+export const ui = {
+  es: {
+    'nav.about': 'Perfil',
+    'nav.experience': 'Experiencia',
+    'nav.skills': 'Habilidades',
+    'nav.projects': 'Proyectos',
+    'nav.certifications': 'Certificaciones',
+    'nav.contact': 'Contacto',
+    'nav.faq': 'FAQ',
+    'nav.menu': 'Menu',
+    'nav.language': 'Idioma',
+
+    'hero.status': 'Disponible para trabajar',
+    'hero.role': 'SOC Analyst · Blue Team · Deteccion de Amenazas con IA',
+    'hero.tagline':
+      'Analista de seguridad especializado en deteccion de amenazas, respuesta a incidentes y automatizacion en Python. Certificado Fortinet NSE.',
+    'hero.location': 'Badalona, Barcelona (Espana)',
+    'hero.languages': 'Espanol · Catalan · Ingles B2',
+    'hero.cta.contact': 'Contactar',
+    'hero.cta.cv': 'Descargar CV',
+    'hero.cta.linkedin': 'LinkedIn',
+
+    'experience.title': 'Experiencia',
+    'experience.subtitle': 'Trayectoria profesional en ciberseguridad y sistemas',
+    'experience.current': 'Actual',
+    'experience.tech': 'Tecnologias',
+
+    'skills.title': 'Habilidades',
+    'skills.subtitle': 'Tecnologias y areas de conocimiento',
+
+    'projects.title': 'Proyectos',
+    'projects.subtitle': 'Trabajo tecnico seleccionado y proyectos personales',
+    'projects.loading': 'Cargando proyectos...',
+    'projects.error': 'No se pudieron cargar los proyectos.',
+    'projects.empty': 'Aun no hay proyectos publicados.',
+    'projects.repo': 'Codigo',
+    'projects.demo': 'Demo',
+    'projects.store': 'Tienda',
+    'projects.featured': 'Destacado',
+    'projects.details': 'Ver detalles',
+    'projects.close': 'Cerrar',
+
+    'certs.title': 'Certificaciones',
+    'certs.subtitle': 'Formacion y credenciales verificadas',
+    'certs.count.label': 'certificaciones obtenidas',
+    'certs.loading': 'Cargando certificaciones...',
+    'certs.error': 'No se pudieron cargar las certificaciones.',
+    'certs.empty': 'Aun no hay certificaciones publicadas.',
+    'certs.verify': 'Verificar',
+    'certs.credly': 'Ver más insignias en Credly',
+
+    'contact.title': 'Contacto',
+    'contact.subtitle': 'Estoy abierto a nuevas oportunidades. Hablemos.',
+    'contact.name': 'Nombre',
+    'contact.email': 'Email',
+    'contact.subject': 'Asunto',
+    'contact.message': 'Mensaje',
+    'contact.send': 'Enviar mensaje',
+    'contact.sending': 'Enviando...',
+    'contact.success': 'Mensaje enviado. Gracias, te respondere pronto.',
+    'contact.error': 'Hubo un problema al enviar. Intentalo de nuevo o escribeme por LinkedIn.',
+    'contact.required': 'Por favor rellena todos los campos obligatorios.',
+    'contact.invalidEmail': 'Introduce un email valido.',
+    'contact.or': 'o encuentrame en',
+    'contact.vcard': 'Guardar contacto',
+
+    // Kickers: la linea pequena sobre cada titulo de seccion. Deben ser
+    // DISTINTOS del titulo (antes se repetian) para no duplicar texto.
+    'kicker.experience': '01 / Trayectoria',
+    'kicker.skills': '02 / Stack tecnico',
+    'kicker.projects': '03 / Portfolio',
+    'kicker.certs': '04 / Credenciales',
+    'kicker.faq': '05 / Preguntas frecuentes',
+    'kicker.contact': '06 / Hablemos',
+
+    'faq.title': 'Preguntas frecuentes',
+    'faq.subtitle': 'Lo que suelen preguntarme antes de escribirme',
+
+    'contact.disabled':
+      'El formulario esta temporalmente desactivado. Escribeme por email o LinkedIn y te respondo igual.',
+
+    'announcement.close': 'Cerrar aviso',
+
+    'footer.built': 'Disenado y desarrollado por Eduardo Olivares',
+    'footer.rights': 'Todos los derechos reservados.',
+    'footer.backTop': 'Volver arriba',
+    'footer.location': 'Badalona · Barcelona · Espana',
+    'footer.aboutSite': 'Sobre esta web',
+    'cv.modal.title': 'CV en actualización',
+    'cv.modal.body': 'Mi currículum está siendo mejorado en este momento, por lo que no está disponible para descarga directa. Te invito a echar un vistazo a mi perfil de LinkedIn, el cual está SIEMPRE actualizado.',
+    'cv.modal.linkedin': 'Ver mi LinkedIn',
+    'cv.modal.close': 'Cerrar',
+  },
+
+  en: {
+    'nav.about': 'About',
+    'nav.experience': 'Experience',
+    'nav.skills': 'Skills',
+    'nav.projects': 'Projects',
+    'nav.certifications': 'Certifications',
+    'nav.contact': 'Contact',
+    'nav.faq': 'FAQ',
+    'nav.menu': 'Menu',
+    'nav.language': 'Language',
+
+    'hero.status': 'Open to work',
+    'hero.role': 'SOC Analyst · Blue Team · AI-Driven Threat Detection',
+    'hero.tagline':
+      'Security analyst focused on threat detection, incident response and Python automation. Fortinet NSE certified.',
+    'hero.location': 'Badalona, Barcelona (Spain)',
+    'hero.languages': 'Spanish · Catalan · English B2',
+    'hero.cta.contact': 'Get in touch',
+    'hero.cta.cv': 'Download CV',
+    'hero.cta.linkedin': 'LinkedIn',
+
+    'experience.title': 'Experience',
+    'experience.subtitle': 'Professional background in cybersecurity and systems',
+    'experience.current': 'Current',
+    'experience.tech': 'Technologies',
+
+    'skills.title': 'Skills',
+    'skills.subtitle': 'Technologies and areas of expertise',
+
+    'projects.title': 'Projects',
+    'projects.subtitle': 'Selected technical work and personal projects',
+    'projects.loading': 'Loading projects...',
+    'projects.error': 'Projects could not be loaded.',
+    'projects.empty': 'No projects published yet.',
+    'projects.repo': 'Code',
+    'projects.demo': 'Demo',
+    'projects.store': 'Store',
+    'projects.featured': 'Featured',
+    'projects.details': 'View details',
+    'projects.close': 'Close',
+
+    'certs.title': 'Certifications',
+    'certs.subtitle': 'Training and verified credentials',
+    'certs.count.label': 'certifications earned',
+    'certs.loading': 'Loading certifications...',
+    'certs.error': 'Certifications could not be loaded.',
+    'certs.empty': 'No certifications published yet.',
+    'certs.verify': 'Verify',
+    'certs.credly': 'View more badges on Credly',
+
+    'contact.title': 'Contact',
+    'contact.subtitle': "I'm open to new opportunities. Let's talk.",
+    'contact.name': 'Name',
+    'contact.email': 'Email',
+    'contact.subject': 'Subject',
+    'contact.message': 'Message',
+    'contact.send': 'Send message',
+    'contact.sending': 'Sending...',
+    'contact.success': 'Message sent. Thanks, I will get back to you soon.',
+    'contact.error': 'Something went wrong. Try again or reach me on LinkedIn.',
+    'contact.required': 'Please fill in all required fields.',
+    'contact.invalidEmail': 'Enter a valid email address.',
+    'contact.or': 'or find me on',
+    'contact.vcard': 'Save contact',
+
+    'kicker.experience': '01 / Background',
+    'kicker.skills': '02 / Tech stack',
+    'kicker.projects': '03 / Portfolio',
+    'kicker.certs': '04 / Credentials',
+    'kicker.faq': '05 / Frequently asked',
+    'kicker.contact': '06 / Get in touch',
+
+    'faq.title': 'Frequently asked questions',
+    'faq.subtitle': 'What people usually ask before reaching out',
+
+    'contact.disabled':
+      'The form is temporarily disabled. Email me or reach out on LinkedIn and I will still reply.',
+
+    'announcement.close': 'Dismiss notice',
+
+    'footer.built': 'Designed and built by Eduardo Olivares',
+    'footer.rights': 'All rights reserved.',
+    'footer.backTop': 'Back to top',
+    'footer.location': 'Badalona · Barcelona · Spain',
+    'footer.aboutSite': 'About this website',
+    'cv.modal.title': 'CV Under Update',
+    'cv.modal.body': 'My CV is currently being improved, so it is temporarily unavailable for direct download. Please feel free to check out my LinkedIn profile, which is ALWAYS kept up to date.',
+    'cv.modal.linkedin': 'View my LinkedIn',
+    'cv.modal.close': 'Close',
+  },
+
+  ca: {
+    'nav.about': 'Perfil',
+    'nav.experience': 'Experiencia',
+    'nav.skills': 'Habilitats',
+    'nav.projects': 'Projectes',
+    'nav.certifications': 'Certificacions',
+    'nav.contact': 'Contacte',
+    'nav.faq': 'FAQ',
+    'nav.menu': 'Menu',
+    'nav.language': 'Idioma',
+
+    'hero.status': 'Disponible per treballar',
+    'hero.role': 'SOC Analyst · Blue Team · Deteccio dAmenaces amb IA',
+    'hero.tagline':
+      'Analista de seguretat especialitzat en deteccio damenaces, resposta a incidents i automatitzacio en Python. Certificat Fortinet NSE.',
+    'hero.location': 'Badalona, Barcelona (Espanya)',
+    'hero.languages': 'Espanyol · Catala · Angles B2',
+    'hero.cta.contact': 'Contactar',
+    'hero.cta.cv': 'Descarregar CV',
+    'hero.cta.linkedin': 'LinkedIn',
+
+    'experience.title': 'Experiencia',
+    'experience.subtitle': 'Trajectoria professional en ciberseguretat i sistemes',
+    'experience.current': 'Actual',
+    'experience.tech': 'Tecnologies',
+
+    'skills.title': 'Habilitats',
+    'skills.subtitle': 'Tecnologies i arees de coneixement',
+
+    'projects.title': 'Projectes',
+    'projects.subtitle': 'Treball tecnic seleccionat i projectes personals',
+    'projects.loading': 'Carregant projectes...',
+    'projects.error': 'No shan pogut carregar els projectes.',
+    'projects.empty': 'Encara no hi ha projectes publicats.',
+    'projects.repo': 'Codi',
+    'projects.demo': 'Demo',
+    'projects.store': 'Botiga',
+    'projects.featured': 'Destacat',
+    'projects.details': 'Veure detalls',
+    'projects.close': 'Tancar',
+
+    'certs.title': 'Certificacions',
+    'certs.subtitle': 'Formacio i credencials verificades',
+    'certs.count.label': 'certificacions obtingudes',
+    'certs.loading': 'Carregant certificacions...',
+    'certs.error': 'No shan pogut carregar les certificacions.',
+    'certs.empty': 'Encara no hi ha certificacions publicades.',
+    'certs.verify': 'Verificar',
+    'certs.credly': 'Veure més insígnies a Credly',
+
+    'contact.title': 'Contacte',
+    'contact.subtitle': 'Estic obert a noves oportunitats. Parlem-ne.',
+    'contact.name': 'Nom',
+    'contact.email': 'Email',
+    'contact.subject': 'Assumpte',
+    'contact.message': 'Missatge',
+    'contact.send': 'Enviar missatge',
+    'contact.sending': 'Enviant...',
+    'contact.success': 'Missatge enviat. Gracies, et respondre aviat.',
+    'contact.error': 'Hi ha hagut un problema en enviar. Torna-ho a provar o escriu-me per LinkedIn.',
+    'contact.required': 'Si us plau, omple tots els camps obligatoris.',
+    'contact.invalidEmail': 'Introdueix un email valid.',
+    'contact.or': 'o troba m a',
+    'contact.vcard': 'Desar contacte',
+
+    'kicker.experience': '01 / Trajectoria',
+    'kicker.skills': '02 / Stack tecnic',
+    'kicker.projects': '03 / Portfolio',
+    'kicker.certs': '04 / Credencials',
+    'kicker.faq': '05 / Preguntes frequents',
+    'kicker.contact': '06 / Parlem-ne',
+
+    'faq.title': 'Preguntes frequents',
+    'faq.subtitle': 'El que solen preguntar-me abans descriure m',
+
+    'contact.disabled':
+      'El formulari esta temporalment desactivat. Escriu-me per email o LinkedIn i et responc igualment.',
+
+    'announcement.close': 'Tancar avis',
+
+    'footer.built': 'Dissenyat i desenvolupat per Eduardo Olivares',
+    'footer.rights': 'Tots els drets reservats.',
+    'footer.backTop': 'Tornar amunt',
+    'footer.location': 'Badalona · Barcelona · Espanya',
+    'footer.aboutSite': 'Sobre aquesta web',
+    'cv.modal.title': 'CV en actualització',
+    'cv.modal.body': "El meu currículum s'està millorant en aquest moment, per la qual cosa no està disponible per a la descàrrega directa. Et convido a fer un cop d'ull al meu perfil de LinkedIn, el qual està SEMPRE actualitzat.",
+    'cv.modal.linkedin': 'Veure el meu LinkedIn',
+    'cv.modal.close': 'Tancar',
+  },
+} as const;
+
+export type Lang = keyof typeof ui;
+export type UIKey = keyof (typeof ui)['es'];

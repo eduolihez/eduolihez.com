@@ -1,0 +1,293 @@
+---
+/**
+ * <Seo /> - Todo el SEO de la pagina: meta etiquetas, Open Graph, Twitter Card,
+ * senales geograficas locales y datos estructurados de Schema.org.
+ * Se incluye dentro del <head> del layout.
+ *
+ * Tres objetivos, en orden de importancia:
+ *
+ *  1. SEO LOCAL. Que al buscar "analista SOC Badalona" o "ciberseguridad
+ *     Barcelona" aparezcas tu. Lo consiguen: el titulo y la descripcion con la
+ *     ubicacion, las etiquetas geo.* y, sobre todo, el bloque Person con
+ *     address + areaServed + homeLocation.
+ *
+ *  2. IA. Que ChatGPT, Claude, Perplexity o Gemini sepan responder cuando les
+ *     preguntan por ti. Lo consiguen el grafo de Schema.org (Person +
+ *     ProfilePage + FAQPage) y /llms.txt.
+ *
+ *  3. Redes. Que al pegar el enlace en LinkedIn salga una tarjeta decente.
+ *     Eso es Open Graph.
+ *
+ * Nota tecnica: todos los bloques JSON-LD van en UN SOLO <script> con @graph.
+ * Es lo que Google recomienda y evita que se contradigan entre si.
+ */
+import { SITE } from '../config';
+import type { Lang } from '../i18n/ui';
+import { experiences } from '../data/experience';
+import { skillGroups } from '../data/skills';
+import { faqItems } from '../data/faq';
+import { pick } from '../i18n/utils';
+
+interface Props {
+  title: string;
+  description: string;
+  lang: Lang;
+  /** Ruta canonica relativa, p.ej. "/" o "/en/". */
+  path?: string;
+  /** Incluir el bloque FAQPage (solo en paginas que muestran la FAQ). */
+  withFaq?: boolean;
+  /** Pedir a los buscadores que NO indexen esta pagina (errores, utilidades). */
+  noindex?: boolean;
+}
+
+const { title, description, lang, path = '/', withFaq = true, noindex = false } = Astro.props;
+
+const canonical = new URL(path, SITE.domain).href;
+const ogImageUrl = new URL(SITE.ogImage, SITE.domain).href;
+const avatarUrl = new URL(SITE.avatar, SITE.domain).href;
+const loc = SITE.location;
+
+const localeMap = { es: 'es_ES', en: 'en_US', ca: 'ca_ES' } as const;
+const locale = localeMap[lang];
+const altLocales = (Object.keys(localeMap) as Array<keyof typeof localeMap>)
+  .filter((l) => l !== lang)
+  .map((l) => localeMap[l]);
+
+// --- Textos localizados que solo se usan en los datos estructurados ---------
+const bio: Record<Lang, string> = {
+  es: `Analista SOC y perfil Blue Team en ${loc.city} (${loc.region}). Especializado en deteccion de amenazas, respuesta a incidentes, plataformas XDR/SIEM y automatizacion de seguridad con Python. Certificado Fortinet NSE, Microsoft y Trend Micro.`,
+  en: `SOC analyst and Blue Team professional based in ${loc.city} (${loc.region}, Spain). Specialised in threat detection, incident response, XDR/SIEM platforms and Python security automation. Fortinet NSE, Microsoft and Trend Micro certified.`,
+  ca: `Analista SOC i perfil Blue Team a ${loc.city} (${loc.region}). Especialitzat en deteccio d'amenaces, resposta a incidents, plataformes XDR/SIEM i automatitzacio de seguretat amb Python. Certificat Fortinet NSE, Microsoft i Trend Micro.`,
+};
+
+const siteNameByLang: Record<Lang, string> = {
+  es: `${SITE.name} — Analista SOC en ${loc.city}, ${loc.region}`,
+  en: `${SITE.name} — SOC Analyst in ${loc.city}, ${loc.region}`,
+  ca: `${SITE.name} — Analista SOC a ${loc.city}, ${loc.region}`,
+};
+
+// Palabras clave: siguen sin usarse para posicionar, pero algunos agregadores
+// y herramientas de IA las leen. Cuestan cero y no hacen dano.
+const keywords = [
+  'SOC Analyst',
+  'analista SOC',
+  `analista SOC ${loc.city}`,
+  `ciberseguridad ${loc.city}`,
+  `ciberseguridad ${loc.region}`,
+  `SOC Analyst ${loc.region}`,
+  'Blue Team',
+  'deteccion de amenazas',
+  'respuesta a incidentes',
+  'XDR',
+  'SIEM',
+  'Fortinet NSE',
+  'Trend Micro Vision One',
+  'Threat Intelligence',
+  'analisis de phishing',
+  'Python',
+  'Eduardo Olivares',
+  'Eduardo Olivares Hernandez',
+  'Eduardo Olivares Hernández',
+  'Edu Olivares',
+  'Edu Olivares Hernandez',
+  'Edu Olivares Hernández',
+  'eduolihez',
+].join(', ');
+
+// --- Datos estructurados ----------------------------------------------------
+const personId = `${SITE.domain}/#person`;
+const siteId = `${SITE.domain}/#website`;
+
+// Puestos de trabajo -> Schema.org (da contexto de trayectoria a Google y a las IAs).
+const jobRoles = experiences.map((exp) => ({
+  '@type': 'OrganizationRole',
+  roleName: pick(exp.role, lang),
+  description: pick(exp.description, lang),
+  startDate: pick(exp.period, lang),
+  worksFor: { '@type': 'Organization', name: exp.company },
+}));
+
+// Todas las habilidades planas, para knowsAbout.
+const allSkills = skillGroups.flatMap((g) => g.items);
+
+const person = {
+  '@type': 'Person',
+  '@id': personId,
+  name: SITE.name,
+  alternateName: ['Edu Olivares', 'eduolihez', 'Eduardo Olivares', 'Edu Olivares Hernández', 'Eduardo Olivares Hernández'],
+  givenName: 'Eduardo',
+  familyName: 'Olivares Hernández',
+  jobTitle: SITE.jobTitle,
+  description: bio[lang],
+  url: SITE.domain,
+  image: { '@type': 'ImageObject', url: avatarUrl, caption: `${SITE.name}, ${SITE.jobTitle}` },
+  email: `mailto:${SITE.social.email}`,
+  nationality: { '@type': 'Country', name: loc.countryName },
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: loc.city,
+    addressRegion: loc.region,
+    postalCode: loc.postalCode,
+    addressCountry: loc.country,
+  },
+  homeLocation: {
+    '@type': 'Place',
+    name: `${loc.city}, ${loc.region}`,
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: loc.city,
+      addressRegion: loc.region,
+      addressCountry: loc.country,
+    },
+    geo: { '@type': 'GeoCoordinates', latitude: loc.lat, longitude: loc.lon },
+  },
+  workLocation: loc.areaServed.map((area) => ({ '@type': 'Place', name: area })),
+  knowsAbout: [...SITE.knowsAbout, ...allSkills],
+  knowsLanguage: SITE.languages.map((l) => ({
+    '@type': 'Language',
+    name: l.name,
+    alternateName: l.code,
+  })),
+  worksFor: { '@type': 'Organization', name: SITE.worksFor.name },
+  hasOccupation: {
+    '@type': 'Occupation',
+    name: 'Security Operations Center Analyst',
+    occupationalCategory: '15-1212.00', // O*NET: Information Security Analysts
+    occupationLocation: {
+      '@type': 'City',
+      name: loc.city,
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: loc.city,
+        addressRegion: loc.region,
+        addressCountry: loc.country,
+      },
+    },
+    skills: SITE.knowsAbout.join(', '),
+  },
+  hasOccupationalExperience: jobRoles,
+  sameAs: [SITE.social.linkedin, SITE.social.github],
+};
+
+const website = {
+  '@type': 'WebSite',
+  '@id': siteId,
+  url: SITE.domain,
+  name: siteNameByLang[lang],
+  description: bio[lang],
+  inLanguage: lang,
+  publisher: { '@id': personId },
+  author: { '@id': personId },
+  copyrightHolder: { '@id': personId },
+};
+
+const profilePage = {
+  '@type': 'ProfilePage',
+  '@id': `${canonical}#profile`,
+  url: canonical,
+  name: title,
+  description,
+  inLanguage: lang,
+  isPartOf: { '@id': siteId },
+  about: { '@id': personId },
+  mainEntity: { '@id': personId },
+  primaryImageOfPage: { '@type': 'ImageObject', url: ogImageUrl },
+};
+
+const faqPage = {
+  '@type': 'FAQPage',
+  '@id': `${canonical}#faq`,
+  inLanguage: lang,
+  isPartOf: { '@id': siteId },
+  mainEntity: faqItems.map((item) => ({
+    '@type': 'Question',
+    name: pick(item.question, lang),
+    acceptedAnswer: { '@type': 'Answer', text: pick(item.answer, lang) },
+  })),
+};
+
+const breadcrumb = {
+  '@type': 'BreadcrumbList',
+  '@id': `${canonical}#breadcrumb`,
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: SITE.name, item: canonical },
+  ],
+};
+
+const graph = {
+  '@context': 'https://schema.org',
+  '@graph': [person, website, profilePage, breadcrumb, ...(withFaq ? [faqPage] : [])],
+};
+---
+
+<!-- Basico -->
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+<meta name="author" content={SITE.name} />
+<meta name="keywords" content={keywords} />
+<meta
+  name="robots"
+  content={
+    noindex
+      ? 'noindex, follow'
+      : 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1'
+  }
+/>
+{
+  !noindex && (
+    <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large" />
+  )
+}
+
+<!-- Senales geograficas: SEO local (Badalona / Barcelona) -->
+<meta name="geo.region" content={SITE.location.regionCode} />
+<meta name="geo.placename" content={`${SITE.location.city}, ${SITE.location.region}`} />
+<meta name="geo.position" content={`${SITE.location.lat};${SITE.location.lon}`} />
+<meta name="ICBM" content={`${SITE.location.lat}, ${SITE.location.lon}`} />
+
+<!-- Enlaces alternos por idioma (hreflang) -->
+<link rel="alternate" hreflang="es-ES" href={new URL('/', SITE.domain).href} />
+<link rel="alternate" hreflang="es" href={new URL('/', SITE.domain).href} />
+<link rel="alternate" hreflang="en" href={new URL('/en/', SITE.domain).href} />
+<link rel="alternate" hreflang="ca-ES" href={new URL('/ca/', SITE.domain).href} />
+<link rel="alternate" hreflang="ca" href={new URL('/ca/', SITE.domain).href} />
+<link rel="alternate" hreflang="x-default" href={new URL('/', SITE.domain).href} />
+
+<!-- Open Graph (LinkedIn, Facebook, WhatsApp...) -->
+<meta property="og:type" content="profile" />
+<meta property="og:site_name" content={SITE.name} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={ogImageUrl} />
+<meta property="og:image:secure_url" content={ogImageUrl} />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta
+  property="og:image:alt"
+  content={`${SITE.name} — ${SITE.jobTitle} en ${SITE.location.city}, ${SITE.location.region}`}
+/>
+<meta property="og:locale" content={locale} />
+{altLocales.map((l) => <meta property="og:locale:alternate" content={l} />)}
+<meta property="profile:first_name" content="Eduardo" />
+<meta property="profile:last_name" content="Olivares Hernandez" />
+<meta property="profile:username" content="eduolihez" />
+
+<!-- Twitter / X -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImageUrl} />
+<meta
+  name="twitter:image:alt"
+  content={`${SITE.name} — ${SITE.jobTitle}`}
+/>
+
+<!-- Enlace al resumen para IAs (ChatGPT, Claude, Perplexity...) -->
+<link rel="alternate" type="text/plain" href={new URL('/llms.txt', SITE.domain).href} title="llms.txt" />
+
+<!-- Datos estructurados: un unico grafo con Person, WebSite, ProfilePage,
+     BreadcrumbList y FAQPage enlazados entre si por @id. -->
+<script type="application/ld+json" set:html={JSON.stringify(graph)} />

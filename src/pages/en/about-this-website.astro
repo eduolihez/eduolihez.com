@@ -1,0 +1,133 @@
+---
+/**
+ * about-this-website.astro - Technical explanation of the web in ENGLISH.
+ * Describes the security, local SEO, AI optimizations, and performance pillars.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+
+const lang = 'en';
+const title = 'Technical Background and Security | Eduardo Olivares';
+const description = 'Technical details regarding cybersecurity (Blue Team), local SEO optimization, AI integrations, and portfolio performance.';
+---
+
+<BaseLayout title={title} description={description} lang={lang} path="/en/about-this-website" withFaq={false}>
+  <section class="py-20 sm:py-28 border-b border-bg-border">
+    <div class="container-page max-w-4xl">
+      <!-- Back button -->
+      <a href="/en/" class="inline-flex items-center gap-2 text-xs font-mono text-text-muted hover:text-accent transition mb-8 group">
+        <span class="transition-transform group-hover:-translate-x-1">&larr;</span> Back to home
+      </a>
+
+      <!-- Header -->
+      <div class="reveal mb-16">
+        <p class="section-kicker">00 / Architecture</p>
+        <h1 class="text-3xl sm:text-5xl font-bold tracking-tight text-text mb-4">
+          Technical Details & Security
+        </h1>
+        <p class="text-text-muted text-base sm:text-lg leading-relaxed max-w-2xl">
+          This platform was designed with a focus on technical minimalism, hardened security, and high local visibility for search engines and AI agents.
+        </p>
+      </div>
+
+      <!-- Core Pillars Grid -->
+      <div class="grid gap-6 md:grid-cols-3 mb-16">
+        <!-- Security Card -->
+        <div class="reveal border border-bg-border bg-bg-card rounded-xl p-6 transition hover:border-text-faint/30">
+          <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10 border border-accent/20 text-accent mb-4">
+            <Icon name="shield" class="h-5 w-5" />
+          </div>
+          <h3 class="font-mono text-sm font-semibold text-text uppercase tracking-wider mb-3">01 / Security</h3>
+          <ul class="space-y-2 text-xs text-text-muted leading-relaxed">
+            <li><strong class="text-text">Strict CSP:</strong> Content-Security-Policy header blocking unauthorized code executions and script injections (XSS).</li>
+            <li><strong class="text-text">Privacy (GDPR):</strong> In-house analytics system that hashes IP addresses using SHA-256 with a dynamic salt (GDPR compliant).</li>
+            <li><strong class="text-text">Anti-Brute Force:</strong> Protection locks for the admin panel by connection IP and built-in rate-limiters.</li>
+            <li><strong class="text-text">Hardened Session:</strong> Secure HTTP cookie parameters (HttpOnly, Secure, SameSite=Lax).</li>
+          </ul>
+        </div>
+
+        <!-- SEO Card -->
+        <div class="reveal border border-bg-border bg-bg-card rounded-xl p-6 transition hover:border-text-faint/30">
+          <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-cyan/10 border border-cyan/20 text-cyan mb-4">
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+          </div>
+          <h3 class="font-mono text-sm font-semibold text-text uppercase tracking-wider mb-3">02 / SEO & AIs</h3>
+          <ul class="space-y-2 text-xs text-text-muted leading-relaxed">
+            <li><strong class="text-text">Schema Graph:</strong> JSON-LD structured data linking Person, WebSite, and FAQPage.</li>
+            <li><strong class="text-text">Local SEO:</strong> Accurate city coordinates, region tags, and local name indexing.</li>
+            <li><strong class="text-text">AI Optimizations:</strong> Clear plain-text data feed in <code class="bg-bg-soft px-1 rounded">/llms.txt</code> specifically tailored for AI chatbots.</li>
+            <li><strong class="text-text">Multilingual:</strong> Interlinked hreflang headers in the sitemap and HTML documents.</li>
+          </ul>
+        </div>
+
+        <!-- Architecture Card -->
+        <div class="reveal border border-bg-border bg-bg-card rounded-xl p-6 transition hover:border-text-faint/30">
+          <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-violet/10 border border-violet/20 text-violet mb-4">
+            <Icon name="code" class="h-5 w-5" />
+          </div>
+          <h3 class="font-mono text-sm font-semibold text-text uppercase tracking-wider mb-3">03 / Architecture</h3>
+          <ul class="space-y-2 text-xs text-text-muted leading-relaxed">
+            <li><strong class="text-text">Static Zero-JS:</strong> Compiled using Astro, which removes client-side framework overhead (React/Vue) for lightning-fast loads.</li>
+            <li><strong class="text-text">Lightweight Backend:</strong> Dynamic PHP 8 natve core for internas APIs serving projects, messages, and settings.</li>
+            <li><strong class="text-text">Zero CDN:</strong> Locally hosted assets, fonts, and scripts to eliminate third-party connections.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Performance PageSpeed Block -->
+      <div class="reveal border border-bg-border bg-bg-card rounded-xl p-8 mb-16">
+        <h3 class="font-mono text-sm font-semibold text-text uppercase tracking-wider mb-6 text-center">
+          Performance Metrics (PageSpeed Insights)
+        </h3>
+        
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
+          <div class="flex flex-col items-center">
+            <div class="relative flex items-center justify-center h-20 w-20 rounded-full border-4 border-accent text-accent font-mono text-xl font-bold shadow-[0_0_15px_rgba(74,222,128,0.2)]">
+              100
+            </div>
+            <span class="mt-2 text-xs text-text font-medium">Performance</span>
+          </div>
+
+          <div class="flex flex-col items-center">
+            <div class="relative flex items-center justify-center h-20 w-20 rounded-full border-4 border-accent text-accent font-mono text-xl font-bold shadow-[0_0_15px_rgba(74,222,128,0.2)]">
+              100
+            </div>
+            <span class="mt-2 text-xs text-text font-medium">Accessibility</span>
+          </div>
+
+          <div class="flex flex-col items-center">
+            <div class="relative flex items-center justify-center h-20 w-20 rounded-full border-4 border-accent text-accent font-mono text-xl font-bold shadow-[0_0_15px_rgba(74,222,128,0.2)]">
+              100
+            </div>
+            <span class="mt-2 text-xs text-text font-medium">Best Practices</span>
+          </div>
+
+          <div class="flex flex-col items-center">
+            <div class="relative flex items-center justify-center h-20 w-20 rounded-full border-4 border-accent text-accent font-mono text-xl font-bold shadow-[0_0_15px_rgba(74,222,128,0.2)]">
+              100
+            </div>
+            <span class="mt-2 text-xs text-text font-medium">SEO</span>
+          </div>
+        </div>
+
+        <p class="text-center text-[11px] text-text-faint mt-6">
+          * Audits measured directly under CDMON production server with HTTPS and active TLS.
+        </p>
+      </div>
+
+      <!-- Action Footer Buttons -->
+      <div class="reveal flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a href="https://github.com/eduolihez" target="_blank" rel="noopener noreferrer" class="btn-primary flex items-center gap-2 text-xs font-semibold w-full sm:w-auto justify-center">
+          <Icon name="github" class="h-4 w-4" />
+          View Code on GitHub
+        </a>
+        <a href="/en/#contacto" class="btn-ghost flex items-center gap-2 text-xs font-semibold w-full sm:w-auto justify-center">
+          <Icon name="mail" class="h-4 w-4" />
+          Contact for details
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

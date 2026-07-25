@@ -1,0 +1,12 @@
+BEGIN:VCARD
+VERSION:3.0
+N:Olivares Hernandez;Eduardo;;;
+FN:Eduardo Olivares Hernandez
+TITLE:SOC Analyst / Blue Team
+EMAIL;TYPE=INTERNET,PREF:eduardo@eduolihez.com
+URL:https://eduolihez.com
+URL;TYPE=LinkedIn:https://www.linkedin.com/in/eduolihez/
+URL;TYPE=GitHub:https://github.com/eduolihez
+ADR;TYPE=HOME:;;Badalona;Barcelona;;;Espana
+NOTE:SOC Analyst - Blue Team - Fortinet NSE
+END:VCARD

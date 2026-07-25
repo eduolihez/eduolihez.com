@@ -1,0 +1,105 @@
+---
+/**
+ * BaseLayout - Estructura HTML comun a todas las paginas.
+ * Incluye <head> con SEO, cabecera, footer, y los scripts globales
+ * (reveal on scroll + registro de visita).
+ */
+import '../styles/global.css';
+import Seo from '../components/Seo.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Announcement from '../components/Announcement.astro';
+import type { Lang } from '../i18n/ui';
+
+interface Props {
+  title: string;
+  description: string;
+  lang: Lang;
+  path?: string;
+  /** Incluir el dato estructurado FAQPage (solo donde se muestra la FAQ). */
+  withFaq?: boolean;
+  /** Marcar la pagina como no indexable (paginas de error, utilidades). */
+  noindex?: boolean;
+}
+const {
+  title,
+  description,
+  lang,
+  path = '/',
+  withFaq = true,
+  noindex = false,
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang={lang} class="dark scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0a0e14" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="apple-touch-icon" href="/img/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <Seo
+      title={title}
+      description={description}
+      lang={lang}
+      path={path}
+      withFaq={withFaq}
+      noindex={noindex}
+    />
+  </head>
+
+  <body>
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-accent focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-bg"
+    >
+      Saltar al contenido
+    </a>
+
+    <span id="top"></span>
+    <Header lang={lang} />
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <Footer lang={lang} />
+
+    <!-- Reveal on scroll (aparicion suave de secciones) -->
+    <script src="../scripts/reveal.ts"></script>
+
+    <!-- Registro de visita (analitica propia via PHP/MySQL) -->
+    <script>
+      import { api } from '../config';
+      function trackVisit() {
+        try {
+          // No registramos si el usuario pide "Do Not Track".
+          if (navigator.doNotTrack === '1') return;
+          const body = JSON.stringify({
+            path: location.pathname,
+            referrer: document.referrer || '',
+          });
+          // sendBeacon no bloquea la carga; si no existe, usamos fetch.
+          const url = api('/api/visit.php');
+          if (navigator.sendBeacon) {
+            navigator.sendBeacon(url, body);
+          } else {
+            fetch(url, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body,
+              keepalive: true,
+            }).catch(() => {});
+          }
+        } catch {
+          /* silencioso: la analitica nunca debe romper la web */
+        }
+      }
+      trackVisit();
+      document.addEventListener('astro:page-load', trackVisit);
+    </script>
+  </body>
+</html>

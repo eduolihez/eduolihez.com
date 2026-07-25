@@ -1,0 +1,71 @@
+---
+/**
+ * <Faq /> - Preguntas frecuentes.
+ *
+ * No es relleno: es la seccion que mas trabaja para el SEO y para las IAs.
+ *   - Google puede mostrarla desplegable en los resultados (dato FAQPage,
+ *     generado en Seo.astro a partir de este mismo archivo de datos).
+ *   - Los modelos de lenguaje leen respuestas cortas y autosuficientes, que es
+ *     exactamente el formato de una FAQ. Es lo que citan cuando alguien les
+ *     pregunta "¿quien es Eduardo Olivares?".
+ *   - Y de paso mete de forma natural las palabras que buscan las personas:
+ *     "analista SOC en Badalona", "ciberseguridad Barcelona".
+ *
+ * Usa <details>/<summary> nativos: acordeon accesible, con teclado, sin una
+ * sola linea de JavaScript. El contenido esta SIEMPRE en el HTML, asi que los
+ * rastreadores lo leen aunque no ejecuten scripts.
+ */
+import { useTranslations, pick } from '../i18n/utils';
+import type { Lang } from '../i18n/ui';
+import { faqItems } from '../data/faq';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<section id="faq" class="border-b border-bg-border bg-bg-soft py-20 sm:py-28">
+  <div class="container-page">
+    <div class="reveal mb-12">
+      <p class="section-kicker">{t('kicker.faq')}</p>
+      <h2 class="section-title">{t('faq.title')}</h2>
+      <p class="section-subtitle">{t('faq.subtitle')}</p>
+    </div>
+
+    <div class="reveal mx-auto max-w-3xl divide-y divide-bg-border border-y border-bg-border">
+      {
+        faqItems.map((item) => (
+          <details class="faq-item group">
+            <summary
+              class="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-left text-[15px] font-medium text-text transition hover:text-accent"
+            >
+              <span>{pick(item.question, lang)}</span>
+              <svg
+                class="faq-chevron h-4 w-4 shrink-0 text-text-faint transition-transform duration-200"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path fill="currentColor" d="M12 15.4 6.6 10 8 8.6l4 4 4-4L17.4 10Z" />
+              </svg>
+            </summary>
+            <p class="pb-5 pr-8 text-sm leading-relaxed text-text-muted">
+              {pick(item.answer, lang)}
+            </p>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Quita el triangulo por defecto del <summary> en Safari y Chrome. */
+  .faq-item summary::-webkit-details-marker {
+    display: none;
+  }
+  .faq-item[open] .faq-chevron {
+    transform: rotate(180deg);
+  }
+</style>

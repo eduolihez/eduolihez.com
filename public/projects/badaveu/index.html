@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BadaVeu | Plataforma Cívica Badalona — Eduardo Olivares</title>
+    <meta name="description" content="BadaVeu és la plataforma cívica per reportar i gestionar incidències urbanes a Badalona, desenvolupada per Eduardo Olivares. Arquitectura PWA segura i accessible.">
+    <link rel="canonical" href="https://eduolihez.com/badaveu/">
+    <meta name="theme-color" content="#002D5A">
+    <link rel="manifest" href="manifest.json">
+    <meta name="author" content="Eduardo Olivares">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta property="og:title" content="BadaVeu — Plataforma Cívica de Badalona">
+    <meta property="og:description" content="Reporta y sigue incidencias urbanas en Badalona. Plataforma cívica PWA con Open311 y panel administrativo en tiempo real.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://eduolihez.com/badaveu/">
+    <meta property="og:image" content="https://eduolihez.com/assets/og-badaveu.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="Eduardo Olivares">
+    <meta property="og:locale" content="ca_ES">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="BadaVeu — Plataforma Cívica de Badalona">
+    <meta name="twitter:description" content="Reporta y sigue incidencias urbanas en Badalona. PWA con Open311 y panel administrativo en tiempo real.">
+    <meta name="twitter:image" content="https://eduolihez.com/assets/og-badaveu.jpg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://unpkg.com">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+    <link rel="stylesheet" href="assets/css/style.css?v=3.0">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "BadaVeu",
+      "applicationCategory": "GovernmentApplication",
+      "operatingSystem": "Web (PWA)",
+      "description": "Plataforma cívica para reportar y seguir incidencias urbanas en Badalona. Integración Open311, geolocalización con Leaflet y panel administrativo en tiempo real.",
+      "url": "https://eduolihez.com/badaveu/",
+      "inLanguage": ["ca", "es"],
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+      "author": { "@type": "Person", "name": "Eduardo Olivares", "url": "https://eduolihez.com" }
+    }
+    </script>
+    </head>
+<body>
+    <nav class="top-bar" role="banner">
+        <div class="brand"><i class="ri-government-line" aria-hidden="true"></i> <span class="brand-bada">Bada</span><span class="brand-veu">Veu</span></div>
+        <div class="lang-toggles">
+            <a href="admin.html" class="top-admin-link" aria-label="Accés Administrador"><i class="ri-lock-2-line" aria-hidden="true"></i></a>
+            <div class="lang-toggles-group" role="group" aria-label="Selector d'idioma">
+                <span onclick="app.setLang('ca')" onkeydown="if(event.key==='Enter'||event.key===' '){app.setLang('ca')}" role="button" tabindex="0" class="active-lang" aria-pressed="true" aria-label="Canvia a Català">CA</span>
+                <span onclick="app.setLang('es')" onkeydown="if(event.key==='Enter'||event.key===' '){app.setLang('es')}" role="button" tabindex="0" aria-pressed="false" aria-label="Canvia a Castellà">ES</span>
+            </div>
+        </div>
+    </nav>
+
+    <div id="map" role="application" aria-label="Mapa d'incidències de Badalona"></div>
+
+    <div class="map-filters" role="toolbar" aria-label="Filtres del mapa">
+        <button class="filter-btn active" data-filter-key="categoria" data-filter-value="all" data-i18n="filter_barri_all" onclick="app.setFilter(this)" aria-pressed="true">Tots</button>
+        <button class="filter-btn" data-filter-key="categoria" data-filter-value="infraestructura" data-i18n="cat_infra" onclick="app.setFilter(this)" aria-pressed="false"><i class="ri-hammer-line" aria-hidden="true"></i> Infraestructura</button>
+        <button class="filter-btn" data-filter-key="categoria" data-filter-value="denuncia" data-i18n="cat_denuncia" onclick="app.setFilter(this)" aria-pressed="false"><i class="ri-alert-line" aria-hidden="true"></i> Denúncia</button>
+        <button class="filter-btn" data-filter-key="tipo" data-filter-value="Barrera Arquitectònica" onclick="app.setFilter(this)" aria-pressed="false"><i class="ri-wheelchair-line" aria-hidden="true"></i> Barrera Arq.</button>
+        <div class="map-filters-divider" role="separator" aria-hidden="true"></div>
+        <select id="filter-barri" class="filter-select" data-filter-key="barri" onchange="app.setFilter(this)" aria-label="Filtrar per barri">
+            <option value="all" data-i18n="filter_barri_all">Tots els Barris</option>
+        </select>
+        <div class="map-filters-divider" role="separator" aria-hidden="true"></div>
+        <button class="filter-btn" id="heatmap-toggle-btn" onclick="ui.toggleHeatmap()" data-i18n="heatmap_on" aria-pressed="false" aria-label="Activar mapa de calor d'incidències"><i class="ri-fire-line" aria-hidden="true"></i> Calor</button>
+        <button class="filter-btn filter-resolved-btn" id="btn-toggle-resolved" onclick="app.toggleShowResolved()" aria-pressed="false" aria-label="Mostrar incidències resoltes">
+            <i class="ri-checkbox-circle-line" aria-hidden="true"></i>
+            <span data-i18n="show_resolved">Resoltes</span>
+        </button>
+    </div>
+
+    <div id="map-picker-ui" class="map-floater hidden">
+        <div class="floater-card">
+            <span id="picker-status-msg" data-i18n="picker_msg">Mou el mapa per situar la incidència</span>
+            <p id="picker-address-display" class="picker-address-line" aria-live="polite">
+                <i class="ri-map-pin-line" aria-hidden="true"></i>
+                <span>Cercant adreça...</span>
+            </p>
+            <div class="floater-actions">
+                <button class="btn-confirm" onclick="ui.confirmLocation()" data-i18n="btn_confirm">
+                    <i class="ri-crosshair-2-line" aria-hidden="true"></i> Fixar Ubicació
+                </button>
+                <button class="btn-picker-cancel" onclick="ui.closePanel()" aria-label="Cancel·lar selecció d'ubicació">Cancel·lar</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="slide-panel" class="slide-panel closed category-infra"
+         role="dialog" aria-modal="true" aria-labelledby="panel-form-title" inert>
+
+        <div class="panel-content">
+            <div class="panel-header">
+                <h2 id="panel-form-title" data-i18n="form_title">Nova Incidència</h2>
+                <button class="close-icon-fixed" onclick="ui.closePanel()" aria-label="Tancar el formulari">
+                    <i class="ri-close-line" aria-hidden="true"></i>
+                </button>
+            </div>
+
+            <nav aria-label="Pas actual del formulari">
+                <ol class="progress-steps wizard-steps" role="list">
+                    <li class="progress-step active" id="step-1" data-step="1" role="listitem" aria-current="step">
+                        <div class="step-circle" aria-hidden="true">1</div>
+                        <span class="step-label">Foto</span>
+                    </li>
+                    <li class="progress-line" id="line-1" role="presentation"></li>
+                    <li class="progress-step" id="step-2" data-step="2" role="listitem">
+                        <div class="step-circle" aria-hidden="true">2</div>
+                        <span class="step-label">Ubicació</span>
+                    </li>
+                    <li class="progress-line" id="line-2" role="presentation"></li>
+                    <li class="progress-step" id="step-3" data-step="3" role="listitem">
+                        <div class="step-circle" aria-hidden="true">3</div>
+                        <span class="step-label">Enviar</span>
+                    </li>
+                </ol>
+            </nav>
+
+            <form id="incidentForm" enctype="multipart/form-data">
+
+                <!-- WIZARD STEP 1: Foto -->
+                <div class="wizard-step" id="wizard-step-1"
+                     role="group" aria-label="Pas 1 de 3: Afegir una foto">
+                    <div class="photo-zone" id="photo-zone"
+                         role="button" tabindex="0"
+                         aria-label="Afegir una foto: toca per fer una foto o triar-ne una de la galeria"
+                         onclick="document.getElementById('foto-input').click()"
+                         onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();document.getElementById('foto-input').click()}">
+                        <i class="ri-camera-line photo-zone-icon" aria-hidden="true"></i>
+                        <p>Toca per fer una foto o triar-ne una</p>
+                        <small class="text-muted">JPG, PNG — Màx. 2MB</small>
+                    </div>
+                    <div id="img-preview" class="img-preview-box hidden" role="img" aria-label="Previsualització de la foto seleccionada"></div>
+                    <input type="file" id="foto-input" name="foto" accept="image/*" capture="environment" class="hidden"
+                           aria-label="Seleccionar arxiu de foto" onchange="ui.previewImage(this)">
+
+                    <!-- RGPD Notice — Step 5 -->
+                    <div class="rgpd-notice" role="note" aria-label="Avís de privacitat RGPD">
+                        <i class="ri-shield-check-line" aria-hidden="true"></i>
+                        <div>
+                            <strong>Avís de privacitat (RGPD)</strong>
+                            <span>Assegureu-vos de no incloure <strong>cares de persones</strong> ni <strong>matrícules de vehicles</strong> en la fotografia.</span>
+                        </div>
+                    </div>
+
+                    <div class="wizard-nav">
+                        <button type="button" class="btn-wizard-skip" onclick="app.goWizardStep(2)" aria-label="Continuar sense afegir foto">Sense foto →</button>
+                        <button type="button" class="btn-wizard-next" onclick="app.goWizardStep(2)">Continuar <i class="ri-arrow-right-line" aria-hidden="true"></i></button>
+                    </div>
+                </div>
+
+                <!-- WIZARD STEP 2: Ubicació -->
+                <div class="wizard-step hidden" id="wizard-step-2"
+                     role="group" aria-label="Pas 2 de 3: Confirmar ubicació" inert>
+
+                    <!-- Dirección confirmada (read-only, se rellena tras el picker) -->
+                    <div class="location-confirmed-box" id="location-confirmed-display" aria-live="polite">
+                        <i class="ri-map-pin-fill" aria-hidden="true"></i>
+                        <span id="wizard-address-display"><span data-i18n="loc_unknown">Adreça desconeguda</span></span>
+                    </div>
+
+                    <!-- Camps readonly de geocodificació inversa (Nominatim) -->
+                    <div class="geo-fields-group" aria-label="Dades de l'adreça detectada automàticament" role="group">
+                        <div class="geo-field-item geo-field-full">
+                            <span class="geo-field-label"><i class="ri-road-map-line" aria-hidden="true"></i> Carrer detectat</span>
+                            <div class="geo-field-value loading" id="geo-street" aria-live="polite" aria-label="Carrer">
+                                <i class="ri-route-line" aria-hidden="true"></i>
+                                <span>—</span>
+                            </div>
+                        </div>
+                        <div class="geo-field-item">
+                            <span class="geo-field-label"><i class="ri-community-line" aria-hidden="true"></i> Barri / Zona</span>
+                            <div class="geo-field-value loading" id="geo-neighbourhood" aria-live="polite" aria-label="Barri">
+                                <i class="ri-home-2-line" aria-hidden="true"></i>
+                                <span>—</span>
+                            </div>
+                        </div>
+                        <div class="geo-field-item">
+                            <span class="geo-field-label"><i class="ri-mail-line" aria-hidden="true"></i> Codi Postal</span>
+                            <div class="geo-field-value loading" id="geo-cp" aria-live="polite" aria-label="Codi postal">
+                                <i class="ri-hashtag" aria-hidden="true"></i>
+                                <span>—</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn-map-pick"
+                            onclick="app._pickerCalledFromStep=2; ui.pickLocationMode()"
+                            aria-label="Canviar la ubicació al mapa">
+                        <i class="ri-crosshair-2-line" aria-hidden="true"></i> Canviar ubicació al mapa
+                    </button>
+
+                    <label for="barri_select" class="sr-only">Selecciona el barri</label>
+                    <select id="barri_select" name="barri" class="modern-select" style="margin-top:14px;"
+                            onchange="app.updateDistrictFromBarrio(this.value)" required aria-required="true">
+                        <option value="" data-i18n="ph_barri_select">-- Selecciona Barri --</option>
+                    </select>
+
+                    <input type="hidden" id="addr_input" name="direccion">
+                    <input type="hidden" id="cp_input" name="cp">
+                    <input type="hidden" id="lat_input" name="lat" required>
+                    <input type="hidden" id="lng_input" name="lng" required>
+                    <input type="hidden" id="districte_input" name="districte">
+
+                    <p id="loc-searching-msg" class="loc-hint" style="display:none;" aria-live="polite">
+                        <i class="ri-loader-4-line ri-spin" aria-hidden="true"></i> Cercant adreça...
+                    </p>
+                    <div class="wizard-nav">
+                        <button type="button" class="btn-wizard-back" onclick="app.goWizardStep(1)">
+                            <i class="ri-arrow-left-line" aria-hidden="true"></i> Enrere
+                        </button>
+                        <button type="button" class="btn-wizard-next" onclick="app.goWizardStep(3)">Continuar <i class="ri-arrow-right-line" aria-hidden="true"></i></button>
+                    </div>
+                </div>
+
+                <!-- WIZARD STEP 3: Categoria i Enviar -->
+                <div class="wizard-step hidden" id="wizard-step-3"
+                     role="group" aria-label="Pas 3 de 3: Seleccionar categoria i enviar" inert>
+                    <div class="category-grid-wizard" id="category-grid-wizard" role="group" aria-label="Selecciona el tipus d'incidència">
+                        <button type="button" class="cat-grid-btn" data-tipo="Il·luminació" data-cat="infraestructura"
+                                onclick="app.selectWizardCategory(this)" aria-pressed="false">
+                            <span class="cat-icon" aria-hidden="true">💡</span><span class="cat-label">Il·luminació</span>
+                        </button>
+                        <button type="button" class="cat-grid-btn" data-tipo="Voreres" data-cat="infraestructura"
+                                onclick="app.selectWizardCategory(this)" aria-pressed="false">
+                            <span class="cat-icon" aria-hidden="true">🚶</span><span class="cat-label">Voreres</span>
+                        </button>
+                        <button type="button" class="cat-grid-btn" data-tipo="Neteja" data-cat="infraestructura"
+                                onclick="app.selectWizardCategory(this)" aria-pressed="false">
+                            <span class="cat-icon" aria-hidden="true">🗑️</span><span class="cat-label">Neteja</span>
+                        </button>
+                        <button type="button" class="cat-grid-btn" data-tipo="Parcs i Jardins" data-cat="infraestructura"
+                                onclick="app.selectWizardCategory(this)" aria-pressed="false">
+                            <span class="cat-icon" aria-hidden="true">🌳</span><span class="cat-label">Parcs</span>
+                        </button>
+                        <button type="button" class="cat-grid-btn" data-tipo="Barrera Arquitectònica" data-cat="infraestructura"
+                                onclick="app.selectWizardCategory(this)" aria-pressed="false">
+                            <span class="cat-icon" aria-hidden="true">♿</span><span class="cat-label">Barrera Arq.</span>
+                        </button>
+                        <button type="button" class="cat-grid-btn" data-tipo="Vandalisme" data-cat="denuncia"
+                                onclick="app.selectWizardCategory(this)" aria-pressed="false">
+                            <span class="cat-icon" aria-hidden="true">🚫</span><span class="cat-label">Vandalisme</span>
+                        </button>
+                        <button type="button" class="cat-grid-btn" data-tipo="Soroll" data-cat="denuncia"
+                                onclick="app.selectWizardCategory(this)" aria-pressed="false">
+                            <span class="cat-icon" aria-hidden="true">📢</span><span class="cat-label">Soroll</span>
+                        </button>
+                        <button type="button" class="cat-grid-btn" data-tipo="Altres" data-cat="infraestructura"
+                                onclick="app.selectWizardCategory(this)" aria-pressed="false">
+                            <span class="cat-icon" aria-hidden="true">⚙️</span><span class="cat-label">Altres</span>
+                        </button>
+                    </div>
+                    <!-- Hidden fields per compatibilitat amb l'API -->
+                    <input type="hidden" id="cat-hidden" name="categoria" value="infraestructura">
+                    <input type="hidden" id="tipo-hidden" name="tipo" value="">
+                    <input type="hidden" id="titulo-hidden" name="titulo" value="">
+                    <input type="hidden" name="urgencia" value="media">
+                    <input type="hidden" name="afectacion" value="col·lectiva">
+                    <label for="wizard-desc" class="sr-only">Descripció addicional (opcional)</label>
+                    <textarea name="descripcion" id="wizard-desc" class="modern-textarea" rows="2"
+                              placeholder="Afegeix detalls addicionals (opcional)..."></textarea>
+                    <label for="wizard-email" class="sr-only">Email per a notificacions (opcional)</label>
+                    <input type="email" id="wizard-email" name="email" class="modern-input"
+                           placeholder="Email per notificacions (opcional)" style="margin-top:8px;" autocomplete="email">
+                    <p id="wizard-cat-error" class="field-error" role="alert" aria-live="assertive"
+                       style="display:none; margin-top:8px;">Selecciona una categoria per continuar.</p>
+                    <div class="wizard-nav">
+                        <button type="button" class="btn-wizard-back" onclick="app.goWizardStep(2)">
+                            <i class="ri-arrow-left-line" aria-hidden="true"></i> Enrere
+                        </button>
+                        <button type="submit" class="btn-submit-wizard">
+                            <i class="ri-send-plane-fill" aria-hidden="true"></i> Enviar incidència
+                        </button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+    <div id="toast-container"></div>
+
+    <!-- INCIDENT BOTTOM CARD (reemplaza popups Leaflet) -->
+    <div id="incident-bottom-card"
+         role="dialog" aria-modal="false" aria-label="Detall d'incidència"
+         aria-hidden="true" inert>
+        <div class="ibc-handle-row">
+            <div class="ibc-handle" aria-hidden="true"></div>
+            <button class="ibc-close" onclick="app.closeIncidentCard()" aria-label="Tancar detall d'incidència">
+                <i class="ri-close-line" aria-hidden="true"></i>
+            </button>
+        </div>
+        <div class="ibc-body" id="ibc-body-content"></div>
+    </div>
+
+    <!-- BOTTOM NAV (navegació) — 5 items amb FAB central -->
+    <nav class="bottom-nav" role="navigation" aria-label="Navegació principal">
+        <a href="index.html" class="nav-item active" aria-current="page">
+            <i class="ri-map-2-fill" aria-hidden="true"></i>
+            <span data-i18n="nav_map">Mapa</span>
+        </a>
+        <a href="incidents.html" class="nav-item">
+            <i class="ri-list-check-2" aria-hidden="true"></i>
+            <span data-i18n="nav_incidents">Incidències</span>
+        </a>
+        <div class="nav-fab-container">
+            <button id="fab-nueva" class="fab-btn" onclick="ui.startReportFlow()" aria-label="Nova incidència">
+                <i class="ri-add-line" aria-hidden="true"></i>
+            </button>
+        </div>
+        <a href="stats.html" class="nav-item">
+            <i class="ri-pie-chart-2-fill" aria-hidden="true"></i>
+            <span data-i18n="nav_stats">Dades</span>
+        </a>
+        <a href="about.html" class="nav-item">
+            <i class="ri-information-line" aria-hidden="true"></i>
+            <span data-i18n="nav_about">Sobre</span>
+        </a>
+    </nav>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exif-js@2.3.0/exif.js"></script>
+    <script src="assets/js/core.js?v=3.0"></script>
+    <script src="assets/js/app.js?v=3.0"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            app.init();
+        });
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(() => {});
+        }
+    </script>
+    <footer style="text-align:center; padding:1.5rem; font-size:0.8rem; color:#888; border-top:1px solid rgba(0,45,90,0.15); background:#f4f7f9;">
+        <p>Un projecte de <a href="https://eduolihez.com" style="color:inherit; text-decoration:underline;">Eduardo Olivares — Consultor de Ciberseguretat</a></p>
+    </footer>
+</body>
+</html>

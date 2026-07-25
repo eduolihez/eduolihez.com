@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Electricidad Martín · Instalador eléctrico autorizado · Madrid</title>
+<meta name="description" content="Instalador eléctrico autorizado en Madrid. Cuadros, averías, iluminación y wallbox. Presupuesto en 24h. Certificado oficial.">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:#fff;color:#111;line-height:1.65;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+.wrap{max-width:1100px;margin:0 auto;padding:0 2rem}
+
+/* NAV — clean white strip */
+nav{background:#fff;border-bottom:1px solid #e5e7eb;position:sticky;top:0;z-index:200}
+.nav-in{max-width:1100px;margin:0 auto;padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center}
+.logo{display:flex;align-items:center;gap:.6rem}
+.logo-bolt{width:28px;height:28px;background:#1e3a5f;border-radius:6px;display:flex;align-items:center;justify-content:center}
+.logo-bolt svg{width:14px;height:14px;fill:#f59e0b}
+.logo-text{font-family:'Instrument Serif',serif;font-size:1.25rem;color:#1e3a5f}
+.nav-r{display:flex;gap:1.8rem;align-items:center}
+.nav-r a{font-size:.82rem;color:#6b7280;transition:color .2s}
+.nav-r a:hover{color:#1e3a5f}
+.nbtn{background:#1e3a5f;color:#fff;padding:.48rem 1.1rem;border-radius:6px;font-size:.8rem;font-weight:600}
+.nbtn:hover{background:#0f2035}
+
+/* HERO — split technical */
+#hero{display:grid;grid-template-columns:1fr 420px;min-height:calc(100vh - 57px);border-bottom:1px solid #e5e7eb}
+.hero-left{background:linear-gradient(to bottom right,rgba(0,0,0,.04) 0%,rgba(0,0,0,.38) 100%),linear-gradient(155deg,#1e3a5f 0%,#152c4a 40%,#0e1f35 70%,#071525 100%);padding:5rem 3rem 5rem 4rem;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden}
+.cert-badge{display:inline-flex;align-items:center;gap:.5rem;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);color:#fbbf24;font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:.32rem .8rem;border-radius:20px;margin-bottom:1.8rem;width:fit-content}
+.cert-badge svg{width:12px;height:12px;fill:none;stroke:#fbbf24;stroke-width:2}
+h1{font-family:'Instrument Serif',serif;font-size:clamp(2.2rem,4vw,3.4rem);color:#fff;line-height:1.1;font-weight:400;margin-bottom:1.2rem}
+h1 em{font-style:italic;color:#f59e0b}
+.hero-p{font-size:.94rem;color:rgba(255,255,255,.5);font-weight:300;line-height:1.85;max-width:400px;margin-bottom:2.5rem}
+.hbtns{display:flex;gap:.8rem;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:.4rem;padding:.82rem 1.6rem;font-size:.84rem;font-weight:600;border-radius:7px;border:2px solid transparent;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
+.btn-amber{background:#f59e0b;color:#1e3a5f;border-color:#f59e0b}
+.btn-amber:hover{background:#d97706}
+.btn-outline{background:transparent;color:rgba(255,255,255,.5);border-color:rgba(255,255,255,.2)}
+.btn-outline:hover{border-color:rgba(255,255,255,.5);color:#fff}
+/* right panel: spec card */
+.hero-right{background:#f9fafb;padding:4rem 2.5rem;display:flex;flex-direction:column;justify-content:center;gap:1.5rem;border-left:1px solid #e5e7eb}
+.spec-title{font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:#9ca3af;font-weight:700;margin-bottom:1.2rem}
+.spec-row{display:flex;justify-content:space-between;align-items:baseline;padding:.7rem 0;border-bottom:1px solid #e5e7eb;font-size:.85rem}
+.spec-row:last-of-type{border-bottom:none}
+.sk{color:#6b7280;font-weight:300}
+.sv{color:#1e3a5f;font-weight:600}
+.cert-list{display:flex;flex-direction:column;gap:.5rem;margin-top:.5rem}
+.cl-item{font-size:.75rem;color:#6b7280;padding:.5rem .8rem;border-left:2px solid #f59e0b;line-height:1.45;background:#fff;border-radius:0 5px 5px 0}
+.cta-block{background:#1e3a5f;border-radius:10px;padding:1.5rem;text-align:center}
+.cta-block p{font-size:.78rem;color:rgba(255,255,255,.5);margin-bottom:.8rem}
+.cta-block a{display:block;background:#f59e0b;color:#1e3a5f;padding:.8rem;border-radius:6px;font-size:.85rem;font-weight:700;text-align:center}
+.cta-block a:hover{background:#d97706}
+
+/* SERVICES — 2 col with specs */
+#servicios{padding:6rem 0;background:#fff}
+.sec-tag{font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:#f59e0b;font-weight:700;margin-bottom:.7rem}
+h2{font-family:'Instrument Serif',serif;font-size:clamp(1.8rem,3vw,2.4rem);color:#1e3a5f;font-weight:400;line-height:1.15;margin-bottom:.5rem}
+.sec-sub{font-size:.92rem;color:#6b7280;max-width:480px;line-height:1.8;font-weight:300}
+.svc-wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin-top:3rem;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;background:#e5e7eb}
+.svc{background:#fff;padding:2rem 1.8rem;transition:background .2s}
+.svc:hover{background:#f9fafb}
+.svc-ico{width:40px;height:40px;background:#eef2f8;border:1px solid #d1dce8;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:1.1rem}
+.svc-ico svg{width:20px;height:20px;fill:none;stroke:#1e3a5f;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.svc-name{font-size:.9rem;font-weight:600;color:#1e3a5f;margin-bottom:.4rem}
+.svc-desc{font-size:.8rem;color:#6b7280;line-height:1.65;font-weight:300}
+.svc-spec{margin-top:.8rem;padding:.5rem .7rem;background:#f9fafb;border-radius:5px;border-left:2px solid #f59e0b}
+.svc-spec span{font-size:.72rem;color:#1e3a5f;font-weight:600;font-family:'JetBrains Mono',monospace,sans-serif}
+
+/* PROCESS */
+#proceso{padding:6rem 0;background:#f9fafb;border-top:1px solid #e5e7eb}
+.proc-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:2rem;margin-top:3.5rem;position:relative}
+.proc-steps::before{content:'';position:absolute;top:28px;left:2rem;right:2rem;height:1px;background:#e5e7eb;z-index:0}
+.ps{position:relative;z-index:1}
+.ps-num{width:56px;height:56px;border-radius:50%;background:#fff;border:1px solid #e5e7eb;display:flex;align-items:center;justify-content:center;font-family:'Instrument Serif',serif;font-size:1.5rem;color:#1e3a5f;margin-bottom:1.2rem;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.ps h4{font-size:.9rem;font-weight:600;color:#1e3a5f;margin-bottom:.35rem;font-family:'Inter',sans-serif}
+.ps p{font-size:.8rem;color:#6b7280;line-height:1.65;font-weight:300}
+
+/* TESTIMONIALS */
+#testi{padding:6rem 0;background:#fff;border-top:1px solid #e5e7eb}
+.t-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin-top:3rem}
+.tc{background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:1.8rem}
+.tc-stars{color:#f59e0b;letter-spacing:.1em;margin-bottom:.9rem;font-size:.9rem}
+.tc-q{font-size:.83rem;color:#374151;line-height:1.8;font-style:italic;margin-bottom:1.2rem}
+.tc-q::before{content:'"'}
+.tc-q::after{content:'"'}
+.tc-a{display:flex;align-items:center;gap:.7rem}
+.tc-av{width:36px;height:36px;border-radius:50%;background:#dbeafe;display:flex;align-items:center;justify-content:center;font-size:.73rem;font-weight:700;color:#1e3a5f;flex-shrink:0}
+.tc-name{font-size:.82rem;font-weight:600;color:#1e3a5f}
+.tc-loc{font-size:.7rem;color:#9ca3af}
+
+/* CTA */
+#cta{padding:5rem 0;background:#1e3a5f}
+#cta h2{color:#fff;margin-bottom:.8rem}
+#cta .sec-sub{color:rgba(255,255,255,.45);max-width:none}
+.cta-row{display:flex;gap:.8rem;flex-wrap:wrap;margin-top:2rem}
+.btn-w{background:#fff;color:#1e3a5f;border:2px solid #fff}
+.btn-w:hover{background:transparent;color:#fff}
+.btn-amb{background:#f59e0b;color:#1e3a5f;border:2px solid #f59e0b}
+.btn-amb:hover{background:#d97706}
+
+footer{background:#0a1628;padding:2rem 0;border-top:1px solid rgba(255,255,255,.06)}
+.foot{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.8rem}
+.foot-logo{font-family:'Instrument Serif',serif;font-size:1rem;color:rgba(255,255,255,.4)}
+footer p{font-size:.7rem;color:rgba(255,255,255,.18)}
+.zeora a{color:rgba(255,255,255,.3);font-size:.7rem;transition:color .2s}
+.zeora a:hover{color:rgba(255,255,255,.6)}
+
+@media(max-width:960px){
+  #hero{grid-template-columns:1fr}
+  .hero-right{display:none}
+}
+@media(max-width:860px){
+  .svc-wrap{grid-template-columns:1fr 1fr}
+  .proc-steps{grid-template-columns:1fr 1fr}
+  .proc-steps::before{display:none}
+  .t-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:540px){
+  .svc-wrap,.t-grid{grid-template-columns:1fr}
+  .wrap{padding:0 1.3rem}
+  .hero-left{padding:4rem 1.5rem}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-in">
+    <div class="logo">
+      <div class="logo-bolt"><svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+      <span class="logo-text">Electricidad Martín</span>
+    </div>
+    <div class="nav-r">
+      <a href="#servicios">Servicios</a>
+      <a href="#proceso">Proceso</a>
+      <a href="#testi">Opiniones</a>
+      <a href="#cta" class="nbtn">Pedir presupuesto</a>
+    </div>
+  </div>
+</nav>
+
+<section id="hero">
+  <div class="hero-left">
+    <div class="cert-badge"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Instalador autorizado · Madrid</div>
+    <h1>Electricista<br><em>certificado</em><br>en Madrid</h1>
+    <p class="hero-p">Instalaciones eléctricas con certificado oficial de instalador autorizado. Cuadros, averías, iluminación y cargadores de vehículo. Presupuesto detallado en menos de 24 horas.</p>
+    <div class="hbtns">
+      <a href="tel:912345678" class="btn btn-amber">Solicitar presupuesto</a>
+      <a href="#servicios" class="btn btn-outline">Ver servicios</a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="spec-title">Ficha técnica</div>
+    <div class="spec-row"><span class="sk">Licencia</span><span class="sv">Instalador autorizado nº EM-28-1234</span></div>
+    <div class="spec-row"><span class="sk">Plazo presupuesto</span><span class="sv">≤ 24 horas</span></div>
+    <div class="spec-row"><span class="sk">Garantía</span><span class="sv">2 años en instalaciones</span></div>
+    <div class="spec-row"><span class="sk">Zona de trabajo</span><span class="sv">Madrid capital y área</span></div>
+    <div class="spec-row"><span class="sk">Experiencia</span><span class="sv">15 años · +280 instalaciones</span></div>
+    <div class="cert-list">
+      <div class="cl-item">Instalador BT autorizado · nº EM-28-1234</div>
+      <div class="cl-item">Certificado Comunidad de Madrid (REBT)</div>
+      <div class="cl-item">Wallbox homologado MITMA · MOVES III</div>
+      <div class="cl-item">Seguro de responsabilidad civil profesional</div>
+    </div>
+    <div class="cta-block">
+      <p>Respuesta garantizada en 24h</p>
+      <a href="tel:912345678">Llamar: 91 234 56 78</a>
+    </div>
+  </div>
+</section>
+
+<section id="servicios">
+  <div class="wrap">
+    <div class="sec-tag">Servicios</div>
+    <h2>Instalaciones con<br>certificado oficial.</h2>
+    <p class="sec-sub">Cada trabajo queda documentado y certificado. Necesario para seguros, comunidades y transmisiones de vivienda.</p>
+    <div class="svc-wrap">
+      <div class="svc"><div class="svc-ico"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M7 8h10M7 12h6M7 16h8"/></svg></div><div class="svc-name">Cuadros eléctricos</div><div class="svc-desc">Revisión, ampliación y sustitución. ICP, diferenciales y magnetotérmicos según REBT.</div><div class="svc-spec"><span>Desde 180 € · Con certificado REBT</span></div></div>
+      <div class="svc"><div class="svc-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/></svg></div><div class="svc-name">Puntos de luz y enchufes</div><div class="svc-desc">Instalación de nuevos puntos con cableado empotrado. Iluminación LED, reguladores, sensores.</div><div class="svc-spec"><span>Desde 55 € / punto · IVA no incluido</span></div></div>
+      <div class="svc"><div class="svc-ico"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><div class="svc-name">Averías eléctricas</div><div class="svc-desc">Diagnóstico con comprobadores homologados. Cortocircuitos, sobrecargas, fallos de tierra.</div><div class="svc-spec"><span>Diagnóstico desde 65 € · Urgente disponible</span></div></div>
+      <div class="svc"><div class="svc-ico"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><circle cx="12" cy="17" r="1"/></svg></div><div class="svc-name">Cargador vehículo eléctrico</div><div class="svc-desc">Instalación de wallbox en garaje o parking. Gestión de subvenciones MOVES III incluida.</div><div class="svc-spec"><span>Wallbox desde 650 € instalado · Subvencionable</span></div></div>
+      <div class="svc"><div class="svc-ico"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><div class="svc-name">Instalación completa</div><div class="svc-desc">Obra nueva y reformas. Proyecto de legalización, ejecución, pruebas y certificado de fin de obra.</div><div class="svc-spec"><span>Precio según m² · Proyecto incluido</span></div></div>
+      <div class="svc"><div class="svc-ico"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div class="svc-name">Domótica y automatización</div><div class="svc-desc">Persianas, climatización y alumbrado automático. Integración con Alexa, Google Home, Apple Home.</div><div class="svc-spec"><span>Desde 350 € / zona · Proyecto personalizado</span></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="proceso">
+  <div class="wrap">
+    <div class="sec-tag">Cómo trabajamos</div>
+    <h2>Del presupuesto al<br>certificado oficial.</h2>
+    <div class="proc-steps">
+      <div class="ps"><div class="ps-num">1</div><h4>Solicitud y visita</h4><p>Nos describes la instalación. Acordamos visita sin cargo. Medimos y evaluamos in situ.</p></div>
+      <div class="ps"><div class="ps-num">2</div><h4>Presupuesto detallado</h4><p>En menos de 24h recibes un presupuesto con materiales, mano de obra y plazo. Sin sorpresas.</p></div>
+      <div class="ps"><div class="ps-num">3</div><h4>Ejecución certificada</h4><p>Instalamos según REBT. Usamos solo materiales homologados y probamos cada circuito.</p></div>
+      <div class="ps"><div class="ps-num">4</div><h4>Certificado y garantía</h4><p>Entregamos certificado de instalador autorizado y documento de garantía de 2 años.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="testi">
+  <div class="wrap">
+    <div class="sec-tag">Opiniones</div>
+    <h2>Clientes que confían<br>en nuestro trabajo.</h2>
+    <div class="t-grid">
+      <div class="tc"><div class="tc-stars">★★★★★</div><p class="tc-q">Instalaron el wallbox en 3 horas. Me gestionaron la subvención MOVES y me ahorraron 600€. Todo perfecto y con certificado oficial.</p><div class="tc-a"><div class="tc-av">RG</div><div><div class="tc-name">Roberto García</div><div class="tc-loc">Salamanca, Madrid</div></div></div></div>
+      <div class="tc"><div class="tc-stars">★★★★★</div><p class="tc-q">Renovaron el cuadro del piso antiguo. Me explicaron cada paso, el precio fue exacto al presupuesto y el certificado llegó en 24h.</p><div class="tc-a"><div class="tc-av">LS</div><div><div class="tc-name">Laura Sánchez</div><div class="tc-loc">Chamberí, Madrid</div></div></div></div>
+      <div class="tc"><div class="tc-stars">★★★★★</div><p class="tc-q">3 años con el mantenimiento anual. Siempre puntual, documentan todo y el seguro del piso no pone objeciones gracias a sus certificados.</p><div class="tc-a"><div class="tc-av">AM</div><div><div class="tc-name">Alejandro Moreno</div><div class="tc-loc">Retiro, Madrid</div></div></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="cta">
+  <div class="wrap">
+    <div class="sec-tag" style="color:rgba(255,255,255,.4)">Contacto</div>
+    <h2>¿Necesitas presupuesto?</h2>
+    <p class="sec-sub">Cuéntanos el proyecto. Te respondemos en menos de 24 horas con presupuesto detallado, sin compromiso.</p>
+    <div class="cta-row">
+      <a href="tel:912345678" class="btn btn-w">Llamar: 91 234 56 78</a>
+      <a href="mailto:info@electricidadmartin.es" class="btn btn-amb">Enviar email</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot">
+      <div class="foot-logo">Electricidad Martín · Madrid · Instalador EM-28-1234</div>
+      <p>© 2026 · electricidadmartinmadrid.es</p>
+      <div class="zeora"><a href="../index.html">Web por Zéora</a></div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

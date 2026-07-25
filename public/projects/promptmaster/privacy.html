@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — PromptMaster</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:      #09090b;
+      --border:  rgba(255,255,255,0.08);
+      --accent:  #8b5cf6;
+      --text:    #f8fafc;
+      --muted:   #94a3b8;
+      --subtle:  #64748b;
+    }
+
+    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+
+    body {
+      font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      line-height:1.75;
+      padding:48px 24px 80px;
+      -webkit-font-smoothing:antialiased;
+    }
+
+    .wrap {
+      max-width:720px;
+      margin:0 auto;
+    }
+
+    .back {
+      display:inline-flex; align-items:center; gap:6px;
+      font-size:13px; color:var(--subtle); text-decoration:none;
+      margin-bottom:40px;
+      transition:color 0.15s;
+    }
+    .back:hover { color:var(--muted); }
+
+    .logo {
+      font-size:14px; font-weight:700; color:var(--accent);
+      margin-bottom:8px;
+    }
+
+    h1 {
+      font-size:32px; font-weight:800; letter-spacing:-0.03em;
+      margin-bottom:8px;
+    }
+
+    .meta {
+      font-size:13px; color:var(--subtle); margin-bottom:48px;
+    }
+
+    h2 {
+      font-size:17px; font-weight:700; margin:40px 0 12px;
+      letter-spacing:-0.01em;
+    }
+
+    p { font-size:15px; color:var(--muted); margin-bottom:14px; }
+
+    ul {
+      list-style:none; padding:0; margin:0 0 14px;
+      display:flex; flex-direction:column; gap:8px;
+    }
+
+    ul li {
+      font-size:15px; color:var(--muted);
+      padding-left:20px; position:relative;
+    }
+
+    ul li::before {
+      content:'·';
+      position:absolute; left:0;
+      color:var(--accent); font-weight:700;
+    }
+
+    a { color:var(--accent); text-decoration:underline; }
+
+    hr {
+      border:none; border-top:1px solid var(--border);
+      margin:40px 0;
+    }
+
+    .contact-box {
+      background:rgba(255,255,255,0.03);
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:20px 24px;
+      margin-top:40px;
+    }
+
+    .contact-box p { margin:0; font-size:14px; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <a href="index.html" class="back">← Back to PromptMaster</a>
+
+  <div class="logo">⚡ PromptMaster</div>
+  <h1>Privacy Policy</h1>
+  <p class="meta">Last updated: May 2025 &nbsp;·&nbsp; Applies to the PromptMaster Chrome Extension</p>
+
+  <p>This Privacy Policy explains how PromptMaster ("the Extension", "we", "us") handles your data. We are committed to being transparent and collecting only what is strictly necessary to provide the service.</p>
+
+  <hr>
+
+  <h2>1. What data we collect</h2>
+  <p>PromptMaster collects a minimal amount of data to function:</p>
+  <ul>
+    <li><strong>Prompt text you submit for enhancement.</strong> When you press Ctrl+M or click the PromptMaster button, the text in the active AI input field is sent to our enhancement API (api.promptly.fyi) to generate an improved version. This text is used solely to process the enhancement request and is not stored on our servers.</li>
+    <li><strong>License key.</strong> If you activate a PRO license, your license key is sent to the Gumroad API (api.gumroad.com) for verification. We do not store or log this key on any server.</li>
+    <li><strong>Daily usage count.</strong> The number of prompt enhancements you perform each day is stored locally in your browser to enforce the free plan limit. This data never leaves your device.</li>
+  </ul>
+
+  <h2>2. What data we do NOT collect</h2>
+  <ul>
+    <li>We do not collect your name, email address, or any personal identification information.</li>
+    <li>We do not collect, read, or store your AI conversations.</li>
+    <li>We do not track which websites you visit.</li>
+    <li>We do not monitor mouse movements, keystrokes, or any behavioral data.</li>
+    <li>We do not use cookies or any third-party analytics services (no Google Analytics, no Mixpanel, etc.).</li>
+    <li>We do not collect financial or payment data. Purchases are handled entirely by Gumroad.</li>
+  </ul>
+
+  <h2>3. Where your data is stored</h2>
+  <p>Your saved prompts, PRO activation status, and usage count are stored <strong>exclusively in your browser's local storage</strong> (chrome.storage.local). This data lives on your device and is not transmitted to any external server. Clearing your browser data or uninstalling the Extension will permanently delete this information.</p>
+
+  <h2>4. Third-party services</h2>
+  <p>The Extension makes network requests to the following external services:</p>
+  <ul>
+    <li><strong>api.promptly.fyi</strong> — Our prompt enhancement API. Receives the prompt text you submit and returns the enhanced version. No data is retained beyond the duration of the request.</li>
+    <li><strong>api.gumroad.com</strong> — Used exclusively to verify your PRO license key. Gumroad's own privacy policy applies to data processed on their platform.</li>
+  </ul>
+  <p>No data is sold, shared, or transferred to any other third parties.</p>
+
+  <h2>5. Permissions used and why</h2>
+  <ul>
+    <li><strong>activeTab</strong> — To read the prompt text from the active AI platform tab and inject the enhanced version back into the input field.</li>
+    <li><strong>sidePanel</strong> — To display the saved prompt library and PRO content alongside the AI platform.</li>
+    <li><strong>storage</strong> — To save prompts, license status, and usage count locally in your browser.</li>
+    <li><strong>contextMenus</strong> — To add an "Enhance Prompt" option to the right-click menu on supported AI platforms.</li>
+    <li><strong>clipboardWrite</strong> — To copy a saved prompt to your clipboard when you click the "Copy" button.</li>
+  </ul>
+
+  <h2>6. Children's privacy</h2>
+  <p>PromptMaster is not directed at children under 13. We do not knowingly collect any data from children.</p>
+
+  <h2>7. Changes to this policy</h2>
+  <p>If we make material changes to this Privacy Policy, we will update the "Last updated" date at the top of this page. We encourage you to review this page periodically. Continued use of the Extension after any changes constitutes acceptance of the updated policy.</p>
+
+  <h2>8. Your rights</h2>
+  <p>Since we do not collect personal data tied to your identity, there is no personal profile to access, correct, or delete. If you wish to erase all locally stored Extension data, simply clear your browser's local storage or uninstall the Extension.</p>
+
+  <hr>
+
+  <div class="contact-box">
+    <p><strong>Questions about this policy?</strong></p>
+    <p>Contact us at <a href="mailto:eduolihez@gmail.com">eduolihez@gmail.com</a> — we reply within 24 hours.</p>
+  </div>
+
+</div>
+</body>
+</html>

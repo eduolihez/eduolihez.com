@@ -1,0 +1,3 @@
+# Bloquea el acceso web directo a la carpeta de librerias PHP.
+# Estos archivos solo deben incluirse desde el codigo, nunca abrirse por URL.
+Require all denied

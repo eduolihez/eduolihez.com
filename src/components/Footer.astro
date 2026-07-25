@@ -1,0 +1,76 @@
+---
+/**
+ * <Footer /> - Pie minimalista con enlaces sociales y "volver arriba".
+ */
+import { useTranslations } from '../i18n/utils';
+import type { Lang } from '../i18n/ui';
+import { SITE } from '../config';
+import Icon from './Icon.astro';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const year = new Date().getFullYear();
+const aboutPath = lang === 'en' ? '/en/about-this-website' : (lang === 'ca' ? '/ca/sobre-aquesta-web' : '/sobre-esta-web');
+---
+
+<footer class="border-t border-bg-border">
+  <div
+    class="container-page flex flex-col items-center justify-between gap-4 py-8 sm:flex-row"
+  >
+    <div class="text-center font-mono text-xs text-text-faint sm:text-left">
+      <p>&copy; {year} {SITE.shortName} · {t('footer.built')}</p>
+      {/* La ubicacion visible tambien es una senal de SEO local: Google la
+          cruza con el dato estructurado del <head> para confirmar la ciudad. */}
+      <p class="mt-1">
+        <span class="not-italic">{t('footer.location')}</span>
+        <span aria-hidden="true"> · </span>
+        <a class="transition hover:text-accent" href={`mailto:${SITE.social.email}`}>
+          {SITE.social.email}
+        </a>
+      </p>
+      <p class="mt-1.5">
+        <a class="transition hover:text-accent text-accent font-medium" href={aboutPath}>
+          {t('footer.aboutSite')} &rarr;
+        </a>
+      </p>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <a
+        href={SITE.social.linkedin}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="rounded-md p-2 text-text-faint transition hover:text-accent"
+        aria-label="LinkedIn"
+      >
+        <Icon name="linkedin" class="h-5 w-5" />
+      </a>
+      <a
+        href={SITE.social.github}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="rounded-md p-2 text-text-faint transition hover:text-accent"
+        aria-label="GitHub"
+      >
+        <Icon name="github" class="h-5 w-5" />
+      </a>
+      <a
+        href={`mailto:${SITE.social.email}`}
+        class="rounded-md p-2 text-text-faint transition hover:text-accent"
+        aria-label="Email"
+      >
+        <Icon name="mail" class="h-5 w-5" />
+      </a>
+      <a
+        href="#top"
+        class="rounded-md p-2 text-text-faint transition hover:text-accent"
+        aria-label={t('footer.backTop')}
+      >
+        <Icon name="arrowUp" class="h-5 w-5" />
+      </a>
+    </div>
+  </div>
+</footer>

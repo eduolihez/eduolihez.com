@@ -1,0 +1,10 @@
+CV DESCARGABLES
+===============
+
+Coloca aqui tus PDF con estos nombres (o cambia las rutas en src/config.ts):
+
+- CV-Eduardo-Olivares-ES.pdf   -> version en espanol
+- CV-Eduardo-Olivares-EN.pdf   -> version en ingles
+
+El boton "Descargar CV" del Hero enlaza automaticamente al PDF del idioma
+activo (ES en "/", EN en "/en/").

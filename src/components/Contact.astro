@@ -1,0 +1,327 @@
+---
+/**
+ * <Contact /> - Formulario de contacto (minimalista).
+ * - Script PROCESADO (externo, CSP-safe); config via data-* en el formulario.
+ * - Envio: /api/contact.php (MySQL + email) con respaldo Formspree.
+ * - Honeypot accesible-oculto (B6) + Cloudflare Turnstile OPCIONAL (F9).
+ * - vCard descargable (F10).
+ */
+import { useTranslations } from '../i18n/utils';
+import type { Lang } from '../i18n/ui';
+import { SITE, api } from '../config';
+import Icon from './Icon.astro';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const apiUrl = api('/api/contact.php');
+const settingsUrl = api(`/api/settings.php?lang=${lang}`);
+const turnstileKey = SITE.turnstileSiteKey;
+const messages = {
+  sending: t('contact.sending'),
+  send: t('contact.send'),
+  success: t('contact.success'),
+  error: t('contact.error'),
+  required: t('contact.required'),
+  invalidEmail: t('contact.invalidEmail'),
+  disabled: t('contact.disabled'),
+};
+---
+
+<section id="contacto" class="bg-bg-soft py-20 sm:py-28">
+  <div class="container-page">
+    <div class="grid gap-12 lg:grid-cols-2 lg:gap-16">
+      <div class="reveal">
+        <p class="section-kicker">{t('kicker.contact')}</p>
+        <h2 class="section-title">{t('contact.title')}</h2>
+        <p class="section-subtitle">{t('contact.subtitle')}</p>
+
+        <div class="mt-8 space-y-3">
+          <a
+            href={`mailto:${SITE.social.email}`}
+            class="flex items-center gap-3 text-sm text-text-muted transition hover:text-accent"
+          >
+            <Icon name="mail" class="h-5 w-5 text-text-faint" />
+            {SITE.social.email}
+          </a>
+          <a
+            href={SITE.social.linkedin}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center gap-3 text-sm text-text-muted transition hover:text-accent"
+          >
+            <Icon name="linkedin" class="h-5 w-5 text-text-faint" />
+            LinkedIn
+          </a>
+          <a
+            href={SITE.social.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center gap-3 text-sm text-text-muted transition hover:text-accent"
+          >
+            <Icon name="github" class="h-5 w-5 text-text-faint" />
+            GitHub
+          </a>
+          <a
+            href={SITE.vcard}
+            download
+            class="flex items-center gap-3 text-sm text-text-muted transition hover:text-accent"
+          >
+            <Icon name="download" class="h-5 w-5 text-text-faint" />
+            {t('contact.vcard')}
+          </a>
+        </div>
+      </div>
+
+      <div class="reveal">
+        <form
+          id="contact-form"
+          class="rounded-xl border border-bg-border bg-bg-card p-6 sm:p-8"
+          novalidate
+          data-api={apiUrl}
+          data-settings={settingsUrl}
+          data-formspree={SITE.formspree}
+          data-messages={JSON.stringify(messages)}
+        >
+          <!-- Honeypot: oculto para humanos y lectores, presente para bots (B6).
+               Usa clases (hoja externa), no style inline, por la CSP estricta. -->
+          <div aria-hidden="true" class="absolute left-[-9999px] top-auto h-px w-px overflow-hidden">
+            <label for="website">No rellenar</label>
+            <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" />
+          </div>
+
+          <div class="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label for="name" class="mb-1.5 block text-sm font-medium text-text">
+                {t('contact.name')} <span class="text-accent">*</span>
+              </label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                required
+                maxlength="100"
+                autocomplete="name"
+                class="w-full rounded-md border border-bg-border bg-bg px-3.5 py-2.5 text-sm text-text placeholder:text-text-faint focus:border-accent focus:outline-none"
+              />
+            </div>
+            <div>
+              <label for="email" class="mb-1.5 block text-sm font-medium text-text">
+                {t('contact.email')} <span class="text-accent">*</span>
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                required
+                maxlength="150"
+                autocomplete="email"
+                class="w-full rounded-md border border-bg-border bg-bg px-3.5 py-2.5 text-sm text-text placeholder:text-text-faint focus:border-accent focus:outline-none"
+              />
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <label for="subject" class="mb-1.5 block text-sm font-medium text-text">
+              {t('contact.subject')}
+            </label>
+            <input
+              type="text"
+              id="subject"
+              name="subject"
+              maxlength="150"
+              class="w-full rounded-md border border-bg-border bg-bg px-3.5 py-2.5 text-sm text-text placeholder:text-text-faint focus:border-accent focus:outline-none"
+            />
+          </div>
+
+          <div class="mt-4">
+            <label for="message" class="mb-1.5 block text-sm font-medium text-text">
+              {t('contact.message')} <span class="text-accent">*</span>
+            </label>
+            <textarea
+              id="message"
+              name="message"
+              required
+              rows="5"
+              maxlength="3000"
+              class="w-full resize-y rounded-md border border-bg-border bg-bg px-3.5 py-2.5 text-sm text-text placeholder:text-text-faint focus:border-accent focus:outline-none"
+            ></textarea>
+          </div>
+
+          {
+            turnstileKey && (
+              <div
+                class="cf-turnstile mt-4"
+                data-sitekey={turnstileKey}
+                data-theme="dark"
+              />
+            )
+          }
+
+          <button type="submit" id="contact-submit" class="btn-primary mt-6 w-full">
+            <span id="contact-submit-text">{t('contact.send')}</span>
+          </button>
+
+          <p
+            id="contact-feedback"
+            role="status"
+            aria-live="polite"
+            class="mt-4 hidden text-sm"
+          >
+          </p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  {
+    /* Turnstile: solo se carga su script externo si has configurado la clave.
+       Recuerda anadir challenges.cloudflare.com a la CSP (ver CLOUDFLARE.md). */
+    turnstileKey && (
+      <script
+        is:inline
+        src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+        async
+        defer
+      />
+    )
+  }
+</section>
+
+<script>
+  function initContact() {
+    const form = document.getElementById('contact-form');
+    if (!form || form.dataset.bound) return;
+    form.dataset.bound = '1';
+
+    const apiUrl = form.dataset.api || '';
+    const formspree = form.dataset.formspree || '';
+    const messages = JSON.parse(form.dataset.messages || '{}');
+    const btn = document.getElementById('contact-submit');
+    const btnText = document.getElementById('contact-submit-text');
+    const feedback = document.getElementById('contact-feedback');
+
+    function setFeedback(text, ok) {
+      feedback.textContent = text;
+      feedback.classList.remove('hidden', 'text-accent', 'text-red-400');
+      feedback.classList.add(ok ? 'text-accent' : 'text-red-400');
+    }
+
+    // El formulario se puede apagar desde /admin -> Ajustes (util si llega
+    // spam). Si esta apagado, bloqueamos el envio y mostramos las vias
+    // alternativas, que siguen visibles a la izquierda de la seccion.
+    let formEnabled = true;
+    fetch(form.dataset.settings || '', { headers: { Accept: 'application/json' } })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data && String(data.contact_enabled) === '0') {
+          formEnabled = false;
+          btn.setAttribute('disabled', 'true');
+          btn.classList.add('opacity-50', 'cursor-not-allowed');
+          setFeedback(messages.disabled, false);
+        }
+      })
+      .catch(() => {
+        /* si el API no responde, dejamos el formulario activo: el propio
+           endpoint volvera a comprobarlo al recibir el envio */
+      });
+    function isEmail(v) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+    }
+
+    async function sendFormspree(payload) {
+      const res = await fetch(formspree, {
+        method: 'POST',
+        headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error('formspree');
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!formEnabled) return setFeedback(messages.disabled, false);
+
+      const data = Object.fromEntries(new FormData(form).entries());
+
+      if (data.website) {
+        setFeedback(messages.success, true);
+        form.reset();
+        return;
+      }
+      if (!data.name?.trim() || !data.email?.trim() || !data.message?.trim()) {
+        return setFeedback(messages.required, false);
+      }
+      if (!isEmail(data.email)) {
+        return setFeedback(messages.invalidEmail, false);
+      }
+
+      btn.setAttribute('disabled', 'true');
+      btn.classList.add('opacity-60', 'cursor-not-allowed');
+      btnText.textContent = messages.sending;
+      feedback.classList.add('hidden');
+
+      const payload = {
+        name: data.name.trim(),
+        email: data.email.trim(),
+        subject: (data.subject || '').trim(),
+        message: data.message.trim(),
+        turnstileToken: data['cf-turnstile-response'] || '',
+      };
+
+      try {
+        const res = await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        // 503 = formulario desactivado a proposito desde el panel.
+        // 429 = demasiados envios desde esta IP.
+        // En ambos casos NO usamos el respaldo de Formspree: seria saltarse
+        // justo lo que el servidor acaba de denegar.
+        if (res.status === 503) {
+          formEnabled = false;
+          btn.setAttribute('disabled', 'true');
+          return setFeedback(messages.disabled, false);
+        }
+        if (res.status === 429 || res.status === 422 || res.status === 403) {
+          const body = await res.json().catch(() => null);
+          return setFeedback((body && body.error) || messages.error, false);
+        }
+        if (!res.ok) throw new Error('php');
+
+        setFeedback(messages.success, true);
+        form.reset();
+      } catch (err) {
+        // Solo llegamos aqui si el backend PHP esta caido o no responde:
+        // entonces si tiene sentido el respaldo de Formspree.
+        try {
+          await sendFormspree(payload);
+          setFeedback(messages.success, true);
+          form.reset();
+        } catch (err2) {
+          setFeedback(messages.error, false);
+        }
+      } finally {
+        // Si el formulario quedo desactivado por el servidor, no lo
+        // reactivamos (el bloque finally se ejecuta incluso tras un return).
+        if (formEnabled) {
+          btn.removeAttribute('disabled');
+          btn.classList.remove('opacity-60', 'cursor-not-allowed');
+        }
+        btnText.textContent = messages.send;
+        if (window.turnstile) {
+          try {
+            window.turnstile.reset();
+          } catch (e) {}
+        }
+      }
+    });
+  }
+  initContact();
+  document.addEventListener('astro:page-load', initContact);
+</script>

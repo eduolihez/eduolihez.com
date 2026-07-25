@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Fluence es el asistente inteligente de crecimiento en Instagram diseñado por Eduardo Olivares. Automatización ética, networking orgánico y privacidad local. Desde €29.">
+  <title>Fluence | Asistente de Crecimiento Instagram — Eduardo Olivares</title>
+  <link rel="canonical" href="https://eduolihez.com/fluence/">
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://eduolihez.com/fluence/">
+  <meta property="og:title" content="Fluence | Asistente de Crecimiento Instagram — Eduardo Olivares">
+  <meta property="og:description" content="Fluence automatiza el crecimiento en Instagram de forma ética. Networking orgánico, privacidad local. Desde €29 pago único.">
+  <meta property="og:image" content="https://eduolihez.com/assets/og-fluence.jpg">
+  <meta property="og:locale" content="es_ES">
+  <meta property="og:site_name" content="Eduardo Olivares — Consultor de Ciberseguridad">
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Fluence | Asistente de Crecimiento Instagram">
+  <meta name="twitter:description" content="Fluence automatiza el crecimiento en Instagram de forma ética. Networking orgánico, privacidad local. Desde €29 pago único.">
+  <meta name="twitter:image" content="https://eduolihez.com/assets/og-fluence.jpg">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%236a3de8'/><text y='.9em' font-size='72' font-family='sans-serif' font-weight='800' fill='white' x='22'>F</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+  <style>
+    /* ── Reset & Tokens ─────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:      #08090d;
+      --ink-mid:  #3a3d4a;
+      --ink-low:  #7a7e8e;
+      --ink-xlow: #b8bcc8;
+      --bg:       #fafaf8;
+      --surface:  #ffffff;
+      --rule:     #eeedf0;
+      --accent:   #6a3de8;
+      --accent-2: #9d71ff;
+      --accent-lt:#f0ebff;
+      --success:  #0fa968;
+      --font-display: 'Syne', sans-serif;
+      --font-body:    'DM Sans', sans-serif;
+      --shadow-sm: 0 1px 4px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 20px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04);
+      --shadow-lg: 0 12px 48px rgba(0,0,0,0.10), 0 4px 16px rgba(0,0,0,0.06);
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Utilities ─────────────────────────────── */
+    .container { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+    .tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: var(--font-display); font-size: 11px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      background: var(--accent-lt); color: var(--accent);
+      border: 1px solid rgba(106,61,232,0.2);
+      padding: 5px 12px; border-radius: 100px;
+    }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--font-display); font-weight: 700; font-size: 15px;
+      color: #fff; background: var(--accent);
+      border: none; border-radius: 12px;
+      padding: 14px 28px; cursor: pointer; text-decoration: none;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 16px rgba(106,61,232,0.35);
+    }
+    .btn-primary:hover { background: #5a32c8; transform: translateY(-2px); box-shadow: 0 8px 28px rgba(106,61,232,0.4); }
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--font-display); font-weight: 600; font-size: 14px;
+      color: var(--ink-mid); background: var(--surface);
+      border: 1.5px solid var(--rule); border-radius: 12px;
+      padding: 13px 24px; cursor: pointer; text-decoration: none;
+      transition: all 0.2s ease;
+      box-shadow: var(--shadow-sm);
+    }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
+
+    /* ── Nav ────────────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(250,250,248,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--rule);
+    }
+    .nav-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px;
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      font-family: var(--font-display); font-weight: 800; font-size: 18px;
+      color: var(--ink); text-decoration: none; letter-spacing: -0.02em;
+    }
+    .nav-logo-mark {
+      width: 34px; height: 34px; background: var(--accent);
+      border-radius: 9px; display: flex; align-items: center; justify-content: center;
+    }
+    .nav-links { display: flex; align-items: center; gap: 32px; }
+    .nav-links a {
+      font-size: 14px; font-weight: 500; color: var(--ink-mid);
+      text-decoration: none; transition: color 0.15s;
+    }
+    .nav-links a:hover { color: var(--ink); }
+    .nav-cta { display: flex; align-items: center; gap: 12px; }
+
+    /* ── Hero ───────────────────────────────────── */
+    #hero {
+      padding: 140px 0 100px;
+      position: relative; overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 800px 600px at 60% 20%, rgba(106,61,232,0.07) 0%, transparent 70%),
+        radial-gradient(ellipse 400px 400px at 20% 80%, rgba(157,113,255,0.06) 0%, transparent 70%);
+    }
+    .hero-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 60px; align-items: center; position: relative; z-index: 1;
+    }
+    .hero-eyebrow { margin-bottom: 20px; }
+    .hero-title {
+      font-family: var(--font-display); font-weight: 800;
+      font-size: clamp(36px, 5vw, 58px); line-height: 1.05;
+      letter-spacing: -0.03em; color: var(--ink);
+      margin-bottom: 20px;
+    }
+    .hero-title span { color: var(--accent); }
+    .hero-subtitle {
+      font-size: 17px; color: var(--ink-mid); line-height: 1.7;
+      max-width: 440px; margin-bottom: 36px;
+    }
+    .hero-actions { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+    .hero-trust {
+      display: flex; align-items: center; gap: 10px;
+      margin-top: 24px; font-size: 13px; color: var(--ink-low);
+    }
+    .hero-trust-dots { display: flex; gap: -4px; }
+    .hero-trust-dot {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      border: 2px solid var(--bg); margin-left: -6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; color: white;
+    }
+
+    /* App mockup */
+    .hero-mockup {
+      position: relative;
+    }
+    .mockup-window {
+      background: var(--surface); border-radius: 16px;
+      box-shadow: var(--shadow-lg), 0 0 0 1px rgba(0,0,0,0.06);
+      overflow: hidden;
+    }
+    .mockup-bar {
+      background: #f4f4f2; padding: 12px 16px;
+      display: flex; align-items: center; gap: 8px;
+      border-bottom: 1px solid var(--rule);
+    }
+    .mockup-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .mockup-title {
+      font-family: var(--font-display); font-size: 11px; font-weight: 700;
+      color: var(--ink-low); letter-spacing: 0.05em; text-transform: uppercase;
+      margin-left: 8px;
+    }
+    .mockup-status {
+      margin-left: auto; display: flex; align-items: center; gap: 5px;
+      font-size: 11px; font-weight: 600; color: var(--success);
+      background: rgba(15,169,104,0.1); border: 1px solid rgba(15,169,104,0.2);
+      padding: 3px 10px; border-radius: 100px;
+    }
+    .mockup-body { padding: 20px; }
+    .mockup-hero-card {
+      background: linear-gradient(135deg, #6a3de8, #4a25c8);
+      border-radius: 12px; padding: 18px 20px; margin-bottom: 14px;
+      color: white;
+    }
+    .mockup-hero-title { font-family: var(--font-display); font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+    .mockup-hero-sub { font-size: 11px; opacity: 0.7; margin-bottom: 14px; }
+    .mockup-stats { display: flex; gap: 20px; }
+    .mockup-stat-val { font-family: var(--font-display); font-size: 22px; font-weight: 800; line-height: 1; }
+    .mockup-stat-label { font-size: 10px; opacity: 0.6; margin-top: 2px; }
+    .mockup-cards { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+    .mockup-card {
+      background: var(--bg); border: 1px solid var(--rule);
+      border-radius: 8px; padding: 10px 12px;
+    }
+    .mockup-card-label { font-size: 9px; font-weight: 600; color: var(--ink-low); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+    .mockup-card-val { font-family: var(--font-display); font-size: 13px; font-weight: 700; color: var(--ink); }
+    .mockup-log {
+      background: var(--bg); border: 1px solid var(--rule);
+      border-radius: 8px; padding: 10px 12px;
+    }
+    .mockup-log-title { font-size: 9px; font-weight: 700; color: var(--ink-low); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; display: flex; align-items: center; gap: 5px; }
+    .mockup-log-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--success); animation: pulse 2s infinite; }
+    .mockup-log-line { font-size: 10px; font-family: monospace; margin-bottom: 3px; }
+
+    /* ── Stats bar ─────────────────────────────── */
+    #stats {
+      background: var(--ink); padding: 48px 0;
+    }
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px; }
+    .stat-item { text-align: center; }
+    .stat-number {
+      font-family: var(--font-display); font-size: 40px; font-weight: 800;
+      color: white; line-height: 1; margin-bottom: 6px; letter-spacing: -0.03em;
+    }
+    .stat-number span { color: var(--accent-2); }
+    .stat-label { font-size: 13px; color: rgba(255,255,255,0.5); }
+
+    /* ── How it works ──────────────────────────── */
+    #how { padding: 100px 0; }
+    .section-header { text-align: center; margin-bottom: 64px; }
+    .section-tag { margin-bottom: 16px; }
+    .section-title {
+      font-family: var(--font-display); font-weight: 800;
+      font-size: clamp(28px, 4vw, 44px); letter-spacing: -0.03em;
+      line-height: 1.1; margin-bottom: 16px;
+    }
+    .section-subtitle { font-size: 17px; color: var(--ink-mid); max-width: 480px; margin: 0 auto; }
+
+    .steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; position: relative; }
+    .steps-grid::before {
+      content: ''; position: absolute; top: 40px; left: calc(16.66% + 20px); right: calc(16.66% + 20px);
+      height: 1px; background: linear-gradient(90deg, var(--accent), var(--accent-2)); opacity: 0.3;
+    }
+    .step-card {
+      background: var(--surface); border: 1px solid var(--rule);
+      border-radius: 16px; padding: 28px; position: relative;
+      box-shadow: var(--shadow-sm); transition: all 0.25s ease;
+    }
+    .step-card:hover { box-shadow: var(--shadow-md); transform: translateY(-3px); border-color: rgba(106,61,232,0.2); }
+    .step-number {
+      width: 44px; height: 44px; background: var(--accent);
+      border-radius: 12px; display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-display); font-weight: 800; font-size: 18px; color: white;
+      margin-bottom: 18px; box-shadow: 0 4px 12px rgba(106,61,232,0.3);
+    }
+    .step-title {
+      font-family: var(--font-display); font-size: 17px; font-weight: 700;
+      margin-bottom: 10px; letter-spacing: -0.01em;
+    }
+    .step-text { font-size: 14px; color: var(--ink-mid); line-height: 1.7; }
+
+    /* ── Features ──────────────────────────────── */
+    #features { padding: 80px 0; background: var(--ink); }
+    .features-inner {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+    }
+    .features-title {
+      font-family: var(--font-display); font-weight: 800;
+      font-size: clamp(26px, 3.5vw, 40px); letter-spacing: -0.03em;
+      line-height: 1.1; color: white; margin-bottom: 40px;
+    }
+    .features-title span { color: var(--accent-2); }
+    .feature-item {
+      display: flex; gap: 16px; margin-bottom: 28px; align-items: flex-start;
+    }
+    .feature-icon {
+      width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
+      background: rgba(106,61,232,0.2); border: 1px solid rgba(106,61,232,0.3);
+      display: flex; align-items: center; justify-content: center; font-size: 18px;
+    }
+    .feature-text-title { font-family: var(--font-display); font-weight: 700; font-size: 15px; color: white; margin-bottom: 4px; }
+    .feature-text-sub { font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.6; }
+
+    .features-visual {
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px; padding: 28px;
+    }
+    .log-header {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 16px;
+      font-family: var(--font-display); font-size: 11px; font-weight: 700;
+      color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.08em;
+    }
+    .log-line {
+      font-family: monospace; font-size: 12px; margin-bottom: 8px;
+      display: flex; gap: 10px; align-items: flex-start;
+    }
+    .log-time { color: rgba(255,255,255,0.25); flex-shrink: 0; }
+    .log-success { color: #4ade80; }
+    .log-blue    { color: #60a5fa; }
+    .log-pink    { color: #f472b6; }
+    .log-muted   { color: rgba(255,255,255,0.4); }
+
+    /* ── Pricing ───────────────────────────────── */
+    #pricing { padding: 100px 0; }
+    .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; align-items: start; }
+    .pricing-card {
+      background: var(--surface); border: 1.5px solid var(--rule);
+      border-radius: 20px; padding: 32px 28px; position: relative;
+      box-shadow: var(--shadow-sm); transition: all 0.25s ease;
+    }
+    .pricing-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-4px); }
+    .pricing-card.popular {
+      border-color: var(--accent); box-shadow: 0 8px 32px rgba(106,61,232,0.15);
+      transform: translateY(-8px);
+    }
+    .pricing-card.popular:hover { transform: translateY(-12px); }
+    .popular-badge {
+      position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+      background: var(--accent); color: white; border-radius: 100px;
+      font-family: var(--font-display); font-size: 10px; font-weight: 800;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 4px 14px; white-space: nowrap;
+    }
+    .plan-icon { font-size: 28px; margin-bottom: 14px; }
+    .plan-name {
+      font-family: var(--font-display); font-weight: 800; font-size: 20px;
+      letter-spacing: -0.02em; margin-bottom: 4px;
+    }
+    .plan-tagline { font-size: 13px; color: var(--ink-low); margin-bottom: 20px; }
+    .plan-price {
+      font-family: var(--font-display); font-weight: 800;
+      font-size: 42px; letter-spacing: -0.04em; line-height: 1; margin-bottom: 4px;
+    }
+    .plan-price sup { font-size: 20px; vertical-align: super; }
+    .plan-price-note { font-size: 12px; color: var(--ink-low); margin-bottom: 24px; }
+    .plan-divider { height: 1px; background: var(--rule); margin-bottom: 20px; }
+    .plan-features { list-style: none; margin-bottom: 28px; }
+    .plan-features li {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 13px; color: var(--ink-mid); margin-bottom: 10px; line-height: 1.5;
+    }
+    .plan-features li .check { color: var(--success); flex-shrink: 0; font-weight: 700; }
+    .plan-features li .cross { color: var(--ink-xlow); flex-shrink: 0; }
+    .plan-features li.locked { opacity: 0.45; }
+    .plan-cta {
+      display: block; text-align: center; text-decoration: none;
+      font-family: var(--font-display); font-weight: 700; font-size: 14px;
+      padding: 13px; border-radius: 12px; transition: all 0.2s;
+      cursor: pointer; border: none;
+    }
+    .plan-cta.primary { background: var(--accent); color: white; box-shadow: 0 4px 14px rgba(106,61,232,0.3); }
+    .plan-cta.primary:hover { background: #5a32c8; box-shadow: 0 6px 20px rgba(106,61,232,0.4); }
+    .plan-cta.secondary { background: var(--bg); color: var(--ink-mid); border: 1.5px solid var(--rule); }
+    .plan-cta.secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── Testimonials ──────────────────────────── */
+    #testimonials { padding: 100px 0; background: var(--accent-lt); }
+    .testimonials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .testimonial-card {
+      background: var(--surface); border-radius: 16px; padding: 28px;
+      box-shadow: var(--shadow-sm); border: 1px solid var(--rule);
+      transition: all 0.25s;
+    }
+    .testimonial-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+    .testimonial-stars { color: #f59e0b; font-size: 14px; margin-bottom: 14px; letter-spacing: 2px; }
+    .testimonial-quote {
+      font-size: 14px; color: var(--ink-mid); line-height: 1.75;
+      font-style: italic; margin-bottom: 20px;
+    }
+    .testimonial-author { display: flex; align-items: center; gap: 10px; }
+    .testimonial-avatar {
+      width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-display); font-size: 14px; font-weight: 800; color: white;
+    }
+    .testimonial-name { font-family: var(--font-display); font-weight: 700; font-size: 13px; }
+    .testimonial-handle { font-size: 12px; color: var(--ink-low); }
+
+    /* ── FAQ ───────────────────────────────────── */
+    #faq { padding: 100px 0; }
+    .faq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 860px; margin: 0 auto; }
+    .faq-item {
+      background: var(--surface); border: 1px solid var(--rule);
+      border-radius: 14px; overflow: hidden; box-shadow: var(--shadow-sm);
+    }
+    .faq-q {
+      padding: 18px 22px; cursor: pointer;
+      font-family: var(--font-display); font-weight: 700; font-size: 14px;
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 12px; transition: background 0.15s; user-select: none;
+    }
+    .faq-q:hover { background: var(--bg); }
+    .faq-icon { font-size: 18px; flex-shrink: 0; transition: transform 0.2s; color: var(--accent); }
+    .faq-a {
+      padding: 0 22px; max-height: 0; overflow: hidden;
+      font-size: 13px; color: var(--ink-mid); line-height: 1.75;
+      transition: max-height 0.3s ease, padding 0.3s ease;
+    }
+    .faq-item.open .faq-a { max-height: 200px; padding: 0 22px 18px; }
+    .faq-item.open .faq-icon { transform: rotate(45deg); }
+
+    /* ── CTA Banner ────────────────────────────── */
+    #cta {
+      padding: 80px 0;
+      background: linear-gradient(135deg, #6a3de8, #4a25c8);
+      position: relative; overflow: hidden;
+    }
+    #cta::before {
+      content: ''; position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='30' cy='30' r='1' fill='rgba(255,255,255,0.06)'/%3E%3C/svg%3E");
+    }
+    .cta-inner { text-align: center; position: relative; z-index: 1; }
+    .cta-title {
+      font-family: var(--font-display); font-weight: 800;
+      font-size: clamp(28px, 4vw, 46px); letter-spacing: -0.03em;
+      color: white; margin-bottom: 16px; line-height: 1.1;
+    }
+    .cta-sub { font-size: 16px; color: rgba(255,255,255,0.75); margin-bottom: 36px; }
+    .cta-actions { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; }
+    .btn-white {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--font-display); font-weight: 700; font-size: 15px;
+      color: var(--accent); background: white;
+      border: none; border-radius: 12px;
+      padding: 14px 28px; cursor: pointer; text-decoration: none;
+      transition: all 0.2s ease; box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+    .btn-white:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.2); }
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--font-display); font-weight: 600; font-size: 14px;
+      color: rgba(255,255,255,0.85); background: rgba(255,255,255,0.12);
+      border: 1.5px solid rgba(255,255,255,0.25); border-radius: 12px;
+      padding: 13px 24px; cursor: pointer; text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .btn-ghost:hover { background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.4); }
+
+    /* ── Footer ────────────────────────────────── */
+    footer {
+      background: var(--ink); padding: 48px 0 32px;
+    }
+    .footer-inner {
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px;
+      padding-bottom: 40px; border-bottom: 1px solid rgba(255,255,255,0.08);
+      margin-bottom: 28px;
+    }
+    .footer-brand-name {
+      font-family: var(--font-display); font-weight: 800; font-size: 20px;
+      color: white; margin-bottom: 10px; letter-spacing: -0.02em;
+    }
+    .footer-brand-desc { font-size: 13px; color: rgba(255,255,255,0.4); line-height: 1.7; max-width: 260px; }
+    .footer-col-title { font-family: var(--font-display); font-weight: 700; font-size: 12px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px; }
+    .footer-col-link { display: block; font-size: 13px; color: rgba(255,255,255,0.45); text-decoration: none; margin-bottom: 9px; transition: color 0.15s; }
+    .footer-col-link:hover { color: rgba(255,255,255,0.85); }
+    .footer-bottom { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+    .footer-copy { font-size: 12px; color: rgba(255,255,255,0.3); }
+    .footer-legal { display: flex; gap: 20px; }
+    .footer-legal a { font-size: 12px; color: rgba(255,255,255,0.3); text-decoration: none; transition: color 0.15s; }
+    .footer-legal a:hover { color: rgba(255,255,255,0.6); }
+
+    /* ── Animations ────────────────────────────── */
+    @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.4} }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeIn { from{opacity:0}to{opacity:1} }
+    @keyframes float { 0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)} }
+
+    .animate { opacity: 0; }
+    .animate.visible { animation: fadeUp 0.6s ease forwards; }
+
+    /* ── Responsive ────────────────────────────── */
+    @media (max-width: 900px) {
+      .hero-grid { grid-template-columns: 1fr; }
+      .hero-mockup { display: none; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
+      .steps-grid { grid-template-columns: 1fr; }
+      .steps-grid::before { display: none; }
+      .features-inner { grid-template-columns: 1fr; }
+      .pricing-grid { grid-template-columns: 1fr; }
+      .pricing-card.popular { transform: none; }
+      .testimonials-grid { grid-template-columns: 1fr; }
+      .faq-grid { grid-template-columns: 1fr; }
+      .footer-inner { grid-template-columns: 1fr 1fr; gap: 32px; }
+    }
+    /* ── Hamburger ─────────────────────────────── */
+    .nav-hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+    }
+    .nav-hamburger span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--ink);
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+
+    @media (max-width: 600px) {
+      .nav-links { display: none; }
+      .nav-links.open {
+        display: flex; flex-direction: column;
+        position: fixed; top: 64px; left: 0; right: 0;
+        background: rgba(250,250,248,0.97);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        padding: 16px 24px;
+        border-bottom: 1px solid var(--rule);
+        z-index: 99; gap: 20px;
+      }
+      .nav-hamburger { display: flex; }
+      .nav-cta .btn-secondary { display: none; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .footer-inner { grid-template-columns: 1fr; }
+      .footer-bottom { flex-direction: column; text-align: center; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      .animate { opacity: 1; }
+      .animate.visible { animation: none; opacity: 1; }
+    }
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Fluence",
+    "applicationCategory": "BusinessApplication",
+    "description": "Fluence es el asistente inteligente de crecimiento en Instagram. Automatización ética, networking orgánico y privacidad local.",
+    "operatingSystem": "Windows, macOS, Linux",
+    "url": "https://eduolihez.com/fluence/",
+    "author": {
+      "@type": "Person",
+      "name": "Eduardo Olivares",
+      "url": "https://eduolihez.com"
+    },
+    "offers": {
+      "@type": "AggregateOffer",
+      "lowPrice": "29",
+      "highPrice": "179",
+      "priceCurrency": "EUR"
+    }
+  }
+  </script>
+</head>
+<body>
+
+<!-- ── Nav ── -->
+<nav>
+  <div class="container nav-inner">
+    <a href="#" class="nav-logo">
+      <div class="nav-logo-mark">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path d="M3 3H11M3 3V15M3 9H8" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M12 3V15H16" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      Fluence
+    </a>
+    <div class="nav-links">
+      <a href="#how">How it works</a>
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+    </div>
+    <button class="nav-hamburger" aria-label="Abrir menú" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="nav-cta">
+      <a href="https://discord.gg/kwnnf6UmcR" target="_blank" class="btn-secondary" style="padding:10px 16px;font-size:13px;">
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M13.545 1.044A13.22 13.22 0 0 0 10.29 0a.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.22 12.22 0 0 0-3.664 0 8.258 8.258 0 0 0-.412-.833.051.051 0 0 0-.052-.025 13.18 13.18 0 0 0-3.255 1.044.046.046 0 0 0-.021.018C.356 4.463-.213 7.793.066 11.08c.001.017.01.033.021.043a13.278 13.278 0 0 0 4.001 2.02.052.052 0 0 0 .056-.018c.308-.42.582-.863.818-1.329a.05.05 0 0 0-.028-.07 8.742 8.742 0 0 1-1.248-.595.051.051 0 0 1-.005-.084c.084-.063.168-.129.248-.195a.049.049 0 0 1 .051-.007c2.619 1.196 5.454 1.196 8.041 0a.049.049 0 0 1 .053.006c.08.066.164.133.248.196a.051.051 0 0 1-.004.084 8.19 8.19 0 0 1-1.249.594.05.05 0 0 0-.027.071c.24.465.514.909.817 1.328a.051.051 0 0 0 .056.019 13.235 13.235 0 0 0 4.01-2.02.052.052 0 0 0 .02-.042c.334-3.451-.559-6.754-2.366-9.536a.04.04 0 0 0-.02-.02z" fill="currentColor"/></svg>
+        Discord
+      </a>
+      <a href="#pricing" class="btn-primary" style="padding:10px 20px;font-size:13px;">Get Fluence →</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Hero ── -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="container">
+    <div class="hero-grid">
+      <div>
+        <div class="hero-eyebrow">
+          <span class="tag">✦ Instagram Growth Assistant</span>
+        </div>
+        <h1 class="hero-title">
+          Grow your Instagram<br><span>organically</span>,<br>on autopilot.
+        </h1>
+        <p class="hero-subtitle">
+          Fluence runs on your desktop and engages real accounts in your niche with human-like behavior — follows, interactions, automatic cleanup. Your audience grows while you work.
+        </p>
+        <div class="hero-actions">
+          <a href="#pricing" class="btn-primary">Start from €29 →</a>
+          <a href="#how" class="btn-secondary">See how it works</a>
+        </div>
+        <div class="hero-trust">
+          <div class="hero-trust-dots">
+            <div class="hero-trust-dot" style="margin-left:0">E</div>
+            <div class="hero-trust-dot" style="background:linear-gradient(135deg,#9d71ff,#6a3de8)">M</div>
+            <div class="hero-trust-dot" style="background:linear-gradient(135deg,#4a25c8,#9d71ff)">S</div>
+          </div>
+          <span>Trusted by <strong>200+ creators</strong> — One-time purchase, no subscriptions</span>
+        </div>
+      </div>
+
+      <div class="hero-mockup" style="animation: float 6s ease-in-out infinite;">
+        <div class="mockup-window">
+          <div class="mockup-bar">
+            <div class="mockup-dot" style="background:#ff5f57"></div>
+            <div class="mockup-dot" style="background:#febc2e"></div>
+            <div class="mockup-dot" style="background:#28c840"></div>
+            <span class="mockup-title">Fluence</span>
+            <div class="mockup-status">
+              <div style="width:6px;height:6px;border-radius:50%;background:#0fa968;animation:pulse 2s infinite"></div>
+              Running
+            </div>
+          </div>
+          <div class="mockup-body">
+            <div class="mockup-hero-card">
+              <div class="mockup-hero-title">Fluence is working for you</div>
+              <div class="mockup-hero-sub">Growth assistant active · keep window open</div>
+              <div class="mockup-stats">
+                <div><div class="mockup-stat-val">47</div><div class="mockup-stat-label">Connections today</div></div>
+                <div><div class="mockup-stat-val">12</div><div class="mockup-stat-label">Cleaned up</div></div>
+                <div><div class="mockup-stat-val">89</div><div class="mockup-stat-label">Interactions</div></div>
+              </div>
+            </div>
+            <div class="mockup-cards">
+              <div class="mockup-card">
+                <div class="mockup-card-label">Status</div>
+                <div class="mockup-card-val" style="color:#0fa968">● Active</div>
+              </div>
+              <div class="mockup-card">
+                <div class="mockup-card-label">Account</div>
+                <div class="mockup-card-val">@yourname</div>
+              </div>
+              <div class="mockup-card">
+                <div class="mockup-card-label">Limit</div>
+                <div class="mockup-card-val">200/day</div>
+              </div>
+            </div>
+            <div class="mockup-log">
+              <div class="mockup-log-title"><div class="mockup-log-dot"></div> Live activity</div>
+              <div class="mockup-log-line" style="color:#4ade80">✓ Following user @creativehub</div>
+              <div class="mockup-log-line" style="color:#f472b6">♥ Liked 2 photos · @artsy.co</div>
+              <div class="mockup-log-line" style="color:#60a5fa">↩ Cleaned up @oldfollow_32</div>
+              <div class="mockup-log-line" style="color:rgba(255,255,255,0.3)">→ Skipping private account</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Stats ── -->
+<section id="stats">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-item animate">
+        <div class="stat-number">200<span>+</span></div>
+        <div class="stat-label">Active users</div>
+      </div>
+      <div class="stat-item animate" style="animation-delay:0.1s">
+        <div class="stat-number">2.4<span>M</span></div>
+        <div class="stat-label">Connections made</div>
+      </div>
+      <div class="stat-item animate" style="animation-delay:0.2s">
+        <div class="stat-number">99<span>%</span></div>
+        <div class="stat-label">Uptime reliability</div>
+      </div>
+      <div class="stat-item animate" style="animation-delay:0.3s">
+        <div class="stat-number">0</div>
+        <div class="stat-label">Monthly fees</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── How it works ── -->
+<section id="how">
+  <div class="container">
+    <div class="section-header animate">
+      <div class="section-tag"><span class="tag">How it works</span></div>
+      <h2 class="section-title">Up and running in minutes</h2>
+      <p class="section-subtitle">No technical knowledge required. Install, configure, and watch your audience grow.</p>
+    </div>
+    <div class="steps-grid">
+      <div class="step-card animate">
+        <div class="step-number">1</div>
+        <div class="step-title">Install & activate</div>
+        <p class="step-text">Download the desktop app for Windows or Mac. Enter your license key and connect your account — set up in under 60 seconds.</p>
+      </div>
+      <div class="step-card animate" style="animation-delay:0.15s">
+        <div class="step-number">2</div>
+        <div class="step-title">Set your targets</div>
+        <p class="step-text">Add accounts from your niche as targets. Fluence maps their followers and prioritizes the profiles most likely to follow you back.</p>
+      </div>
+      <div class="step-card animate" style="animation-delay:0.3s">
+        <div class="step-number">3</div>
+        <div class="step-title">Let Fluence work</div>
+        <p class="step-text">Press Start and leave it running. Fluence handles follows, engagement and non-follower cleanup — on a smart daily schedule with randomized human-like timing.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Features ── -->
+<section id="features">
+  <div class="container">
+    <div class="features-inner">
+      <div>
+        <h2 class="features-title">Built to grow.<br><span>Designed to stay safe.</span></h2>
+        <div class="feature-item animate">
+          <div class="feature-icon">🤝</div>
+          <div>
+            <div class="feature-text-title">Organic networking engine</div>
+            <div class="feature-text-sub">Targets real accounts in your niche using configurable filters — engagement rate, follower count, posting frequency.</div>
+          </div>
+        </div>
+        <div class="feature-item animate" style="animation-delay:0.1s">
+          <div class="feature-icon">🧹</div>
+          <div>
+            <div class="feature-text-title">Smart auto-cleanup</div>
+            <div class="feature-text-sub">Unfollows non-followers after a configurable delay. Your follower ratio stays clean without manual work.</div>
+          </div>
+        </div>
+        <div class="feature-item animate" style="animation-delay:0.2s">
+          <div class="feature-icon">🕵️</div>
+          <div>
+            <div class="feature-text-title">Anti-detection technology</div>
+            <div class="feature-text-sub">Randomized delays, natural interaction pacing and stealth browser layer keep your account within safe usage limits.</div>
+          </div>
+        </div>
+        <div class="feature-item animate" style="animation-delay:0.3s">
+          <div class="feature-icon">📊</div>
+          <div>
+            <div class="feature-text-title">Session analytics</div>
+            <div class="feature-text-sub">Per-session stats: connections made, interactions, cleanups, errors. Exportable logs and aggregated trends across sessions.</div>
+          </div>
+        </div>
+      </div>
+      <div class="features-visual animate">
+        <div class="log-header">
+          <div style="width:6px;height:6px;border-radius:50%;background:#4ade80;animation:pulse 2s infinite"></div>
+          Live activity log
+        </div>
+        <div class="log-line"><span class="log-time">14:22</span><span class="log-success">✓ Following user @travel.diaries</span></div>
+        <div class="log-line"><span class="log-time">14:22</span><span class="log-pink">♥ Liked 2 photos · @wanderlust.co</span></div>
+        <div class="log-line"><span class="log-time">14:23</span><span class="log-success">✓ Following user @photobook.xyz</span></div>
+        <div class="log-line"><span class="log-time">14:24</span><span class="log-muted">→ Skipping private account @user_48</span></div>
+        <div class="log-line"><span class="log-time">14:25</span><span class="log-blue">↩ Cleaned up @oldfollow_112</span></div>
+        <div class="log-line"><span class="log-time">14:26</span><span class="log-success">✓ Following user @studio.minimal</span></div>
+        <div class="log-line"><span class="log-time">14:27</span><span class="log-pink">♥ Liked 2 photos · @designdaily</span></div>
+        <div class="log-line"><span class="log-time">14:28</span><span class="log-muted">⏱ Sleeping 3min between batches...</span></div>
+        <div class="log-line"><span class="log-time">14:31</span><span class="log-success">✓ Following user @creative.hub</span></div>
+        <div style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.08);display:flex;gap:24px;">
+          <div><div style="font-family:var(--font-display);font-size:22px;font-weight:800;color:white">47</div><div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px">Today</div></div>
+          <div><div style="font-family:var(--font-display);font-size:22px;font-weight:800;color:white">1,284</div><div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px">Total</div></div>
+          <div><div style="font-family:var(--font-display);font-size:22px;font-weight:800;color:#4ade80">+12%</div><div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px">Growth rate</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Pricing ── -->
+<section id="pricing">
+  <div class="container">
+    <div class="section-header animate">
+      <div class="section-tag"><span class="tag">Pricing</span></div>
+      <h2 class="section-title">One-time payment.<br>Yours forever.</h2>
+      <p class="section-subtitle">No subscriptions. No monthly fees. Buy once, grow forever.</p>
+    </div>
+    <div class="pricing-grid">
+
+      <!-- Starter -->
+      <div class="pricing-card animate">
+        <div class="plan-icon">⚡</div>
+        <div class="plan-name">Starter</div>
+        <div class="plan-tagline">Perfect for creators starting out</div>
+        <div class="plan-price"><sup>€</sup>29</div>
+        <div class="plan-price-note">one-time · lifetime license</div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li><span class="check">✓</span> 1 Instagram account</li>
+          <li><span class="check">✓</span> 100 connections / day</li>
+          <li><span class="check">✓</span> 15 actions / hour</li>
+          <li><span class="check">✓</span> Smart auto-cleanup</li>
+          <li><span class="check">✓</span> Session history</li>
+          <li><span class="check">✓</span> Email support</li>
+          <li class="locked"><span class="cross">✗</span> Post interactions</li>
+          <li class="locked"><span class="cross">✗</span> Advanced filters</li>
+        </ul>
+        <a href="mailto:support@fluence.eduolihez.com?subject=Purchase Starter" class="plan-cta secondary">Get Starter →</a>
+      </div>
+
+      <!-- Growth -->
+      <div class="pricing-card popular animate" style="animation-delay:0.15s">
+        <div class="popular-badge">MOST POPULAR</div>
+        <div class="plan-icon">🚀</div>
+        <div class="plan-name">Growth</div>
+        <div class="plan-tagline">For active influencers & creators</div>
+        <div class="plan-price"><sup>€</sup>59</div>
+        <div class="plan-price-note">one-time · lifetime license</div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li><span class="check">✓</span> 1 Instagram account</li>
+          <li><span class="check">✓</span> 200 connections / day</li>
+          <li><span class="check">✓</span> 25 actions / hour</li>
+          <li><span class="check">✓</span> Smart auto-cleanup</li>
+          <li><span class="check">✓</span> Post interactions</li>
+          <li><span class="check">✓</span> Advanced audience filters</li>
+          <li><span class="check">✓</span> Session analytics</li>
+          <li><span class="check">✓</span> Priority support</li>
+        </ul>
+        <a href="mailto:support@fluence.eduolihez.com?subject=Purchase Growth" class="plan-cta primary">Get Growth →</a>
+      </div>
+
+      <!-- Pro -->
+      <div class="pricing-card animate" style="animation-delay:0.3s">
+        <div class="plan-icon">👑</div>
+        <div class="plan-name">Pro</div>
+        <div class="plan-tagline">For agencies & professionals</div>
+        <div class="plan-price"><sup>€</sup>179</div>
+        <div class="plan-price-note">one-time · lifetime license</div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li><span class="check">✓</span> Up to 3 Instagram accounts</li>
+          <li><span class="check">✓</span> 300 connections / day</li>
+          <li><span class="check">✓</span> 35 actions / hour</li>
+          <li><span class="check">✓</span> Everything in Growth</li>
+          <li><span class="check">✓</span> Multi-account manager</li>
+          <li><span class="check">✓</span> Advanced analytics</li>
+          <li><span class="check">✓</span> Dedicated support</li>
+          <li><span class="check">✓</span> Onboarding call</li>
+        </ul>
+        <a href="mailto:support@fluence.eduolihez.com?subject=Purchase Pro" class="plan-cta secondary">Get Pro →</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── Testimonials ── -->
+<section id="testimonials">
+  <div class="container">
+    <div class="section-header animate">
+      <div class="section-tag"><span class="tag">Testimonials</span></div>
+      <h2 class="section-title">Real results,<br>real creators.</h2>
+    </div>
+    <div class="testimonials-grid">
+      <div class="testimonial-card animate">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-quote">"I gained 800 followers in my first month without doing anything. Fluence runs overnight and I wake up to new followers every day. Best €59 I've ever spent."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar" style="background:linear-gradient(135deg,#6a3de8,#9d71ff)">M</div>
+          <div>
+            <div class="testimonial-name">María G.</div>
+            <div class="testimonial-handle">@maria.creates · 12k followers</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card animate" style="animation-delay:0.15s">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-quote">"I manage 3 client accounts with the Pro plan. It saves me 10+ hours a week. The ROI is insane — my clients are seeing 15-20% follower growth monthly."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar" style="background:linear-gradient(135deg,#0fa968,#4ade80)">A</div>
+          <div>
+            <div class="testimonial-name">Alex T.</div>
+            <div class="testimonial-handle">Social media manager</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card animate" style="animation-delay:0.3s">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-quote">"Started with Starter at €29 just to test. Upgraded to Growth after a week. The engagement on my account completely changed. Very impressed with the anti-detection."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar" style="background:linear-gradient(135deg,#f59e0b,#ef4444)">S</div>
+          <div>
+            <div class="testimonial-name">Sara K.</div>
+            <div class="testimonial-handle">@sara.lifestyle · 28k followers</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FAQ ── -->
+<section id="faq">
+  <div class="container">
+    <div class="section-header animate">
+      <div class="section-tag"><span class="tag">FAQ</span></div>
+      <h2 class="section-title">Questions answered.</h2>
+    </div>
+    <div class="faq-grid">
+      <div class="faq-item animate">
+        <div class="faq-q">Is Fluence safe for my Instagram account? <span class="faq-icon">+</span></div>
+        <div class="faq-a">Fluence uses advanced anti-detection technology (puppeteer-extra stealth) and stays within safe daily limits. It mimics human behaviour with randomised delays. We recommend running it on the same network you normally use Instagram on.</div>
+      </div>
+      <div class="faq-item animate" style="animation-delay:0.1s">
+        <div class="faq-q">How is this different from a bot? <span class="faq-icon">+</span></div>
+        <div class="faq-a">Fluence is a desktop growth assistant, not a bot. It runs locally on your computer, uses a real browser, and operates within conservative limits. It never spams or sends bulk messages.</div>
+      </div>
+      <div class="faq-item animate" style="animation-delay:0.1s">
+        <div class="faq-q">Do I need to keep my computer on? <span class="faq-icon">+</span></div>
+        <div class="faq-a">Yes. Fluence runs on your desktop and requires the computer to be awake and connected to the internet. It's designed to run overnight or while you work.</div>
+      </div>
+      <div class="faq-item animate" style="animation-delay:0.2s">
+        <div class="faq-q">Is it really a one-time payment? <span class="faq-icon">+</span></div>
+        <div class="faq-a">Yes. You pay once and own your license forever. Updates are included. There are no hidden fees, no subscriptions, and no recurring charges.</div>
+      </div>
+      <div class="faq-item animate" style="animation-delay:0.2s">
+        <div class="faq-q">Can I transfer my license to another computer? <span class="faq-icon">+</span></div>
+        <div class="faq-a">Each license is tied to one device. If you need to transfer it to a new computer, contact support@fluence.eduolihez.com and we'll handle it within 24 hours.</div>
+      </div>
+      <div class="faq-item animate" style="animation-delay:0.3s">
+        <div class="faq-q">Which platforms does Fluence support? <span class="faq-icon">+</span></div>
+        <div class="faq-a">Fluence is available for Windows, macOS (Intel & Apple Silicon) and Linux. Download links are provided after purchase.</div>
+      </div>
+      <div class="faq-item animate" style="animation-delay:0.3s">
+        <div class="faq-q">What if I want a refund? <span class="faq-icon">+</span></div>
+        <div class="faq-a">We offer a 7-day money-back guarantee. If Fluence isn't working for you, contact us within 7 days of purchase for a full refund — no questions asked.</div>
+      </div>
+      <div class="faq-item animate" style="animation-delay:0.4s">
+        <div class="faq-q">Can I upgrade my plan later? <span class="faq-icon">+</span></div>
+        <div class="faq-a">Yes. You can upgrade from Starter to Growth or Pro at any time. Contact support and we'll apply the difference in price to your upgrade.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA ── -->
+<section id="cta">
+  <div class="container cta-inner">
+    <h2 class="cta-title">Start growing today.<br>Pay once, grow forever.</h2>
+    <p class="cta-sub">200+ creators already trust Fluence. One-time purchase, no subscriptions, no recurring fees.</p>
+    <div class="cta-actions">
+      <a href="#pricing" class="btn-white">Get Fluence from €29 →</a>
+      <a href="https://discord.gg/kwnnf6UmcR" target="_blank" class="btn-ghost">Join the community</a>
+    </div>
+  </div>
+</section>
+
+<!-- ── Footer ── -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand-name">Fluence</div>
+        <div class="footer-brand-desc">Intelligent Instagram growth assistant. Organic networking, smart automation. Desktop app for Windows, Mac and Linux.</div>
+      </div>
+      <div>
+        <div class="footer-col-title">Product</div>
+        <a href="#how" class="footer-col-link">How it works</a>
+        <a href="#features" class="footer-col-link">Features</a>
+        <a href="#pricing" class="footer-col-link">Pricing</a>
+        <a href="#faq" class="footer-col-link">FAQ</a>
+      </div>
+      <div>
+        <div class="footer-col-title">Support</div>
+        <a href="https://discord.gg/kwnnf6UmcR" target="_blank" class="footer-col-link">Join Discord</a>
+        <a href="mailto:support@fluence.eduolihez.com" class="footer-col-link">Contact us</a>
+        <a href="mailto:support@fluence.eduolihez.com?subject=License transfer" class="footer-col-link">Transfer license</a>
+        <a href="mailto:support@fluence.eduolihez.com?subject=Refund request" class="footer-col-link">Refund policy</a>
+      </div>
+      <div>
+        <div class="footer-col-title">Legal</div>
+        <a href="terms.html" class="footer-col-link">Terms of Service</a>
+        <a href="privacy.html" class="footer-col-link">Privacy Policy</a>
+        <a href="disclaimer.html" class="footer-col-link">Disclaimer</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2026 Fluence · fluence.eduolihez.com · All rights reserved.</div>
+      <div class="footer-legal">
+        <a href="terms.html">Terms</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="mailto:support@fluence.eduolihez.com">support@fluence.eduolihez.com</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // ── Hamburger menu ──
+  const hamburgerBtn = document.querySelector('.nav-hamburger');
+  const navLinksMenu = document.querySelector('.nav-links');
+  if (hamburgerBtn && navLinksMenu) {
+    hamburgerBtn.addEventListener('click', () => {
+      const isOpen = navLinksMenu.classList.toggle('open');
+      hamburgerBtn.setAttribute('aria-expanded', isOpen);
+    });
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('nav') && navLinksMenu.classList.contains('open')) {
+        navLinksMenu.classList.remove('open');
+        hamburgerBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+    navLinksMenu.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => {
+        navLinksMenu.classList.remove('open');
+        hamburgerBtn.setAttribute('aria-expanded', 'false');
+      });
+    });
+  }
+
+  // ── Scroll animations ──
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((e) => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.animate').forEach((el) => observer.observe(el));
+
+  // ── FAQ accordion ──
+  document.querySelectorAll('.faq-q').forEach((q) => {
+    q.addEventListener('click', () => {
+      const item = q.parentElement;
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach((i) => i.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    });
+  });
+
+  // ── Nav active state ──
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-links a');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach((s) => { if (window.scrollY >= s.offsetTop - 100) current = s.id; });
+    navLinks.forEach((a) => {
+      a.style.color = a.getAttribute('href') === `#${current}` ? 'var(--accent)' : '';
+    });
+  });
+</script>
+</body>
+</html>

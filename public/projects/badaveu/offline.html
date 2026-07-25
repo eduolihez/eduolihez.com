@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sense connexió — BadaVeu</title>
+    <meta name="theme-color" content="#002D5A">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css?v=2.1">
+    <style>
+        body { display: flex; flex-direction: column; min-height: 100vh; justify-content: center; align-items: center; padding: 20px; text-align: center; }
+        .offline-icon { font-size: 4rem; color: var(--text-light); margin-bottom: 16px; }
+        .offline-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 8px; }
+        .offline-sub { color: var(--text-light); margin-bottom: 24px; }
+        .last-incidents { width: 100%; max-width: 500px; text-align: left; margin-top: 20px; }
+        .last-incidents h3 { font-size: 1rem; color: var(--text-light); margin-bottom: 12px; }
+        .offline-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; margin-bottom: 8px; }
+        .offline-card strong { display: block; font-size: 0.95rem; margin-bottom: 4px; }
+        .offline-card small { color: var(--text-light); font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+    <i class="ri-wifi-off-line offline-icon"></i>
+    <p class="offline-title">Sense connexió a Internet</p>
+    <p class="offline-sub">Comprova la connexió i torna a intentar-ho.</p>
+    <a href="/" class="btn-submit-main" style="display:inline-block;padding:12px 28px;text-decoration:none;border-radius:10px;">
+        <i class="ri-refresh-line"></i> Reintentar
+    </a>
+
+    <div class="last-incidents" id="last-incidents"></div>
+
+    <script>
+        try {
+            const raw = localStorage.getItem('badaveu_last_incidents');
+            if (raw) {
+                const incidents = JSON.parse(raw).slice(0, 5);
+                if (incidents.length) {
+                    const container = document.getElementById('last-incidents');
+                    container.innerHTML = '<h3>Últimes incidències vistes (caché)</h3>' +
+                        incidents.map(inc => `
+                            <div class="offline-card">
+                                <strong>${inc.titulo ? inc.titulo.replace(/</g,'&lt;') : '—'}</strong>
+                                <small>${inc.barri || ''} &mdash; ${inc.estado || ''}</small>
+                            </div>`).join('');
+                }
+            }
+        } catch(e) {}
+    </script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+---
+/**
+ * Pagina principal en CATALA (ruta "/ca/").
+ * La interficie esta en catala; el contingut dinamic (projectes/certis)
+ * es mostra en espanyol com a respatller.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PortfolioSections from '../../components/PortfolioSections.astro';
+
+const lang = 'ca';
+const title = 'Eduardo Olivares | Analista SOC a Badalona, Barcelona';
+const description =
+  "Analista SOC i Blue Team a Badalona (Barcelona). Deteccio d'amenaces, resposta a incidents, XDR/SIEM i automatitzacio amb Python. Certificat Fortinet NSE, Microsoft i Trend Micro.";
+---
+
+<BaseLayout title={title} description={description} lang={lang} path="/ca/">
+  <PortfolioSections lang={lang} />
+</BaseLayout>

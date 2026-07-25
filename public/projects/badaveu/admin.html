@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BadaVeu — Centre de Comandament Municipal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+    <link rel="stylesheet" href="assets/css/admin.css?v=4.0">
+</head>
+<body>
+
+    <!-- ═══ LOADING SCREEN ═══════════════════════════════════════════════════ -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-logo-wrap">
+                <i class="ri-government-line loading-logo-icon"></i>
+            </div>
+            <div class="loading-brand">BadaVeu</div>
+            <div class="loading-sub">Centre de Comandament Municipal</div>
+            <div class="loading-bar-track"><div class="loading-bar-fill"></div></div>
+        </div>
+    </div>
+
+    <!-- ═══ LOGIN PAGE ═══════════════════════════════════════════════════════ -->
+    <div id="admin-login" class="login-page hidden">
+        <div class="login-bg-animated">
+            <div class="login-orb login-orb-1"></div>
+            <div class="login-orb login-orb-2"></div>
+            <div class="login-orb login-orb-3"></div>
+        </div>
+
+        <div class="login-split">
+            <div class="login-hero">
+                <div class="login-hero-brand">
+                    <div class="login-hero-icon"><i class="ri-government-line"></i></div>
+                    <div>
+                        <h1 class="login-hero-title"><span class="brand-bada">Bada</span><span class="brand-veu-yellow">Veu</span></h1>
+                        <p class="login-hero-sub">Plataforma d'Incidències Municipal</p>
+                    </div>
+                </div>
+                <p class="login-hero-desc">Sistema de gestió centralitzada d'incidències urbanes per a l'Ajuntament de Badalona.</p>
+                <div class="login-feature-list">
+                    <div class="login-feature-item">
+                        <div class="login-feature-icon"><i class="ri-map-pin-2-fill"></i></div>
+                        <div>
+                            <strong>Geolocalització en temps real</strong>
+                            <span>Mapa interactiu amb totes les incidències del territori</span>
+                        </div>
+                    </div>
+                    <div class="login-feature-item">
+                        <div class="login-feature-icon"><i class="ri-bar-chart-grouped-fill"></i></div>
+                        <div>
+                            <strong>Analytics i KPIs avançats</strong>
+                            <span>Quadre de comandament amb indicadors de gestió</span>
+                        </div>
+                    </div>
+                    <div class="login-feature-item">
+                        <div class="login-feature-icon"><i class="ri-shield-check-fill"></i></div>
+                        <div>
+                            <strong>Control d'accés per rol</strong>
+                            <span>Gestió granular per districte i categoria</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="login-footer-badge">
+                    <i class="ri-lock-2-line"></i> Accés restringit a personal autoritzat
+                </div>
+            </div>
+
+            <div class="login-card-wrap">
+                <div class="login-card">
+                    <div class="login-card-header">
+                        <div class="login-card-icon"><i class="ri-lock-2-line"></i></div>
+                        <h2 class="login-card-title">Accés Administratiu</h2>
+                        <p class="login-card-sub">Identifica't amb les teves credencials municipals</p>
+                    </div>
+
+                    <form id="adminLoginForm" class="login-form">
+                        <div class="login-field">
+                            <label for="username" class="login-label">Correu electrònic</label>
+                            <div class="login-input-wrap">
+                                <i class="ri-mail-line login-input-icon"></i>
+                                <input type="email" id="username" name="usuario" required
+                                       class="login-input" placeholder="admin@badaveu.cat"
+                                       autocomplete="username">
+                            </div>
+                        </div>
+
+                        <div class="login-field">
+                            <label for="password" class="login-label">Contrasenya</label>
+                            <div class="login-input-wrap">
+                                <i class="ri-lock-line login-input-icon"></i>
+                                <input type="password" id="password" name="password" required
+                                       class="login-input" placeholder="••••••••"
+                                       autocomplete="current-password">
+                            </div>
+                        </div>
+
+                        <p id="loginMessage" class="login-error"></p>
+
+                        <button type="submit" class="btn-login">
+                            <i class="ri-login-box-line"></i>
+                            Accedir al Sistema
+                        </button>
+
+                        <a href="index.html" class="login-back-link">
+                            <i class="ri-arrow-left-line"></i> Tornar al mapa públic
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ DASHBOARD ════════════════════════════════════════════════════════ -->
+    <div id="admin-dashboard" class="admin-layout hidden">
+
+        <!-- ── SIDEBAR ──────────────────────────────────────────────────────── -->
+        <nav id="admin-sidebar" class="admin-sidebar">
+
+            <div class="sidebar-header">
+                <div class="sidebar-logo-icon"><i class="ri-government-line"></i></div>
+                <div class="sidebar-logo-text">
+                    <span class="brand-bada">Bada</span><span class="brand-veu-yellow">Veu</span>
+                    <span class="sidebar-logo-env">Admin</span>
+                </div>
+            </div>
+
+            <div class="sidebar-nav-wrap">
+                <p class="sidebar-section-label">Gestió</p>
+                <div class="sidebar-nav" id="admin-tabs">
+                    <button class="admin-tab-btn" data-tab="stats" id="tab-stats-btn"
+                            onclick="app.setActiveAdminTab('stats')">
+                        <i class="ri-dashboard-3-line"></i>
+                        <span>Dashboard</span>
+                    </button>
+                    <button class="admin-tab-btn" data-tab="incidents" id="tab-incidents-btn"
+                            onclick="app.setActiveAdminTab('incidents')">
+                        <i class="ri-list-settings-line"></i>
+                        <span>Incidències</span>
+                        <span class="tab-badge hidden" id="incidents-tab-badge"></span>
+                    </button>
+                    <button class="admin-tab-btn" data-tab="priority" id="tab-priority-btn"
+                            onclick="app.setActiveAdminTab('priority')">
+                        <i class="ri-medal-line"></i>
+                        <span>Prioritat</span>
+                    </button>
+
+                    <p class="sidebar-section-label" style="margin-top:12px;">Operacions</p>
+                    <button class="admin-tab-btn" data-tab="map" id="tab-map-btn"
+                            onclick="app.setActiveAdminTab('map')">
+                        <i class="ri-map-2-line"></i>
+                        <span>Mapa Interactiu</span>
+                    </button>
+                    <button class="admin-tab-btn" data-tab="activity" id="tab-activity-btn"
+                            onclick="app.setActiveAdminTab('activity')">
+                        <i class="ri-history-line"></i>
+                        <span>Registre</span>
+                    </button>
+
+                    <p class="sidebar-section-label" style="margin-top:12px;">Sistema</p>
+                    <button class="admin-tab-btn" data-tab="users" id="tab-users-btn"
+                            onclick="app.setActiveAdminTab('users')">
+                        <i class="ri-group-line"></i>
+                        <span>Usuaris</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="sidebar-user-row">
+                    <div class="sidebar-avatar" id="sidebar-avatar-initials">A</div>
+                    <div class="sidebar-user-info-col">
+                        <div class="sidebar-user-name" id="admin-user-display-pc">Administrador</div>
+                        <div class="sidebar-user-role" id="sidebar-role-label">Carregant...</div>
+                    </div>
+                </div>
+                <div class="sidebar-session-row">
+                    <span class="session-dot"></span>
+                    <span class="session-text">Sessió activa</span>
+                    <button id="logoutBtnPc" class="btn-sidebar-logout" onclick="app.handleAdminLogout()"
+                            title="Tancar sessió" aria-label="Tancar sessió">
+                        <i class="ri-logout-box-r-line"></i>
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- ── MAIN CONTENT AREA ────────────────────────────────────────────── -->
+        <div id="main-content-area" class="main-content-area">
+
+            <!-- Top Bar -->
+            <header class="top-bar admin-top-bar">
+                <div class="topbar-left">
+                    <div class="topbar-brand-mobile">
+                        <i class="ri-government-line"></i>
+                        <span class="brand-bada">Bada</span><span class="brand-veu-yellow">Veu</span>
+                    </div>
+                    <div class="topbar-breadcrumb">
+                        <i class="ri-home-3-line topbar-home-icon"></i>
+                        <span class="topbar-breadcrumb-sep">/</span>
+                        <span id="current-tab-title" class="topbar-page-title">Dashboard</span>
+                    </div>
+                </div>
+                <div class="topbar-right">
+                    <div class="topbar-datetime" id="topbar-datetime">
+                        <i class="ri-calendar-line"></i>
+                        <span id="topbar-date-text"></span>
+                    </div>
+                    <div class="topbar-divider"></div>
+                    <button id="btn-dark-mode" class="btn-theme-toggle"
+                            onclick="app.toggleDarkMode()"
+                            aria-label="Alternar mode fosc/clar"
+                            title="Mode fosc / Mode clar">
+                        <i class="ri-moon-line"></i>
+                    </button>
+                    <div class="topbar-divider"></div>
+                    <div class="topbar-user-chip">
+                        <div class="topbar-avatar" id="topbar-avatar">A</div>
+                        <span id="admin-user-display-mobile" class="topbar-username"></span>
+                    </div>
+                    <button id="logoutBtnMobile" class="btn-logout btn-sm" onclick="app.handleAdminLogout()"
+                            aria-label="Tancar sessió">
+                        <i class="ri-logout-box-r-line"></i>
+                        <span class="logout-label">Sortir</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Mobile Tab Navigation -->
+            <div class="admin-tabs-mobile" id="admin-tabs-mobile-nav"></div>
+
+            <!-- ── PAGE CONTENT ──────────────────────────────────────────────── -->
+            <div class="admin-content-wrapper page-content">
+
+                <!-- KPI GRID — 6 Metrics -->
+                <div class="kpi-grid" id="kpi-grid">
+                    <div class="kpi-card kpi-total">
+                        <div class="kpi-icon-wrap"><i class="ri-map-pin-line kpi-icon"></i></div>
+                        <div class="kpi-body">
+                            <div class="kpi-value" id="kpi-total">—</div>
+                            <div class="kpi-label">Total</div>
+                        </div>
+                        <div class="kpi-trend" id="kpi-total-trend"></div>
+                    </div>
+                    <div class="kpi-card kpi-open">
+                        <div class="kpi-icon-wrap"><i class="ri-alarm-warning-line kpi-icon"></i></div>
+                        <div class="kpi-body">
+                            <div class="kpi-value" id="kpi-open">—</div>
+                            <div class="kpi-label">Pendents</div>
+                        </div>
+                        <div class="kpi-trend" id="kpi-open-trend"></div>
+                    </div>
+                    <div class="kpi-card kpi-inprocess">
+                        <div class="kpi-icon-wrap"><i class="ri-refresh-line kpi-icon"></i></div>
+                        <div class="kpi-body">
+                            <div class="kpi-value" id="kpi-inprocess">—</div>
+                            <div class="kpi-label">En Procés</div>
+                        </div>
+                    </div>
+                    <div class="kpi-card kpi-resolved">
+                        <div class="kpi-icon-wrap"><i class="ri-check-double-line kpi-icon"></i></div>
+                        <div class="kpi-body">
+                            <div class="kpi-value" id="kpi-resolved">—</div>
+                            <div class="kpi-label">Resoltes</div>
+                        </div>
+                    </div>
+                    <div class="kpi-card kpi-avg">
+                        <div class="kpi-icon-wrap"><i class="ri-timer-line kpi-icon"></i></div>
+                        <div class="kpi-body">
+                            <div class="kpi-value" id="kpi-avg">—</div>
+                            <div class="kpi-label">Dies Resolució</div>
+                        </div>
+                    </div>
+                    <div class="kpi-card kpi-urgent">
+                        <div class="kpi-icon-wrap"><i class="ri-error-warning-line kpi-icon"></i></div>
+                        <div class="kpi-body">
+                            <div class="kpi-value" id="kpi-urgent">—</div>
+                            <div class="kpi-label">Urgència Alta</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── TAB: INCIDÈNCIES ──────────────────────────────────────── -->
+                <div id="tab-incidents-content" class="admin-tab-content">
+                    <div class="filter-bar-admin">
+                        <div class="filter-search-box">
+                            <i class="ri-search-line filter-search-icon"></i>
+                            <input type="text" id="filter-search"
+                                   placeholder="Cercar per títol o descripció..."
+                                   oninput="app.loadAdminData()"
+                                   aria-label="Cercar incidències"
+                                   class="filter-search-input">
+                        </div>
+                        <select id="filter-status" onchange="app.loadAdminData()"
+                                class="filter-select" aria-label="Filtrar per estat">
+                            <option value="all">Tots els estats</option>
+                            <option value="pendiente">⏳ Pendents</option>
+                            <option value="proceso">🔄 En Procés</option>
+                            <option value="resuelto">✅ Solucionats</option>
+                        </select>
+                        <select id="filter-category" onchange="app.loadAdminData()"
+                                class="filter-select" aria-label="Filtrar per categoria">
+                            <option value="all">Totes les categories</option>
+                            <option value="infraestructura">Infraestructura</option>
+                            <option value="denuncia">Denúncia</option>
+                        </select>
+                        <select id="filter-barri-admin" onchange="app.loadAdminData()"
+                                class="filter-select" aria-label="Filtrar per barri">
+                            <option value="all">Tots els barris</option>
+                        </select>
+                        <select id="filter-urgency" onchange="app.loadAdminData()"
+                                class="filter-select" aria-label="Filtrar per urgència">
+                            <option value="all">Totes les urgències</option>
+                            <option value="alta">🔴 Alta</option>
+                            <option value="media">🟡 Mitjana</option>
+                            <option value="baja">🟢 Baixa</option>
+                        </select>
+                        <div class="filter-actions-group">
+                            <button class="btn-sm btn-export" onclick="app.exportCsv()"
+                                    aria-label="Exportar CSV">
+                                <i class="ri-download-2-line"></i>
+                                <span>Exportar</span>
+                            </button>
+                            <button class="btn-sm btn-bulk-toggle" id="btn-bulk-toggle"
+                                    onclick="app.toggleBulkMode()"
+                                    title="Selecció múltiple" aria-label="Activar selecció múltiple">
+                                <i class="ri-checkbox-multiple-line"></i>
+                                <span>Lot</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="incident-list" class="incident-list-admin">
+                        <p id="list-message" class="state-loading">
+                            <i class="ri-loader-4-line ri-spin"></i> Carregant dades...
+                        </p>
+                    </div>
+                </div>
+
+                <!-- ── TAB: PRIORITAT ─────────────────────────────────────────── -->
+                <div id="tab-priority-content" class="admin-tab-content hidden">
+                    <div class="tab-toolbar">
+                        <div class="priority-info-banner" id="priority-info-banner">
+                            <i class="ri-information-line"></i>
+                            <span>Incidències ordenades per puntuació automàtica: urgència, vots i antiguitat.</span>
+                        </div>
+                        <button class="btn-sm btn-primary" onclick="app.loadPriorityView()">
+                            <i class="ri-refresh-line"></i> Actualitzar
+                        </button>
+                    </div>
+                    <div id="priority-list" class="incident-list-admin">
+                        <p class="state-loading"><i class="ri-loader-4-line ri-spin"></i> Carregant prioritats...</p>
+                    </div>
+                </div>
+
+                <!-- ── TAB: ACTIVITAT ─────────────────────────────────────────── -->
+                <div id="tab-activity-content" class="admin-tab-content hidden">
+                    <div class="tab-toolbar">
+                        <div class="tab-toolbar-info">
+                            <i class="ri-history-line"></i>
+                            Registre complet de canvis d'estat fets pels administradors
+                        </div>
+                        <button class="btn-sm btn-primary"
+                                onclick="app.loadActivityLog(app._activityPage)">
+                            <i class="ri-refresh-line"></i> Actualitzar
+                        </button>
+                    </div>
+                    <div id="activity-log-list" class="activity-log-list"></div>
+                    <div id="activity-pagination"></div>
+                </div>
+
+                <!-- ── TAB: MAPA ──────────────────────────────────────────────── -->
+                <div id="tab-map-content" class="admin-tab-content hidden">
+                    <div class="map-filter-panel">
+                        <div class="map-filter-grid">
+                            <select id="map-filter-status" onchange="app.updateAdminMapFilters()"
+                                    aria-label="Filtrar mapa per estat"></select>
+                            <select id="map-filter-category" onchange="app.updateAdminMapFilters()"
+                                    aria-label="Filtrar mapa per categoria"></select>
+                            <select id="map-filter-urgency" onchange="app.updateAdminMapFilters()"
+                                    aria-label="Filtrar mapa per urgència"></select>
+                            <select id="map-filter-afectacion" onchange="app.updateAdminMapFilters()"
+                                    aria-label="Filtrar mapa per afectació"></select>
+                            <select id="map-filter-votos" onchange="app.updateAdminMapFilters()"
+                                    aria-label="Filtrar mapa per vots"></select>
+                            <button class="btn-sm btn-outline-gray" onclick="app.resetAdminMapFilters()">
+                                <i class="ri-filter-off-line"></i> Reset
+                            </button>
+                            <button class="btn-sm btn-heatmap" id="btn-heatmap"
+                                    onclick="app.toggleHeatmap()" aria-pressed="false">
+                                <i class="ri-fire-line"></i> Mapa de Calor
+                            </button>
+                        </div>
+                    </div>
+                    <div id="map-admin"></div>
+                </div>
+
+                <!-- ── TAB: STATS / DASHBOARD ─────────────────────────────────── -->
+                <div id="tab-stats-content" class="admin-tab-content hidden">
+                    <p class="state-loading"><i class="ri-loader-4-line ri-spin"></i> Carregant dashboard...</p>
+                </div>
+
+                <!-- ── TAB: USUARIS ──────────────────────────────────────────── -->
+                <div id="tab-users-content" class="admin-tab-content hidden">
+                    <div class="tab-toolbar">
+                        <div class="tab-toolbar-info">
+                            <i class="ri-group-line"></i>
+                            Gestió d'administradors i permisos d'accés al sistema
+                        </div>
+                        <button id="createUserBtn" class="btn-sm btn-primary"
+                                onclick="app.openCreateAdminModal()" style="display:none;">
+                            <i class="ri-user-add-line"></i> Nou Administrador
+                        </button>
+                    </div>
+                    <div id="admin-users-list"></div>
+                </div>
+
+            </div><!-- /.admin-content-wrapper -->
+
+            <!-- ── BULK ACTION BAR (floating) ──────────────────────────────── -->
+            <div id="bulk-action-bar" class="bulk-action-bar hidden" role="toolbar"
+                 aria-label="Accions en lot">
+                <div class="bulk-left">
+                    <i class="ri-checkbox-multiple-line bulk-icon"></i>
+                    <span class="bulk-count" id="bulk-count-label">0 seleccionades</span>
+                </div>
+                <div class="bulk-controls">
+                    <select id="bulk-status-select"
+                            aria-label="Nou estat per a les incidències seleccionades">
+                        <option value="">Canviar estat a...</option>
+                        <option value="pendiente">⏳ Pendent</option>
+                        <option value="proceso">🔄 En Procés</option>
+                        <option value="resuelto">✅ Resolt</option>
+                    </select>
+                    <button class="btn-sm btn-bulk-apply" onclick="app.executeBulkAction()">
+                        <i class="ri-check-double-line"></i> Aplicar
+                    </button>
+                    <button class="btn-sm btn-bulk-cancel" onclick="app.clearBulkSelection()">
+                        <i class="ri-close-line"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ── DETAIL PANEL (Drawer) ────────────────────────────────────── -->
+            <div id="detail-panel" class="detail-panel">
+                <button class="detail-close-btn" onclick="app.closeDetailPanel()"
+                        aria-label="Tancar detall">
+                    <i class="ri-close-line"></i>
+                </button>
+                <div id="detail-content"></div>
+            </div>
+
+        </div><!-- /#main-content-area -->
+    </div><!-- /#admin-dashboard -->
+
+    <!-- ═══ MODAL: ADMIN USER ════════════════════════════════════════════════ -->
+    <div id="adminUserModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-header-icon"><i class="ri-user-settings-line"></i></div>
+                <div>
+                    <h2 class="modal-title" id="adminModalTitle">Nou Administrador</h2>
+                    <p class="modal-subtitle">Configura les credencials i permisos d'accés</p>
+                </div>
+                <button class="modal-close-btn" onclick="app.closeAdminUserModal()"
+                        aria-label="Tancar modal">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+
+            <form id="adminUserForm">
+                <input type="hidden" id="adminUserId" name="id">
+
+                <div class="modal-field-group">
+                    <label for="adminUsername" class="modal-label">Correu electrònic (usuari)</label>
+                    <input type="email" id="adminUsername" name="usuario" required
+                           class="modern-input" placeholder="usuari@badaveu.cat">
+                </div>
+
+                <div class="modal-field-group">
+                    <label for="adminPassword" id="passwordLabel" class="modal-label">
+                        Contrasenya (mínim 8 caràcters)
+                    </label>
+                    <input type="password" id="adminPassword" name="password"
+                           required minlength="8" class="modern-input"
+                           placeholder="Contrasenya segura">
+                </div>
+
+                <div class="modal-field-row">
+                    <div class="modal-field-group">
+                        <label for="adminRole" class="modal-label">Rol</label>
+                        <select id="adminRole" name="role" required class="modern-input"></select>
+                    </div>
+                    <div class="modal-field-group">
+                        <label for="adminAccessType" class="modal-label">Accés per Categoria</label>
+                        <select id="adminAccessType" name="access_type" required class="modern-input"></select>
+                    </div>
+                </div>
+
+                <div id="districtAccessContainer" class="modal-field-group hidden">
+                    <label for="adminDistrictAccess" class="modal-label">
+                        Districtes autoritzats <span class="label-hint">(separats per comes o «all»)</span>
+                    </label>
+                    <input type="text" id="adminDistrictAccess" name="district_access"
+                           placeholder="Ex: 1, 3, 6" class="modern-input">
+                </div>
+
+                <p id="userMessage" class="modal-error-msg"></p>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-sm btn-cancel"
+                            onclick="app.closeAdminUserModal()">Cancel·lar</button>
+                    <button type="submit" id="adminSubmitBtn" class="btn-sm btn-primary">
+                        <i class="ri-user-add-line"></i> Crear Usuari
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ═══ SCRIPTS ══════════════════════════════════════════════════════════ -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="assets/js/core.js?v=4.0"></script>
+    <script src="assets/js/app.js?v=4.0"></script>
+    <script src="assets/js/admin.js?v=4.0"></script>
+</body>
+</html>

@@ -18,10 +18,15 @@
         .offline-card strong { display: block; font-size: 0.95rem; margin-bottom: 4px; }
         .offline-card small { color: var(--text-light); font-size: 0.8rem; }
     </style>
+  <meta name="robots" content="noindex, follow">
+  <link rel="canonical" href="https://eduolihez.com/projects/badaveu/offline.html">
+    <meta name="description" content="No hi ha connexió. BadaVeu funciona com a aplicació instal·lable i tornarà a carregar quan recuperis la xarxa.">
 </head>
 <body>
-    <i class="ri-wifi-off-line offline-icon"></i>
-    <p class="offline-title">Sense connexió a Internet</p>
+    <i class="ri-wifi-off-line offline-icon" aria-hidden="true"></i>
+    <!-- Era un <p>: visualmente identico, pero un lector de pantalla anunciaba
+         la pagina sin ningun encabezado. La clase mantiene el estilo. -->
+    <h1 class="offline-title">Sense connexió a Internet</h1>
     <p class="offline-sub">Comprova la connexió i torna a intentar-ho.</p>
     <a href="/" class="btn-submit-main" style="display:inline-block;padding:12px 28px;text-decoration:none;border-radius:10px;">
         <i class="ri-refresh-line"></i> Reintentar

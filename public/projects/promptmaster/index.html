@@ -3,47 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PromptMaster | Optimizador Universal de Prompts IA — Eduardo Olivares</title>
-    <meta name="description" content="Escribe prompts perfectos en segundos. La extensión definitiva para ChatGPT, Claude, Gemini y más. Freemium o licencia Pro de pago único.">
-    <link rel="canonical" href="https://eduolihez.com/promptmaster/">
+    <title>PromptMaster — Optimiza tus prompts de IA en un clic</title>
+    <meta name="description" content="Convierte cualquier instrucción vaga en un prompt estructurado con rol, contexto y formato, sin salir de ChatGPT, Claude o Gemini. Gratis o licencia Pro.">
+    <link rel="canonical" href="https://eduolihez.com/projects/promptmaster/">
     <!-- Open Graph -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://eduolihez.com/promptmaster/">
-    <meta property="og:title" content="PromptMaster | Optimizador Universal de Prompts IA — Eduardo Olivares">
-    <meta property="og:description" content="Escribe prompts perfectos en segundos. Extensión Chrome para ChatGPT, Claude, Gemini y más. Freemium disponible.">
-    <meta property="og:image" content="https://eduolihez.com/assets/og-promptmaster.jpg">
+    <meta property="og:url" content="https://eduolihez.com/projects/promptmaster/">
+    <meta property="og:title" content="PromptMaster — Optimiza tus prompts de IA en un clic">
+    <meta property="og:description" content="Convierte instrucciones vagas en prompts estructurados sin salir de ChatGPT, Claude o Gemini. Extensión de Chrome.">
+    <meta property="og:image" content="https://eduolihez.com/img/og-cover.png">
     <meta property="og:locale" content="es_ES">
-    <meta property="og:site_name" content="Eduardo Olivares — Consultor de Ciberseguridad">
+    <meta property="og:site_name" content="Eduardo Olivares Hernández">
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="PromptMaster | Optimizador Universal de Prompts IA">
-    <meta name="twitter:description" content="Escribe prompts perfectos en segundos para ChatGPT, Claude, Gemini y más. Extensión Chrome gratis.">
-    <meta name="twitter:image" content="https://eduolihez.com/assets/og-promptmaster.jpg">
+    <meta name="twitter:title" content="PromptMaster — Optimiza tus prompts de IA en un clic">
+    <meta name="twitter:description" content="Convierte instrucciones vagas en prompts estructurados sin salir de ChatGPT, Claude o Gemini. Extensión de Chrome.">
+    <meta name="twitter:image" content="https://eduolihez.com/img/og-cover.png">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%238b5cf6'/><text y='.9em' font-size='66' x='12'>✦</text></svg>">
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Tailwind Config for Custom Colors -->
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        darkBase: '#09090b',
-                        glassBg: 'rgba(255, 255, 255, 0.03)',
-                        glassBorder: 'rgba(139, 92, 246, 0.2)',
-                        primary: '#8b5cf6',
-                        secondary: '#3b82f6'
-                    },
-                    backgroundImage: {
-                        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-                        'hero-glow': 'conic-gradient(from 180deg at 50% 50%, #2a8af6 0deg, #a853ba 180deg, #e92a67 360deg)',
-                    }
-                }
-            }
-        }
-    </script>
+    <!-- Tailwind CSS — hoja compilada y servida desde este mismo dominio.
+         Antes se cargaba https://cdn.tailwindcss.com, que NO es una hoja de
+         estilos sino un compilador en JavaScript: se ejecuta en el navegador
+         del visitante con permisos totales sobre la pagina. En una web que
+         vende un producto de seguridad, un tercero con capacidad de ejecutar
+         codigo aqui es justo lo que no toca. Ademas la propia documentacion
+         de Tailwind desaconseja usarlo en produccion.
+
+         Los colores del tema (primary, secondary, darkBase...) que antes
+         definia el bloque `tailwind.config` en linea ya vienen compilados
+         dentro de este archivo.
+
+         Para regenerarla tras tocar el marcado:  npm run css:promptmaster
+         (config en scripts/promptmaster-tailwind/)
+    -->
+    <link rel="stylesheet" href="tailwind.css">
+    <!-- Lucide Icons — copia local y con version fija (v1.17.0).
+         Antes se cargaba de https://unpkg.com/lucide@latest: una etiqueta
+         "latest" sin fijar y sin SRI significa ejecutar en esta pagina el
+         codigo que haya publicado un tercero en ese momento. -->
+    <script src="lucide.min.js"></script>
     <style>
         .glass-card {
             background: rgba(255, 255, 255, 0.03);
@@ -147,6 +144,33 @@
             .wl-box { padding: 32px 24px; }
         }
     </style>
+    <meta name="robots" content="index, follow, max-image-preview:large">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Inicio",
+      "item": "https://eduolihez.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Proyectos",
+      "item": "https://eduolihez.com/projects/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "PromptMaster",
+      "item": "https://eduolihez.com/projects/promptmaster/"
+    }
+  ]
+}
+</script>
 </head>
 <body class="bg-darkBase text-slate-300 font-sans antialiased overflow-x-hidden selection:bg-primary selection:text-white">
 
@@ -453,9 +477,9 @@
       "applicationCategory": "ProductivityApplication",
       "description": "PromptMaster es la extensión Chrome que optimiza prompts para ChatGPT, Claude, Gemini y más IAs con un solo clic.",
       "operatingSystem": "Chrome",
-      "url": "https://eduolihez.com/promptmaster/",
+      "url": "https://eduolihez.com/projects/promptmaster/",
       "author": {
-        "@type": "Person",
+        "@type": "Person", "@id": "https://eduolihez.com/#person",
         "name": "Eduardo Olivares",
         "url": "https://eduolihez.com"
       },

@@ -21,11 +21,21 @@ server/config.php
 public/projects/badaveu/.env
 public/projects/badaveu/config/db.php
 
+# Copias sueltas de credenciales en la RAIZ del repo.
+# Las reglas de arriba son rutas exactas: una copia de db.php o config.php en
+# la raiz no quedaba cubierta y un "git add ." la habria subido al repositorio
+# publico con la contrasena de la base de datos dentro.
+# Se anclan con "/" para no afectar a server/db.php, que si va versionado
+# (ese lee las credenciales de config.php y no las lleva escritas).
+/db.php
+/config.php
+
 # uploads (keep folder structures but ignore uploaded files)
 server/uploads/*
 !server/uploads/.htaccess
 !server/uploads/index.html
 public/projects/badaveu/uploads/*
+!public/projects/badaveu/uploads/.htaccess
 
 # editor / OS
 .vscode/

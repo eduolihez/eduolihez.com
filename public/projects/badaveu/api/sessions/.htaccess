@@ -1,0 +1,36 @@
+# ===========================================================================
+#  BLOQUEO TOTAL - carpeta de sesiones PHP
+#
+#  api/index.php hace session_save_path(__DIR__.'/sessions'), asi que PHP
+#  escribe aqui los archivos sess_<PHPSESSID> de cada usuario conectado.
+#  Al estar dentro de la raiz web, sin este archivo cualquiera que conozca
+#  o adivine un ID de sesion podria descargar
+#      /projects/badaveu/api/sessions/sess_<ID>
+#  y leer el contenido serializado de la sesion (admin_logged_in, admin_role...),
+#  es decir, secuestrar la cuenta de administrador.
+#
+#  Lo ideal es mover session.save_path FUERA de public_html; mientras siga
+#  aqui, este bloqueo es obligatorio.
+# ===========================================================================
+
+Require all denied
+
+# Sin listado de directorio ni ejecucion de codigo, por si el bloqueo anterior
+# no se aplicara (hosting con AllowOverride limitado).
+Options -Indexes
+
+# OJO: php_flag solo existe con mod_php. Si el hosting usa PHP-FPM/CGI (lo
+# habitual hoy), la directiva sin proteger devuelve "Internal Server Error"
+# en toda la carpeta. Por eso va dentro de <IfModule>.
+<IfModule mod_php.c>
+  php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+  php_flag engine off
+</IfModule>
+<IfModule mod_php5.c>
+  php_flag engine off
+</IfModule>
+<IfModule mod_mime.c>
+  RemoveHandler .php .phtml .php3 .php4 .php5 .php7 .php8
+</IfModule>

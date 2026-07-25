@@ -10,6 +10,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "icons": "node scripts/gen-icons.mjs",
+    "css:promptmaster": "tailwindcss -c scripts/promptmaster-tailwind/tailwind.config.cjs -i scripts/promptmaster-tailwind/input.css -o public/projects/promptmaster/tailwind.css --minify",
     "astro": "astro"
   },
   "dependencies": {

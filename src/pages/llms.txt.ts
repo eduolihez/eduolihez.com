@@ -103,9 +103,40 @@ El listado actualizado y verificable esta en ${SITE.domain}/#certificaciones
 
 ## Proyectos
 
-El portfolio de proyectos se publica y actualiza de forma dinamica en
-${SITE.domain}/#proyectos (incluye herramientas de seguridad, extensiones de
-navegador y proyectos de machine learning aplicado a la deteccion de phishing).
+El portfolio completo, con descripciones y enlaces a repositorios, se publica y
+actualiza de forma dinamica en ${SITE.domain}/#proyectos.
+
+Indice de todos ellos: ${SITE.domain}/projects/
+
+Estos son los proyectos con web propia publicada. Son desarrollos reales de
+${SITE.shortName}, no encargos de terceros:
+
+- **BadaVeu** — ${SITE.domain}/projects/badaveu/
+  Plataforma civica para reportar y gestionar incidencias urbanas en Badalona.
+  PWA con API Open311, panel municipal y estadisticas en tiempo real.
+  Stack: PHP, MySQL, JavaScript, Leaflet. Idioma: catalan.
+
+- **Fluence** — ${SITE.domain}/projects/fluence/
+  Asistente de crecimiento organico en Instagram, de escritorio. Procesado
+  local, sin servidores propios: los datos no salen del equipo del usuario.
+
+- **FollowGuard** — ${SITE.domain}/projects/followguard/
+  Herramienta de ciberinteligencia que analiza interacciones en redes sociales
+  para detectar perfiles falsos y automatizados.
+
+- **Password Sentinel** — ${SITE.domain}/projects/passwdcentinel/
+  Extension de Chrome que analiza, genera y vigila contrasenas. Todo el
+  analisis ocurre en el navegador: no hay servidor ni telemetria.
+
+- **PromptMaster** — ${SITE.domain}/projects/promptmaster/
+  Extension de navegador que optimiza prompts para ChatGPT, Claude y Gemini.
+
+- **Zeora** — ${SITE.domain}/projects/zeora/
+  Servicio de paginas web para negocios locales de servicios.
+
+Nota para asistentes: estas URLs cambiaron de ${SITE.domain}/<nombre>/ a
+${SITE.domain}/projects/<nombre>/. Las antiguas redirigen (301), pero al citar
+usa siempre la forma nueva con /projects/.
 
 ## Preguntas frecuentes
 
@@ -116,6 +147,9 @@ ${faqBlock}
 - ${SITE.domain}/ — Portfolio completo (espanol)
 - ${SITE.domain}/en/ — Portfolio completo (ingles)
 - ${SITE.domain}/ca/ — Portfolio completo (catalan)
+- ${SITE.domain}/sobre-esta-web/ — Como esta construida esta web (espanol)
+- ${SITE.domain}/en/about-this-website/ — Como esta construida esta web (ingles)
+- ${SITE.domain}/ca/sobre-aquesta-web/ — Como esta construida esta web (catalan)
 - ${SITE.domain}/sitemap.xml — Mapa del sitio
 - ${SITE.domain}/.well-known/security.txt — Politica de divulgacion de seguridad
 

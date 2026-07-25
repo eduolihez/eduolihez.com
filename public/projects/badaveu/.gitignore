@@ -1,5 +1,13 @@
-api/sessions/
-api/rate_cache/
+# Dades generades en execucio (fitxers de sessio i cache del rate limiter):
+# mai al repositori. Pero SI el .htaccess que protegeix cada carpeta.
+#
+# S'exclou el CONTINGUT amb "/*" i no el directori amb "/": git no entra dins
+# d'un directori exclos, aixi que amb "api/sessions/" la linia "!...htaccess"
+# no faria res i la proteccio es quedaria fora del repositori.
+api/sessions/*
+!api/sessions/.htaccess
+api/rate_cache/*
+!api/rate_cache/.htaccess
 
 # Environment — mai pujar credencials al repositori
 .env

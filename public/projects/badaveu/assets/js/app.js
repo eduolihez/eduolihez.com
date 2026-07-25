@@ -156,7 +156,10 @@ const app = {
                     <i class="ri-linkedin-box-fill" style="width: 20px;"></i> <a href="https://linkedin.com/in/eduolihez" target="_blank" style="color: var(--primary); text-decoration: none;">linkedin.com/in/eduolihez</a>
                 </p>
             `,
-            page_title_about: "Sobre BadaVeu",
+            page_title_about: "Sobre BadaVeu — Plataforma cívica de Badalona",
+            page_title_guia: "Com reportar una incidència a Badalona — BadaVeu",
+            page_title_incidents: "Incidències obertes i resoltes de Badalona — BadaVeu",
+            page_title_stats: "Estadístiques d'incidències de Badalona — BadaVeu",
             about_section_credits: "Crèdits del Desenvolupament",
             step_loc_short: "Ubicació",
             step_detail_short: "Detalls",
@@ -284,7 +287,10 @@ const app = {
                     <i class="ri-linkedin-box-fill" style="width: 20px;"></i> <a href="https://linkedin.com/in/eduolihez" target="_blank" style="color: var(--primary); text-decoration: none;">linkedin.com/in/eduolihez</a>
                 </p>
             `,
-            page_title_about: "Sobre BadaVeu",
+            page_title_about: "Sobre BadaVeu — Plataforma cívica de Badalona",
+            page_title_guia: "Cómo reportar una incidencia en Badalona — BadaVeu",
+            page_title_incidents: "Incidencias abiertas y resueltas de Badalona — BadaVeu",
+            page_title_stats: "Estadísticas de incidencias de Badalona — BadaVeu",
             about_section_credits: "Créditos del Desarrollo",
             step_loc_short: "Ubicación",
             step_detail_short: "Detalles",

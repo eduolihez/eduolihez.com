@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title data-i18n="page_title_about">Sobre BadaVeu</title>
-    <meta name="description" content="Coneix BadaVeu: la plataforma institucional de gestió d'incidències de Badalona.">
+    <title data-i18n="page_title_about">Sobre BadaVeu — Plataforma cívica de Badalona</title>
+    <meta name="description" content="Què és BadaVeu, com funciona i qui hi ha al darrere: la plataforma cívica per reportar i seguir incidències urbanes de Badalona amb Open311.">
     <meta name="theme-color" content="#002D5A">
     <link rel="manifest" href="manifest.json">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
@@ -88,6 +88,14 @@
 
         @media (max-width: 380px) { .pillars-grid { grid-template-columns: 1fr; } .tips-grid { grid-template-columns: 1fr; } }
     </style>
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <link rel="canonical" href="https://eduolihez.com/projects/badaveu/about.html">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://eduolihez.com/projects/badaveu/about.html">
+  <meta property="og:title" content="Sobre BadaVeu — Plataforma cívica de Badalona">
+  <meta property="og:description" content="Coneix BadaVeu: la plataforma institucional de gestió d'incidències urbanes de Badalona.">
+  <meta property="og:image" content="https://eduolihez.com/img/og-cover.png">
+  <meta name="twitter:card" content="summary_large_image">
 </head>
 <body>
     <nav class="top-bar" role="banner">
@@ -172,7 +180,10 @@
         <div id="about-panel-guia" class="about-tab-panel"
              role="tabpanel" tabindex="0" aria-labelledby="about-tab-btn-guia">
             <div class="guide-hero">
-                <h1 data-i18n="guide_title"><i class="ri-book-open-line" style="color:var(--primary);" aria-hidden="true"></i> Guia d'Ús</h1>
+                <!-- Era un <h1>, pero esta pagina ya tiene el suyo ("Sobre
+                     BadaVeu"). Dos H1 dejan a Google sin saber cual es el tema
+                     principal; este es el titulo de una pestana, o sea H2. -->
+                <h2 data-i18n="guide_title"><i class="ri-book-open-line" style="color:var(--primary);" aria-hidden="true"></i> Guia d'Ús</h2>
                 <p data-i18n="guide_intro">Com reportar i fer seguiment de les incidències del teu barri.</p>
             </div>
             <section class="info-section">

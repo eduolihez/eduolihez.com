@@ -13,10 +13,55 @@ interface Props {
 const { lang } = Astro.props;
 const t = useTranslations(lang);
 const year = new Date().getFullYear();
-const aboutPath = lang === 'en' ? '/en/about-this-website' : (lang === 'ca' ? '/ca/sobre-aquesta-web' : '/sobre-esta-web');
+const aboutPath = lang === 'en' ? '/en/about-this-website/' : (lang === 'ca' ? '/ca/sobre-aquesta-web/' : '/sobre-esta-web/');
+
+/**
+ * Proyectos publicados bajo /projects/.
+ *
+ * IMPORTANTE (SEO): antes de esto, ninguna pagina del sitio enlazaba a estas
+ * webs, asi que para Google eran "paginas huerfanas": sin ningun enlace
+ * entrante, un rastreador no tiene forma de llegar a ellas ni de repartirles
+ * autoridad, por mucho que esten en el sitemap. Al ponerlas en el pie
+ * aparecen en TODAS las paginas del portfolio, que es la forma estandar de
+ * resolverlo.
+ *
+ * La seccion "Proyectos" de la portada se sirve desde MySQL y sus enlaces
+ * dependen de lo que haya en la base de datos; esta lista es estatica a
+ * proposito, para que la ruta de rastreo no dependa del backend.
+ */
+const projects = [
+  { name: 'BadaVeu', href: '/projects/badaveu/' },
+  { name: 'Fluence', href: '/projects/fluence/' },
+  { name: 'FollowGuard', href: '/projects/followguard/' },
+  { name: 'Password Sentinel', href: '/projects/passwdcentinel/' },
+  { name: 'PromptMaster', href: '/projects/promptmaster/' },
+  { name: 'Zéora', href: '/projects/zeora/' },
+];
 ---
 
 <footer class="border-t border-bg-border">
+  {/* Proyectos publicados: da a Google (y a las IAs) una ruta de rastreo
+      hacia cada web, presente en todas las paginas del sitio. */}
+  <div class="container-page border-b border-bg-border/60 py-6">
+    <p class="mb-3 font-mono text-[11px] uppercase tracking-wider text-text-faint">
+      <a href="/projects/" class="transition hover:text-accent">{t('footer.projects')}</a>
+    </p>
+    <ul class="flex flex-wrap gap-x-4 gap-y-2">
+      {
+        projects.map((p) => (
+          <li>
+            <a
+              href={p.href}
+              class="font-mono text-xs text-text-muted transition hover:text-accent"
+            >
+              {p.name}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
   <div
     class="container-page flex flex-col items-center justify-between gap-4 py-8 sm:flex-row"
   >

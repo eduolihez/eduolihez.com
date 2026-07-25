@@ -3,26 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BadaVeu | Plataforma Cívica Badalona — Eduardo Olivares</title>
-    <meta name="description" content="BadaVeu és la plataforma cívica per reportar i gestionar incidències urbanes a Badalona, desenvolupada per Eduardo Olivares. Arquitectura PWA segura i accessible.">
-    <link rel="canonical" href="https://eduolihez.com/badaveu/">
+    <title>BadaVeu — Incidències urbanes de Badalona en un mapa</title>
+    <meta name="description" content="Reporta i segueix incidències urbanes de Badalona en un mapa obert. Plataforma cívica PWA amb Open311, geolocalització i seguiment públic de cada avís.">
+    <link rel="canonical" href="https://eduolihez.com/projects/badaveu/">
     <meta name="theme-color" content="#002D5A">
     <link rel="manifest" href="manifest.json">
     <meta name="author" content="Eduardo Olivares">
     <meta name="robots" content="index, follow, max-image-preview:large">
-    <meta property="og:title" content="BadaVeu — Plataforma Cívica de Badalona">
-    <meta property="og:description" content="Reporta y sigue incidencias urbanas en Badalona. Plataforma cívica PWA con Open311 y panel administrativo en tiempo real.">
+    <meta property="og:title" content="BadaVeu — Plataforma cívica de Badalona">
+    <meta property="og:description" content="Reporta i segueix incidències urbanes de Badalona. Mapa obert, Open311 i seguiment públic de cada avís.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://eduolihez.com/badaveu/">
-    <meta property="og:image" content="https://eduolihez.com/assets/og-badaveu.jpg">
+    <meta property="og:url" content="https://eduolihez.com/projects/badaveu/">
+    <meta property="og:image" content="https://eduolihez.com/img/og-cover.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:site_name" content="Eduardo Olivares">
+    <meta property="og:site_name" content="Eduardo Olivares Hernández">
     <meta property="og:locale" content="ca_ES">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="BadaVeu — Plataforma Cívica de Badalona">
-    <meta name="twitter:description" content="Reporta y sigue incidencias urbanas en Badalona. PWA con Open311 y panel administrativo en tiempo real.">
-    <meta name="twitter:image" content="https://eduolihez.com/assets/og-badaveu.jpg">
+    <meta name="twitter:title" content="BadaVeu — Plataforma cívica de Badalona">
+    <meta name="twitter:description" content="Reporta i segueix incidències urbanes de Badalona. Mapa obert, Open311 i seguiment públic de cada avís.">
+    <meta name="twitter:image" content="https://eduolihez.com/img/og-cover.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://unpkg.com">
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
@@ -38,14 +38,45 @@
       "applicationCategory": "GovernmentApplication",
       "operatingSystem": "Web (PWA)",
       "description": "Plataforma cívica para reportar y seguir incidencias urbanas en Badalona. Integración Open311, geolocalización con Leaflet y panel administrativo en tiempo real.",
-      "url": "https://eduolihez.com/badaveu/",
+      "url": "https://eduolihez.com/projects/badaveu/",
       "inLanguage": ["ca", "es"],
       "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
-      "author": { "@type": "Person", "name": "Eduardo Olivares", "url": "https://eduolihez.com" }
+      "author": { "@type": "Person", "@id": "https://eduolihez.com/#person", "name": "Eduardo Olivares", "url": "https://eduolihez.com" }
     }
     </script>
-    </head>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Inicio",
+      "item": "https://eduolihez.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Proyectos",
+      "item": "https://eduolihez.com/projects/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "BadaVeu",
+      "item": "https://eduolihez.com/projects/badaveu/"
+    }
+  ]
+}
+</script>
+</head>
 <body>
+    <!-- Titulo principal de la pagina. Va oculto a la vista (.sr-only) porque
+         la portada es el mapa a pantalla completa, pero sin un <h1> ni Google
+         ni un lector de pantalla saben cual es el tema de la pagina. -->
+    <h1 class="sr-only">BadaVeu — Mapa d'incidències urbanes de Badalona</h1>
+
     <nav class="top-bar" role="banner">
         <div class="brand"><i class="ri-government-line" aria-hidden="true"></i> <span class="brand-bada">Bada</span><span class="brand-veu">Veu</span></div>
         <div class="lang-toggles">

@@ -1,4 +1,4 @@
-name: "CodeQL Analysis"
+name: "Analisis de seguridad"
 
 on:
   push:
@@ -8,30 +8,100 @@ on:
   schedule:
     - cron: '23 20 * * 1'
 
+# Sin permisos por defecto: cada job pide solo lo que necesita.
+permissions: {}
+
 jobs:
-  analyze:
-    name: Analyze
+  # ---------------------------------------------------------------------------
+  # CodeQL: cubre el frontend (Astro / TypeScript / JavaScript).
+  #
+  # OJO: aqui NO se puede poner 'php'. CodeQL no tiene analizador para PHP
+  # (los lenguajes admitidos son C/C++, C#, Go, Java/Kotlin, JavaScript/
+  # TypeScript, Python, Ruby, Rust, Swift y GitHub Actions). Tenerlo en la
+  # matriz era lo que provocaba el fallo "Did not recognize the following
+  # languages: php". El PHP lo cubre el job de abajo.
+  # ---------------------------------------------------------------------------
+  codeql:
+    name: CodeQL (JS/TS)
     runs-on: ubuntu-latest
     permissions:
-      actions: read
       contents: read
       security-events: write
+      actions: read
 
     strategy:
       fail-fast: false
       matrix:
-        language: [ 'javascript-typescript', 'php' ]
+        language: [ 'javascript-typescript' ]
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      # v5 es la primera version que corre sobre Node 24. Con v4 el runner
+      # avisa de que Node 20 esta en desuso.
+      - name: Descargar el repositorio
+        uses: actions/checkout@v5
 
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@v3
-      with:
-        languages: ${{ matrix.language }}
+      # v4 es la version sobre Node 24; v3 queda obsoleta en diciembre de 2026.
+      - name: Inicializar CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: ${{ matrix.language }}
 
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v3
-      with:
-        category: "/language:${{matrix.language}}"
+      - name: Analizar
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:${{ matrix.language }}"
+
+  # ---------------------------------------------------------------------------
+  # PHP: todo el backend (panel de administracion, API y BadaVeu) esta en PHP,
+  # que es justo la parte con acceso a la base de datos y a las subidas de
+  # archivos. Como CodeQL no lo analiza, se usa Semgrep, que si tiene reglas
+  # de seguridad para PHP y exporta SARIF, asi que los hallazgos aparecen en
+  # la misma pestana "Security > Code scanning" que los de CodeQL.
+  #
+  # Si algun dia no lo quieres, borra este job entero: el de arriba es
+  # independiente y seguira funcionando.
+  # ---------------------------------------------------------------------------
+  php:
+    name: Semgrep (PHP)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+
+    steps:
+      - name: Descargar el repositorio
+        uses: actions/checkout@v5
+
+      # pipx viene preinstalado en los runners de GitHub e instala la
+      # herramienta aislada, sin chocar con el Python del sistema
+      # (que en Ubuntu 24.04 rechaza "pip install" directo).
+      - name: Instalar Semgrep
+        run: pipx install semgrep
+
+      # Dos conjuntos de reglas, ambos justificados por lo que ya ha aparecido
+      # en este repositorio:
+      #   p/php     -> inyeccion SQL, XSS, subida de archivos, deserializacion.
+      #   p/secrets -> credenciales escritas a mano dentro del codigo.
+      #
+      # Sin --error, encontrar algo NO tumba el job: los hallazgos viajan en el
+      # SARIF. Por eso un codigo de salida distinto de 0 significa que el
+      # analisis se ha roto de verdad, y entonces si conviene que falle en vez
+      # de quedarse en silencio.
+      - name: Analizar el codigo PHP
+        run: |
+          semgrep scan \
+            --config=p/php \
+            --config=p/secrets \
+            --sarif --output=semgrep.sarif \
+            --metrics=off \
+            .
+
+      # always(): si el analisis se corta a medias, lo encontrado hasta ese
+      # punto se sube igualmente en lugar de perderse.
+      - name: Subir los resultados
+        if: always()
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: semgrep.sarif
+          category: semgrep-php

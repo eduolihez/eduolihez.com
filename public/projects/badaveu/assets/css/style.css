@@ -2973,3 +2973,21 @@ tr.sla-overdue td:first-child {
         scroll-behavior: auto !important;
     }
 }
+
+/* ---------------------------------------------------------------------------
+   Texto solo para lectores de pantalla y buscadores.
+   La portada de BadaVeu es un mapa a pantalla completa: no hay hueco para un
+   titulo visible, pero una pagina sin <h1> deja a Google sin saber de que
+   trata. Esta clase permite ponerlo sin alterar el diseno.
+   --------------------------------------------------------------------------- */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}

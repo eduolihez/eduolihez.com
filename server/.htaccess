@@ -24,6 +24,30 @@
   # www -> sin www  (comenta este bloque si prefieres usar www)
   RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
   RewriteRule ^ https://%1%{REQUEST_URI} [L,R=301]
+
+  # -------------------------------------------------------------------------
+  # Proyectos: estructura ANTIGUA -> NUEVA  (301 permanente)
+  #
+  # Hasta la reorganizacion, cada proyecto colgaba de la raiz (/badaveu/,
+  # /fluence/...). Ahora viven en /projects/<nombre>/. Sin estas redirecciones
+  # cualquier enlace antiguo daria 404: y algunos NO se pueden cambiar, como
+  # la URL de politica de privacidad que figura en la ficha de las extensiones
+  # de Chrome (PromptMaster, Password Sentinel) o los enlaces ya compartidos.
+  #
+  # El 301 traslada ademas el posicionamiento acumulado a la URL nueva.
+  # -------------------------------------------------------------------------
+  RewriteRule ^(badaveu|fluence|followguard|mesbadalona|passwdcentinel|promptmaster|zeora)(/.*)?$ /projects/$1$2 [L,R=301]
+
+  # -------------------------------------------------------------------------
+  # Mes Badalona -> BadaVeu  (cambio de marca)
+  #
+  # /projects/mesbadalona/ solo contiene una pagina-puente que avisa del
+  # cambio de nombre. Un 301 de verdad es mejor que esa pagina: traslada a
+  # BadaVeu el posicionamiento que tuviera la marca antigua, en vez de
+  # dejarlo atrapado en una pagina intermedia sin contenido propio.
+  # El HTML se conserva como respaldo por si estas reglas no se aplicaran.
+  # -------------------------------------------------------------------------
+  RewriteRule ^projects/mesbadalona(/.*)?$ /projects/badaveu/ [L,R=301]
 </IfModule>
 
 # --- Paginas de error personalizadas ---

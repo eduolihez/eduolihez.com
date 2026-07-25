@@ -38,9 +38,42 @@ interface Props {
   withFaq?: boolean;
   /** Pedir a los buscadores que NO indexen esta pagina (errores, utilidades). */
   noindex?: boolean;
+  /**
+   * Equivalente de ESTA pagina en cada idioma (para los hreflang).
+   *
+   * Por defecto apunta a las tres portadas, que es lo correcto en la home.
+   * Cualquier otra pagina traducida DEBE pasar su propio mapa: un hreflang
+   * que apunta a la portada en vez de a la traduccion real es un error, y
+   * Google acaba ignorando todo el grupo de alternos de esa pagina.
+   */
+  alternates?: Record<Lang, string>;
+  /**
+   * Migas de pan de la pagina, de la raiz hacia dentro y SIN incluir la
+   * pagina actual (se anade sola al final).
+   *
+   * Por defecto solo esta la raiz. Google las usa para mostrar la ruta
+   * ("eduolihez.com › Proyectos") en lugar de la URL cruda en el resultado.
+   */
+  breadcrumbs?: { name: string; path: string }[];
+  /**
+   * Nombre corto de la pagina para la ultima miga. Sin esto se usaria el
+   * <title> completo ("Proyectos publicados | Eduardo Olivares"), que queda
+   * largo y redundante dentro de una ruta de navegacion.
+   */
+  breadcrumbName?: string;
 }
 
-const { title, description, lang, path = '/', withFaq = true, noindex = false } = Astro.props;
+const {
+  title,
+  description,
+  lang,
+  path = '/',
+  withFaq = true,
+  noindex = false,
+  alternates = { es: '/', en: '/en/', ca: '/ca/' },
+  breadcrumbs = [],
+  breadcrumbName,
+} = Astro.props;
 
 const canonical = new URL(path, SITE.domain).href;
 const ogImageUrl = new URL(SITE.ogImage, SITE.domain).href;
@@ -206,12 +239,26 @@ const faqPage = {
   })),
 };
 
+// Ruta completa: la portada del idioma, las migas intermedias y la pagina
+// actual al final. Antes era una lista de UN solo elemento con el nombre de la
+// persona apuntando a la propia pagina, lo que no describe jerarquia ninguna.
+const homePath = lang === 'en' ? '/en/' : lang === 'ca' ? '/ca/' : '/';
+const trail = [
+  { name: SITE.shortName, path: homePath },
+  ...breadcrumbs,
+  // En la portada, anadirla otra vez crearia dos migas con la misma URL.
+  ...(path === homePath ? [] : [{ name: breadcrumbName ?? title, path }]),
+];
+
 const breadcrumb = {
   '@type': 'BreadcrumbList',
   '@id': `${canonical}#breadcrumb`,
-  itemListElement: [
-    { '@type': 'ListItem', position: 1, name: SITE.name, item: canonical },
-  ],
+  itemListElement: trail.map((crumb, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: crumb.name,
+    item: new URL(crumb.path, SITE.domain).href,
+  })),
 };
 
 const graph = {
@@ -246,13 +293,14 @@ const graph = {
 <meta name="geo.position" content={`${SITE.location.lat};${SITE.location.lon}`} />
 <meta name="ICBM" content={`${SITE.location.lat}, ${SITE.location.lon}`} />
 
-<!-- Enlaces alternos por idioma (hreflang) -->
-<link rel="alternate" hreflang="es-ES" href={new URL('/', SITE.domain).href} />
-<link rel="alternate" hreflang="es" href={new URL('/', SITE.domain).href} />
-<link rel="alternate" hreflang="en" href={new URL('/en/', SITE.domain).href} />
-<link rel="alternate" hreflang="ca-ES" href={new URL('/ca/', SITE.domain).href} />
-<link rel="alternate" hreflang="ca" href={new URL('/ca/', SITE.domain).href} />
-<link rel="alternate" hreflang="x-default" href={new URL('/', SITE.domain).href} />
+<!-- Enlaces alternos por idioma (hreflang), calculados desde `alternates`
+     para que cada pagina apunte a SU traduccion, no siempre a la portada. -->
+<link rel="alternate" hreflang="es-ES" href={new URL(alternates.es, SITE.domain).href} />
+<link rel="alternate" hreflang="es" href={new URL(alternates.es, SITE.domain).href} />
+<link rel="alternate" hreflang="en" href={new URL(alternates.en, SITE.domain).href} />
+<link rel="alternate" hreflang="ca-ES" href={new URL(alternates.ca, SITE.domain).href} />
+<link rel="alternate" hreflang="ca" href={new URL(alternates.ca, SITE.domain).href} />
+<link rel="alternate" hreflang="x-default" href={new URL(alternates.es, SITE.domain).href} />
 
 <!-- Open Graph (LinkedIn, Facebook, WhatsApp...) -->
 <meta property="og:type" content="profile" />

@@ -20,6 +20,12 @@ interface Props {
   withFaq?: boolean;
   /** Marcar la pagina como no indexable (paginas de error, utilidades). */
   noindex?: boolean;
+  /** Equivalente de esta pagina en cada idioma (hreflang). Ver <Seo />. */
+  alternates?: Record<Lang, string>;
+  /** Migas de pan intermedias (sin raiz ni pagina actual). Ver <Seo />. */
+  breadcrumbs?: { name: string; path: string }[];
+  /** Nombre corto de esta pagina para la ultima miga. Ver <Seo />. */
+  breadcrumbName?: string;
 }
 const {
   title,
@@ -28,6 +34,9 @@ const {
   path = '/',
   withFaq = true,
   noindex = false,
+  alternates,
+  breadcrumbs,
+  breadcrumbName,
 } = Astro.props;
 ---
 
@@ -48,6 +57,9 @@ const {
       path={path}
       withFaq={withFaq}
       noindex={noindex}
+      alternates={alternates}
+      breadcrumbs={breadcrumbs}
+      breadcrumbName={breadcrumbName}
     />
   </head>
 

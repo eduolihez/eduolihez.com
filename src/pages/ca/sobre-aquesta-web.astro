@@ -9,9 +9,16 @@ import Icon from '../../components/Icon.astro';
 const lang = 'ca';
 const title = 'Rerefons Tècnic i Seguretat | Eduardo Olivares';
 const description = 'Detalls tècnics de ciberseguretat (Blue Team), optimització SEO local, integració d\'IA i rendiment del portafoli.';
+
+/** Aquesta mateixa pagina en els altres dos idiomes (per als hreflang). */
+const alternates = {
+  es: '/sobre-esta-web/',
+  en: '/en/about-this-website/',
+  ca: '/ca/sobre-aquesta-web/',
+};
 ---
 
-<BaseLayout title={title} description={description} lang={lang} path="/ca/sobre-aquesta-web" withFaq={false}>
+<BaseLayout title={title} description={description} lang={lang} path="/ca/sobre-aquesta-web/" withFaq={false} alternates={alternates} breadcrumbName="Sobre aquesta web">
   <section class="py-20 sm:py-28 border-b border-bg-border">
     <div class="container-page max-w-4xl">
       <!-- Back button -->

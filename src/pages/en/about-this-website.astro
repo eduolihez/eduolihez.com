@@ -9,9 +9,16 @@ import Icon from '../../components/Icon.astro';
 const lang = 'en';
 const title = 'Technical Background and Security | Eduardo Olivares';
 const description = 'Technical details regarding cybersecurity (Blue Team), local SEO optimization, AI integrations, and portfolio performance.';
+
+/** This same page in the other two languages (for hreflang). */
+const alternates = {
+  es: '/sobre-esta-web/',
+  en: '/en/about-this-website/',
+  ca: '/ca/sobre-aquesta-web/',
+};
 ---
 
-<BaseLayout title={title} description={description} lang={lang} path="/en/about-this-website" withFaq={false}>
+<BaseLayout title={title} description={description} lang={lang} path="/en/about-this-website/" withFaq={false} alternates={alternates} breadcrumbName="About this website">
   <section class="py-20 sm:py-28 border-b border-bg-border">
     <div class="container-page max-w-4xl">
       <!-- Back button -->

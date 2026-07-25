@@ -186,13 +186,12 @@ if (!empty($errors)) {
       <input type="url" id="repo_url" name="repo_url" maxlength="255" value="<?= e($p['repo_url']) ?>" placeholder="https://github.com/...">
     </div>
     <div>
-      <label for="demo_url">URL de la demo</label>
-      <input type="url" id="demo_url" name="demo_url" maxlength="255" value="<?= e($p['demo_url']) ?>">
+      <label for="demo_url">URL de la página del proyecto <span class="faint">(sustituye a Demo)</span></label>
+      <input type="url" id="demo_url" name="demo_url" maxlength="255" value="<?= e($p['demo_url']) ?>" placeholder="https://...">
     </div>
   </div>
 
-  <label for="store_url">URL de tienda <span class="faint">(extensiones Chrome, etc.)</span></label>
-  <input type="url" id="store_url" name="store_url" maxlength="255" value="<?= e($p['store_url']) ?>">
+  <input type="hidden" id="store_url" name="store_url" value="<?= e($p['store_url']) ?>">
 
   <div class="row2">
     <div>

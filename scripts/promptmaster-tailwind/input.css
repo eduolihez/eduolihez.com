@@ -1,0 +1,4 @@
+/* Entrada de Tailwind para la web de PromptMaster. Ver tailwind.config.cjs. */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

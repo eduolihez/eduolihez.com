@@ -959,20 +959,31 @@ function handleLogin(mysqli $conn): never {
 
     $user = $stmt->get_result()->fetch_assoc();
 
-    if ($user && password_verify($password, $user['password'])) {
+    // Si l'usuari no existeix, verifiquem igualment contra un hash fals perque
+    // la resposta trigui el mateix. Sense aixo, el temps de resposta delata
+    // quins noms d'usuari existeixen (enumeracio d'usuaris).
+    $hash = $user['password'] ?? '$2y$12$usesomesillystringfooooooooooooooooooooooooooooooooooooo';
+    $ok   = password_verify($password, $hash) && $user;
+
+    if ($ok) {
         session_regenerate_id(true);
         $_SESSION['admin_logged_in']  = true;
         $_SESSION['user_id']          = $user['id'];
         $_SESSION['username']         = $usuario;
+        // Mateix valor amb la clau que llegeix el registre d'historial. Sense
+        // aixo, historial_incidencias.admin_usuario es desava sempre NULL i el
+        // rastre d'auditoria no deia qui havia canviat cada incidencia.
+        $_SESSION['admin_user']       = $usuario;
         $_SESSION['admin_role']       = $user['role'];
         $_SESSION['access_type']      = $user['access_type'];
         $_SESSION['district_access']  = $user['district_access'];
         sendResponse(["status" => "success", "message" => "Login correcte.", "role" => $user['role']]);
-    } elseif ($user) {
-        sendResponse(["status" => "error", "message" => "Contrasenya incorrecta."], 401);
-    } else {
-        sendResponse(["status" => "error", "message" => "Usuari no trobat."], 401);
     }
+
+    // Missatge UNIC per a usuari inexistent i contrasenya incorrecta: distingir
+    // els dos casos permet a un atacant confirmar noms d'usuari valids abans
+    // de provar contrasenyes.
+    sendResponse(["status" => "error", "message" => "Credencials incorrectes."], 401);
 }
 
 function handleLogout(): never {

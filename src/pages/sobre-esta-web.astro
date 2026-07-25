@@ -9,9 +9,16 @@ import Icon from '../components/Icon.astro';
 const lang = 'es';
 const title = 'Transfondo Técnico y Seguridad | Eduardo Olivares';
 const description = 'Detalles técnicos de ciberseguridad (Blue Team), optimización SEO local, integración de IA y rendimiento del portafolio.';
+
+/** Esta misma página en los otros dos idiomas (para los hreflang). */
+const alternates = {
+  es: '/sobre-esta-web/',
+  en: '/en/about-this-website/',
+  ca: '/ca/sobre-aquesta-web/',
+};
 ---
 
-<BaseLayout title={title} description={description} lang={lang} path="/sobre-esta-web" withFaq={false}>
+<BaseLayout title={title} description={description} lang={lang} path="/sobre-esta-web/" withFaq={false} alternates={alternates} breadcrumbName="Sobre esta web">
   <section class="py-20 sm:py-28 border-b border-bg-border">
     <div class="container-page max-w-4xl">
       <!-- Back button -->

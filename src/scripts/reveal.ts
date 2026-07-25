@@ -3,7 +3,7 @@
  * Anade la clase "is-visible" a cualquier elemento con clase "reveal"
  * cuando entra en el viewport. Usa IntersectionObserver (nativo, sin librerias).
  */
-function initReveal() {
+export function initReveal() {
   // Gate de progressive enhancement (B1): solo AHORA, con JS ejecutandose,
   // activamos el ocultado inicial. Si este script no corre, el CSS deja todo
   // visible y nunca se queda nada oculto.

@@ -89,6 +89,12 @@ function migration_pending(): array
             $missing[] = 'tabla activity_log';
         }
 
+        // Tabla de posts (blog).
+        $t2 = $pdo->query("SHOW TABLES LIKE 'posts'")->fetchColumn();
+        if (!$t2) {
+            $missing[] = 'tabla posts';
+        }
+
         // Columnas nuevas de messages y visits.
         $need = [
             'messages' => ['is_starred', 'is_archived'],

@@ -1,0 +1,204 @@
+---
+/**
+ * /blog/post — Vista de detalle de un artículo (español).
+ * 
+ * Carga el contenido del artículo desde el API de PHP de forma dinámica en base al slug
+ * proporcionado en la URL (?slug=titulo-del-post).
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { useTranslations } from '../../i18n/utils';
+import { api } from '../../config';
+
+const lang = 'es';
+const t = useTranslations(lang);
+
+const defaultTitle = 'Artículo | Blog | Eduardo Olivares';
+const defaultDesc = 'Detalle del artículo del blog de ciberseguridad de Eduardo Olivares.';
+
+const apiUrl = api('/api/post.php');
+---
+
+<BaseLayout
+  title={defaultTitle}
+  description={defaultDesc}
+  lang={lang}
+  path="/blog/post/"
+  withFaq={false}
+  noindex={false}
+  breadcrumbName="Artículo"
+>
+  <article id="post-detail-wrapper" class="border-b border-bg-border bg-bg-soft py-20 sm:py-28" data-api={apiUrl}>
+    <div class="container-page max-w-3xl">
+      <!-- Botón de regreso -->
+      <a
+        href="/blog/"
+        class="group mb-8 inline-flex items-center gap-2 font-mono text-xs text-text-muted transition hover:text-accent"
+      >
+        <span class="transition-transform group-hover:-translate-x-1">&larr;</span> {t('blog.back')}
+      </a>
+
+      <!-- Carga / Error -->
+      <div id="post-status" class="flex items-center gap-3 text-sm text-text-muted my-12">
+        <span class="h-4 w-4 animate-spin rounded-full border-2 border-bg-border border-t-accent"></span>
+        <span id="post-status-text">{t('blog.loading')}</span>
+      </div>
+
+      <!-- Contenido del Post -->
+      <div id="post-content-container" class="hidden">
+        <!-- Cabecera del artículo -->
+        <header class="mb-8">
+          <div class="flex items-center gap-3 mb-3">
+            <span class="font-mono text-xs text-text-muted" id="post-date"></span>
+            <span class="pill" style="text-transform: uppercase; font-family: 'JetBrains Mono', monospace; font-size: 10px;">ES</span>
+          </div>
+          <h1 id="post-title" class="text-3xl sm:text-4xl font-bold leading-tight text-text-title mb-4"></h1>
+          <p id="post-summary" class="text-base text-text-muted border-l-2 border-accent pl-4 italic"></p>
+        </header>
+
+        <!-- Portada -->
+        <div id="post-cover-wrapper" class="mb-10 hidden">
+          <img id="post-cover" src="" alt="" class="w-full h-auto max-h-[400px] object-cover rounded-xl border border-bg-border" />
+        </div>
+
+        <!-- Cuerpo del artículo -->
+        <div id="post-body" class="prose prose-invert max-w-none text-text-base leading-relaxed space-y-4">
+        </div>
+      </div>
+    </div>
+  </article>
+</BaseLayout>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    loadPost();
+  });
+
+  async function loadPost() {
+    const status = document.getElementById('post-status');
+    const statusText = document.getElementById('post-status-text');
+    const container = document.getElementById('post-content-container');
+
+    const titleEl = document.getElementById('post-title');
+    const summaryEl = document.getElementById('post-summary');
+    const dateEl = document.getElementById('post-date');
+    const coverEl = document.getElementById('post-cover') as HTMLImageElement;
+    const coverWrap = document.getElementById('post-cover-wrapper');
+    const bodyEl = document.getElementById('post-body');
+
+    // Obtener slug de los parámetros de búsqueda
+    const params = new URLSearchParams(window.location.search);
+    const slug = params.get('slug') || '';
+
+    if (!slug) {
+      showError('Falta el parámetro slug en la URL.');
+      return;
+    }
+
+    const wrapper = document.getElementById('post-detail-wrapper');
+    const apiUrl = wrapper ? wrapper.getAttribute('data-api') || '' : '';
+
+    try {
+      const res = await fetch(`${apiUrl}?slug=${encodeURIComponent(slug)}`);
+      if (!res.ok) {
+        if (res.status === 404) {
+          throw new Error('El artículo solicitado no existe o aún no ha sido publicado.');
+        }
+        throw new Error('No se pudo cargar el artículo.');
+      }
+      
+      const post = await res.json();
+
+      // Actualizar metadatos del documento
+      document.title = `${post.title} | Blog | Eduardo Olivares`;
+      const descMeta = document.querySelector('meta[name="description"]');
+      if (descMeta) descMeta.setAttribute('content', post.summary);
+
+      // Renderizar campos
+      if (titleEl) titleEl.textContent = post.title;
+      if (summaryEl) summaryEl.textContent = post.summary;
+      
+      if (dateEl && post.created_at) {
+        const d = new Date(post.created_at.replace(' ', 'T'));
+        dateEl.textContent = d.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+      }
+
+      if (post.cover_url) {
+        if (coverEl) coverEl.src = post.cover_url;
+        if (coverWrap) coverWrap.classList.remove('hidden');
+      }
+
+      if (bodyEl) {
+        bodyEl.innerHTML = post.content;
+      }
+
+      if (status) status.classList.add('hidden');
+      if (container) container.classList.remove('hidden');
+
+    } catch (e: any) {
+      showError(e.message || 'Error al cargar el artículo.');
+    }
+  }
+
+  function showError(msg: string) {
+    const statusText = document.getElementById('post-status-text');
+    const status = document.getElementById('post-status');
+    if (statusText) statusText.textContent = msg;
+    const spinner = status?.querySelector('.animate-spin');
+    if (spinner) spinner.classList.add('hidden');
+  }
+</script>
+
+<style is:global>
+  /* Estilos adicionales para que el contenido HTML inyectado se vea de forma impecable */
+  .prose h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    color: var(--color-text-title, #f0f3f6);
+  }
+  .prose h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    color: var(--color-text-title, #f0f3f6);
+  }
+  .prose p {
+    margin-bottom: 1.25rem;
+  }
+  .prose ul, .prose ol {
+    margin-bottom: 1.25rem;
+    padding-left: 1.5rem;
+    list-style-type: unset;
+  }
+  .prose li {
+    margin-bottom: 0.5rem;
+  }
+  .prose code {
+    background: #161b22;
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.25rem;
+    font-family: ui-monospace, monospace;
+    font-size: 0.9em;
+  }
+  .prose pre {
+    background: #161b22;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+    margin-bottom: 1.25rem;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+  .prose pre code {
+    background: transparent;
+    padding: 0;
+  }
+  .prose a {
+    color: var(--color-accent, #10b981);
+    text-decoration: underline;
+  }
+  .prose a:hover {
+    color: var(--color-accent-hover, #059669);
+  }
+</style>

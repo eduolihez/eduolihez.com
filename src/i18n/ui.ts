@@ -30,6 +30,7 @@ export const ui = {
     'nav.faq': 'FAQ',
     'nav.menu': 'Menu',
     'nav.language': 'Idioma',
+    'nav.blog': 'Blog',
 
     'hero.status': 'Disponible para trabajar',
     'hero.role': 'SOC Analyst · Blue Team · Deteccion de Amenazas con IA',
@@ -112,6 +113,14 @@ export const ui = {
     'cv.modal.body': 'Mi currículum está siendo mejorado en este momento, por lo que no está disponible para descarga directa. Te invito a echar un vistazo a mi perfil de LinkedIn, el cual está SIEMPRE actualizado.',
     'cv.modal.linkedin': 'Ver mi LinkedIn',
     'cv.modal.close': 'Cerrar',
+    'blog.title': 'Blog',
+    'blog.subtitle': 'Artículos sobre ciberseguridad, respuesta a incidentes y tecnología',
+    'blog.readMore': 'Leer artículo',
+    'blog.back': 'Volver al blog',
+    'blog.empty': 'Aún no hay artículos publicados en este idioma.',
+    'blog.loading': 'Cargando artículos...',
+    'blog.error': 'No se pudieron cargar los artículos.',
+    'blog.publishedAt': 'Publicado el',
   },
 
   en: {
@@ -124,6 +133,7 @@ export const ui = {
     'nav.faq': 'FAQ',
     'nav.menu': 'Menu',
     'nav.language': 'Language',
+    'nav.blog': 'Blog',
 
     'hero.status': 'Open to work',
     'hero.role': 'SOC Analyst · Blue Team · AI-Driven Threat Detection',
@@ -204,6 +214,14 @@ export const ui = {
     'cv.modal.body': 'My CV is currently being improved, so it is temporarily unavailable for direct download. Please feel free to check out my LinkedIn profile, which is ALWAYS kept up to date.',
     'cv.modal.linkedin': 'View my LinkedIn',
     'cv.modal.close': 'Close',
+    'blog.title': 'Blog',
+    'blog.subtitle': 'Articles about cybersecurity, incident response and technology',
+    'blog.readMore': 'Read article',
+    'blog.back': 'Back to blog',
+    'blog.empty': 'No articles published in this language yet.',
+    'blog.loading': 'Loading articles...',
+    'blog.error': 'Could not load articles.',
+    'blog.publishedAt': 'Published on',
   },
 
   ca: {
@@ -216,6 +234,7 @@ export const ui = {
     'nav.faq': 'FAQ',
     'nav.menu': 'Menu',
     'nav.language': 'Idioma',
+    'nav.blog': 'Blog',
 
     'hero.status': 'Disponible per treballar',
     'hero.role': 'SOC Analyst · Blue Team · Deteccio dAmenaces amb IA',
@@ -296,6 +315,14 @@ export const ui = {
     'cv.modal.body': "El meu currículum s'està millorant en aquest moment, per la qual cosa no està disponible per a la descàrrega directa. Et convido a fer un cop d'ull al meu perfil de LinkedIn, el qual està SEMPRE actualitzat.",
     'cv.modal.linkedin': 'Veure el meu LinkedIn',
     'cv.modal.close': 'Tancar',
+    'blog.title': 'Blog',
+    'blog.subtitle': 'Articles sobre ciberseguretat, resposta a incidents i tecnologia',
+    'blog.readMore': 'Llegir article',
+    'blog.back': 'Tornar al blog',
+    'blog.empty': 'Encara no hi ha articles publicats en aquest idioma.',
+    'blog.loading': 'Carregant articles...',
+    'blog.error': 'No s’han pogut carregar els articles.',
+    'blog.publishedAt': 'Publicat el',
   },
 } as const;
 

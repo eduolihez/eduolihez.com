@@ -1,0 +1,150 @@
+---
+/**
+ * /blog/ — Índice de artículos en español.
+ * 
+ * Muestra el listado de entradas del blog de forma dinámica cargando los posts
+ * desde la API de PHP, lo que garantiza que los cambios realizados en el panel
+ * de administración sean visibles de forma inmediata.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { useTranslations } from '../../i18n/utils';
+import { api } from '../../config';
+
+const lang = 'es';
+const t = useTranslations(lang);
+
+const title = 'Blog de Ciberseguridad | Eduardo Olivares';
+const description = 'Artículos, tutoriales y análisis de ciberseguridad, respuesta a incidentes, malware, Blue Team y automatización con Python.';
+
+const apiUrl = api(`/api/posts.php?lang=${lang}`);
+const alternates = { es: '/blog/', en: '/en/blog/', ca: '/ca/blog/' };
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  lang={lang}
+  path="/blog/"
+  withFaq={false}
+  alternates={alternates}
+  breadcrumbName="Blog"
+>
+  <section class="border-b border-bg-border bg-bg-soft py-20 sm:py-28">
+    <div class="container-page">
+      <a
+        href="/"
+        class="group mb-8 inline-flex items-center gap-2 font-mono text-xs text-text-muted transition hover:text-accent"
+      >
+        <span class="transition-transform group-hover:-translate-x-1">&larr;</span> Volver al inicio
+      </a>
+
+      <div class="reveal mb-12">
+        <p class="section-kicker">Divulgación técnica</p>
+        <h1 class="section-title">{t('blog.title')}</h1>
+        <p class="section-subtitle">{t('blog.subtitle')}</p>
+      </div>
+
+      <!-- Estado de carga -->
+      <div id="blog-status" class="flex items-center gap-3 text-sm text-text-muted mb-8">
+        <span class="h-4 w-4 animate-spin rounded-full border-2 border-bg-border border-t-accent"></span>
+        <span id="blog-status-text">{t('blog.loading')}</span>
+      </div>
+
+      <!-- Cuadrícula de artículos -->
+      <div
+        id="blog-grid"
+        class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 hidden"
+        data-api={apiUrl}
+        data-empty={t('blog.empty')}
+        data-error={t('blog.error')}
+        data-readmore={t('blog.readMore')}
+        data-lang={lang}
+      >
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import { initReveal } from '../../scripts/reveal';
+
+  document.addEventListener('DOMContentLoaded', () => {
+    initBlog();
+  });
+
+  async function initBlog() {
+    const grid = document.getElementById('blog-grid');
+    const status = document.getElementById('blog-status');
+    const statusText = document.getElementById('blog-status-text');
+
+    if (!grid) return;
+
+    const apiUrl = grid.getAttribute('data-api') || '';
+    const emptyMsg = grid.getAttribute('data-empty') || '';
+    const errorMsg = grid.getAttribute('data-error') || '';
+    const readMoreText = grid.getAttribute('data-readmore') || '';
+    const lang = grid.getAttribute('data-lang') || 'es';
+
+    try {
+      const res = await fetch(apiUrl);
+      if (!res.ok) throw new Error();
+      const posts = await res.json();
+
+      if (status) status.classList.add('hidden');
+
+      if (!posts || posts.length === 0) {
+        grid.innerHTML = `<div class="col-span-full py-16 text-center text-text-muted italic">${emptyMsg}</div>`;
+        grid.classList.remove('hidden');
+        return;
+      }
+
+      grid.innerHTML = posts.map(post => {
+        const cover = post.cover_url 
+          ? `<img src="${post.cover_url}" alt="" class="h-48 w-full object-cover transition-transform duration-500 group-hover:scale-105" />`
+          : `<div class="h-48 w-full bg-bg-card border-b border-bg-border flex items-center justify-content-center text-text-muted text-xs font-mono font-bold">NO PORTADA</div>`;
+
+        const dateStr = post.created_at ? formatBlogDate(post.created_at, lang) : '';
+        const detailUrl = lang === 'es' ? `/blog/post/?slug=${post.slug}` : `/${lang}/blog/post/?slug=${post.slug}`;
+
+        return `
+          <article class="group reveal flex flex-col overflow-hidden rounded-xl border border-bg-border bg-bg-card shadow-sm transition hover:-translate-y-1 hover:border-bg-border-hover hover:shadow-md">
+            <a href="${detailUrl}" class="overflow-hidden block">
+              ${cover}
+            </a>
+            <div class="flex flex-1 flex-col p-5">
+              <span class="mb-2 font-mono text-xs text-text-muted">${dateStr}</span>
+              <h2 class="mb-3 text-lg font-bold leading-snug text-text-title transition group-hover:text-accent">
+                <a href="${detailUrl}">
+                  ${post.title}
+                </a>
+              </h2>
+              <p class="mb-5 text-sm text-text-muted line-clamp-3">${post.summary}</p>
+              <div class="mt-auto">
+                <a href="${detailUrl}" class="inline-flex items-center gap-1 text-sm font-semibold text-accent hover:text-accent-hover transition">
+                  ${readMoreText} &rarr;
+                </a>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+
+      grid.classList.remove('hidden');
+      initReveal(); // Disparar la animación de aparición
+    } catch (e) {
+      if (statusText) statusText.textContent = errorMsg;
+      const spinner = status?.querySelector('.animate-spin');
+      if (spinner) spinner.classList.add('hidden');
+    }
+  }
+
+  function formatBlogDate(dateStr: string, lang: string): string {
+    try {
+      const d = new Date(dateStr.replace(' ', 'T'));
+      const locale = lang === 'en' ? 'en-US' : lang === 'ca' ? 'ca-ES' : 'es-ES';
+      return d.toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' });
+    } catch(e) {
+      return dateStr;
+    }
+  }
+</script>

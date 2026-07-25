@@ -1,0 +1,47 @@
+# ===========================================================================
+#  Dependabot — actualizaciones automaticas de dependencias.
+#
+#  POR QUE EXISTE: sin este archivo, Dependabot solo abre avisos de SEGURIDAD
+#  para npm. No vigila las versiones de las GitHub Actions, y por eso
+#  actions/checkout@v4 y github/codeql-action@v3 se quedaron atras hasta que
+#  el runner empezo a avisar de que Node 20 estaba en desuso. Con el bloque
+#  "github-actions" de abajo, eso llega como un pull request en cuanto salga
+#  una version nueva, en vez de como un warning en rojo meses despues.
+# ===========================================================================
+version: 2
+
+updates:
+  # --- GitHub Actions (.github/workflows/) --------------------------------
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    commit-message:
+      prefix: "ci"
+    # Todas las actions en un unico pull request: son pocas y suelen
+    # actualizarse a la vez (checkout y codeql-action saltaron de version
+    # el mismo mes al pasar a Node 24).
+    groups:
+      actions:
+        patterns:
+          - "*"
+
+  # --- npm (package.json) --------------------------------------------------
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    commit-message:
+      prefix: "deps"
+    open-pull-requests-limit: 5
+    # Menor y parche agrupados: son los que casi nunca rompen nada y no
+    # merece la pena revisar por separado. Las versiones mayores llegan en
+    # su propio pull request, que si conviene mirar con calma (Astro 7 -> 8
+    # puede traer cambios incompatibles).
+    groups:
+      dependencias-menores:
+        update-types:
+          - "minor"
+          - "patch"

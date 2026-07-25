@@ -11,6 +11,15 @@ on:
 # Sin permisos por defecto: cada job pide solo lo que necesita.
 permissions: {}
 
+# Evita ejecuciones solapadas sobre la misma rama. Sin esto, dos pushes
+# seguidos (o un push y su pull request) lanzan analisis en paralelo que
+# suben resultados a la misma categoria de Code scanning y se pisan entre si:
+# las alertas parpadean entre abierta y cerrada segun cual termine ultimo.
+# La del medio se cancela; la de master nunca, para no perder el historico.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+
 jobs:
   # ---------------------------------------------------------------------------
   # CodeQL: cubre el frontend (Astro / TypeScript / JavaScript).

@@ -198,20 +198,26 @@ CREATE TABLE IF NOT EXISTS `certifications` (
 -- ESTA es la forma que usan /api/posts.php, /api/post.php y el panel.
 -- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `posts` (
-  `id`          INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `title`       VARCHAR(200) NOT NULL,
-  `slug`        VARCHAR(200) NOT NULL,
-  `summary`     VARCHAR(500) NOT NULL,               -- meta description del articulo
-  `content`     MEDIUMTEXT   NOT NULL,               -- HTML redactado desde el panel
-  `cover_url`   VARCHAR(255) NULL,
-  `lang`        CHAR(2)      NOT NULL DEFAULT 'es',  -- es | en | ca
-  `visible`     TINYINT(1)   NOT NULL DEFAULT 1,     -- 0 = borrador
-  `created_at`  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at`  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `id`           INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `title`        VARCHAR(200) NOT NULL,
+  `slug`         VARCHAR(200) NOT NULL,
+  `summary`      VARCHAR(500) NOT NULL,               -- meta description del articulo
+  `content`      MEDIUMTEXT   NOT NULL,               -- HTML redactado desde el panel
+  `cover_url`    VARCHAR(255) NULL,
+  `tags`         VARCHAR(255) NULL,                   -- CSV: "python,soc,automatizacion"
+  `lang`         CHAR(2)      NOT NULL DEFAULT 'es',  -- es | en | ca
+  `visible`      TINYINT(1)   NOT NULL DEFAULT 1,     -- 0 = borrador
+  -- Fecha que se muestra y que va al datePublished de Schema.org.
+  -- Separada de created_at a proposito: un articulo puede pasar semanas en
+  -- borrador, y entonces "cuando se creo la fila" y "cuando se publico" dejan
+  -- de ser lo mismo. Tambien permite fechar hacia atras al importar.
+  `published_at` DATETIME     NULL,
+  `created_at`   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at`   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_slug` (`slug`),
   -- Cubre el WHERE + ORDER BY de /api/posts.php de una sola pasada.
-  KEY `idx_visible_lang` (`visible`, `lang`, `created_at`)
+  KEY `idx_visible_lang` (`visible`, `lang`, `published_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
@@ -300,6 +306,15 @@ CALL add_index_if_missing('messages', 'idx_created', '`created_at`');
 
 -- Proyectos: enlace a tienda de extensiones (Chrome Web Store / AMO).
 CALL add_column_if_missing('projects', 'store_url', 'VARCHAR(255) NULL');
+
+-- Blog: etiquetas y fecha de publicacion propia.
+CALL add_column_if_missing('posts', 'tags',         "VARCHAR(255) NULL AFTER `cover_url`");
+CALL add_column_if_missing('posts', 'published_at', "DATETIME NULL AFTER `visible`");
+CALL add_index_if_missing('posts', 'idx_visible_lang', '`visible`, `lang`, `published_at`');
+
+-- Los articulos que ya existieran antes de tener published_at se fechan con su
+-- created_at, que es lo que se venia mostrando como fecha de publicacion.
+UPDATE `posts` SET `published_at` = `created_at` WHERE `published_at` IS NULL;
 
 
 -- ===========================================================================
@@ -394,6 +409,176 @@ BEGIN
       ('Trend Micro Flex Foundation', 'Trend Micro', '2024', '/certificaciones/TrendAI/TrendAI%E2%84%A2%20Flex%20Foundation.pdf', NULL, 'AI Security', 1, 30),
       ('Trend Micro Research Foundation', 'Trend Micro', '2024', '/certificaciones/TrendAI/TrendAI%E2%84%A2%20Research%20Foundation.pdf', NULL, 'Threat Intel', 1, 31),
       ('Certificado de Vela - Acceso', 'Federació Catalana de Vela', '2022', '/certificaciones/Certificat%20vela_prova%20acces.pdf', NULL, 'Otros', 1, 32);
+  END IF;
+
+  -- --- Articulos del blog ---------------------------------------------------
+  -- Cuatro entradas sobre trabajo real: dos proyectos propios y dos rutinas
+  -- del dia a dia en el SOC. El cuerpo va en HTML porque es lo que espera
+  -- /blog/post/ y lo que produce el editor del panel.
+  IF (SELECT COUNT(*) FROM `posts`) = 0 THEN
+    INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `lang`, `visible`, `published_at`, `created_at`) VALUES
+
+    -- 1 ----------------------------------------------------------------------
+    ('Comprobar si una contraseña está filtrada sin enviársela a nadie',
+     'comprobar-si-una-contrasena-esta-filtrada-sin-enviarsela-a-nadie',
+     'Have I Been Pwned tiene más de 800 millones de contraseñas filtradas. Se puede consultar esa base sin revelar cuál estás buscando, y el truco que lo hace posible se llama k-anonimato. Así lo implementé en Password Sentinel.',
+     '<p>Cuando construí <strong>Password Sentinel</strong>, una extensión de navegador que avisa si una contraseña aparece en filtraciones conocidas, el problema no era técnico sino de confianza. Para saber si tu contraseña está en una brecha hay que compararla contra un corpus de cientos de millones. Y ese corpus no cabe en una extensión.</p>
+<p>La solución obvia es preguntarle a un servidor. La solución obvia es también terrible: implicaría que mi extensión envía tus contraseñas a un tercero. Nadie deberia instalar eso, y yo no queria escribirlo.</p>
+
+<h2>El truco: preguntar sin decir qué preguntas</h2>
+<p>Have I Been Pwned resuelve esto con una técnica llamada <strong>k-anonimato</strong>. La idea es que en vez de preguntar por tu contraseña, preguntas por un grupo lo bastante grande de candidatas como para que la tuya se pierda dentro.</p>
+<p>El procedimiento tiene tres pasos:</p>
+<ul>
+  <li>Se calcula el <code>SHA-1</code> de la contraseña <strong>en local</strong>, dentro del navegador.</li>
+  <li>Se envían al servidor únicamente los <strong>cinco primeros caracteres</strong> hexadecimales de ese hash. Nada más.</li>
+  <li>El servidor devuelve todos los hashes de su base que empiezan por ese prefijo, y la comparación final se hace <strong>otra vez en local</strong>.</li>
+</ul>
+<pre><code>Contraseña:  correcthorsebatterystaple
+SHA-1:       BE4A8DE9AFCEE30B29C0A0AB29F9E7A9CF4E1B2C
+Se envía:    BE4A8
+Se recibe:   ~800 sufijos que empiezan por BE4A8
+Se compara:  en el navegador, contra la lista recibida</code></pre>
+
+<h2>Por qué los números funcionan</h2>
+<p>Cinco caracteres hexadecimales dan <code>16^5</code>, algo más de un millón de prefijos posibles. Repartidos sobre un corpus de unos 850 millones de hashes, a cada prefijo le tocan del orden de <strong>800 candidatos</strong>.</p>
+<p>Eso significa que el servidor sabe que has preguntado por una de unas 800 contraseñas, sin ninguna forma de distinguir cuál. Y no puede afinar con peticiones sucesivas, porque cada consulta devuelve el grupo entero: no hay un segundo intento que estreche el cerco.</p>
+
+<h2>Tres detalles que conviene no pasar por alto</h2>
+<p><strong>SHA-1 aquí no es un fallo.</strong> Es lo primero que salta al leer el protocolo, y la respuesta es que SHA-1 no se está usando como función de seguridad: es el índice del corpus. Que SHA-1 tenga colisiones no ayuda a nadie a averiguar qué preguntaste, porque la parte sensible nunca sale del navegador. Otra cosa muy distinta sería usar SHA-1 para almacenar contraseñas, que sí es un error grave.</p>
+<p><strong>TLS sigue haciendo falta.</strong> El k-anonimato protege frente al servidor. No protege frente a alguien que observe la red y vea el prefijo. Son dos capas distintas y las dos son necesarias.</p>
+<p><strong>Cero apariciones no significa contraseña buena.</strong> Este es el malentendido más común. Que una contraseña no esté en el corpus solo quiere decir que aún no se ha filtrado. <code>Barcelona2026!</code> probablemente dé cero resultados, y sigue siendo una contraseña pésima: entra en cualquier ataque de diccionario con reglas. La comprobación de filtraciones descarta lo que ya se sabe roto; no certifica lo que queda.</p>
+
+<h2>Lo que me llevé de escribirlo</h2>
+<p>El k-anonimato me interesa menos por la criptografía que por el planteamiento. La pregunta de partida no fue <em>cómo cifro esto</em>, sino <strong>qué es lo mínimo que necesita saber la otra parte para responderme</strong>. Casi siempre es mucho menos de lo que se acaba enviando por costumbre.</p>
+<p>Es el mismo razonamiento que aplico a la analítica de esta web: no guardo direcciones IP porque para contar visitantes no me hacen falta. Guardo un hash con sal y con eso basta. Recoger datos que no necesitas no es neutral: es asumir un riesgo a cambio de nada.</p>',
+     'criptografia,have-i-been-pwned,k-anonimato,extensiones,javascript,privacidad',
+     'es', 1, '2026-03-14 10:00:00', '2026-03-14 10:00:00'),
+
+    -- 2 ----------------------------------------------------------------------
+    ('Triaje de alertas en un SOC: en qué orden mirar lo que salta',
+     'triaje-de-alertas-en-un-soc-en-que-orden-mirar',
+     'La severidad que trae una alerta no es su prioridad. Cómo ordeno la cola cuando hay más alertas que horas, las tres preguntas con las que abro cada uno y por qué un falso positivo recurrente es un fallo de la regla y no del analista.',
+     '<p>Lo primero que se aprende en un SOC es que la cola no se vacía. Siempre hay más alertas que horas, y el trabajo no consiste en mirarlas todas sino en <strong>acertar con el orden</strong>. Esto es cómo lo enfoco yo.</p>
+
+<h2>La severidad no es la prioridad</h2>
+<p>Toda alerta llega con una severidad puesta por el fabricante. Es un punto de partida útil y un mal criterio único, porque esa etiqueta se calcula en el vacío: describe lo grave que <em>seria</em> ese evento en abstracto, sin saber nada de tu organización.</p>
+<p>La prioridad real sale de cruzar esa severidad con el contexto:</p>
+<ul>
+  <li><strong>Qué activo es.</strong> El mismo evento no pesa igual en un portátil de becario que en un controlador de dominio.</li>
+  <li><strong>Qué usuario.</strong> Una cuenta con privilegios de administración cambia la conversación entera.</li>
+  <li><strong>Cuándo.</strong> Actividad normal a las once de la mañana; la misma a las cuatro de la madrugada de un domingo merece una mirada.</li>
+  <li><strong>Qué hay alrededor.</strong> Una alerta media aislada es ruido. Tres alertas medias sobre el mismo host en diez minutos son una cadena.</li>
+</ul>
+<p>Ese último punto es donde una plataforma XDR se separa de un SIEM clásico. Trabajando con <strong>Trend Micro Vision One</strong>, lo que más me ha cambiado el triaje no es detectar más cosas, sino que los eventos lleguen ya <strong>correlacionados</strong>. Ver la cadena completa (correo, ejecución, conexión de salida) evita el error de cerrar tres alertas por separado como poco relevantes cuando juntas cuentan otra historia.</p>
+
+<h2>Las tres preguntas</h2>
+<p>Al abrir una alerta voy siempre en el mismo orden, y en este orden concreto:</p>
+<ol>
+  <li><strong>¿Es real?</strong> Distinguir detección de incidente. La mayor parte del volumen muere aquí, y está bien que así sea.</li>
+  <li><strong>¿Es relevante?</strong> Puede ser perfectamente real y no importar. Un escaneo bloqueado en el perímetro es real y no es un incidente.</li>
+  <li><strong>¿Está contenido?</strong> Si ha pasado algo, lo urgente no es entenderlo del todo: es que deje de extenderse. Entender viene después.</li>
+</ol>
+<p>El orden importa porque el error caro es saltarse la tercera para seguir investigando la primera. La curiosidad técnica tira mucho, y contener es aburrido comparado con reconstruir. Contener primero.</p>
+
+<h2>Enriquecer antes de escalar</h2>
+<p>Una alerta escalada sin contexto le traslada el trabajo al siguiente nivel y no ahorra nada. Antes de mover algo hacia arriba intento llevar respondido:</p>
+<ul>
+  <li>Qué hace normalmente ese host o ese usuario, para tener con qué comparar.</li>
+  <li>Si el indicador aparece en fuentes de inteligencia y desde cuándo.</li>
+  <li>Si esto ya se vio antes y cómo se cerró entonces.</li>
+  <li>Qué se ha hecho ya y qué está pendiente.</li>
+</ul>
+<p>Lo tercero se paga solo. La mitad de las alertas que llegan son variaciones de algo ya resuelto, y sin registro de la decisión anterior el análisis se repite entero cada vez.</p>
+
+<h2>Un falso positivo recurrente es un error de la regla</h2>
+<p>Esta es la parte que más se descuida, porque cerrar rápido siempre parece más productivo que arreglar. Si una alerta se cierra como falso positivo por sistema, el problema ya no es la alerta: <strong>es la regla</strong>. Cada repetición cuesta atención, y la atención es el recurso escaso de un SOC.</p>
+<p>Peor todavía: una cola llena de ruido conocido educa al equipo para cerrar deprisa. Y el día que entre algo de verdad, llegará con el mismo aspecto que las mil anteriores.</p>
+<p>Ajustar una regla no es bajar la guardia. Es decidir a conciencia qué merece interrumpir a una persona, en vez de dejar que lo decida un valor por defecto que puso alguien que no conoce tu red.</p>',
+     'soc,blue-team,xdr,respuesta-a-incidentes,trend-micro-vision-one,triaje',
+     'es', 1, '2026-04-22 09:30:00', '2026-04-22 09:30:00'),
+
+    -- 3 ----------------------------------------------------------------------
+    ('Clasificar phishing en el navegador sin mandar la URL a ningún servidor',
+     'clasificar-phishing-en-el-navegador-sin-mandar-la-url',
+     'Las listas de navegación segura funcionan, pero implican contarle a alguien por dónde navegas. En NorthGate Browser estoy probando lo contrario: llevar un modelo ONNX pequeño al propio navegador para que la URL no salga nunca del equipo.',
+     '<p>Los navegadores llevan años protegiendo contra phishing con listas de reputación. Funciona bien y tiene un coste que casi nunca se menciona: para saber si un sitio es peligroso, alguien tiene que enterarse de que vas a visitarlo. Las implementaciones seria usan trucos para reducirlo, pero la forma del problema no cambia.</p>
+<p><strong>NorthGate Browser</strong> es un proyecto en desarrollo temprano donde estoy explorando la otra dirección: en lugar de mandar la URL al modelo, mandar el modelo al navegador.</p>
+
+<h2>Qué se puede saber solo con la URL</h2>
+<p>Antes de descargar nada, la propia cadena ya dice bastante. Las señales que estoy usando salen todas de ahí:</p>
+<ul>
+  <li><strong>Longitud y profundidad</strong> del dominio y de la ruta.</li>
+  <li><strong>Número de subdominios.</strong> <code>banco.seguro.login.ejemplo.tk</code> tiene una forma característica.</li>
+  <li><strong>Entropía de los caracteres</strong>, que delata dominios generados por algoritmo.</li>
+  <li><strong>Presencia de punycode</strong>, la vía clásica del ataque homográfico.</li>
+  <li><strong>Marca conocida en el subdominio pero no en el dominio registrable.</strong> Esta es la señal más fuerte que he encontrado, y también la más fácil de explicar: <code>paypal.com.verificacion-cuenta.xyz</code> no es PayPal.</li>
+  <li><strong>Proporción de dígitos y guiones</strong>, y el TLD.</li>
+</ul>
+<p>Nada de esto es concluyente por separado. Juntas, y con suficientes ejemplos, se separan razonablemente bien.</p>
+
+<h2>Por qué ONNX</h2>
+<p>Entrenar es cómodo en Python y ejecutar dentro de un navegador no lo es. <strong>ONNX</strong> resuelve exactamente ese hueco: se entrena con las herramientas de siempre, se exporta a un formato intermedio y se ejecuta desde el runtime nativo, sin arrastrar Python al producto final.</p>
+<p>En un navegador eso importa por tres motivos muy concretos:</p>
+<ul>
+  <li><strong>El tamaño se paga en cada instalación.</strong> Un modelo de decenas de megas no es viable dentro de un binario que la gente descarga.</li>
+  <li><strong>El presupuesto de latencia es minúsculo.</strong> Esto tiene que resolverse antes de que la página pinte. Hablamos de un puñado de milisegundos, no de cientos.</li>
+  <li><strong>No puede depender de la red.</strong> Si necesitara conexión para decidir, habriamos vuelto al punto de partida.</li>
+</ul>
+<p>La integración va en <strong>Rust</strong>, que es el lenguaje del núcleo sobre el que trabajo, y encaja bien: sin recolector de basura, sin pausas impredecibles en una ruta que se ejecuta en cada navegación.</p>
+
+<h2>El umbral es la decisión difícil</h2>
+<p>La parte que más tiempo me está llevando no es el modelo, es dónde poner el corte. Y es porque los dos errores no cuestan lo mismo:</p>
+<ul>
+  <li>Un <strong>falso negativo</strong> deja pasar una página de phishing. Malo, pero es el estado actual sin ninguna protección.</li>
+  <li>Un <strong>falso positivo</strong> marca el banco real del usuario como fraudulento. Eso es peor de lo que parece: entrena a la gente a ignorar el aviso. Y un aviso que se ignora no protege de nada, solo da sensación de que sí.</li>
+</ul>
+<p>Por eso el umbral está deliberadamente conservador y la señal se plantea como advertencia, no como bloqueo. Prefiero cubrir menos y que el aviso conserve su significado.</p>
+
+<h2>Estado</h2>
+<p>Está en desarrollo temprano y lo digo sin adornos: hay un pipeline de extracción de características, un modelo que se comporta de forma razonable en validación y una integración que todavía no consideraria lista. Lo interesante del proyecto, de momento, es la restricción de partida: <strong>si la URL no sale del equipo, hay una categoría entera de fugas que simplemente no puede ocurrir</strong>. Diseñar con esa limitación desde el principio obliga a decisiones bastante más honestas que añadir privacidad al final.</p>',
+     'machine-learning,onnx,rust,phishing,privacidad,navegadores',
+     'es', 1, '2026-05-30 18:00:00', '2026-05-30 18:00:00'),
+
+    -- 4 ----------------------------------------------------------------------
+    ('Automatizar el informe semanal del SOC con Python',
+     'automatizar-el-informe-semanal-del-soc-con-python',
+     'El informe semanal era tres horas de copiar y pegar que salían iguales cada lunes. Al automatizarlo con Python, los problemas de verdad no fueron el código: fueron la paginación, las zonas horarias y qué pasa cuando el script falla en silencio.',
+     '<p>Hay una tarea que aparece en todos los SOC: el informe periódico. Cuántas alertas, de qué tipo, cuántas cerradas, qué tendencia. Se tarda horas, sale casi idéntico cada vez y nadie lo echa de menos cuando desaparece. Es el candidato perfecto para automatizar.</p>
+<p>Lo monté en Python. El código fue lo fácil. Lo que costó fue todo lo demás.</p>
+
+<h2>Separar las tres fases</h2>
+<p>El primer intento fue un script que consultaba, calculaba y escribía el documento a la vez. Funcionó una semana y se volvió imposible de tocar. Rehecho en tres partes independientes:</p>
+<ul>
+  <li><strong>Extraer.</strong> Hablar con la API y guardar la respuesta cruda, sin interpretar nada.</li>
+  <li><strong>Normalizar.</strong> Pasar esa respuesta a una estructura propia, estable, que no cambie aunque cambie la API.</li>
+  <li><strong>Renderizar.</strong> Convertir esa estructura en el documento final.</li>
+</ul>
+<p>La ventaja aparece a la primera incidencia. Si el informe sale raro, se sabe en qué fase mirar sin releer el script entero. Y si el fabricante cambia un campo, solo se toca la fase de normalizar.</p>
+
+<h2>La paginación, que siempre muerde</h2>
+<p>El error clásico, y lo cometí: pedir los datos, recibir una lista con buena pinta y darla por completa. Casi ninguna API devuelve todo de una vez. Suele haber un tope por página y un cursor para seguir.</p>
+<p>Lo peor de este fallo es que <strong>no rompe nada</strong>. No hay excepción ni traza. Simplemente el informe dice 200 alertas donde hubo 1.400, y el número parece perfectamente plausible. Estuvo mal dos semanas antes de que alguien lo notara.</p>
+<p>Desde entonces, cualquier consulta que pueda devolver más de un elemento pasa por una función que agota el cursor, y el resultado se contrasta con el total que declara la propia API. Si no cuadran, el script se detiene.</p>
+
+<h2>Zonas horarias</h2>
+<p>La API responde en UTC. El informe se lee en hora peninsular. Entre una cosa y otra hay una o dos horas según la época del año, y eso desplaza el corte de la semana.</p>
+<p>El síntoma es sutil: las alertas del domingo por la noche caen en la semana equivocada. Los totales del mes cuadran, los semanales no, y cuesta ver por qué.</p>
+<p>La regla que sigo ahora es simple y no la he vuelto a romper: <strong>todo se maneja en UTC y con fechas conscientes de zona horaria hasta el último momento</strong>. La conversión a hora local ocurre solo al escribir el texto, nunca en un cálculo.</p>
+
+<h2>Que falle en alto, no en silencio</h2>
+<p>Un script programado que falla sin avisar es peor que no tenerlo, porque la ausencia de informe se interpreta como semana tranquila. Lo que aprendí a cubrir:</p>
+<ul>
+  <li><strong>Reintentos con espera creciente</strong> ante límites de peticiones, en vez de machacar la API.</li>
+  <li><strong>Idempotencia.</strong> Ejecutarlo dos veces debe producir el mismo informe, no duplicar nada.</li>
+  <li><strong>Un aviso explícito al fallar</strong>, con la fase que se rompió. Un traceback en un log que nadie lee no es un aviso.</li>
+  <li><strong>Comprobaciones de coherencia:</strong> si el total de la semana es cero, casi seguro que el roto es el script y no la realidad.</li>
+</ul>
+
+<h2>Qué no automaticé</h2>
+<p>El análisis. El script reúne los datos, calcula las cifras y deja el documento montado. La lectura de <em>por qué</em> han subido las detecciones de un tipo concreto, o si una caída es buena noticia o un sensor caído, la sigue haciendo una persona.</p>
+<p>Automatizar la recogida devuelve las horas que se iban en copiar y pegar. Automatizar la conclusión produce informes que nadie se cree, y con razón.</p>',
+     'python,automatizacion,soc,reporting,buenas-practicas',
+     'es', 1, '2026-06-18 12:00:00', '2026-06-18 12:00:00');
   END IF;
 END$$
 

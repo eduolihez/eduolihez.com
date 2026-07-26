@@ -42,15 +42,19 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
 
                 case 'duplicate':
                     $uniqueSlug = $row['slug'] . '-' . bin2hex(random_bytes(3));
+                    // La copia nace como borrador y SIN fecha de publicacion:
+                    // heredar la del original la colocaria entre los articulos
+                    // ya publicados en cuanto se marcara visible.
                     db()->prepare(
-                        'INSERT INTO posts (title, slug, summary, content, cover_url, lang, visible, created_at, updated_at)
-                         VALUES (?, ?, ?, ?, ?, ?, 0, NOW(), NOW())'
+                        'INSERT INTO posts (title, slug, summary, content, cover_url, tags, lang, visible, published_at, created_at, updated_at)
+                         VALUES (?, ?, ?, ?, ?, ?, ?, 0, NULL, NOW(), NOW())'
                     )->execute([
                         $row['title'] . ' (copia)',
                         $uniqueSlug,
                         $row['summary'],
                         $row['content'],
                         $row['cover_url'],
+                        $row['tags'] ?? null,
                         $row['lang']
                     ]);
                     $newId = (int) db()->lastInsertId();
@@ -73,8 +77,9 @@ if ($search !== '') {
 }
 
 $st = db()->prepare(
-    "SELECT id, title, slug, summary, cover_url, lang, visible, created_at
-     FROM posts $where ORDER BY created_at DESC"
+    "SELECT id, title, slug, summary, cover_url, tags, lang, visible,
+            COALESCE(published_at, created_at) AS created_at
+     FROM posts $where ORDER BY COALESCE(published_at, created_at) DESC, id DESC"
 );
 $st->execute($params);
 $rows = $st->fetchAll();

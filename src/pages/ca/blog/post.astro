@@ -63,6 +63,7 @@ const apiUrl = api('/api/post.php');
         <header class="mb-8">
           <div class="mb-3 flex items-center gap-3">
             <time id="post-date" class="font-mono text-xs text-text-muted"></time>
+            <span id="post-read" class="hidden font-mono text-xs text-text-faint"></span>
             <span
               class="rounded border border-bg-border px-1.5 py-0.5 font-mono text-[10px] uppercase text-text-faint"
               >CA</span
@@ -78,6 +79,7 @@ const apiUrl = api('/api/post.php');
             class="border-l-2 border-accent pl-4 text-base italic text-text-muted"
           >
           </p>
+          <div id="post-tags" class="mt-4 hidden"></div>
         </header>
 
         <div id="post-cover-wrapper" class="mb-10 hidden">

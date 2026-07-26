@@ -79,8 +79,11 @@ interface Post {
   summary: string;
   content?: string;
   cover_url?: string | null;
+  tags?: string[];
   lang: string;
-  created_at: string;
+  published_at: string;
+  updated_at?: string;
+  read_minutes?: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -173,11 +176,24 @@ function card(
   const body = document.createElement('div');
   body.className = 'flex flex-1 flex-col p-5';
 
+  const meta = document.createElement('p');
+  meta.className = 'mb-2 flex items-center gap-2 font-mono text-xs text-text-muted';
+
   const time = document.createElement('time');
-  time.className = 'mb-2 font-mono text-xs text-text-muted';
-  time.dateTime = isoDate(post.created_at).slice(0, 10);
-  time.textContent = formatDate(post.created_at, opts.lang);
-  body.appendChild(time);
+  time.dateTime = isoDate(post.published_at).slice(0, 10);
+  time.textContent = formatDate(post.published_at, opts.lang);
+  meta.appendChild(time);
+
+  if (post.read_minutes) {
+    const sep = document.createElement('span');
+    sep.setAttribute('aria-hidden', 'true');
+    sep.textContent = '·';
+    meta.appendChild(sep);
+    const read = document.createElement('span');
+    read.textContent = `${post.read_minutes} min`;
+    meta.appendChild(read);
+  }
+  body.appendChild(meta);
 
   const h2 = document.createElement('h2');
   h2.className =
@@ -189,9 +205,13 @@ function card(
   body.appendChild(h2);
 
   const summary = document.createElement('p');
-  summary.className = 'mb-5 line-clamp-3 text-sm text-text-muted';
+  summary.className = 'mb-4 line-clamp-3 text-sm text-text-muted';
   summary.textContent = post.summary || '';
   body.appendChild(summary);
+
+  if (post.tags?.length) {
+    body.appendChild(tagList(post.tags, 3));
+  }
 
   const footer = document.createElement('div');
   footer.className = 'mt-auto';
@@ -205,6 +225,32 @@ function card(
 
   article.appendChild(body);
   return article;
+}
+
+/**
+ * Lista de etiquetas. `limit` recorta en la tarjeta del listado, donde cinco
+ * etiquetas parten la maqueta; en el detalle se muestran todas.
+ */
+function tagList(tags: string[], limit = 0): HTMLElement {
+  const ul = document.createElement('ul');
+  ul.className = 'mb-4 flex flex-wrap gap-1.5';
+  const shown = limit > 0 ? tags.slice(0, limit) : tags;
+
+  shown.forEach((tag) => {
+    const li = document.createElement('li');
+    li.className =
+      'rounded border border-bg-border px-1.5 py-0.5 font-mono text-[10px] text-text-faint';
+    li.textContent = tag;
+    ul.appendChild(li);
+  });
+
+  if (limit > 0 && tags.length > limit) {
+    const li = document.createElement('li');
+    li.className = 'px-1 py-0.5 font-mono text-[10px] text-text-faint';
+    li.textContent = `+${tags.length - limit}`;
+    ul.appendChild(li);
+  }
+  return ul;
 }
 
 // ---------------------------------------------------------------------------
@@ -257,9 +303,21 @@ function render(post: Post, lang: string): void {
   set('post-summary', post.summary || '');
 
   const dateEl = document.getElementById('post-date');
-  if (dateEl && post.created_at) {
-    dateEl.textContent = formatDate(post.created_at, lang, true);
-    dateEl.setAttribute('datetime', isoDate(post.created_at).slice(0, 10));
+  if (dateEl && post.published_at) {
+    dateEl.textContent = formatDate(post.published_at, lang, true);
+    dateEl.setAttribute('datetime', isoDate(post.published_at).slice(0, 10));
+  }
+
+  const readEl = document.getElementById('post-read');
+  if (readEl && post.read_minutes) {
+    readEl.textContent = `${post.read_minutes} min`;
+    readEl.classList.remove('hidden');
+  }
+
+  const tagsEl = document.getElementById('post-tags');
+  if (tagsEl && post.tags?.length) {
+    tagsEl.replaceChildren(tagList(post.tags));
+    tagsEl.classList.remove('hidden');
   }
 
   const cover = safeUrl(post.cover_url);
@@ -330,19 +388,24 @@ function applySeo(
   // hash en la politica.
   const holder = document.getElementById('post-jsonld');
   if (holder) {
+    const person = { '@type': 'Person', name: opts.authorName, url: window.location.origin };
     holder.textContent = JSON.stringify({
       '@context': 'https://schema.org',
       '@type': 'BlogPosting',
       headline: post.title,
       description: post.summary,
       inLanguage: post.lang || opts.lang,
-      datePublished: isoDate(post.created_at),
-      dateModified: isoDate(post.created_at),
+      datePublished: isoDate(post.published_at),
+      // dateModified separado: es lo que distingue un articulo que se revisa
+      // de uno abandonado, y Google lo tiene en cuenta.
+      dateModified: isoDate(post.updated_at || post.published_at),
+      ...(post.tags?.length ? { keywords: post.tags.join(', ') } : {}),
+      ...(post.read_minutes ? { timeRequired: `PT${post.read_minutes}M` } : {}),
       mainEntityOfPage: { '@type': 'WebPage', '@id': url },
       url,
       ...(absoluteImage ? { image: absoluteImage } : {}),
-      author: { '@type': 'Person', name: opts.authorName, url: window.location.origin },
-      publisher: { '@type': 'Person', name: opts.authorName, url: window.location.origin },
+      author: person,
+      publisher: person,
     });
   }
 }

@@ -59,7 +59,7 @@ relativas y no hacen falta cabeceras CORS.
 | `server/api/` | API pública de solo lectura + endpoint de contacto y de analítica |
 | `server/admin/` | Panel de administración protegido por sesión |
 | `server/lib/` | Núcleo compartido: arranque, helpers HTTP, subidas, parseo de user-agent |
-| `database/` | `schema.sql` (idempotente: esquema y migración) y `clean.sql` (vaciado) |
+| `database/` | `schema.sql` (idempotente: esquema, migración y contenido inicial) y `clean.sql` (vaciado) |
 | `scripts/` | Utilidades puntuales: generación de iconos y CSS de una extensión |
 
 ## Seguridad

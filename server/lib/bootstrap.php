@@ -99,7 +99,7 @@ function migration_pending(): array
         $need = [
             'messages' => ['is_starred', 'is_archived'],
             'visits'   => ['device', 'browser', 'os', 'lang', 'is_bot'],
-            'posts'    => ['title', 'slug', 'summary', 'content', 'lang', 'visible'],
+            'posts'    => ['title', 'slug', 'summary', 'content', 'lang', 'visible', 'tags', 'published_at'],
         ];
         foreach ($need as $table => $columns) {
             if (in_array("tabla $table", $missing, true)) {

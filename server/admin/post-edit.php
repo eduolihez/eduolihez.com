@@ -14,13 +14,16 @@ $id = (int) ($_GET['id'] ?? 0);
 $isEdit = $id > 0;
 
 $p = [
-    'title'     => '',
-    'slug'      => '',
-    'summary'   => '',
-    'content'   => '',
-    'cover_url' => '',
-    'lang'      => 'es',
-    'visible'   => 1,
+    'title'        => '',
+    'slug'         => '',
+    'summary'      => '',
+    'content'      => '',
+    'cover_url'    => '',
+    'tags'         => '',
+    'lang'         => 'es',
+    'visible'      => 1,
+    // Al crear se propone ahora; se puede cambiar para fechar hacia atras.
+    'published_at' => date('Y-m-d\TH:i'),
 ];
 
 // --- Cargar datos si es edición ---
@@ -33,6 +36,9 @@ if ($isEdit) {
         redirect('posts.php');
     }
     $p = array_merge($p, $row);
+    // <input type="datetime-local"> espera "Y-m-dTH:i"; MySQL da "Y-m-d H:i:s".
+    $stored = $row['published_at'] ?? $row['created_at'] ?? '';
+    $p['published_at'] = $stored !== '' ? date('Y-m-d\TH:i', strtotime((string) $stored)) : '';
 }
 
 $errors = [];
@@ -42,13 +48,27 @@ $success = false;
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     csrf_check();
 
-    $p['title']   = trim((string) ($_POST['title'] ?? ''));
-    $p['slug']    = trim((string) ($_POST['slug'] ?? ''));
-    $p['summary'] = trim((string) ($_POST['summary'] ?? ''));
-    $p['content'] = trim((string) ($_POST['content'] ?? ''));
-    $p['lang']    = trim((string) ($_POST['lang'] ?? 'es'));
-    $p['visible'] = isset($_POST['visible']) ? 1 : 0;
-    
+    $p['title']        = trim((string) ($_POST['title'] ?? ''));
+    $p['slug']         = trim((string) ($_POST['slug'] ?? ''));
+    $p['summary']      = trim((string) ($_POST['summary'] ?? ''));
+    $p['content']      = trim((string) ($_POST['content'] ?? ''));
+    $p['lang']         = trim((string) ($_POST['lang'] ?? 'es'));
+    $p['visible']      = isset($_POST['visible']) ? 1 : 0;
+    $p['published_at'] = trim((string) ($_POST['published_at'] ?? ''));
+
+    // Etiquetas: se guardan como CSV normalizado (minusculas, sin repetidas ni
+    // vacias) para que "SOC", " soc" y "soc" no acaben siendo tres etiquetas.
+    $tagList = array_values(array_unique(array_filter(array_map(
+        static fn(string $t): string => mb_strtolower(trim($t)),
+        explode(',', (string) ($_POST['tags'] ?? ''))
+    ), static fn(string $t): bool => $t !== '')));
+    $p['tags'] = mb_substr(implode(',', $tagList), 0, 255);
+
+    // El idioma se interpola en las URLs del sitio: lista blanca estricta.
+    if (!in_array($p['lang'], ['es', 'en', 'ca'], true)) {
+        $p['lang'] = 'es';
+    }
+
     // Normalizar slug
     if ($p['slug'] === '' && $p['title'] !== '') {
         // Generar desde título si está vacío
@@ -90,16 +110,35 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     }
 
     if (!$errors) {
+        // El campo del formulario llega como "Y-m-dTH:i"; MySQL quiere
+        // "Y-m-d H:i:s". Si viene vacio se guarda NULL y las consultas caen a
+        // created_at, en vez de escribir una fecha cero que rompe el orden.
+        $publishedAt = $p['published_at'] !== ''
+            ? date('Y-m-d H:i:s', strtotime($p['published_at']))
+            : null;
+
         if ($isEdit) {
-            $sql = 'UPDATE posts SET title=?, slug=?, summary=?, content=?, cover_url=?, lang=?, visible=?, updated_at=NOW() WHERE id=?';
-            $params = [$p['title'], $p['slug'], $p['summary'], $p['content'], $p['cover_url'], $p['lang'], $p['visible'], $id];
-            db()->prepare($sql)->execute($params);
+            db()->prepare(
+                'UPDATE posts
+                    SET title=?, slug=?, summary=?, content=?, cover_url=?, tags=?,
+                        lang=?, visible=?, published_at=?, updated_at=NOW()
+                  WHERE id=?'
+            )->execute([
+                $p['title'], $p['slug'], $p['summary'], $p['content'], $p['cover_url'],
+                $p['tags'], $p['lang'], $p['visible'], $publishedAt, $id,
+            ]);
             log_activity('update', 'post', $id, 'Artículo: ' . $p['title']);
             set_flash('ok', 'Artículo actualizado con éxito.');
         } else {
-            $sql = 'INSERT INTO posts (title, slug, summary, content, cover_url, lang, visible, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())';
-            $params = [$p['title'], $p['slug'], $p['summary'], $p['content'], $p['cover_url'], $p['lang'], $p['visible']];
-            db()->prepare($sql)->execute($params);
+            db()->prepare(
+                'INSERT INTO posts
+                    (title, slug, summary, content, cover_url, tags, lang, visible,
+                     published_at, created_at, updated_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())'
+            )->execute([
+                $p['title'], $p['slug'], $p['summary'], $p['content'], $p['cover_url'],
+                $p['tags'], $p['lang'], $p['visible'], $publishedAt,
+            ]);
             $id = (int) db()->lastInsertId();
             log_activity('create', 'post', $id, 'Artículo: ' . $p['title']);
             set_flash('ok', 'Artículo creado con éxito.');
@@ -155,6 +194,23 @@ admin_header($isEdit ? 'Editar Artículo' : 'Nuevo Artículo', 'posts.php');
           <span><strong>Publicado en la web</strong> (si se desmarca, quedará como borrador y oculto)</span>
         </label>
       </div>
+    </div>
+  </div>
+
+  <div class="row2">
+    <div>
+      <label for="tags">Etiquetas <span class="faint">(separadas por comas)</span></label>
+      <input type="text" id="tags" name="tags" value="<?= e($p['tags']) ?>"
+             placeholder="python, soc, automatizacion" maxlength="255">
+      <p class="hint">Se guardan en minúsculas y sin repetir. Salen en la tarjeta del
+         artículo y como <code>keywords</code> en los datos estructurados.</p>
+    </div>
+    <div>
+      <label for="published_at">Fecha de publicación</label>
+      <input type="datetime-local" id="published_at" name="published_at"
+             value="<?= e($p['published_at']) ?>">
+      <p class="hint">Es la fecha que se muestra y la que ve Google. Puedes fecharla
+         hacia atrás; no tiene por qué coincidir con cuándo creaste el borrador.</p>
     </div>
   </div>
 

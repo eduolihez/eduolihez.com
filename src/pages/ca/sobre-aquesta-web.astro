@@ -1,14 +1,18 @@
 ---
 /**
- * sobre-aquesta-web.astro - Explicació tècnica de la web en CATALÀ.
- * Descriu els pilars de seguretat, SEO local, optimització per a IAs i rendiment.
+ * /ca/sobre-aquesta-web/ — Com esta construit aquest web (CATALA).
+ *
+ * No es una pagina de maqueting: descriu els controls concrets que porta el
+ * lloc i per que hi son. El contingut tecnic viu a src/data/about-tech.ts,
+ * compartit amb les versions en castella i angles.
  */
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import Icon from '../../components/Icon.astro';
+import AboutTech from '../../components/AboutTech.astro';
 
 const lang = 'ca';
-const title = 'Rerefons Tècnic i Seguretat | Eduardo Olivares';
-const description = 'Detalls tècnics de ciberseguretat (Blue Team), optimització SEO local, integració d\'IA i rendiment del portafoli.';
+const title = 'Com està construït aquest web | Eduardo Olivares';
+const description =
+  "Arquitectura, controls de seguretat i decisions tècniques del portfolio: CSP amb hash per build, enduriment del panell PHP, analítica pròpia sense galetes i SEO estructurat.";
 
 /** Aquesta mateixa pagina en els altres dos idiomes (per als hreflang). */
 const alternates = {
@@ -16,125 +20,52 @@ const alternates = {
   en: '/en/about-this-website/',
   ca: '/ca/sobre-aquesta-web/',
 };
+
+const labels = {
+  stackTitle: 'Resum del stack',
+  sourceNote:
+    "Cada punt d'aquesta pàgina correspon a codi que pots obrir al repositori. Si trobes res que no quadri, el canal per avisar-me és a /.well-known/security.txt",
+  metricsTitle: 'Mètriques de rendiment (PageSpeed Insights)',
+  metricsNote:
+    '* Mesura sobre el servidor de producció de CDMON amb HTTPS i TLS actius. És una foto d\'un moment concret, no una garantia permanent: comprova-ho tu mateix si t\'interessa.',
+  metrics: ['Rendiment', 'Accessibilitat', 'Bones pràctiques', 'SEO'],
+  ctaCode: 'Veure el codi a GitHub',
+  ctaContact: "Parlar-ne",
+};
 ---
 
-<BaseLayout title={title} description={description} lang={lang} path="/ca/sobre-aquesta-web/" withFaq={false} alternates={alternates} breadcrumbName="Sobre aquesta web">
-  <section class="py-20 sm:py-28 border-b border-bg-border">
+<BaseLayout
+  title={title}
+  description={description}
+  lang={lang}
+  path="/ca/sobre-aquesta-web/"
+  withFaq={false}
+  alternates={alternates}
+  breadcrumbName="Sobre aquesta web"
+>
+  <section class="border-b border-bg-border py-20 sm:py-28">
     <div class="container-page max-w-4xl">
-      <!-- Back button -->
-      <a href="/ca/" class="inline-flex items-center gap-2 text-xs font-mono text-text-muted hover:text-accent transition mb-8 group">
+      <a
+        href="/ca/"
+        class="group mb-8 inline-flex items-center gap-2 font-mono text-xs text-text-muted transition hover:text-accent"
+      >
         <span class="transition-transform group-hover:-translate-x-1">&larr;</span> Tornar a l'inici
       </a>
 
-      <!-- Header -->
-      <div class="reveal mb-16">
+      <div class="reveal mb-14">
         <p class="section-kicker">00 / Arquitectura</p>
-        <h1 class="text-3xl sm:text-5xl font-bold tracking-tight text-text mb-4">
-          Detalls Tècnics & Seguretat
+        <h1 class="mb-4 text-3xl font-bold tracking-tight text-text sm:text-5xl">
+          Com està construït aquest web
         </h1>
-        <p class="text-text-muted text-base sm:text-lg leading-relaxed max-w-2xl">
-          Aquesta plataforma ha estat dissenyada sota un enfocament de minimalisme tècnic, seguretat endurida i alta visibilitat local per a motors de cerca i agents d'IA.
+        <p class="max-w-2xl text-base leading-relaxed text-text-muted sm:text-lg">
+          Treballo en un SOC, així que aquest web és també una declaració d'intencions: si no fos
+          capaç d'assegurar el meu propi lloc, poc tindria a aportar assegurant el de ningú. A sota
+          hi ha les decisions que hi ha al darrere i el motiu de cadascuna, no una llista de
+          tecnologies.
         </p>
       </div>
 
-      <!-- Core Pillars Grid -->
-      <div class="grid gap-6 md:grid-cols-3 mb-16">
-        <!-- Security Card -->
-        <div class="reveal border border-bg-border bg-bg-card rounded-xl p-6 transition hover:border-text-faint/30">
-          <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10 border border-accent/20 text-accent mb-4">
-            <Icon name="shield" class="h-5 w-5" />
-          </div>
-          <h3 class="font-mono text-sm font-semibold text-text uppercase tracking-wider mb-3">01 / Seguretat</h3>
-          <ul class="space-y-2 text-xs text-text-muted leading-relaxed">
-            <li><strong class="text-text">CSP Estricta:</strong> Directiva Content-Security-Policy estricta que inhabilita injeccions de codi (XSS).</li>
-            <li><strong class="text-text">Privadesa (GDPR):</strong> Registre propi de visites que anonimitza les adreces IP mitjançant SHA-256 amb sal criptogràfica dinàmica.</li>
-            <li><strong class="text-text">Anti-Força Bruta:</strong> Bloqueig de login del panell administratiu per IP i rate-limiters integrats.</li>
-            <li><strong class="text-text">Sessions segures:</strong> Paràmetres de cookies HttpOnly, Secure i SameSite=Lax.</li>
-          </ul>
-        </div>
-
-        <!-- SEO Card -->
-        <div class="reveal border border-bg-border bg-bg-card rounded-xl p-6 transition hover:border-text-faint/30">
-          <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-cyan/10 border border-cyan/20 text-cyan mb-4">
-            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-            </svg>
-          </div>
-          <h3 class="font-mono text-sm font-semibold text-text uppercase tracking-wider mb-3">02 / SEO & IAs</h3>
-          <ul class="space-y-2 text-xs text-text-muted leading-relaxed">
-            <li><strong class="text-text">Graf Schema:</strong> Dades estructurades JSON-LD que enllacen de forma relacional Person, WebSite i FAQPage.</li>
-            <li><strong class="text-text">Local SEO:</strong> Coordenades exactes, etiquetes de regió i indexació en català de Badalona i Barcelona.</li>
-            <li><strong class="text-text">Optimitització IA:</strong> Resum en text pla a <code class="bg-bg-soft px-1 rounded">/llms.txt</code> dissenyat per a bots d'IA.</li>
-            <li><strong class="text-text">Multiidioma:</strong> Etiquetes hreflang creuades en el sitemap i capçaleres HTML.</li>
-          </ul>
-        </div>
-
-        <!-- Architecture Card -->
-        <div class="reveal border border-bg-border bg-bg-card rounded-xl p-6 transition hover:border-text-faint/30">
-          <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-violet/10 border border-violet/20 text-violet mb-4">
-            <Icon name="code" class="h-5 w-5" />
-          </div>
-          <h3 class="font-mono text-sm font-semibold text-text uppercase tracking-wider mb-3">03 / Arquitectura</h3>
-          <ul class="space-y-2 text-xs text-text-muted leading-relaxed">
-            <li><strong class="text-text">Estàtic Zero-JS:</strong> Compilat amb Astro, eliminant la sobrecàrrega de llibreries en client (React/Vue).</li>
-            <li><strong class="text-text">Backend Lleuger:</strong> Nucli dinàmic en PHP 8 natiu i base de dades MySQL per a APIs internes.</li>
-            <li><strong class="text-text">Zero CDN:</strong> Tots els assets, fonts i scripts estan autoallotjats al propi servidor.</li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- Performance PageSpeed Block -->
-      <div class="reveal border border-bg-border bg-bg-card rounded-xl p-8 mb-16">
-        <h3 class="font-mono text-sm font-semibold text-text uppercase tracking-wider mb-6 text-center">
-          Mètriques de Rendiment (PageSpeed Insights)
-        </h3>
-        
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
-          <div class="flex flex-col items-center">
-            <div class="relative flex items-center justify-center h-20 w-20 rounded-full border-4 border-accent text-accent font-mono text-xl font-bold shadow-[0_0_15px_rgba(74,222,128,0.2)]">
-              100
-            </div>
-            <span class="mt-2 text-xs text-text font-medium">Rendiment</span>
-          </div>
-
-          <div class="flex flex-col items-center">
-            <div class="relative flex items-center justify-center h-20 w-20 rounded-full border-4 border-accent text-accent font-mono text-xl font-bold shadow-[0_0_15px_rgba(74,222,128,0.2)]">
-              100
-            </div>
-            <span class="mt-2 text-xs text-text font-medium">Accessibilitat</span>
-          </div>
-
-          <div class="flex flex-col items-center">
-            <div class="relative flex items-center justify-center h-20 w-20 rounded-full border-4 border-accent text-accent font-mono text-xl font-bold shadow-[0_0_15px_rgba(74,222,128,0.2)]">
-              100
-            </div>
-            <span class="mt-2 text-xs text-text font-medium">Bones Pràctiques</span>
-          </div>
-
-          <div class="flex flex-col items-center">
-            <div class="relative flex items-center justify-center h-20 w-20 rounded-full border-4 border-accent text-accent font-mono text-xl font-bold shadow-[0_0_15px_rgba(74,222,128,0.2)]">
-              100
-            </div>
-            <span class="mt-2 text-xs text-text font-medium">SEO</span>
-          </div>
-        </div>
-
-        <p class="text-center text-[11px] text-text-faint mt-6">
-          * Auditories mesurades directament en servidor de producció de CDMON amb HTTPS i TLS actiu.
-        </p>
-      </div>
-
-      <!-- Action Footer Buttons -->
-      <div class="reveal flex flex-col sm:flex-row items-center justify-center gap-4">
-        <a href="https://github.com/eduolihez" target="_blank" rel="noopener noreferrer" class="btn-primary flex items-center gap-2 text-xs font-semibold w-full sm:w-auto justify-center">
-          <Icon name="github" class="h-4 w-4" />
-          Veure codi a GitHub
-        </a>
-        <a href="/ca/#contacto" class="btn-ghost flex items-center gap-2 text-xs font-semibold w-full sm:w-auto justify-center">
-          <Icon name="mail" class="h-4 w-4" />
-          Contactar per a detalls
-        </a>
-      </div>
+      <AboutTech lang={lang} labels={labels} contactHref="/ca/#contacto" />
     </div>
   </section>
 </BaseLayout>

@@ -252,6 +252,17 @@ const labels = {
     }
 
     /**
+     * Sube la vista a la cabecera de la seccion al entrar o salir de un emisor.
+     * Respeta a quien pide menos animacion en el sistema.
+     */
+    function revealSection() {
+      const section = document.getElementById('certificaciones');
+      if (!section) return;
+      const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+      section.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+    }
+
+    /**
      * Color estable por emisor. Antes el hueco del logo mostraba la primera
      * LETRA del emisor, que quedaba pobre y no distinguia nada. Ahora se usa
      * siempre el mismo sello de credencial, y lo que cambia es el color: son
@@ -384,10 +395,32 @@ const labels = {
       });
     }
 
+    /**
+     * Mantiene la barra de categorias en sintonia con lo que se esta viendo.
+     *
+     * Al abrir un emisor NO hay ninguna categoria activa: se esta filtrando por
+     * emisor, no por tema. Antes "Todas" se quedaba resaltada mientras la
+     * rejilla mostraba solo Trend Micro, asi que la barra decia una cosa y el
+     * contenido otra.
+     */
+    function syncFilterButtons() {
+      filterButtons.forEach((b) => {
+        const on = !activeIssuer && b.dataset.filter === activeFilter;
+        b.classList.toggle('is-active', on);
+        if (on) {
+          b.setAttribute('aria-pressed', 'true');
+        } else {
+          b.removeAttribute('aria-pressed');
+        }
+      });
+    }
+
     function render() {
       grid.innerHTML = '';
       const filtered = getFiltered();
       animateCounter(filtered.length);
+
+      syncFilterButtons();
 
       // Migas visibles solo dentro de un emisor.
       if (breadcrumb) {
@@ -483,6 +516,9 @@ const labels = {
         activeIssuer = issuer;
         limit = 12;
         render();
+        // Al entrar desde una tarjeta del final de la rejilla, la lista nueva
+        // se pintaba fuera de la pantalla y parecia que no hubiera pasado nada.
+        revealSection();
         // Devuelve el foco al principio de la lista para quien navega con teclado.
         grid.querySelector('a, button')?.focus({ preventScroll: true });
       });
@@ -588,16 +624,10 @@ const labels = {
 
     filterButtons.forEach((btn) => {
       btn.addEventListener('click', () => {
-        filterButtons.forEach((b) => {
-          b.classList.remove('is-active');
-          b.removeAttribute('aria-pressed');
-        });
-        btn.classList.add('is-active');
-        btn.setAttribute('aria-pressed', 'true');
         activeFilter = btn.dataset.filter;
         activeIssuer = null;
         limit = 12;
-        render();
+        render(); // render() ya deja la barra de categorias sincronizada
       });
     });
 
@@ -605,10 +635,11 @@ const labels = {
       activeIssuer = null;
       limit = 12;
       render();
+      revealSection();
     });
 
     loadMoreBtn?.addEventListener('click', () => {
-      limit = 1299;
+      limit = Infinity; // antes 1299: un tope arbitrario que se quedaria corto
       render();
     });
 

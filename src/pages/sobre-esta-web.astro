@@ -1,14 +1,18 @@
 ---
 /**
- * sobre-esta-web.astro - Explicación técnica de la web en ESPAÑOL.
- * Describe los pilares de seguridad, SEO local, optimización para IAs y rendimiento.
+ * /sobre-esta-web/ — Como esta construida esta web (ESPANOL).
+ *
+ * No es una pagina de marketing: describe los controles concretos que lleva el
+ * sitio y por que estan. El contenido tecnico vive en src/data/about-tech.ts,
+ * compartido con las versiones en ingles y catalan.
  */
 import BaseLayout from '../layouts/BaseLayout.astro';
-import Icon from '../components/Icon.astro';
+import AboutTech from '../components/AboutTech.astro';
 
 const lang = 'es';
-const title = 'Transfondo Técnico y Seguridad | Eduardo Olivares';
-const description = 'Detalles técnicos de ciberseguridad (Blue Team), optimización SEO local, integración de IA y rendimiento del portafolio.';
+const title = 'Cómo está construida esta web | Eduardo Olivares';
+const description =
+  'Arquitectura, controles de seguridad y decisiones técnicas del portfolio: CSP con hashes por build, endurecimiento del panel PHP, analítica propia sin cookies y SEO estructurado.';
 
 /** Esta misma página en los otros dos idiomas (para los hreflang). */
 const alternates = {
@@ -16,125 +20,52 @@ const alternates = {
   en: '/en/about-this-website/',
   ca: '/ca/sobre-aquesta-web/',
 };
+
+const labels = {
+  stackTitle: 'Resumen del stack',
+  sourceNote:
+    'Cada punto de esta página corresponde a código que puedes abrir en el repositorio. Si encuentras algo que no cuadra, el canal para avisarme está en /.well-known/security.txt',
+  metricsTitle: 'Métricas de rendimiento (PageSpeed Insights)',
+  metricsNote:
+    '* Medición sobre el servidor de producción de CDMON con HTTPS y TLS activos. Es una foto de un momento concreto, no una garantía permanente: compruébalo tú mismo si te interesa.',
+  metrics: ['Rendimiento', 'Accesibilidad', 'Buenas prácticas', 'SEO'],
+  ctaCode: 'Ver el código en GitHub',
+  ctaContact: 'Hablar de esto',
+};
 ---
 
-<BaseLayout title={title} description={description} lang={lang} path="/sobre-esta-web/" withFaq={false} alternates={alternates} breadcrumbName="Sobre esta web">
-  <section class="py-20 sm:py-28 border-b border-bg-border">
+<BaseLayout
+  title={title}
+  description={description}
+  lang={lang}
+  path="/sobre-esta-web/"
+  withFaq={false}
+  alternates={alternates}
+  breadcrumbName="Sobre esta web"
+>
+  <section class="border-b border-bg-border py-20 sm:py-28">
     <div class="container-page max-w-4xl">
-      <!-- Back button -->
-      <a href="/" class="inline-flex items-center gap-2 text-xs font-mono text-text-muted hover:text-accent transition mb-8 group">
+      <a
+        href="/"
+        class="group mb-8 inline-flex items-center gap-2 font-mono text-xs text-text-muted transition hover:text-accent"
+      >
         <span class="transition-transform group-hover:-translate-x-1">&larr;</span> Volver al inicio
       </a>
 
-      <!-- Header -->
-      <div class="reveal mb-16">
+      <div class="reveal mb-14">
         <p class="section-kicker">00 / Arquitectura</p>
-        <h1 class="text-3xl sm:text-5xl font-bold tracking-tight text-text mb-4">
-          Detalles Técnicos & Seguridad
+        <h1 class="mb-4 text-3xl font-bold tracking-tight text-text sm:text-5xl">
+          Cómo está construida esta web
         </h1>
-        <p class="text-text-muted text-base sm:text-lg leading-relaxed max-w-2xl">
-          Esta plataforma ha sido diseñada bajo un enfoque de minimalismo técnico, seguridad endurecida y visibilidad local para motores de búsqueda y agentes de IA.
+        <p class="max-w-2xl text-base leading-relaxed text-text-muted sm:text-lg">
+          Trabajo en un SOC, así que esta web es también una declaración de intenciones: si no
+          fuera capaz de asegurar mi propio sitio, poco tendría que aportar asegurando el de nadie.
+          Abajo están las decisiones que hay detrás y el motivo de cada una, no una lista de
+          tecnologías.
         </p>
       </div>
 
-      <!-- Core Pillars Grid -->
-      <div class="grid gap-6 md:grid-cols-3 mb-16">
-        <!-- Security Card -->
-        <div class="reveal border border-bg-border bg-bg-card rounded-xl p-6 transition hover:border-text-faint/30">
-          <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10 border border-accent/20 text-accent mb-4">
-            <Icon name="shield" class="h-5 w-5" />
-          </div>
-          <h3 class="font-mono text-sm font-semibold text-text uppercase tracking-wider mb-3">01 / Seguridad</h3>
-          <ul class="space-y-2 text-xs text-text-muted leading-relaxed">
-            <li><strong class="text-text">CSP Estricta:</strong> Directiva Content-Security-Policy estricta que inhabilita inyecciones de código (XSS).</li>
-            <li><strong class="text-text">Privacidad (GDPR):</strong> Registro propio de visitas que anonimiza las direcciones IP usando SHA-256 más una sal criptográfica dinámica.</li>
-            <li><strong class="text-text">Anti-Fuerza Bruta:</strong> Bloqueo de login del panel administrativo por IP y rate-limiters integrados.</li>
-            <li><strong class="text-text">Sesiones seguras:</strong> Cookies HttpOnly, Secure y SameSite=Lax.</li>
-          </ul>
-        </div>
-
-        <!-- SEO Card -->
-        <div class="reveal border border-bg-border bg-bg-card rounded-xl p-6 transition hover:border-text-faint/30">
-          <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-cyan/10 border border-cyan/20 text-cyan mb-4">
-            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-            </svg>
-          </div>
-          <h3 class="font-mono text-sm font-semibold text-text uppercase tracking-wider mb-3">02 / SEO & IAs</h3>
-          <ul class="space-y-2 text-xs text-text-muted leading-relaxed">
-            <li><strong class="text-text">Grafo Schema:</strong> Datos estructurados JSON-LD que enlazan de forma relacional Person, WebSite y FAQPage.</li>
-            <li><strong class="text-text">Local SEO:</strong> Coordenadas exactas, etiquetas de región e inclusión de Badalona y Barcelona en títulos principales.</li>
-            <li><strong class="text-text">Entonación IA:</strong> Feed de datos en texto plano mediante <code class="bg-bg-soft px-1 rounded">/llms.txt</code> optimizado para crawlers de IA.</li>
-            <li><strong class="text-text">Multiidioma:</strong> Etiquetas hreflang cruzadas en el sitemap y en los encabezados.</li>
-          </ul>
-        </div>
-
-        <!-- Architecture Card -->
-        <div class="reveal border border-bg-border bg-bg-card rounded-xl p-6 transition hover:border-text-faint/30">
-          <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-violet/10 border border-violet/20 text-violet mb-4">
-            <Icon name="code" class="h-5 w-5" />
-          </div>
-          <h3 class="font-mono text-sm font-semibold text-text uppercase tracking-wider mb-3">03 / Arquitectura</h3>
-          <ul class="space-y-2 text-xs text-text-muted leading-relaxed">
-            <li><strong class="text-text">Estático Zero-JS:</strong> Compilado con Astro, eliminando la carga de librerías en cliente (React/Vue) para mayor velocidad.</li>
-            <li><strong class="text-text">Backend Liviano:</strong> Núcleo dinámico en PHP 8 nativo y base de datos MySQL para APIs internas de proyectos, mensajes y ajustes.</li>
-            <li><strong class="text-text">Cero CDN:</strong> Todos los assets y fuentes están autoalojados localmente en el servidor para evitar llamadas externas.</li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- Performance PageSpeed Block -->
-      <div class="reveal border border-bg-border bg-bg-card rounded-xl p-8 mb-16">
-        <h3 class="font-mono text-sm font-semibold text-text uppercase tracking-wider mb-6 text-center">
-          Métricas de Rendimiento (PageSpeed Insights)
-        </h3>
-        
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
-          <div class="flex flex-col items-center">
-            <div class="relative flex items-center justify-center h-20 w-20 rounded-full border-4 border-accent text-accent font-mono text-xl font-bold shadow-[0_0_15px_rgba(74,222,128,0.2)]">
-              100
-            </div>
-            <span class="mt-2 text-xs text-text font-medium">Rendimiento</span>
-          </div>
-
-          <div class="flex flex-col items-center">
-            <div class="relative flex items-center justify-center h-20 w-20 rounded-full border-4 border-accent text-accent font-mono text-xl font-bold shadow-[0_0_15px_rgba(74,222,128,0.2)]">
-              100
-            </div>
-            <span class="mt-2 text-xs text-text font-medium">Accesibilidad</span>
-          </div>
-
-          <div class="flex flex-col items-center">
-            <div class="relative flex items-center justify-center h-20 w-20 rounded-full border-4 border-accent text-accent font-mono text-xl font-bold shadow-[0_0_15px_rgba(74,222,128,0.2)]">
-              100
-            </div>
-            <span class="mt-2 text-xs text-text font-medium">Buenas Prácticas</span>
-          </div>
-
-          <div class="flex flex-col items-center">
-            <div class="relative flex items-center justify-center h-20 w-20 rounded-full border-4 border-accent text-accent font-mono text-xl font-bold shadow-[0_0_15px_rgba(74,222,128,0.2)]">
-              100
-            </div>
-            <span class="mt-2 text-xs text-text font-medium">SEO</span>
-          </div>
-        </div>
-
-        <p class="text-center text-[11px] text-text-faint mt-6">
-          * Valores de auditoría medidos directamente bajo servidor de producción de CDMON con HTTPS y cifrado TLS activo.
-        </p>
-      </div>
-
-      <!-- Action Footer Buttons -->
-      <div class="reveal flex flex-col sm:flex-row items-center justify-center gap-4">
-        <a href="https://github.com/eduolihez" target="_blank" rel="noopener noreferrer" class="btn-primary flex items-center gap-2 text-xs font-semibold w-full sm:w-auto justify-center">
-          <Icon name="github" class="h-4 w-4" />
-          Ver código en GitHub
-        </a>
-        <a href="/#contacto" class="btn-ghost flex items-center gap-2 text-xs font-semibold w-full sm:w-auto justify-center">
-          <Icon name="mail" class="h-4 w-4" />
-          Contactar para detalles
-        </a>
-      </div>
+      <AboutTech lang={lang} labels={labels} contactHref="/#contacto" />
     </div>
   </section>
 </BaseLayout>

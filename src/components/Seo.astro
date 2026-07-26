@@ -202,6 +202,20 @@ const person = {
     skills: SITE.knowsAbout.join(', '),
   },
   hasOccupationalExperience: jobRoles,
+  /**
+   * Certificaciones como credenciales formales. Google y los asistentes tratan
+   * hasCredential como un dato verificable de cualificacion, no como texto
+   * suelto: es la diferencia entre "dice que tiene certificaciones" y "tiene
+   * estas, emitidas por estos".
+   */
+  hasCredential: SITE.credentials.map((c) => ({
+    '@type': 'EducationalOccupationalCredential',
+    name: c.name,
+    credentialCategory: 'certificate',
+    recognizedBy: { '@type': 'Organization', name: c.issuer },
+    dateCreated: c.year,
+  })),
+  award: SITE.awards.map((a) => a.name),
   sameAs: [SITE.social.linkedin, SITE.social.github],
 };
 

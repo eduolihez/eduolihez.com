@@ -74,6 +74,44 @@ export const SITE = {
     { code: 'en', name: 'Ingles', level: 'B2' },
   ],
 
+  /**
+   * Certificaciones DESTACADAS.
+   *
+   * El listado completo y verificable vive en la base de datos y se pinta en
+   * /#certificaciones. Estas son las de mas peso, y estan aqui porque las
+   * necesitan dos consumidores que no pueden leer la base de datos al compilar:
+   * el bloque hasCredential de Schema.org y el resumen de /llms.txt.
+   *
+   * Manten la lista CORTA. Su valor es decir "esto es lo importante"; si crece
+   * hasta replicar la tabla entera, deja de responder a esa pregunta.
+   */
+  credentials: [
+    { name: 'Fortinet NSE', issuer: 'Fortinet', year: '2026' },
+    { name: 'Microsoft Certified: Azure AI Fundamentals', issuer: 'Microsoft', year: '2026' },
+    {
+      name: 'Trend Micro Vision One Platform — Advanced',
+      issuer: 'Trend Micro',
+      year: '2024',
+    },
+    { name: 'TryHackMe Pre-Security', issuer: 'TryHackMe', year: '2023' },
+    {
+      name: 'Fundamentos profesionales en ciberseguridad',
+      issuer: 'Microsoft / LinkedIn',
+      year: '2023',
+    },
+    { name: 'First Certificate in English (B2)', issuer: 'Cambridge English', year: '2021' },
+  ],
+
+  /** Reconocimientos. Alimentan la propiedad `award` de Schema.org. */
+  awards: [
+    {
+      name: 'Ganador de la 8a Hackathon TecnoCampus',
+      year: '2025',
+      description:
+        'Primer premio con Dewi, un prototipo web para monitorizar el consumo de agua en tiempo real.',
+    },
+  ],
+
   // Foto de perfil y CV (colocados en /public, se sirven desde la raiz).
   avatar: '/img/eduardo.webp',
   // Portada para redes (1200x630). Se genera un placeholder con `npm run icons`

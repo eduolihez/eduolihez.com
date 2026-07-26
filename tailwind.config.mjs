@@ -20,6 +20,16 @@ export default {
           soft: '#134e2a', // fondo tenue para badges
           cyan: '#22d3ee', // acento secundario
         },
+        // Acentos sueltos para diferenciar bloques en "Sobre esta web".
+        // Tailwind trae escalas `cyan-500`/`violet-500`, pero NO un valor sin
+        // numero: `text-cyan` y `text-violet` no existian y esos iconos se
+        // quedaban sin color. Aqui se define el tono por defecto que faltaba.
+        cyan: {
+          DEFAULT: '#22d3ee',
+        },
+        violet: {
+          DEFAULT: '#a78bfa',
+        },
         text: {
           DEFAULT: '#e6edf3', // texto principal
           title: '#f0f3f6', // titulares (un punto por encima del cuerpo)

@@ -1,0 +1,25 @@
+# ===========================================================================
+#  Configuracion del selector de issues.
+#
+#  blank_issues_enabled: false obliga a pasar por una plantilla. No es por
+#  burocracia: sin esto, el camino mas corto para quien encuentra un fallo de
+#  SEGURIDAD es abrir una issue en blanco, que es publica desde el primer
+#  segundo. Los enlaces de abajo salen ANTES que las plantillas y llevan al
+#  canal privado.
+# ===========================================================================
+blank_issues_enabled: false
+
+contact_links:
+  - name: Reportar una vulnerabilidad (privado)
+    url: https://github.com/eduolihez/eduolihez.com/security/advisories/new
+    about: >-
+      Para fallos de seguridad, usa SIEMPRE este canal y no una issue publica.
+      El aviso queda visible solo para ti y para mi hasta que haya arreglo.
+
+  - name: Politica de divulgacion (security.txt)
+    url: https://eduolihez.com/.well-known/security.txt
+    about: Contacto, idiomas y alcance segun la RFC 9116.
+
+  - name: Contacto general
+    url: https://eduolihez.com/#contacto
+    about: Dudas, propuestas o cualquier cosa que no sea un fallo del codigo.

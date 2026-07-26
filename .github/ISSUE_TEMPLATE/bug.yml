@@ -1,0 +1,63 @@
+name: Fallo en la web
+description: Algo no funciona como deberia en eduolihez.com
+labels: ['bug']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Gracias por avisar.
+
+        **Si lo que has encontrado es un fallo de seguridad, cierra esto y usa
+        el aviso privado.** Una issue es publica en cuanto se envia, y eso
+        expone el problema antes de que exista arreglo:
+        https://github.com/eduolihez/eduolihez.com/security/advisories/new
+
+  - type: textarea
+    id: que-pasa
+    attributes:
+      label: Que ocurre
+      description: Que has visto, y que esperabas ver en su lugar.
+      placeholder: Al abrir /blog/ la lista se queda cargando y no aparece nada.
+    validations:
+      required: true
+
+  - type: input
+    id: url
+    attributes:
+      label: URL
+      description: La direccion exacta donde pasa, con el idioma incluido.
+      placeholder: https://eduolihez.com/ca/blog/
+    validations:
+      required: true
+
+  - type: textarea
+    id: pasos
+    attributes:
+      label: Como reproducirlo
+      description: Los pasos minimos para llegar al fallo.
+      placeholder: |
+        1. Abrir la URL de arriba
+        2. Esperar a que cargue
+        3. La rejilla se queda vacia
+    validations:
+      required: false
+
+  - type: input
+    id: entorno
+    attributes:
+      label: Navegador y sistema
+      placeholder: Firefox 141 en Windows 11 / Safari en iOS 18
+    validations:
+      required: false
+
+  - type: textarea
+    id: consola
+    attributes:
+      label: Errores de la consola
+      description: >-
+        Si sabes abrir las herramientas de desarrollo (F12), pega aqui lo que
+        aparezca en rojo en la pestana Consola. Se formatea solo, no hace falta
+        que anadas nada.
+      render: text
+    validations:
+      required: false

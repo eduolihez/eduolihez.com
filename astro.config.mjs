@@ -1,6 +1,5 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
-import tailwind from '@astrojs/tailwind';
 
 // https://astro.build/config
 export default defineConfig({
@@ -22,7 +21,8 @@ export default defineConfig({
     },
   },
 
-  integrations: [tailwind()],
+  // Tailwind se engancha por PostCSS (ver postcss.config.mjs), no por una
+  // integracion: @astrojs/tailwind se quedo en Astro 5 y rompia npm install.
 
   // CSP estricta: Astro calcula automaticamente los hashes de los scripts
   // (en linea y externos) en cada build y genera la <meta> CSP. Asi tenemos

@@ -1,8 +1,85 @@
 /* ==========================================================================
    Estilos globales — estetica minimalista, tema oscuro.
    Tailwind aporta el grueso de los estilos (clases utilitarias en los .astro).
-   Aqui: fuentes (solo subset latino), base, reveal on scroll, modal e impresion.
+   Aqui: tema (@theme), fuentes (solo subset latino), base, reveal on scroll,
+   modal e impresion.
+
+   TAILWIND 4: la configuracion ya no vive en tailwind.config.mjs sino en el
+   bloque @theme de este mismo archivo, y el motor entra como plugin de Vite
+   (ver astro.config.mjs). Cada token de @theme se publica ademas como variable
+   CSS en :root, asi que se puede usar `var(--color-accent)` desde cualquier
+   <style> de un .astro sin necesidad de la antigua funcion theme().
    ========================================================================== */
+
+/* `source(none)` desactiva el escaneo automatico de v4 y lo acotamos a mano a
+   /src. Sin esto Tailwind rastrearia tambien /public, donde vive el HTML de
+   PromptMaster, que tiene su propia hoja compilada aparte (npm run
+   css:promptmaster) y meteria clases ajenas en el CSS del sitio. */
+@import 'tailwindcss' source(none);
+@source '../**/*.{astro,html,js,jsx,ts,tsx,md,mdx}';
+
+/* El sitio es oscuro por defecto (clase "dark" en <html>). Equivale al
+   `darkMode: 'class'` de la configuracion antigua. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* --- Paleta ---------------------------------------------------------
+     Oscura y minimalista, orientada a ciberseguridad: acento verde/cian
+     "terminal" sobre fondo casi negro. */
+  --color-bg: #0a0e14; /* fondo principal */
+  --color-bg-soft: #0f141c; /* fondo de secciones alternas */
+  --color-bg-card: #141a24; /* tarjetas */
+  --color-bg-border: #1f2733; /* bordes sutiles */
+  --color-bg-border-hover: #2b3543; /* borde al pasar el raton por una tarjeta */
+
+  --color-accent: #4ade80; /* verde principal (CTA, enlaces) */
+  --color-accent-hover: #22c55e;
+  --color-accent-soft: #134e2a; /* fondo tenue para badges */
+  --color-accent-cyan: #22d3ee; /* acento secundario */
+
+  /* Acentos sueltos para diferenciar bloques en "Sobre esta web".
+     Tailwind trae las escalas `cyan-500`/`violet-500`, pero no un valor sin
+     numero: `text-cyan` y `text-violet` no existirian sin estas dos lineas. */
+  --color-cyan: #22d3ee;
+  --color-violet: #a78bfa;
+
+  --color-text: #e6edf3; /* texto principal */
+  --color-text-title: #f0f3f6; /* titulares (un punto por encima del cuerpo) */
+  --color-text-muted: #9aa7b8; /* texto secundario */
+  --color-text-faint: #6b7688; /* texto terciario / metadatos */
+
+  /* --- Tipografia ----------------------------------------------------- */
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Ancho maximo del contenido (~1152px) -> clase `max-w-content`. */
+  --container-content: 72rem;
+
+  /* --- Animaciones ---------------------------------------------------- */
+  --animate-fade-up: fade-up 0.6s ease-out both;
+  --animate-pulse-dot: pulse-dot 2s ease-in-out infinite;
+
+  @keyframes fade-up {
+    0% {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes pulse-dot {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.4;
+    }
+  }
+}
 
 /* --- Fuentes self-hosted: SOLO subconjuntos latin y latin-ext (B3) ---
    Declaramos las @font-face a mano para no arrastrar cirilico/griego/vietnamita.
@@ -52,10 +129,6 @@
     U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 @layer base {
   html {
     scroll-behavior: smooth;
@@ -66,6 +139,14 @@
   body {
     @apply bg-bg text-text font-sans antialiased;
     text-rendering: optimizeLegibility;
+  }
+
+  /* Preflight de Tailwind 4 deja los botones con el cursor por defecto (v3
+     forzaba `pointer`). Lo restauramos para no perder la senal de "esto se
+     puede pulsar" en cada boton del sitio. */
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -82,7 +163,7 @@
   }
 
   :focus-visible {
-    @apply outline-none ring-2 ring-accent ring-offset-2 ring-offset-bg;
+    @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-bg;
   }
 
   ::-webkit-scrollbar {
@@ -90,19 +171,19 @@
     height: 10px;
   }
   ::-webkit-scrollbar-track {
-    background: #0a0e14;
+    background: var(--color-bg);
   }
   ::-webkit-scrollbar-thumb {
-    background: #1f2733;
+    background: var(--color-bg-border);
     border-radius: 6px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #2b3543;
+    background: var(--color-bg-border-hover);
   }
 
   ::selection {
-    background: rgba(74, 222, 128, 0.22);
-    color: #e6edf3;
+    background: rgb(74 222 128 / 0.22);
+    color: var(--color-text);
   }
 }
 
@@ -139,7 +220,7 @@
 
   /* Chip para tecnologias (mas sobrio). */
   .badge {
-    @apply inline-flex items-center rounded border border-bg-border px-2 py-0.5
+    @apply inline-flex items-center rounded-sm border border-bg-border px-2 py-0.5
            font-mono text-xs text-text-muted;
   }
 
@@ -177,8 +258,11 @@
 
   /* Degradado sutil superior del hero (sustituye a la rejilla marcada). */
   .hero-fade {
-    background:
-      radial-gradient(60% 50% at 50% 0%, rgba(74, 222, 128, 0.06), transparent 70%);
+    background: radial-gradient(
+      60% 50% at 50% 0%,
+      rgb(74 222 128 / 0.06),
+      transparent 70%
+    );
   }
 }
 
@@ -191,7 +275,7 @@
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  background: rgba(3, 5, 8, 0.7);
+  background: rgb(3 5 8 / 0.7);
   backdrop-filter: blur(4px);
   opacity: 0;
   transition: opacity 0.2s ease;
@@ -258,14 +342,14 @@
   margin-bottom: 1rem;
   font-size: 1.5rem;
   font-weight: 700;
-  color: theme('colors.text.title');
+  color: var(--color-text-title);
 }
 .prose h3 {
   margin-top: 1.5rem;
   margin-bottom: 0.75rem;
   font-size: 1.2rem;
   font-weight: 600;
-  color: theme('colors.text.title');
+  color: var(--color-text-title);
 }
 .prose p {
   margin-bottom: 1.25rem;
@@ -287,33 +371,33 @@
 .prose code {
   padding: 0.2rem 0.4rem;
   border-radius: 0.25rem;
-  background: theme('colors.bg.card');
-  font-family: theme('fontFamily.mono');
+  background: var(--color-bg-card);
+  font-family: var(--font-mono);
   font-size: 0.9em;
 }
 .prose pre {
   margin-bottom: 1.25rem;
   overflow-x: auto;
   padding: 1rem;
-  border: 1px solid theme('colors.bg.border');
+  border: 1px solid var(--color-bg-border);
   border-radius: 0.5rem;
-  background: theme('colors.bg.card');
+  background: var(--color-bg-card);
 }
 .prose pre code {
   padding: 0;
   background: transparent;
 }
 .prose a {
-  color: theme('colors.accent.DEFAULT');
+  color: var(--color-accent);
   text-decoration: underline;
 }
 .prose a:hover {
-  color: theme('colors.accent.hover');
+  color: var(--color-accent-hover);
 }
 .prose blockquote {
   margin-bottom: 1.25rem;
   padding-left: 1rem;
-  border-left: 2px solid theme('colors.bg.border');
-  color: theme('colors.text.muted');
+  border-left: 2px solid var(--color-bg-border);
+  color: var(--color-text-muted);
   font-style: italic;
 }

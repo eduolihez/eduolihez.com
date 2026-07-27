@@ -97,7 +97,7 @@ const labels = {
           type="search"
           id="certs-search"
           aria-label={pick('Buscar certificación', 'Cercar certificació', 'Search certification')}
-          class="w-full rounded-lg border border-bg-border bg-bg-card py-2 pl-9 pr-3 text-sm text-text placeholder-text-muted/60 transition focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+          class="w-full rounded-lg border border-bg-border bg-bg-card py-2 pl-9 pr-3 text-sm text-text placeholder-text-muted/60 transition focus:border-accent focus:outline-hidden focus:ring-1 focus:ring-accent"
           placeholder={pick(
             'Buscar certificación o emisor...',
             'Cercar certificació o emissor...',
@@ -155,7 +155,7 @@ const labels = {
       <button
         id="certs-load-more-btn"
         type="button"
-        class="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-bg-border bg-bg-soft/40 px-4 py-2 text-xs font-semibold text-text-muted shadow-sm transition duration-200 hover:border-accent hover:bg-bg-card hover:text-accent"
+        class="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-bg-border bg-bg-soft/40 px-4 py-2 text-xs font-semibold text-text-muted shadow-xs transition duration-200 hover:border-accent hover:bg-bg-card hover:text-accent"
       >
         <span>{pick('Ver más', 'Veure més', 'Show more')}</span>
         <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -183,29 +183,32 @@ const labels = {
      seis veces en el marcado. Ademas el JS solo tiene que alternar .is-active
      en vez de reescribir el className entero, que era lo que hacia antes y
      borraba de paso los atributos de accesibilidad. */
+  /* Tailwind 4 publica cada token de @theme como variable CSS en :root, asi
+     que aqui basta con var(--color-*). La funcion theme() de v3 ya no aplica
+     en un <style> de Astro: este bloque no importa Tailwind. */
   .cert-filter-btn {
     flex-shrink: 0;
     scroll-snap-align: start;
     border-radius: 0.5rem;
-    border: 1px solid theme('colors.bg.border');
-    background-color: theme('colors.bg.card');
+    border: 1px solid var(--color-bg-border);
+    background-color: var(--color-bg-card);
     padding: 0.5rem 0.75rem;
     font-size: 0.75rem;
     font-weight: 600;
-    color: theme('colors.text.muted');
+    color: var(--color-text-muted);
     cursor: pointer;
     transition: color 0.15s, border-color 0.15s, background-color 0.15s;
     /* 40px de alto minimo: objetivo tactil comodo en movil. */
     min-height: 2.5rem;
   }
   .cert-filter-btn:hover {
-    color: theme('colors.text.DEFAULT');
-    border-color: theme('colors.text.faint');
+    color: var(--color-text);
+    border-color: var(--color-text-faint);
   }
   .cert-filter-btn.is-active {
-    border-color: theme('colors.accent.DEFAULT');
+    border-color: var(--color-accent);
     background-color: rgb(74 222 128 / 0.1);
-    color: theme('colors.accent.DEFAULT');
+    color: var(--color-accent);
   }
   /* Oculta la barra de scroll de los filtros sin impedir el desplazamiento. */
   #certs-filter-container {
@@ -479,7 +482,7 @@ const labels = {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className =
-        'reveal is-visible group flex w-full cursor-pointer items-center gap-3 rounded-lg border border-bg-border bg-bg-card p-4 text-left transition hover:border-accent/40 hover:bg-bg-soft/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent';
+        'reveal is-visible group flex w-full cursor-pointer items-center gap-3 rounded-lg border border-bg-border bg-bg-card p-4 text-left transition hover:border-accent/40 hover:bg-bg-soft/40 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-accent';
       btn.setAttribute('aria-label', `${labels.viewIssuer} ${issuer} (${certs.length})`);
 
       let logo = '';

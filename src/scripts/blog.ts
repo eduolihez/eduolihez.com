@@ -144,7 +144,7 @@ function card(
 
   const article = document.createElement('article');
   article.className =
-    'group reveal flex flex-col overflow-hidden rounded-xl border border-bg-border bg-bg-card shadow-sm transition hover:-translate-y-1 hover:border-bg-border-hover hover:shadow-md';
+    'group reveal flex flex-col overflow-hidden rounded-xl border border-bg-border bg-bg-card shadow-xs transition hover:-translate-y-1 hover:border-bg-border-hover hover:shadow-md';
 
   // --- Portada ---
   const cover = safeUrl(post.cover_url);
@@ -239,7 +239,7 @@ function tagList(tags: string[], limit = 0): HTMLElement {
   shown.forEach((tag) => {
     const li = document.createElement('li');
     li.className =
-      'rounded border border-bg-border px-1.5 py-0.5 font-mono text-[10px] text-text-faint';
+      'rounded-sm border border-bg-border px-1.5 py-0.5 font-mono text-[10px] text-text-faint';
     li.textContent = tag;
     ul.appendChild(li);
   });

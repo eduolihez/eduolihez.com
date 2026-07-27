@@ -68,9 +68,9 @@ const getTotalPeriod = (roles: typeof experiences, lang: Lang) => {
                 />
 
                 {/* Company card */}
-                <div class="rounded-xl border border-bg-border/50 bg-bg-card/25 hover:bg-bg-card/40 p-5 sm:p-6 transition-all duration-300 shadow-sm hover:shadow-md">
+                <div class="rounded-xl border border-bg-border/50 bg-bg-card/25 hover:bg-bg-card/40 p-5 sm:p-6 transition-all duration-300 shadow-xs hover:shadow-md">
                   <div class="flex items-center gap-3 mb-4 border-b border-bg-border/30 pb-3">
-                    <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-bg border border-bg-border text-text-muted shadow-sm">
+                    <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-bg border border-bg-border text-text-muted shadow-xs">
                       <Icon name="briefcase" class="h-4 w-4" />
                     </span>
                     <div>
@@ -116,10 +116,10 @@ const getTotalPeriod = (roles: typeof experiences, lang: Lang) => {
                 />
 
                 {/* Company card with nested promotion timeline */}
-                <div class="rounded-xl border border-bg-border/50 bg-bg-card/25 hover:bg-bg-card/40 p-5 sm:p-6 transition-all duration-300 shadow-sm hover:shadow-md">
+                <div class="rounded-xl border border-bg-border/50 bg-bg-card/25 hover:bg-bg-card/40 p-5 sm:p-6 transition-all duration-300 shadow-xs hover:shadow-md">
                   {/* Encabezado de la empresa */}
                   <div class="flex items-center gap-3 mb-5 border-b border-bg-border/30 pb-3">
-                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-bg border border-bg-border text-accent shadow-sm">
+                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-bg border border-bg-border text-accent shadow-xs">
                       <Icon name="briefcase" class="h-5 w-5" />
                     </span>
                     <div>
@@ -159,9 +159,13 @@ const getTotalPeriod = (roles: typeof experiences, lang: Lang) => {
                             {pick(role.description, lang)}
                           </p>
 
+                          <!-- El interlineado del chip se fija a mano (/4 = 1rem):
+                               .badge trae text-xs y en Tailwind 4 su line-height es
+                               un ratio sin unidad, asi que al bajar el tamano a 10px
+                               la altura del chip se encogeria sola. -->
                           <ul class="mt-3 flex flex-wrap gap-1.5" aria-label={t('experience.tech')}>
                             {role.tech.map((tech) => (
-                              <li class="badge text-[10px] py-0.5 px-1.5">{tech}</li>
+                              <li class="badge text-[10px]/4 py-0.5 px-1.5">{tech}</li>
                             ))}
                           </ul>
                         </div>

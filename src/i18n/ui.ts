@@ -64,8 +64,10 @@ export const ui = {
     'projects.filter.all': 'Todos',
     'projects.filter.openSource': 'Open Source',
     'projects.filter.inDevelopment': 'En Desarrollo',
+    'projects.filter.privateCode': 'Código Privado',
     'projects.badge.openSource': 'Open Source',
     'projects.badge.inDevelopment': 'En Desarrollo',
+    'projects.badge.privateCode': 'Código Privado',
 
     'certs.title': 'Certificaciones',
     'certs.subtitle': 'Formacion y credenciales verificadas',
@@ -174,8 +176,10 @@ export const ui = {
     'projects.filter.all': 'All',
     'projects.filter.openSource': 'Open Source',
     'projects.filter.inDevelopment': 'In Development',
+    'projects.filter.privateCode': 'Private Code',
     'projects.badge.openSource': 'Open Source',
     'projects.badge.inDevelopment': 'In Development',
+    'projects.badge.privateCode': 'Private Code',
 
     'certs.title': 'Certifications',
     'certs.subtitle': 'Training and verified credentials',
@@ -282,8 +286,10 @@ export const ui = {
     'projects.filter.all': 'Tots',
     'projects.filter.openSource': 'Open Source',
     'projects.filter.inDevelopment': 'En Desenvolupament',
+    'projects.filter.privateCode': 'Codi Privat',
     'projects.badge.openSource': 'Open Source',
     'projects.badge.inDevelopment': 'En Desenvolupament',
+    'projects.badge.privateCode': 'Codi Privat',
 
     'certs.title': 'Certificacions',
     'certs.subtitle': 'Formacio i credencials verificades',

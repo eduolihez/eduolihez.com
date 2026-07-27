@@ -172,7 +172,7 @@
 }
 </script>
 </head>
-<body class="bg-darkBase text-slate-300 font-sans antialiased overflow-x-hidden selection:bg-primary selection:text-white">
+<body class="bg-dark-base text-slate-300 font-sans antialiased overflow-x-hidden selection:bg-primary selection:text-white">
 
     <!-- Background Glow Effects -->
     <div class="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary/20 blur-[120px] pointer-events-none z-0"></div>
@@ -212,7 +212,11 @@
             Compatible con Claude 4, GPT-4o y Gemini 2.0
         </div>
         
-        <h1 class="text-5xl md:text-7xl font-extrabold text-white tracking-tight mb-6 leading-tight">
+        <!-- md:leading-none es explicito a proposito: en Tailwind 3 el line-height
+             de md:text-7xl (1) pisaba a leading-tight por orden de emision, y el
+             hero salia compacto. En Tailwind 4 gana siempre leading-*, asi que sin
+             esta clase las dos lineas del titular se separarian ~36px. -->
+        <h1 class="text-5xl md:text-7xl font-extrabold text-white tracking-tight mb-6 leading-tight md:leading-none">
             Prompts perfectos.<br>
             <span class="text-gradient">En cualquier IA.</span>
         </h1>
@@ -222,11 +226,11 @@
         </p>
         
         <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
-            <button onclick="openWaitlist('chrome')" class="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-primary to-secondary text-white rounded-xl font-bold text-lg hover:scale-105 transition-transform shadow-[0_0_30px_rgba(139,92,246,0.3)] flex items-center justify-center gap-2 cursor-pointer border-0">
+            <button onclick="openWaitlist('chrome')" class="w-full sm:w-auto px-8 py-4 bg-linear-to-r from-primary to-secondary text-white rounded-xl font-bold text-lg hover:scale-105 transition-transform shadow-[0_0_30px_rgba(139,92,246,0.3)] flex items-center justify-center gap-2 cursor-pointer border-0">
                 <i data-lucide="chrome" class="w-5 h-5"></i>
                 Descargar para Chrome
             </button>
-            <a href="https://addons.mozilla.org/es-ES/firefox/addon/promptmaster/" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-secondary to-primary text-white rounded-xl font-bold text-lg hover:scale-105 transition-transform shadow-[0_0_30px_rgba(59,130,246,0.3)] flex items-center justify-center gap-2 cursor-pointer hover:no-underline">
+            <a href="https://addons.mozilla.org/es-ES/firefox/addon/promptmaster/" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto px-8 py-4 bg-linear-to-r from-secondary to-primary text-white rounded-xl font-bold text-lg hover:scale-105 transition-transform shadow-[0_0_30px_rgba(59,130,246,0.3)] flex items-center justify-center gap-2 cursor-pointer hover:no-underline">
                 <i data-lucide="download" class="w-5 h-5"></i>
                 Descargar para Firefox
             </a>

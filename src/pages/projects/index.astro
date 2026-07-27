@@ -57,7 +57,7 @@ const projects = [
     summary:
       'Aplicación de escritorio que interactúa con cuentas reales de tu nicho con comportamiento humano. Procesado local, sin servidores propios.',
     stack: ['Desktop', 'Automatización'],
-    badges: ['in-development'],
+    badges: ['in-development', 'private-code'],
     lang: 'English',
   },
   {
@@ -67,7 +67,7 @@ const projects = [
     summary:
       'Webs profesionales listas en 72 horas para fontaneros, electricistas y reformistas, con SEO local y mantenimiento mensual.',
     stack: ['HTML', 'SEO local'],
-    badges: [],
+    badges: ['private-code'],
     lang: 'Español',
   },
 ];
@@ -123,24 +123,31 @@ const itemList = {
       >
         <button
           type="button"
-          class="static-filter-btn px-4 py-1.5 text-xs font-semibold rounded-lg bg-accent text-bg transition duration-200 border border-accent shadow-sm cursor-pointer"
+          class="static-filter-btn px-4 py-1.5 text-xs font-semibold rounded-lg bg-accent text-bg transition duration-200 border border-accent shadow-xs cursor-pointer"
           data-filter="all"
         >
           Todos
         </button>
         <button
           type="button"
-          class="static-filter-btn px-4 py-1.5 text-xs font-semibold rounded-lg bg-bg-soft/40 text-text-muted transition duration-200 border border-bg-border/60 hover:bg-bg-card hover:text-text shadow-sm cursor-pointer"
+          class="static-filter-btn px-4 py-1.5 text-xs font-semibold rounded-lg bg-bg-soft/40 text-text-muted transition duration-200 border border-bg-border/60 hover:bg-bg-card hover:text-text shadow-xs cursor-pointer"
           data-filter="open-source"
         >
           Open Source
         </button>
         <button
           type="button"
-          class="static-filter-btn px-4 py-1.5 text-xs font-semibold rounded-lg bg-bg-soft/40 text-text-muted transition duration-200 border border-bg-border/60 hover:bg-bg-card hover:text-text shadow-sm cursor-pointer"
+          class="static-filter-btn px-4 py-1.5 text-xs font-semibold rounded-lg bg-bg-soft/40 text-text-muted transition duration-200 border border-bg-border/60 hover:bg-bg-card hover:text-text shadow-xs cursor-pointer"
           data-filter="in-development"
         >
           En Desarrollo
+        </button>
+        <button
+          type="button"
+          class="static-filter-btn px-4 py-1.5 text-xs font-semibold rounded-lg bg-bg-soft/40 text-text-muted transition duration-200 border border-bg-border/60 hover:bg-bg-card hover:text-text shadow-xs cursor-pointer"
+          data-filter="private-code"
+        >
+          Código Privado
         </button>
       </div>
 
@@ -165,15 +172,22 @@ const itemList = {
                   {p.badges.map((b) => {
                     if (b === 'open-source') {
                       return (
-                        <span class="rounded bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-500 border border-emerald-500/20">
+                        <span class="rounded-sm bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-500 border border-emerald-500/20">
                           Open Source
                         </span>
                       );
                     }
                     if (b === 'in-development') {
                       return (
-                        <span class="rounded bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-500 border border-amber-500/20">
+                        <span class="rounded-sm bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-500 border border-amber-500/20">
                           En Desarrollo
+                        </span>
+                      );
+                    }
+                    if (b === 'private-code') {
+                      return (
+                        <span class="rounded-sm bg-blue-500/10 px-2 py-0.5 text-[10px] font-semibold text-blue-400 border border-blue-500/20">
+                          Código Privado
                         </span>
                       );
                     }
@@ -188,7 +202,7 @@ const itemList = {
               <p class="mb-5 text-sm leading-relaxed text-text-muted">{p.summary}</p>
               <ul class="mt-auto flex flex-wrap gap-1.5">
                 {p.stack.map((s) => (
-                  <li class="rounded border border-bg-border bg-bg-soft/20 px-1.5 py-0.5 font-mono text-[11px] text-text-muted">
+                  <li class="rounded-sm border border-bg-border bg-bg-soft/20 px-1.5 py-0.5 font-mono text-[11px] text-text-muted">
                     {s}
                   </li>
                 ))}

@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import tailwindcss from '@tailwindcss/vite';
 
 // https://astro.build/config
 export default defineConfig({
@@ -21,8 +22,14 @@ export default defineConfig({
     },
   },
 
-  // Tailwind se engancha por PostCSS (ver postcss.config.mjs), no por una
-  // integracion: @astrojs/tailwind se quedo en Astro 5 y rompia npm install.
+  // Tailwind 4 entra como plugin de Vite (no como integracion de Astro y no
+  // por PostCSS). @astrojs/tailwind se quedo en Astro 5 y rompia npm install;
+  // el plugin oficial no depende de la version de Astro y ademas compila con
+  // el motor Oxide, que es bastante mas rapido que el pipeline de PostCSS.
+  // El tema vive ahora en src/styles/global.css (@theme), no en un JS aparte.
+  vite: {
+    plugins: [tailwindcss()],
+  },
 
   // CSP estricta: Astro calcula automaticamente los hashes de los scripts
   // (en linea y externos) en cada build y genera la <meta> CSP. Asi tenemos

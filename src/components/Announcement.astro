@@ -35,7 +35,7 @@ const settingsUrl = api(`/api/settings.php?lang=${lang}`);
     <button
       id="ann-close"
       type="button"
-      class="shrink-0 rounded p-1 text-accent/70 transition hover:text-accent"
+      class="shrink-0 rounded-sm p-1 text-accent/70 transition hover:text-accent"
       aria-label={t('announcement.close')}
     >
       <svg class="h-4 w-4" viewBox="0 0 24 24" aria-hidden="true">
@@ -68,7 +68,7 @@ const settingsUrl = api(`/api/settings.php?lang=${lang}`);
     html = html.replace(/_(.*?)_/g, '<em>$1</em>');
 
     // Código: `texto`
-    html = html.replace(/`(.*?)`/g, '<code class="bg-accent/20 px-1.5 py-0.5 rounded text-xs font-mono font-bold">$1</code>');
+    html = html.replace(/`(.*?)`/g, '<code class="bg-accent/20 px-1.5 py-0.5 rounded-sm text-xs font-mono font-bold">$1</code>');
 
     // Enlaces: [texto](url)
     html = html.replace(/\[(.*?)\]\((.*?)\)/g, (match, text, url) => {

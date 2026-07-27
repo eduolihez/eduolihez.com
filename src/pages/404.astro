@@ -17,7 +17,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   <section class="container-page flex min-h-[75vh] flex-col items-center justify-center gap-10 py-12 lg:flex-row lg:gap-16">
     <!-- Lado Izquierdo: Número de Error Gigante -->
     <div class="text-center lg:text-left lg:w-1/3">
-      <h1 class="font-mono text-8xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-accent to-yellow-500 drop-shadow-[0_0_35px_rgba(74,222,128,0.25)] md:text-9xl lg:text-[10rem]">
+      <h1 class="font-mono text-8xl font-black tracking-tighter text-transparent bg-clip-text bg-linear-to-br from-accent to-yellow-500 drop-shadow-[0_0_35px_rgba(74,222,128,0.25)] md:text-9xl lg:text-[10rem]">
         404
       </h1>
       <h2 class="mt-4 text-2xl font-bold tracking-tight text-text sm:text-3xl uppercase font-mono">
@@ -51,7 +51,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
             El recurso o la dirección URL solicitada no se encuentra en el servidor. Es posible que haya sido eliminada, que se haya cambiado de nombre o que no sea correcta.
           </p>
           
-          <div class="mt-6 rounded border border-bg-border bg-bg-card p-3 text-xs text-text-muted">
+          <div class="mt-6 rounded-sm border border-bg-border bg-bg-card p-3 text-xs text-text-muted">
             <span class="block font-semibold text-text mb-1">Diagnóstico técnico:</span>
             <span>Code: 404_NOT_FOUND // URI: <span id="request-uri">URL_Solicitada</span> // Status: ARCHIVED_OR_INVALID</span>
           </div>

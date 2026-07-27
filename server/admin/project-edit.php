@@ -70,6 +70,9 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     if (isset($_POST['badge_in_development'])) {
         $p['badges'][] = 'in-development';
     }
+    if (isset($_POST['badge_private_code'])) {
+        $p['badges'][] = 'private-code';
+    }
 
     $errors = [];
     if ($p['title_es'] === '') $errors[] = 'El titulo en espanol es obligatorio.';
@@ -198,7 +201,7 @@ if (!empty($errors)) {
   <div class="hint">Separa las tecnologias por comas.</div>
 
   <label style="margin-top:1rem; display:block;">Etiquetas especiales (Badges)</label>
-  <div style="display:flex; gap:1.5rem; margin-top:.3rem; margin-bottom:1rem;">
+  <div style="display:flex; flex-wrap:wrap; gap:1.5rem; margin-top:.3rem; margin-bottom:1rem;">
     <label style="display:flex; align-items:center; gap:.4rem; font-weight:normal; cursor:pointer;">
       <input type="checkbox" name="badge_open_source" value="1" style="width:auto; margin:0;" <?= in_array('open-source', $p['badges']) ? 'checked' : '' ?>>
       <span>Open Source</span>
@@ -206,6 +209,10 @@ if (!empty($errors)) {
     <label style="display:flex; align-items:center; gap:.4rem; font-weight:normal; cursor:pointer;">
       <input type="checkbox" name="badge_in_development" value="1" style="width:auto; margin:0;" <?= in_array('in-development', $p['badges']) ? 'checked' : '' ?>>
       <span>En Desarrollo</span>
+    </label>
+    <label style="display:flex; align-items:center; gap:.4rem; font-weight:normal; cursor:pointer;">
+      <input type="checkbox" name="badge_private_code" value="1" style="width:auto; margin:0;" <?= in_array('private-code', $p['badges']) ? 'checked' : '' ?>>
+      <span>Código Privado</span>
     </label>
   </div>
 

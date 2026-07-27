@@ -28,6 +28,7 @@ const labels = {
   close: t('projects.close'),
   badgeOpenSource: t('projects.badge.openSource'),
   badgeInDevelopment: t('projects.badge.inDevelopment'),
+  badgePrivateCode: t('projects.badge.privateCode'),
 };
 ---
 
@@ -46,24 +47,31 @@ const labels = {
     >
       <button
         type="button"
-        class="project-filter-btn px-4 py-1.5 text-xs font-semibold rounded-lg bg-accent text-bg transition duration-200 border border-accent shadow-sm cursor-pointer"
+        class="project-filter-btn px-4 py-1.5 text-xs font-semibold rounded-lg bg-accent text-bg transition duration-200 border border-accent shadow-xs cursor-pointer"
         data-filter="all"
       >
         {t('projects.filter.all')}
       </button>
       <button
         type="button"
-        class="project-filter-btn px-4 py-1.5 text-xs font-semibold rounded-lg bg-bg-soft/40 text-text-muted transition duration-200 border border-bg-border/60 hover:bg-bg-card hover:text-text shadow-sm cursor-pointer"
+        class="project-filter-btn px-4 py-1.5 text-xs font-semibold rounded-lg bg-bg-soft/40 text-text-muted transition duration-200 border border-bg-border/60 hover:bg-bg-card hover:text-text shadow-xs cursor-pointer"
         data-filter="open-source"
       >
         {t('projects.filter.openSource')}
       </button>
       <button
         type="button"
-        class="project-filter-btn px-4 py-1.5 text-xs font-semibold rounded-lg bg-bg-soft/40 text-text-muted transition duration-200 border border-bg-border/60 hover:bg-bg-card hover:text-text shadow-sm cursor-pointer"
+        class="project-filter-btn px-4 py-1.5 text-xs font-semibold rounded-lg bg-bg-soft/40 text-text-muted transition duration-200 border border-bg-border/60 hover:bg-bg-card hover:text-text shadow-xs cursor-pointer"
         data-filter="in-development"
       >
         {t('projects.filter.inDevelopment')}
+      </button>
+      <button
+        type="button"
+        class="project-filter-btn px-4 py-1.5 text-xs font-semibold rounded-lg bg-bg-soft/40 text-text-muted transition duration-200 border border-bg-border/60 hover:bg-bg-card hover:text-text shadow-xs cursor-pointer"
+        data-filter="private-code"
+      >
+        {t('projects.filter.privateCode')}
       </button>
     </div>
 
@@ -169,8 +177,8 @@ const labels = {
       a.appendChild(spanText);
       
       a.className = isPrimary 
-        ? 'inline-flex items-center gap-1.5 rounded-lg border border-accent bg-accent/10 hover:bg-accent hover:text-bg px-3 py-1.5 text-xs font-semibold text-accent transition duration-200 shadow-sm hover:no-underline'
-        : 'inline-flex items-center gap-1.5 rounded-lg border border-bg-border bg-bg-soft/40 hover:bg-bg-card hover:border-text-faint/40 px-3 py-1.5 text-xs font-semibold text-text-muted hover:text-text transition duration-200 shadow-sm hover:no-underline';
+        ? 'inline-flex items-center gap-1.5 rounded-lg border border-accent bg-accent/10 hover:bg-accent hover:text-bg px-3 py-1.5 text-xs font-semibold text-accent transition duration-200 shadow-xs hover:no-underline'
+        : 'inline-flex items-center gap-1.5 rounded-lg border border-bg-border bg-bg-soft/40 hover:bg-bg-card hover:border-text-faint/40 px-3 py-1.5 text-xs font-semibold text-text-muted hover:text-text transition duration-200 shadow-xs hover:no-underline';
       return a;
     }
 
@@ -199,6 +207,9 @@ const labels = {
         } else if (b === 'in-development') {
           li.className = 'badge bg-amber-500/10 text-amber-500 border border-amber-500/20 font-semibold';
           li.textContent = labels.badgeInDevelopment || 'En Desarrollo';
+        } else if (b === 'private-code') {
+          li.className = 'badge bg-blue-500/10 text-blue-400 border border-blue-500/20 font-semibold';
+          li.textContent = labels.badgePrivateCode || 'Código Privado';
         } else {
           return;
         }
@@ -249,7 +260,7 @@ const labels = {
     function makeCard(p) {
       const card = document.createElement('article');
       card.className =
-        'reveal is-visible group flex flex-col overflow-hidden rounded-lg border border-bg-border bg-bg-card transition hover:border-text-faint/40 shadow-sm';
+        'reveal is-visible group flex flex-col overflow-hidden rounded-lg border border-bg-border bg-bg-card transition hover:border-text-faint/40 shadow-xs';
 
       if (Array.isArray(p.badges) && p.badges.length) {
         card.setAttribute('data-badges', p.badges.join(','));
@@ -271,7 +282,7 @@ const labels = {
         if (Number(p.featured) === 1) {
           const b = document.createElement('span');
           b.className =
-            'absolute left-2 top-2 rounded bg-accent px-1.5 py-0.5 text-[11px] font-semibold text-bg';
+            'absolute left-2 top-2 rounded-sm bg-accent px-1.5 py-0.5 text-[11px] font-semibold text-bg';
           b.textContent = labels.featured;
           wrap.appendChild(b);
         }
@@ -293,11 +304,14 @@ const labels = {
         p.badges.forEach((b) => {
           const badgeSpan = document.createElement('span');
           if (b === 'open-source') {
-            badgeSpan.className = 'rounded bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-500 border border-emerald-500/20';
+            badgeSpan.className = 'rounded-sm bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-500 border border-emerald-500/20';
             badgeSpan.textContent = labels.badgeOpenSource || 'Open Source';
           } else if (b === 'in-development') {
-            badgeSpan.className = 'rounded bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-500 border border-amber-500/20';
+            badgeSpan.className = 'rounded-sm bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-500 border border-amber-500/20';
             badgeSpan.textContent = labels.badgeInDevelopment || 'En Desarrollo';
+          } else if (b === 'private-code') {
+            badgeSpan.className = 'rounded-sm bg-blue-500/10 px-2 py-0.5 text-[10px] font-semibold text-blue-400 border border-blue-500/20';
+            badgeSpan.textContent = labels.badgePrivateCode || 'Código Privado';
           } else {
             return;
           }
@@ -317,7 +331,7 @@ const labels = {
         p.stack.forEach((s) => {
           const li = document.createElement('li');
           li.className =
-            'rounded border border-bg-border px-1.5 py-0.5 font-mono text-[11px] text-text-muted bg-bg-soft/20';
+            'rounded-sm border border-bg-border px-1.5 py-0.5 font-mono text-[11px] text-text-muted bg-bg-soft/20';
           li.textContent = s;
           st.appendChild(li);
         });
@@ -332,7 +346,7 @@ const labels = {
         btn.type = 'button';
         btn.innerHTML = eyeSvg + `<span>${labels.details}</span>`;
         btn.className =
-          'inline-flex items-center gap-1.5 rounded-lg border border-bg-border bg-bg-soft/40 hover:bg-bg-card hover:border-text-faint/40 px-3 py-1.5 text-xs font-semibold text-text-muted hover:text-text transition duration-200 shadow-sm cursor-pointer';
+          'inline-flex items-center gap-1.5 rounded-lg border border-bg-border bg-bg-soft/40 hover:bg-bg-card hover:border-text-faint/40 px-3 py-1.5 text-xs font-semibold text-text-muted hover:text-text transition duration-200 shadow-xs cursor-pointer';
         btn.addEventListener('click', () => openModal(p));
         links.appendChild(btn);
       }

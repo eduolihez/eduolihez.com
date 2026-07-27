@@ -514,7 +514,7 @@ export const techSections: TechSection[] = [
 export const stackRows: { label: Localized; value: string }[] = [
   {
     label: { es: 'Frontend', en: 'Frontend', ca: 'Frontend' },
-    value: 'Astro 7 (SSG) · Tailwind CSS · TypeScript',
+    value: 'Astro 7 (SSG) · Tailwind CSS 4 · TypeScript',
   },
   {
     label: { es: 'Backend', en: 'Backend', ca: 'Backend' },

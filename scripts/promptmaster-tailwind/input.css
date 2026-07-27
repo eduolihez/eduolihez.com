@@ -1,4 +1,30 @@
-/* Entrada de Tailwind para la web de PromptMaster. Ver tailwind.config.cjs. */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/**
+ * Entrada de Tailwind para la web de PromptMaster.
+ * ---------------------------------------------------------------------------
+ * PromptMaster es HTML plano dentro de /public, asi que no pasa por el
+ * pipeline de Astro: su CSS se compila aparte, una sola vez, desde aqui.
+ *
+ * Antes la pagina cargaba https://cdn.tailwindcss.com, que compila en el
+ * navegador del visitante ejecutando JavaScript de un tercero. Esto lo
+ * sustituye por una hoja estatica servida desde el propio dominio.
+ *
+ * Regenerar (desde la raiz del repo):
+ *     npm run css:promptmaster
+ *
+ * Vive FUERA de /public a proposito: es una herramienta de compilacion y no
+ * debe acabar publicada en el servidor.
+ *
+ * TAILWIND 4: ya no hay tailwind.config.cjs. El contenido a escanear se
+ * declara con @source y el tema con @theme, ambos aqui mismo.
+ */
+
+@import 'tailwindcss' source(none);
+@source '../../public/projects/promptmaster/index.html';
+
+@theme {
+  /* Estos colores estaban en un bloque `tailwind.config` en linea dentro del
+     <head>. Al dejar de usar el CDN, viven aqui. */
+  --color-dark-base: #09090b;
+  --color-primary: #8b5cf6;
+  --color-secondary: #3b82f6;
+}

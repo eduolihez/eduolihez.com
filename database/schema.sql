@@ -159,6 +159,7 @@ CREATE TABLE IF NOT EXISTS `projects` (
   `description_en` TEXT         NULL,
   `image_url`      VARCHAR(255) NULL,
   `stack`          TEXT         NULL,                 -- JSON: ["PHP","MySQL"]
+  `badges`         VARCHAR(255) NULL,                 -- JSON: ["open-source","in-development"]
   `repo_url`       VARCHAR(255) NULL,
   `demo_url`       VARCHAR(255) NULL,
   `store_url`      VARCHAR(255) NULL,
@@ -306,6 +307,9 @@ CALL add_index_if_missing('messages', 'idx_created', '`created_at`');
 
 -- Proyectos: enlace a tienda de extensiones (Chrome Web Store / AMO).
 CALL add_column_if_missing('projects', 'store_url', 'VARCHAR(255) NULL');
+
+-- Proyectos: badges (etiquetas).
+CALL add_column_if_missing('projects', 'badges', 'VARCHAR(255) NULL AFTER `stack`');
 
 -- Blog: etiquetas y fecha de publicacion propia.
 CALL add_column_if_missing('posts', 'tags',         "VARCHAR(255) NULL AFTER `cover_url`");

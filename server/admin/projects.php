@@ -84,10 +84,10 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
                 case 'duplicate':
                     db()->prepare(
                         'INSERT INTO projects (title_es, title_en, summary_es, summary_en,
-                            description_es, description_en, image_url, stack, repo_url, demo_url,
+                            description_es, description_en, image_url, stack, badges, repo_url, demo_url,
                             store_url, featured, sort_order, status, created_at, updated_at)
                          SELECT CONCAT(title_es, " (copia)"), title_en, summary_es, summary_en,
-                            description_es, description_en, image_url, stack, repo_url, demo_url,
+                            description_es, description_en, image_url, stack, badges, repo_url, demo_url,
                             store_url, 0, sort_order + 1, "draft", NOW(), NOW()
                          FROM projects WHERE id = ?'
                     )->execute([$id]);

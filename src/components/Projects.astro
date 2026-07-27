@@ -26,6 +26,8 @@ const labels = {
   featured: t('projects.featured'),
   details: t('projects.details'),
   close: t('projects.close'),
+  badgeOpenSource: t('projects.badge.openSource'),
+  badgeInDevelopment: t('projects.badge.inDevelopment'),
 };
 ---
 
@@ -37,7 +39,35 @@ const labels = {
       <p class="section-subtitle">{t('projects.subtitle')}</p>
     </div>
 
-    <div id="projects-status" class="flex items-center gap-3 text-sm text-text-muted">
+    <!-- Filtros de Proyectos -->
+    <div
+      id="projects-filters"
+      class="hidden mb-8 flex flex-wrap gap-2 animate-fade-in"
+    >
+      <button
+        type="button"
+        class="project-filter-btn px-4 py-1.5 text-xs font-semibold rounded-lg bg-accent text-bg transition duration-200 border border-accent shadow-sm cursor-pointer"
+        data-filter="all"
+      >
+        {t('projects.filter.all')}
+      </button>
+      <button
+        type="button"
+        class="project-filter-btn px-4 py-1.5 text-xs font-semibold rounded-lg bg-bg-soft/40 text-text-muted transition duration-200 border border-bg-border/60 hover:bg-bg-card hover:text-text shadow-sm cursor-pointer"
+        data-filter="open-source"
+      >
+        {t('projects.filter.openSource')}
+      </button>
+      <button
+        type="button"
+        class="project-filter-btn px-4 py-1.5 text-xs font-semibold rounded-lg bg-bg-soft/40 text-text-muted transition duration-200 border border-bg-border/60 hover:bg-bg-card hover:text-text shadow-sm cursor-pointer"
+        data-filter="in-development"
+      >
+        {t('projects.filter.inDevelopment')}
+      </button>
+    </div>
+
+    <div id="projects-status" class="reveal is-visible flex items-center gap-3 text-sm text-text-muted">
       <span
         class="h-4 w-4 animate-spin rounded-full border-2 border-bg-border border-t-accent"
       ></span>
@@ -158,13 +188,30 @@ const labels = {
         pmImage.classList.add('hidden');
         pmImage.removeAttribute('src');
       }
+      
       pmStack.innerHTML = '';
+      // Prepend badges to the modal stack
+      (Array.isArray(p.badges) ? p.badges : []).forEach((b) => {
+        const li = document.createElement('li');
+        if (b === 'open-source') {
+          li.className = 'badge bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 font-semibold';
+          li.textContent = labels.badgeOpenSource || 'Open Source';
+        } else if (b === 'in-development') {
+          li.className = 'badge bg-amber-500/10 text-amber-500 border border-amber-500/20 font-semibold';
+          li.textContent = labels.badgeInDevelopment || 'En Desarrollo';
+        } else {
+          return;
+        }
+        pmStack.appendChild(li);
+      });
+
       (Array.isArray(p.stack) ? p.stack : []).forEach((s) => {
         const li = document.createElement('li');
         li.className = 'badge';
         li.textContent = s;
         pmStack.appendChild(li);
       });
+
       pmLinks.innerHTML = '';
       if (p.demo_url) {
         const el = linkEl(p.demo_url, labels.demo, externalSvg, true);
@@ -204,6 +251,12 @@ const labels = {
       card.className =
         'reveal is-visible group flex flex-col overflow-hidden rounded-lg border border-bg-border bg-bg-card transition hover:border-text-faint/40 shadow-sm';
 
+      if (Array.isArray(p.badges) && p.badges.length) {
+        card.setAttribute('data-badges', p.badges.join(','));
+      } else {
+        card.setAttribute('data-badges', '');
+      }
+
       const img = safeUrl(p.image_url);
       if (img) {
         const wrap = document.createElement('div');
@@ -232,6 +285,26 @@ const labels = {
       h.className = 'text-base font-semibold text-text';
       h.textContent = p.title || '';
       body.appendChild(h);
+
+      // Render de Badges Especiales
+      if (Array.isArray(p.badges) && p.badges.length) {
+        const badgeContainer = document.createElement('div');
+        badgeContainer.className = 'flex flex-wrap gap-1.5 mt-1.5 mb-0.5';
+        p.badges.forEach((b) => {
+          const badgeSpan = document.createElement('span');
+          if (b === 'open-source') {
+            badgeSpan.className = 'rounded bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-500 border border-emerald-500/20';
+            badgeSpan.textContent = labels.badgeOpenSource || 'Open Source';
+          } else if (b === 'in-development') {
+            badgeSpan.className = 'rounded bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-500 border border-amber-500/20';
+            badgeSpan.textContent = labels.badgeInDevelopment || 'En Desarrollo';
+          } else {
+            return;
+          }
+          badgeContainer.appendChild(badgeSpan);
+        });
+        body.appendChild(badgeContainer);
+      }
 
       const sum = document.createElement('p');
       sum.className = 'mt-2 text-sm leading-relaxed text-text-muted';
@@ -314,7 +387,37 @@ const labels = {
         const items = Array.isArray(data) ? data : data.items || [];
         if (status) status.classList.add('hidden');
         if (!items.length) return message(labels.empty);
+        
+        // Show filters container
+        const filtersContainer = document.getElementById('projects-filters');
+        if (filtersContainer) filtersContainer.classList.remove('hidden');
+        
         items.forEach((p) => grid.appendChild(makeCard(p)));
+
+        // Setup filter buttons click handling
+        const filterButtons = document.querySelectorAll('.project-filter-btn');
+        filterButtons.forEach(btn => {
+          btn.addEventListener('click', () => {
+            filterButtons.forEach(b => {
+              b.classList.remove('bg-accent', 'text-bg', 'border-accent');
+              b.classList.add('bg-bg-soft/40', 'text-text-muted', 'border-bg-border/60');
+            });
+            btn.classList.add('bg-accent', 'text-bg', 'border-accent');
+            btn.classList.remove('bg-bg-soft/40', 'text-text-muted', 'border-bg-border/60');
+            
+            const filterValue = btn.getAttribute('data-filter');
+            const cards = grid.querySelectorAll('article');
+            cards.forEach(card => {
+              const badgesAttr = card.getAttribute('data-badges') || '';
+              const badges = badgesAttr ? badgesAttr.split(',') : [];
+              if (filterValue === 'all' || badges.includes(filterValue)) {
+                card.classList.remove('hidden');
+              } else {
+                card.classList.add('hidden');
+              }
+            });
+          });
+        });
       })
       .catch(() => {
         if (statusText) statusText.textContent = labels.error;

@@ -30,9 +30,8 @@ const settingsUrl = api(`/api/settings.php?lang=${lang}`);
   role="status"
 >
   <div class="container-page flex items-center justify-between gap-4 py-2">
-    <p class="min-w-0 flex-1 text-center text-accent">
-      <a id="ann-link" class="hover:underline" href="#"><span id="ann-text"></span></a>
-    </p>
+    <div id="ann-content" class="min-w-0 flex-1 text-center text-accent leading-normal">
+    </div>
     <button
       id="ann-close"
       type="button"
@@ -50,6 +49,44 @@ const settingsUrl = api(`/api/settings.php?lang=${lang}`);
 </div>
 
 <script>
+  function parseMarkdown(md: string) {
+    if (typeof md !== 'string') return '';
+    // Escapar HTML para evitar XSS
+    let html = md
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+
+    // Negrita: **texto**
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    html = html.replace(/__(.*?)__/g, '<strong>$1</strong>');
+
+    // Cursiva: *texto*
+    html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    html = html.replace(/_(.*?)_/g, '<em>$1</em>');
+
+    // Código: `texto`
+    html = html.replace(/`(.*?)`/g, '<code class="bg-accent/20 px-1.5 py-0.5 rounded text-xs font-mono font-bold">$1</code>');
+
+    // Enlaces: [texto](url)
+    html = html.replace(/\[(.*?)\]\((.*?)\)/g, (match, text, url) => {
+      const cleanUrl = url.trim();
+      if (/^(https?:\/\/|\/)/i.test(cleanUrl)) {
+        const isExternal = cleanUrl.startsWith('http');
+        const target = isExternal ? ' target="_blank" rel="noopener noreferrer"' : '';
+        return `<a href="${cleanUrl}" class="underline font-semibold hover:text-accent-hover"${target}>${text}</a>`;
+      }
+      return text;
+    });
+
+    // Saltos de línea
+    html = html.replace(/\n/g, '<br>');
+
+    return html;
+  }
+
   function initAnnouncement() {
     const box = document.getElementById('site-announcement');
     if (!box || box.dataset.loaded) return;
@@ -63,8 +100,7 @@ const settingsUrl = api(`/api/settings.php?lang=${lang}`);
     }
 
     const url = box.dataset.settings || '';
-    const textEl = document.getElementById('ann-text');
-    const linkEl = document.getElementById('ann-link');
+    const contentEl = document.getElementById('ann-content');
     const closeEl = document.getElementById('ann-close');
 
     closeEl?.addEventListener('click', () => {
@@ -80,23 +116,19 @@ const settingsUrl = api(`/api/settings.php?lang=${lang}`);
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
         const ann = data && data.announcement;
-        if (!ann || String(ann.on) !== '1' || !ann.text) return;
+        if (!ann || String(ann.on) !== '1' || !ann.text || !contentEl) return;
 
-        textEl.textContent = ann.text;
+        const parsedHtml = parseMarkdown(ann.text);
+        const hasLinks = parsedHtml.includes('<a href=');
 
         // Solo aceptamos https:// o rutas internas. Sin esto, un valor
         // manipulado en la base de datos podria colar un javascript:.
         const href = typeof ann.url === 'string' ? ann.url.trim() : '';
-        if (href && /^(https:\/\/|\/)/i.test(href)) {
-          linkEl.setAttribute('href', href);
-          if (href.startsWith('http')) {
-            linkEl.setAttribute('target', '_blank');
-            linkEl.setAttribute('rel', 'noopener noreferrer');
-          }
+        if (href && /^(https:\/\/|\/)/i.test(href) && !hasLinks) {
+          const target = href.startsWith('http') ? ' target="_blank" rel="noopener noreferrer"' : '';
+          contentEl.innerHTML = `<a id="ann-link" class="hover:underline" href="${href}"${target}>${parsedHtml}</a>`;
         } else {
-          // Sin enlace valido: se muestra como texto plano.
-          linkEl.removeAttribute('href');
-          linkEl.classList.remove('hover:underline');
+          contentEl.innerHTML = parsedHtml;
         }
 
         box.classList.remove('hidden');

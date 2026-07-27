@@ -17,6 +17,7 @@ $p = [
     'summary_es' => '', 'summary_en' => '',
     'description_es' => '', 'description_en' => '',
     'image_url' => '', 'stack' => '',
+    'badges' => [],
     'repo_url' => '', 'demo_url' => '', 'store_url' => '',
     'featured' => 0, 'sort_order' => 0, 'status' => 'published',
 ];
@@ -33,6 +34,11 @@ if ($isEdit) {
     // "stack" es JSON en la DB -> lo mostramos como lista separada por comas.
     $stackArr = json_decode($row['stack'] ?? '[]', true);
     $row['stack'] = is_array($stackArr) ? implode(', ', $stackArr) : '';
+    
+    // Decodificar badges
+    $badgesArr = json_decode($row['badges'] ?? '[]', true);
+    $row['badges'] = is_array($badgesArr) ? $badgesArr : [];
+    
     $p = array_merge($p, $row);
 }
 
@@ -78,25 +84,36 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
             JSON_UNESCAPED_UNICODE
         );
 
+        // Procesar badges seleccionados
+        $badges = [];
+        if (isset($_POST['badge_open_source'])) {
+            $badges[] = 'open-source';
+        }
+        if (isset($_POST['badge_in_development'])) {
+            $badges[] = 'in-development';
+        }
+        $p['badges'] = $badges;
+        $badgesJson = json_encode($badges, JSON_UNESCAPED_UNICODE);
+
         if ($isEdit) {
             $sql = 'UPDATE projects SET title_es=?, title_en=?, summary_es=?, summary_en=?,
-                    description_es=?, description_en=?, image_url=?, stack=?, repo_url=?,
+                    description_es=?, description_en=?, image_url=?, stack=?, badges=?, repo_url=?,
                     demo_url=?, store_url=?, featured=?, sort_order=?, status=?, updated_at=NOW()
                     WHERE id=?';
             $params = [
                 $p['title_es'], $p['title_en'], $p['summary_es'], $p['summary_en'],
-                $p['description_es'], $p['description_en'], $p['image_url'], $stackJson,
+                $p['description_es'], $p['description_en'], $p['image_url'], $stackJson, $badgesJson,
                 $p['repo_url'], $p['demo_url'], $p['store_url'], $p['featured'],
                 $p['sort_order'], $p['status'], $id,
             ];
         } else {
             $sql = 'INSERT INTO projects (title_es, title_en, summary_es, summary_en,
-                    description_es, description_en, image_url, stack, repo_url, demo_url,
+                    description_es, description_en, image_url, stack, badges, repo_url, demo_url,
                     store_url, featured, sort_order, status, created_at, updated_at)
-                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW(),NOW())';
+                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW(),NOW())';
             $params = [
                 $p['title_es'], $p['title_en'], $p['summary_es'], $p['summary_en'],
-                $p['description_es'], $p['description_en'], $p['image_url'], $stackJson,
+                $p['description_es'], $p['description_en'], $p['image_url'], $stackJson, $badgesJson,
                 $p['repo_url'], $p['demo_url'], $p['store_url'], $p['featured'],
                 $p['sort_order'], $p['status'],
             ];
@@ -179,6 +196,18 @@ if (!empty($errors)) {
   <label for="stack">Stack tecnologico</label>
   <input type="text" id="stack" name="stack" value="<?= e($p['stack']) ?>" placeholder="Next.js, TypeScript, Tailwind">
   <div class="hint">Separa las tecnologias por comas.</div>
+
+  <label style="margin-top:1rem; display:block;">Etiquetas especiales (Badges)</label>
+  <div style="display:flex; gap:1.5rem; margin-top:.3rem; margin-bottom:1rem;">
+    <label style="display:flex; align-items:center; gap:.4rem; font-weight:normal; cursor:pointer;">
+      <input type="checkbox" name="badge_open_source" value="1" style="width:auto; margin:0;" <?= in_array('open-source', $p['badges']) ? 'checked' : '' ?>>
+      <span>Open Source</span>
+    </label>
+    <label style="display:flex; align-items:center; gap:.4rem; font-weight:normal; cursor:pointer;">
+      <input type="checkbox" name="badge_in_development" value="1" style="width:auto; margin:0;" <?= in_array('in-development', $p['badges']) ? 'checked' : '' ?>>
+      <span>En Desarrollo</span>
+    </label>
+  </div>
 
   <div class="row2">
     <div>

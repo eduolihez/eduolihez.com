@@ -41,9 +41,16 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
             if ($type === 'bool') {
                 $value = isset($_POST[$key]) ? '1' : '0';
             } else {
-                $value = mb_substr(trim((string) ($_POST[$key] ?? '')), 0, 300);
-                // Sin saltos de linea ni caracteres de control en textos cortos.
-                $value = (string) preg_replace('/[\x00-\x1F\x7F]+/u', ' ', $value);
+                if (strpos($key, 'announcement_') === 0 && $key !== 'announcement_url') {
+                    // Permitir saltos de línea y hasta 1000 caracteres para el banner en markdown
+                    $value = mb_substr(trim((string) ($_POST[$key] ?? '')), 0, 1000);
+                    // Quitamos otros caracteres de control pero dejamos \n y \r (\x0A, \x0D)
+                    $value = (string) preg_replace('/[\x00-\x09\x0B\x0C\x0E-\x1F\x7F]+/u', '', $value);
+                } else {
+                    $value = mb_substr(trim((string) ($_POST[$key] ?? '')), 0, 300);
+                    // Sin saltos de linea ni caracteres de control en textos cortos.
+                    $value = (string) preg_replace('/[\x00-\x1F\x7F]+/u', ' ', $value);
+                }
             }
             if (setting_get($key, '') !== $value) {
                 $changed[] = $key;
@@ -124,24 +131,27 @@ show_flash();
       </span>
     </label>
 
-    <div class="row3">
+    <div class="row3" style="margin-bottom:1rem;">
       <div>
-        <label for="announcement_es">Texto en espanol</label>
-        <input type="text" id="announcement_es" name="announcement_es" maxlength="300"
-               value="<?= e($v('announcement_es')) ?>" placeholder="Nuevo articulo sobre deteccion de phishing">
+        <label for="announcement_es">Texto en español (Markdown)</label>
+        <textarea id="announcement_es" name="announcement_es" maxlength="1000" rows="3"
+                  placeholder="**Nuevo** artículo sobre [detección de phishing](/#proyectos)"
+                  style="width:100%; font-family:monospace; resize:vertical; font-size:0.85rem;"><?= e($v('announcement_es')) ?></textarea>
       </div>
       <div>
-        <label for="announcement_en">Texto en ingles</label>
-        <input type="text" id="announcement_en" name="announcement_en" maxlength="300"
-               value="<?= e($v('announcement_en')) ?>" placeholder="New post about phishing detection">
+        <label for="announcement_en">Texto en inglés (Markdown)</label>
+        <textarea id="announcement_en" name="announcement_en" maxlength="1000" rows="3"
+                  placeholder="**New** article about [phishing detection](/#proyectos)"
+                  style="width:100%; font-family:monospace; resize:vertical; font-size:0.85rem;"><?= e($v('announcement_en')) ?></textarea>
       </div>
       <div>
-        <label for="announcement_ca">Texto en catalan</label>
-        <input type="text" id="announcement_ca" name="announcement_ca" maxlength="300"
-               value="<?= e($v('announcement_ca')) ?>" placeholder="Nou article sobre deteccio de phishing">
+        <label for="announcement_ca">Texto en catalán (Markdown)</label>
+        <textarea id="announcement_ca" name="announcement_ca" maxlength="1000" rows="3"
+                  placeholder="**Nou** article sobre [detecció de phishing](/#proyectos)"
+                  style="width:100%; font-family:monospace; resize:vertical; font-size:0.85rem;"><?= e($v('announcement_ca')) ?></textarea>
       </div>
     </div>
-    <div class="hint">Si dejas el ingles o el catalan vacios, se usara el texto en espanol.</div>
+    <div class="hint" style="margin-bottom:1rem;">Si dejas el inglés o el catalán vacíos, se usará el texto en español. Puedes usar negritas (<code>**texto**</code>), cursivas (<code>*texto*</code>), código (<code>`texto`</code>) y enlaces (<code>[texto](URL)</code>).</div>
 
     <label for="announcement_url">Enlace del aviso <span class="faint">(opcional)</span></label>
     <input type="text" id="announcement_url" name="announcement_url" maxlength="300"

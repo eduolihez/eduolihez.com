@@ -30,91 +30,131 @@ const aboutPath = lang === 'en' ? '/en/about-this-website/' : (lang === 'ca' ? '
  * proposito, para que la ruta de rastreo no dependa del backend.
  */
 const projects = [
-  { name: 'Fluence', href: '/projects/fluence/' },
-  { name: 'FollowGuard', href: '/projects/followguard/' },
-  { name: 'Password Sentinel', href: '/projects/passwdcentinel/' },
-  { name: 'PromptMaster', href: '/projects/promptmaster/' },
-  { name: 'Zéora', href: '/projects/zeora/' },
+  { name: 'Password Sentinel', href: '/projects/passwdcentinel/', badge: 'Open Source' },
+  { name: 'PromptMaster', href: '/projects/promptmaster/', badge: 'Open Source' },
+  { name: 'FollowGuard', href: '/projects/followguard/', badge: 'En Desarrollo' },
+  { name: 'Fluence', href: '/projects/fluence/', badge: 'En Desarrollo' },
+  { name: 'Zéora', href: '/projects/zeora/', badge: 'Servicios' },
 ];
 ---
 
-<footer class="border-t border-bg-border">
-  {/* Proyectos publicados: da a Google (y a las IAs) una ruta de rastreo
-      hacia cada web, presente en todas las paginas del sitio. */}
-  <div class="container-page border-b border-bg-border/60 py-6">
-    <p class="mb-3 font-mono text-[11px] uppercase tracking-wider text-text-faint">
-      <a href="/projects/" class="transition hover:text-accent">{t('footer.projects')}</a>
-    </p>
-    <ul class="flex flex-wrap gap-x-4 gap-y-2">
-      {
-        projects.map((p) => (
-          <li>
-            <a
-              href={p.href}
-              class="font-mono text-xs text-text-muted transition hover:text-accent"
-            >
-              {p.name}
-            </a>
-          </li>
-        ))
-      }
-    </ul>
-  </div>
-
-  <div
-    class="container-page flex flex-col items-center justify-between gap-4 py-8 sm:flex-row"
-  >
-    <div class="text-center font-mono text-xs text-text-faint sm:text-left">
-      <p>&copy; {year} {SITE.shortName} · {t('footer.built')}</p>
-      {/* La ubicacion visible tambien es una senal de SEO local: Google la
-          cruza con el dato estructurado del <head> para confirmar la ciudad. */}
-      <p class="mt-1">
-        <span class="not-italic">{t('footer.location')}</span>
-        <span aria-hidden="true"> · </span>
-        <a class="transition hover:text-accent" href={`mailto:${SITE.social.email}`}>
-          {SITE.social.email}
-        </a>
+<footer class="border-t border-bg-border bg-bg-soft/10 text-sm">
+  <div class="container-page py-16 grid gap-8 sm:grid-cols-2 md:grid-cols-4">
+    <!-- Columna 1: Bio & Info de Marca -->
+    <div class="flex flex-col">
+      <div class="font-mono font-bold text-sm tracking-tight text-text mb-2">
+        {SITE.name}
+      </div>
+      <p class="text-xs text-text-muted leading-relaxed max-w-xs mb-6">
+        {SITE.jobTitle}
       </p>
-      <p class="mt-1.5">
-        <a class="transition hover:text-accent text-accent font-medium" href={aboutPath}>
-          {t('footer.aboutSite')} &rarr;
-        </a>
+      <p class="font-mono text-[11px] text-text-faint mt-auto">
+        &copy; {year} {SITE.shortName}<br/>
+        {t('footer.built')}
       </p>
     </div>
 
-    <div class="flex items-center gap-2">
-      <a
-        href={SITE.social.linkedin}
-        target="_blank"
-        rel="noopener noreferrer"
-        class="rounded-md p-2 text-text-faint transition hover:text-accent"
-        aria-label="LinkedIn"
-      >
-        <Icon name="linkedin" class="h-5 w-5" />
-      </a>
-      <a
-        href={SITE.social.github}
-        target="_blank"
-        rel="noopener noreferrer"
-        class="rounded-md p-2 text-text-faint transition hover:text-accent"
-        aria-label="GitHub"
-      >
-        <Icon name="github" class="h-5 w-5" />
-      </a>
-      <a
-        href={`mailto:${SITE.social.email}`}
-        class="rounded-md p-2 text-text-faint transition hover:text-accent"
-        aria-label="Email"
-      >
-        <Icon name="mail" class="h-5 w-5" />
-      </a>
-      <a
-        href="#top"
-        class="rounded-md p-2 text-text-faint transition hover:text-accent"
-        aria-label={t('footer.backTop')}
-      >
-        <Icon name="arrowUp" class="h-5 w-5" />
-      </a>
+    <!-- Columna 2: Proyectos -->
+    <div>
+      <p class="mb-4 font-mono text-[11px] uppercase tracking-wider text-text-faint font-bold">
+        <a href="/projects/" class="transition hover:text-accent">{t('footer.projects')}</a>
+      </p>
+      <ul class="flex flex-col gap-3">
+        {
+          projects.map((p) => (
+            <li>
+              <a
+                href={p.href}
+                class="group inline-flex items-center gap-1.5 font-mono text-xs text-text-muted transition hover:text-accent hover:no-underline"
+              >
+                <span>{p.name}</span>
+                {p.badge && (
+                  <span class={`rounded px-1.5 py-0.2 text-[9px] font-semibold font-sans tracking-wide leading-normal border ${
+                    p.badge === 'Open Source' 
+                      ? 'bg-emerald-500/5 text-emerald-500 border-emerald-500/20' 
+                      : p.badge === 'En Desarrollo'
+                      ? 'bg-amber-500/5 text-amber-500 border-amber-500/20'
+                      : 'bg-accent/5 text-accent border-accent/20'
+                  }`}>
+                    {p.badge}
+                  </span>
+                )}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <!-- Columna 3: Navegación -->
+    <div>
+      <p class="mb-4 font-mono text-[11px] uppercase tracking-wider text-text-faint font-bold">
+        Navegación
+      </p>
+      <ul class="grid grid-cols-2 gap-x-2 gap-y-2.5 font-mono text-xs">
+        <li><a href="/#perfil" class="text-text-muted hover:text-accent transition hover:no-underline">{t('nav.about')}</a></li>
+        <li><a href="/#experiencia" class="text-text-muted hover:text-accent transition hover:no-underline">{t('nav.experience')}</a></li>
+        <li><a href="/#habilidades" class="text-text-muted hover:text-accent transition hover:no-underline">{t('nav.skills')}</a></li>
+        <li><a href="/#proyectos" class="text-text-muted hover:text-accent transition hover:no-underline">{t('nav.projects')}</a></li>
+        <li><a href="/#certificaciones" class="text-text-muted hover:text-accent transition hover:no-underline">{t('nav.certifications')}</a></li>
+        <li><a href="/#faq" class="text-text-muted hover:text-accent transition hover:no-underline">{t('nav.faq')}</a></li>
+        <li><a href="/#contacto" class="text-text-muted hover:text-accent transition hover:no-underline">{t('nav.contact')}</a></li>
+        <li><a href="/blog/" class="text-text-muted hover:text-accent transition hover:no-underline">{t('nav.blog')}</a></li>
+      </ul>
+    </div>
+
+    <!-- Columna 4: Contacto & Redes -->
+    <div class="flex flex-col">
+      <p class="mb-4 font-mono text-[11px] uppercase tracking-wider text-text-faint font-bold">
+        Contacto
+      </p>
+      <p class="text-xs text-text-muted font-mono leading-relaxed mb-4">
+        <span class="not-italic block mb-1">{t('footer.location')}</span>
+        <a class="transition hover:text-accent block" href={`mailto:${SITE.social.email}`}>
+          {SITE.social.email}
+        </a>
+      </p>
+      
+      <div class="flex items-center gap-1.5 mb-6">
+        <a
+          href={SITE.social.linkedin}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="rounded-md p-1.5 text-text-faint transition hover:bg-accent/10 hover:text-accent border border-bg-border"
+          aria-label="LinkedIn"
+        >
+          <Icon name="linkedin" class="h-4 w-4" />
+        </a>
+        <a
+          href={SITE.social.github}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="rounded-md p-1.5 text-text-faint transition hover:bg-accent/10 hover:text-accent border border-bg-border"
+          aria-label="GitHub"
+        >
+          <Icon name="github" class="h-4 w-4" />
+        </a>
+        <a
+          href={`mailto:${SITE.social.email}`}
+          class="rounded-md p-1.5 text-text-faint transition hover:bg-accent/10 hover:text-accent border border-bg-border"
+          aria-label="Email"
+        >
+          <Icon name="mail" class="h-4 w-4" />
+        </a>
+      </div>
+
+      <div class="mt-auto flex flex-col gap-2">
+        <a class="transition hover:text-accent text-accent font-mono text-xs font-semibold hover:no-underline flex items-center gap-1" href={aboutPath}>
+          {t('footer.aboutSite')} &rarr;
+        </a>
+        <a
+          href="#top"
+          class="inline-flex items-center gap-1.5 text-xs font-mono text-text-muted hover:text-accent transition hover:no-underline mt-1"
+        >
+          <Icon name="arrowUp" class="h-3.5 w-3.5" />
+          <span>{t('footer.backTop')}</span>
+        </a>
+      </div>
     </div>
   </div>
 </footer>

@@ -95,11 +95,11 @@ function migration_pending(): array
             }
         }
 
-        // Columnas que deben existir en tablas que ya estaban.
         $need = [
             'messages' => ['is_starred', 'is_archived'],
             'visits'   => ['device', 'browser', 'os', 'lang', 'is_bot'],
             'posts'    => ['title', 'slug', 'summary', 'content', 'lang', 'visible', 'tags', 'published_at'],
+            'projects' => ['badges'],
         ];
         foreach ($need as $table => $columns) {
             if (in_array("tabla $table", $missing, true)) {

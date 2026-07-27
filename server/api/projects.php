@@ -17,7 +17,7 @@ try {
     $stmt = db()->query(
         "SELECT id, title_es, title_en, summary_es, summary_en,
                 description_es, description_en, image_url,
-                stack, repo_url, demo_url, store_url, featured, sort_order
+                stack, badges, repo_url, demo_url, store_url, featured, sort_order
          FROM projects
          WHERE status = 'published'
          ORDER BY featured DESC, sort_order ASC, id DESC"
@@ -35,6 +35,15 @@ $items = array_map(function (array $r) use ($isEn) {
             $stack = $decoded;
         }
     }
+    
+    $badges = [];
+    if (!empty($r['badges'])) {
+        $decodedBadges = json_decode($r['badges'], true);
+        if (is_array($decodedBadges)) {
+            $badges = $decodedBadges;
+        }
+    }
+
     // Para ingles usa el campo _en si existe; si esta vacio, cae al _es.
     $pick = function (string $es, string $en) use ($isEn, $r) {
         if ($isEn) {
@@ -50,6 +59,7 @@ $items = array_map(function (array $r) use ($isEn) {
         'description' => $pick('description_es', 'description_en'),
         'image_url'   => $r['image_url'],
         'stack'       => $stack,
+        'badges'      => $badges,
         'repo_url'    => $r['repo_url'],
         'demo_url'    => $r['demo_url'],
         'store_url'   => $r['store_url'],

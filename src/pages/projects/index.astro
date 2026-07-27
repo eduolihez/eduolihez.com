@@ -27,6 +27,7 @@ const projects = [
     summary:
       'Audita la fuerza de tus contraseñas, comprueba filtraciones vía Have I Been Pwned y genera credenciales seguras. Todo dentro del navegador.',
     stack: ['JavaScript', 'Chrome API', 'HIBP'],
+    badges: ['open-source'],
     lang: 'English',
   },
   {
@@ -36,6 +37,7 @@ const projects = [
     summary:
       'Convierte instrucciones vagas en prompts estructurados con rol, contexto y formato, sin salir de ChatGPT, Claude o Gemini.',
     stack: ['JavaScript', 'Chrome API', 'Tailwind'],
+    badges: ['open-source'],
     lang: 'Español',
   },
   {
@@ -45,6 +47,7 @@ const projects = [
     summary:
       'Analiza el grafo social de tus seguidores para detectar bots y perfiles falsos, con scoring de autenticidad y mapa de red.',
     stack: ['Python', 'Análisis de grafos'],
+    badges: ['open-source', 'in-development'],
     lang: 'Español',
   },
   {
@@ -54,6 +57,7 @@ const projects = [
     summary:
       'Aplicación de escritorio que interactúa con cuentas reales de tu nicho con comportamiento humano. Procesado local, sin servidores propios.',
     stack: ['Desktop', 'Automatización'],
+    badges: ['in-development'],
     lang: 'English',
   },
   {
@@ -63,6 +67,7 @@ const projects = [
     summary:
       'Webs profesionales listas en 72 horas para fontaneros, electricistas y reformistas, con SEO local y mantenimiento mensual.',
     stack: ['HTML', 'SEO local'],
+    badges: [],
     lang: 'Español',
   },
 ];
@@ -111,10 +116,41 @@ const itemList = {
         </p>
       </div>
 
+      <!-- Filtros de Proyectos -->
+      <div
+        id="static-projects-filters"
+        class="mb-8 flex flex-wrap gap-2 animate-fade-in"
+      >
+        <button
+          type="button"
+          class="static-filter-btn px-4 py-1.5 text-xs font-semibold rounded-lg bg-accent text-bg transition duration-200 border border-accent shadow-sm cursor-pointer"
+          data-filter="all"
+        >
+          Todos
+        </button>
+        <button
+          type="button"
+          class="static-filter-btn px-4 py-1.5 text-xs font-semibold rounded-lg bg-bg-soft/40 text-text-muted transition duration-200 border border-bg-border/60 hover:bg-bg-card hover:text-text shadow-sm cursor-pointer"
+          data-filter="open-source"
+        >
+          Open Source
+        </button>
+        <button
+          type="button"
+          class="static-filter-btn px-4 py-1.5 text-xs font-semibold rounded-lg bg-bg-soft/40 text-text-muted transition duration-200 border border-bg-border/60 hover:bg-bg-card hover:text-text shadow-sm cursor-pointer"
+          data-filter="in-development"
+        >
+          En Desarrollo
+        </button>
+      </div>
+
       <ul class="grid gap-5 sm:grid-cols-2">
         {
           projects.map((p) => (
-            <li class="reveal flex flex-col rounded-xl border border-bg-border bg-bg-card p-6 transition hover:border-accent/40">
+            <li 
+              class="reveal flex flex-col rounded-xl border border-bg-border bg-bg-card p-6 transition hover:border-accent/40 project-card-item"
+              data-badges={p.badges.join(',')}
+            >
               <div class="mb-3 flex items-baseline justify-between gap-3">
                 <h2 class="text-lg font-semibold text-text">
                   <a href={p.href} class="transition hover:text-accent hover:no-underline">
@@ -123,6 +159,29 @@ const itemList = {
                 </h2>
                 <span class="shrink-0 font-mono text-[11px] text-text-faint">{p.lang}</span>
               </div>
+              
+              {p.badges && p.badges.length > 0 && (
+                <div class="flex flex-wrap gap-1.5 mb-2.5">
+                  {p.badges.map((b) => {
+                    if (b === 'open-source') {
+                      return (
+                        <span class="rounded bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-500 border border-emerald-500/20">
+                          Open Source
+                        </span>
+                      );
+                    }
+                    if (b === 'in-development') {
+                      return (
+                        <span class="rounded bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-500 border border-amber-500/20">
+                          En Desarrollo
+                        </span>
+                      );
+                    }
+                    return null;
+                  })}
+                </div>
+              )}
+
               <p class="mb-3 font-mono text-xs uppercase tracking-wider text-accent">
                 {p.tagline}
               </p>
@@ -142,4 +201,34 @@ const itemList = {
   </section>
 
   <script type="application/ld+json" set:html={JSON.stringify(itemList)} />
+
+  <script>
+    function initStaticFilters() {
+      const filterButtons = document.querySelectorAll('.static-filter-btn');
+      filterButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          filterButtons.forEach(b => {
+            b.classList.remove('bg-accent', 'text-bg', 'border-accent');
+            b.classList.add('bg-bg-soft/40', 'text-text-muted', 'border-bg-border/60');
+          });
+          btn.classList.add('bg-accent', 'text-bg', 'border-accent');
+          btn.classList.remove('bg-bg-soft/40', 'text-text-muted', 'border-bg-border/60');
+          
+          const filterValue = btn.getAttribute('data-filter');
+          const cards = document.querySelectorAll('.project-card-item');
+          cards.forEach(card => {
+            const badgesAttr = card.getAttribute('data-badges') || '';
+            const badges = badgesAttr ? badgesAttr.split(',') : [];
+            if (filterValue === 'all' || badges.includes(filterValue)) {
+              card.classList.remove('hidden');
+            } else {
+              card.classList.add('hidden');
+            }
+          });
+        });
+      });
+    }
+    initStaticFilters();
+    document.addEventListener('astro:page-load', initStaticFilters);
+  </script>
 </BaseLayout>

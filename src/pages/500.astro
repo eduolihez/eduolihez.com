@@ -30,11 +30,13 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
     <!-- Lado Derecho: Terminal -->
     <div class="w-full max-w-lg lg:w-2/3">
-      <div class="rounded-lg border border-red-950/60 bg-bg-soft p-6 shadow-2xl md:p-8">
+      <div class="rounded-lg border border-red-500/25 bg-bg-soft p-6 shadow-2xl md:p-8">
         <div class="mb-6 flex items-center justify-between border-b border-bg-border pb-4">
           <div class="flex items-center gap-2">
-            <span class="h-3 w-3 rounded-full bg-red-600 animate-ping absolute" title="Fallo Crítico"></span>
-            <span class="h-3 w-3 rounded-full bg-red-500 relative" title="Fallo Crítico"></span>
+            <span class="relative flex h-3 w-3">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-600 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+            </span>
             <span class="font-mono text-xs font-bold text-red-500">CRITICAL_SYSTEM_ERR</span>
           </div>
           <span class="font-mono text-xs text-text-faint">kernel_panic.log</span>
@@ -55,7 +57,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
             El servidor ha experimentado una anomalía inesperada que impide completar la solicitud. Este evento se asocia habitualmente a tareas de mantenimiento, caída de servicios o fallos de configuración.
           </p>
           
-          <div class="mt-6 rounded border border-red-950/60 bg-red-950/30 p-4 text-xs text-red-300 font-mono">
+          <div class="mt-6 rounded border border-red-500/20 bg-red-500/5 p-4 text-xs text-red-300 font-mono">
             <div class="font-semibold text-red-400 mb-1">Volcado de pila simulado:</div>
             <div class="text-[11px] leading-4 text-text-muted">
               [PANIC] Traceback (most recent call):<br/>

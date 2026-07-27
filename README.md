@@ -2,7 +2,7 @@
 
 # eduolihez.com
 
-**Portfolio profesional de Eduardo Olivares Hernández** — Analista SOC / Blue Team
+**Wiki y Portfolio Profesional de Eduardo Olivares Hernández** — Analista SOC / Blue Team
 
 [![Web](https://img.shields.io/badge/web-eduolihez.com-4ade80?style=flat-square)](https://eduolihez.com)
 [![Astro](https://img.shields.io/badge/Astro-7-BC52EE?style=flat-square&logo=astro&logoColor=white)](https://astro.build)
@@ -10,133 +10,144 @@
 [![CodeQL](https://github.com/eduolihez/eduolihez.com/actions/workflows/codeql.yml/badge.svg)](https://github.com/eduolihez/eduolihez.com/actions/workflows/codeql.yml)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
 
+---
+
+### [🌐 English version](README.en.md) · [🌐 Versió en Català](README.ca.md) · **[🌐 Versión en Español](README.md)**
+
 </div>
 
 ---
 
-Sitio web y portfolio en **español, inglés y catalán**. El frontend se compila a HTML
-estático con Astro; el contenido que cambia a menudo —proyectos, certificaciones y blog—
-lo sirve una API propia en PHP contra MySQL, gestionada desde un panel de administración
-hecho a medida.
+Bienvenido al repositorio y wiki técnica de **eduolihez.com**. Este es el código fuente del sitio web personal y portfolio profesional de Eduardo Olivares, disponible completamente en **español, inglés y catalán**.
 
-La web está pensada como una demostración práctica: si trabajo asegurando sistemas ajenos,
-lo mínimo es que el mío aguante una revisión. En
-**[eduolihez.com/sobre-esta-web](https://eduolihez.com/sobre-esta-web/)** están explicados
-los controles concretos y el motivo de cada uno.
+El sitio se ha diseñado siguiendo el principio de **defensa en profundidad** y sirve como demostración de competencias técnicas en seguridad ofensiva, endurecimiento de servidores (hardening) y desarrollo web seguro. Todos los detalles técnicos sobre su diseño se describen en [eduolihez.com/sobre-esta-web](https://eduolihez.com/sobre-esta-web/).
 
-## Arquitectura
+---
+
+## 📖 Índice Wiki
+1. [Arquitectura y Flujo de Trabajo](#-arquitectura-y-flujo-de-trabajo)
+2. [Estructura del Proyecto](#-estructura-del-proyecto)
+3. [Seguridad Avanzada (Hardening)](#-seguridad-avanzada-hardening)
+4. [Administración y Base de Datos](#-administración-y-base-de-datos)
+5. [SEO Técnico e IA-Friendliness](#-seo-técnico-e-ia-friendliness)
+6. [Instalación y Despliegue](#-instalación-y-despliegue)
+7. [Licencia](#-licencia)
+
+---
+
+## 🏗️ Arquitectura y Flujo de Trabajo
+
+El proyecto combina un generador de sitios estáticos (SSG) moderno con una infraestructura backend robusta para la gestión del contenido dinámico:
 
 ```
-┌─ src/          Astro · compila a HTML estático ──► dist/ ──► FTP ──┐
-│                                                                    │
-│                                                          ┌─────────▼────────┐
-│  fetch /api/*.php  ◄─────────────────────────────────────┤  CDMON · Apache  │
-│                                                          │  Cloudflare/TLS  │
-└─ server/       PHP 8 + MySQL · API pública + /admin ─────►└─────────┬────────┘
-                                                                     │
-                                                            ┌────────▼───────┐
-                                                            │ MySQL/MariaDB  │
-                                                            └────────────────┘
+┌─ src/          Astro (Frontend) · Compila a HTML estático ─► dist/ ──► Servidor Apache ─┐
+│                                                                                         │
+│                                                                               ┌─────────▼────────┐
+│  fetch /api/*.php  ◄──────────────────────────────────────────────────────────┤  CDMON / Hosting │
+│                                                                               │  Cloudflare / TLS│
+└─ server/       PHP 8 + MySQL (Backend) · API Pública + Admin Panel ──────────►└─────────┬────────┘
+                                                                                          │
+                                                                                ┌─────────▼────────┐
+                                                                                │ MySQL / MariaDB  │
+                                                                                └──────────────────┘
 ```
 
-El frontend no necesita Node en producción: se sube `dist/` ya compilado. `server/` se sube
-tal cual, sin build. Ambas mitades comparten dominio, así que la API se consume con rutas
-relativas y no hacen falta cabeceras CORS.
+* **Frontend**: Astro compila las páginas estáticas. En producción, la carga de Node es inexistente; solo se sirven archivos planos desde la carpeta `dist/`.
+* **Backend**: Una API REST propia e independiente en PHP 8 interactúa con la base de datos MySQL/MariaDB para gestionar el buzón de contacto, visitas, artículos de blog, certificaciones y proyectos.
+* **Integración**: Ambos residen en el mismo hosting bajo el mismo dominio. Esto elimina la necesidad de configurar reglas de CORS cruzadas.
 
-| Capa | Tecnología |
-| --- | --- |
-| Frontend | Astro 7 (SSG), Tailwind CSS, TypeScript, i18n nativo (ES/EN/CA) |
-| Backend | PHP 8 con PDO, MySQL/MariaDB, sin framework |
-| Infraestructura | CDMON, Apache, Cloudflare, TLS |
-| CI | CodeQL (JS/TS), Semgrep (PHP), Dependabot |
+---
 
-## Estructura
+## 📂 Estructura del Proyecto
 
-| Ruta | Contenido |
-| --- | --- |
-| `src/` | Páginas, componentes, layouts, datos estáticos e i18n de Astro |
-| `public/` | Recursos servidos tal cual: imágenes, PDFs de certificaciones, `robots.txt`, `security.txt` |
-| `server/api/` | API pública de solo lectura + endpoint de contacto y de analítica |
-| `server/admin/` | Panel de administración protegido por sesión |
-| `server/lib/` | Núcleo compartido: arranque, helpers HTTP, subidas, parseo de user-agent |
-| `database/` | `schema.sql` (idempotente: esquema, migración y contenido inicial) y `clean.sql` (vaciado) |
-| `scripts/` | Utilidades puntuales: generación de iconos y CSS de una extensión |
+El repositorio está organizado de forma modular para aislar responsabilidades:
 
-## Seguridad
+```
+├── .github/workflows/   # CI/CD: Análisis estático (CodeQL y Semgrep)
+├── database/            # Esquema MySQL idempotente y migración de base de datos
+│   ├── schema.sql       # Tablas, índices, procedimientos de migración y seed inicial
+│   └── clean.sql        # Utilidad para vaciado de tablas
+├── public/              # Recursos estáticos servidos tal cual (PDFs, robots.txt, security.txt)
+├── scripts/             # Herramientas auxiliares de compilación y generación de iconos
+├── server/              # Backend en PHP
+│   ├── admin/           # Panel de administración (Autenticación, formularios de edición)
+│   ├── api/             # Endpoints públicos de la API de solo lectura y telemetría
+│   ├── lib/             # Núcleo backend (bootstrap, subida de archivos, base de datos, utilidades HTTP)
+│   └── config.example.php # Plantilla de configuración (BD, límites de subida)
+└── src/                 # Frontend en Astro (Páginas, Layouts, Componentes, I18n)
+```
 
-Un resumen de lo que lleva implementado. Cada punto está desarrollado, con su motivo, en
-[la página técnica del sitio](https://eduolihez.com/sobre-esta-web/).
+---
 
-**Frontend**
-- CSP con hashes SHA-256 recalculados en cada compilación; `script-src` sin `'unsafe-inline'`.
-- HSTS a un año con `includeSubDomains`, deliberadamente sin `preload`.
-- `X-Frame-Options: DENY`, COOP y CORP en `same-origin`, `Permissions-Policy` restrictiva.
-- Cero recursos de terceros: fuentes autoalojadas, sin CDN ni analítica externa.
+## 🛡️ Seguridad Avanzada (Hardening)
 
-**Backend y panel**
-- Consultas preparadas reales (`ATTR_EMULATE_PREPARES = false`), nunca concatenación.
-- CSRF en todos los formularios, comparado en tiempo constante con `hash_equals`.
-- Bloqueo de fuerza bruta por IP y ventana temporal.
-- Sesiones con regeneración de ID tras el login, cookies `HttpOnly`/`Secure`/`SameSite=Lax`,
-  y caducidad tanto por inactividad como absoluta.
-- Login con verificación de hash ficticio para que el tiempo de respuesta no permita
-  enumerar usuarios.
-- Subidas validadas por MIME real (`finfo`) **y** `getimagesize()`, con tope de dimensiones,
-  nombre aleatorio y ejecución de código desactivada en la carpeta de destino.
-- Exportaciones CSV con neutralización de inyección de fórmulas.
+Como portfolio de un profesional de ciberseguridad, se han implementado rigurosos controles para cerrar vectores de ataque comunes:
 
-**Privacidad**
-- Analítica propia, sin cookies y sin terceros. La IP no se almacena: se guarda su SHA-256
-  con sal. Se respeta `Do Not Track` y la retención está acotada con purga automática.
+### Frontend
+* **Content Security Policy (CSP)**: `script-src` configurado únicamente con hashes SHA-256 calculados automáticamente en cada compilación (evita `'unsafe-inline'`). Si un atacante inyecta una etiqueta `<script>`, el navegador se negará a ejecutarla.
+* **Cabeceras de Aislamiento**: HSTS activo (1 año con subdominios), `X-Frame-Options: DENY` contra clickjacking, y directivas COOP/CORP restrictivas.
+* **Privacidad por Diseño (Do Not Track)**: Respeto estricto a las peticiones `DNT` (si el navegador la envía, la analítica local se inhabilita por completo). Las direcciones IP de las estadísticas se hashean inmediatamente con `SHA-256` y una sal de un solo uso; nunca se almacenan en texto plano.
 
-Para reportar un fallo de seguridad: [`SECURITY.md`](SECURITY.md) o
-[`/.well-known/security.txt`](https://eduolihez.com/.well-known/security.txt).
+### Backend e Inyecciones
+* **Consultas Preparadas Reales**: Deshabilitada la emulación de PDO (`ATTR_EMULATE_PREPARES = false`) para evitar desbordes o fallos de codificación de caracteres.
+* **Seguridad en Formularios**: CSRF implementado con tokens de sesión verificados en tiempo constante (`hash_equals`).
+* **Protección del Banner superior con Markdown**: El campo del banner de administración admite Markdown y se renderiza en el cliente de forma segura. El HTML se escapa por completo *antes* del parseo para evitar inyecciones XSS persistentes (Stored XSS).
+* **Sanitización de Subidas**: Las imágenes se analizan con `finfo` (MIME real) y `getimagesize()` (estructura interna). La carpeta de subidas deshabilita la ejecución de scripts (handlers PHP apagados vía `.htaccess`) y asigna nombres aleatorios aleatorios a los archivos guardados.
 
-## Puesta en marcha
+---
 
-Requiere Node 20 o superior. Para el backend, PHP 8 y una base de datos MySQL/MariaDB.
+## 🗄️ Administración y Base de Datos
 
+* **Mantenimiento Preventivo**: El sistema incluye un validador en [bootstrap.php](file:///c:/Users/eduol/Documents/GitHub/eduolihez.com/server/lib/bootstrap.php) que comprueba las tablas y columnas necesarias al iniciar el panel de administración. Si detecta la falta de campos (ej. tras el despliegue de una columna como `badges`), redirige a una pantalla de aviso con instrucciones guiadas en vez de lanzar un error crítico en el cliente.
+* **Esquema Idempotente**: El archivo [schema.sql](file:///c:/Users/eduol/Documents/GitHub/eduolihez.com/database/schema.sql) se puede importar repetidamente en phpMyAdmin sobre bases de datos existentes sin borrar la información previa del usuario.
+
+---
+
+## 🔍 SEO Técnico e IA-Friendliness
+
+* **Grafo Único JSON-LD**: Datos estructurados (`Person`, `WebSite`, `FAQPage`, `BreadcrumbList`) unificados mediante identificadores `@id` cruzados en vez de bloques dispersos.
+* **hreflang Recíproco**: La distribución multilingüe incluye referencias cruzadas y `x-default` únicamente en páginas con traducción activa.
+* **IA Rastreabilidad**: Cumple con la especificación de [llmstxt.org](https://llmstxt.org/) generando un archivo plano [`/llms.txt`](https://eduolihez.com/llms.txt) en cada build, ideal para que los modelos de lenguaje (LLM) indexen el portfolio sin HTML residual.
+* **Control de Bots**: Filtro selectivo en `robots.txt` que permite indexar a los rastreadores legítimos de IA (GPTBot, ClaudeBot, etc.) y bloquea los rastreadores agresivos de SEO de pago.
+
+---
+
+## 🚀 Instalación y Despliegue
+
+### Requisitos
+* Node.js v20+
+* PHP 8.0+ con PDO habilitado
+* Base de datos MySQL / MariaDB
+
+### Instalación Local (Entorno Frontend)
 ```bash
+# Instalar dependencias
 npm install
-npm run dev      # http://localhost:4321
+
+# Iniciar servidor de desarrollo (Astro)
+npm run dev
 ```
 
-> En local no hay PHP, así que las secciones dinámicas (proyectos, certificaciones, blog)
-> mostrarán su mensaje de error. Es el comportamiento esperado, no un fallo.
+> [!NOTE]
+> Dado que la base de datos dinámica y PHP no corren directamente bajo el servidor de desarrollo de Astro (`localhost:4321`), es normal ver mensajes de error en las secciones dinámicas locales. Para probar la integración completa, utiliza una pila local tipo XAMPP, Laragon o Docker.
 
-| Comando | Qué hace |
-| --- | --- |
-| `npm run dev` | Servidor de desarrollo con recarga en caliente |
-| `npm run build` | Compila el sitio a `dist/` |
-| `npm run preview` | Sirve `dist/` localmente para revisarlo antes de subir |
-| `npm run icons` | Regenera favicons e iconos PWA |
+### Comandos Útiles
+* `npm run build`: Compila el frontend estático a la carpeta `dist/`.
+* `npm run preview`: Lanza una vista previa local del directorio compilado.
+* `npm run icons`: Regenera la pila de favicons y gráficos de la web.
 
-### Despliegue
+### Instrucciones de Despliegue en Servidor (CDMON / CPanel)
+1. Compila el sitio localmente con `npm run build`.
+2. Sube por FTP el contenido de `dist/` a la raíz de tu servidor (ej. `public_html/`).
+3. Sube la carpeta `server/` al mismo nivel de tu servidor para mapear `/api/` y `/admin/`.
+4. Copia `server/config.example.php` a `server/config.php` y configura tus variables de conexión. **Importante**: No subas este archivo al control de versiones.
+5. Accede a phpMyAdmin e importa [schema.sql](file:///c:/Users/eduol/Documents/GitHub/eduolihez.com/database/schema.sql).
+6. Entra en `tudominio.com/admin/setup.php` para crear tu primera cuenta de administración. **Una vez creado el usuario, borra el archivo `setup.php` del servidor.**
 
-1. `npm run build`.
-2. Subir el **contenido** de `dist/` a la raíz web (`public_html/`).
-3. Subir `server/` a la raíz web, de forma que la API quede en `/api/` y el panel en `/admin/`.
-4. Copiar `server/config.example.php` a `server/config.php` y rellenar las credenciales.
-   Este archivo está en `.gitignore` y **nunca** debe subirse al repositorio.
-5. Importar `database/schema.sql` desde phpMyAdmin. Es idempotente: sirve igual para una
-   instalación nueva que para actualizar una base ya en producción.
-6. Crear el usuario administrador en `/admin/setup.php` y **borrar ese archivo** del servidor.
+---
 
-## Visibilidad y SEO
+## 📄 Licencia
 
-- Grafo JSON-LD único (`Person`, `WebSite`, `ProfilePage`, `BreadcrumbList`, `FAQPage`)
-  enlazado por `@id`, más `BlogPosting` por artículo.
-- `hreflang` recíprocos con `x-default`, declarados solo donde la traducción existe.
-- Sitemap generado en cada compilación, con `xhtml:link` por idioma y solo URLs indexables.
-- `410 Gone` para contenido retirado a propósito y `301` para las rutas antiguas.
-- [`/llms.txt`](https://eduolihez.com/llms.txt) con un resumen en texto plano para modelos
-  de lenguaje, generado desde las mismas fuentes que la web.
-- `robots.txt` con política explícita: rastreadores de IA permitidos, SEO comercial agresivo
-  bloqueado.
+Este proyecto está bajo la [Licencia MIT](LICENSE). 
 
-## Licencia
-
-Código bajo [licencia MIT](LICENSE).
-
-El contenido personal —textos, fotografías, CV y los PDF de las certificaciones— no entra en
-esa licencia y queda reservado. Puedes reutilizar la implementación; no la identidad.
+* Quedan excluidos de la licencia MIT y reservados todos los derechos sobre el contenido personal (imágenes de marca, fotografías, archivos PDF de certificaciones y textos biográficos del autor). Puedes emplear la lógica y arquitectura del proyecto para tu propio desarrollo; se prohíbe el clonado directo de la identidad visual e información del autor.

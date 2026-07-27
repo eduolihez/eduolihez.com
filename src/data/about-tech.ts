@@ -100,6 +100,19 @@ export const techSections: TechSection[] = [
           ca: "Sense CDN, sense Google Fonts, sense etiquetes d'analitica externa. Les tipografies van autoallotjades amb subset llati. Cada domini que es treu es un tercer menys que pot caure, canviar el fitxer que serveix o registrar la IP del visitant.",
         },
       },
+      {
+        term: {
+          es: 'Filtrado de proyectos interactivo en cliente sin estado',
+          en: 'Stateless client-side project filtering',
+          ca: 'Filtratge de projectes interactiu en client sense estat',
+        },
+        detail: {
+          es: 'El filtrado de proyectos por etiquetas se ejecuta íntegramente en el navegador mediante manipulación de clases CSS. Evita guardar estados en sesión o realizar consultas HTTP adicionales para re-renderizar, minimizando la transferencia de datos y la carga del servidor.',
+          en: 'Project filtering by tags runs entirely in the browser using CSS class manipulation. This avoids storing session states or making additional HTTP requests to re-render, minimizing data transfer and server load.',
+          ca: 'El filtratge de projectes per etiquetes s’executa íntegrament al navegador mitjançant manipulació de classes CSS. Evita desar estats en sessió o fer consultes HTTP addicionals per re-renderitzar, minimitzant la transferència de dades i la càrrega del servidor.',
+        },
+        source: 'src/components/Projects.astro',
+      },
     ],
   },
 
@@ -183,6 +196,32 @@ export const techSections: TechSection[] = [
           ca: "Els intents fallits es compten en una finestra temporal i bloquegen la IP en superar el llindar. La IP es pren de REMOTE_ADDR llevat que es declari explicitament un proxy de confianca: fiar-se de X-Forwarded-For sense proxy al davant permet falsejar la IP i saltar-se el limit sencer.",
         },
         source: 'server/lib/http.php',
+      },
+      {
+        term: {
+          es: 'Markdown seguro en el banner superior',
+          en: 'Secure Markdown in the announcement banner',
+          ca: 'Markdown segur al bàner superior',
+        },
+        detail: {
+          es: 'El texto del banner superior se edita en Markdown y se parsea en el navegador. Antes de la conversión a HTML (enlaces, negritas, código), la cadena se escapa completamente contra XSS, impidiendo que una potencial inyección en base de datos ejecute código script.',
+          en: 'The top banner text is edited in Markdown and parsed in the browser. Before converting to HTML (links, bold, code), the string is fully escaped against XSS, preventing any potential database injection from executing script code.',
+          ca: 'El text del bàner superior s’edita en Markdown i es parseja al navegador. Abans de la conversió a HTML (enllaços, negretes, codi), la cadena s’escapa completament contra XSS, impedint que una potencial injecció en base de dades executi codi script.',
+        },
+        source: 'src/components/Announcement.astro',
+      },
+      {
+        term: {
+          es: 'Controlador preventivo de migraciones de base de datos',
+          en: 'Preventative database migration handler',
+          ca: 'Controlador preventiu de migracions de base de dades',
+        },
+        detail: {
+          es: 'El script de inicialización verifica las tablas y columnas necesarias al cargar el panel de administración. Si falta alguna columna (por ejemplo, tras desplegar cambios del esquema), muestra una pantalla de mantenimiento con instrucciones de migración seguras en vez de un fallo fatal de SQL.',
+          en: 'The bootstrap script verifies all required tables and columns when loading the admin panel. If any column is missing (e.g. after deploying schema updates), it displays a maintenance notice with safe migration instructions instead of a fatal SQL failure.',
+          ca: 'El script d’inicialització verifica les taules i columnes necessàries en carregar la consola d’administració. Si falta alguna columna (per exemple, després de desplegar canvis de l’esquema), mostra una pantalla de manteniment amb instruccions de migració segures en comptes d’una fallada fatal de SQL.',
+        },
+        source: 'server/lib/bootstrap.php',
       },
     ],
   },

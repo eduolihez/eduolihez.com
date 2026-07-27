@@ -204,6 +204,10 @@ const itemList = {
 
   <script>
     function initStaticFilters() {
+      const container = document.getElementById('static-projects-filters');
+      if (!container || container.dataset.loaded) return;
+      container.dataset.loaded = '1';
+
       const filterButtons = document.querySelectorAll('.static-filter-btn');
       filterButtons.forEach(btn => {
         btn.addEventListener('click', () => {

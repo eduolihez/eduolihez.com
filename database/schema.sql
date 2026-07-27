@@ -334,7 +334,7 @@ BEGIN
   -- --- Proyectos -----------------------------------------------------------
   IF (SELECT COUNT(*) FROM `projects`) = 0 THEN
     INSERT INTO `projects`
-      (`title_es`, `title_en`, `summary_es`, `summary_en`, `stack`,
+      (`title_es`, `title_en`, `summary_es`, `summary_en`, `stack`, `badges`,
        `repo_url`, `demo_url`, `store_url`, `featured`, `sort_order`, `status`)
     VALUES
       ('Dewi App',
@@ -342,6 +342,7 @@ BEGIN
        'Prototipo web ganador de la 8a Hackathon TecnoCampus para monitorizar el consumo de agua en tiempo real.',
        'Award-winning web prototype (8th TecnoCampus Hackathon) to monitor water consumption in real time.',
        '["Next.js","TypeScript","Tailwind CSS"]',
+       '["open-source"]',
        'https://github.com/eduolihez/hackathon-Dewi', NULL, NULL, 1, 1, 'published'),
 
       ('BinCat',
@@ -349,6 +350,7 @@ BEGIN
        'Sistema de gestion segura de tokens en Python con cifrado Fernet y almacenamiento en SQLite.',
        'Secure token management system in Python using Fernet encryption and SQLite storage.',
        '["Python","Cryptography (Fernet)","SQLite"]',
+       '["open-source"]',
        'https://github.com/eduolihez/BinCat', NULL, NULL, 1, 2, 'published'),
 
       ('NorthGate Browser',
@@ -356,6 +358,7 @@ BEGIN
        'Navegador (fork de Mullvad/Firefox) con clasificador de phishing on-device en ONNX/Rust. En desarrollo temprano.',
        'Browser (Mullvad/Firefox fork) with an on-device phishing classifier in ONNX/Rust. Early stage.',
        '["Rust","ONNX","Firefox","Machine Learning"]',
+       '["open-source","in-development"]',
        'https://github.com/eduolihez/northgate-browser', NULL, NULL, 1, 3, 'published'),
 
       ('Password Sentinel',
@@ -363,6 +366,7 @@ BEGIN
        'Extension de Chrome que comprueba la seguridad de tus contrasenas con Have I Been Pwned, sin enviar datos a ningun servidor.',
        'Chrome extension that checks password safety against Have I Been Pwned, without sending data to any server.',
        '["JavaScript","Chrome Extension","Have I Been Pwned API"]',
+       '["open-source"]',
        NULL, '/projects/passwdcentinel/', NULL, 0, 4, 'published'),
 
       ('PromptMaster Universal AI',
@@ -370,6 +374,7 @@ BEGIN
        'Extension de Chrome que optimiza tus prompts para ChatGPT, Claude y Gemini.',
        'Chrome extension that optimizes your prompts for ChatGPT, Claude and Gemini.',
        '["JavaScript","Chrome Extension","Prompt Engineering"]',
+       '["open-source"]',
        NULL, '/projects/promptmaster/', 'https://addons.mozilla.org/es-ES/firefox/addon/promptmaster/', 0, 5, 'published');
   END IF;
 

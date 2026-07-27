@@ -62,6 +62,15 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     $p['sort_order']     = (int) ($_POST['sort_order'] ?? 0);
     $p['status']         = ($_POST['status'] ?? 'published') === 'draft' ? 'draft' : 'published';
 
+    // Recogemos badges seleccionados para que no se pierdan en caso de error de validación
+    $p['badges'] = [];
+    if (isset($_POST['badge_open_source'])) {
+        $p['badges'][] = 'open-source';
+    }
+    if (isset($_POST['badge_in_development'])) {
+        $p['badges'][] = 'in-development';
+    }
+
     $errors = [];
     if ($p['title_es'] === '') $errors[] = 'El titulo en espanol es obligatorio.';
     if ($p['summary_es'] === '') $errors[] = 'El resumen en espanol es obligatorio.';
@@ -84,16 +93,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
             JSON_UNESCAPED_UNICODE
         );
 
-        // Procesar badges seleccionados
-        $badges = [];
-        if (isset($_POST['badge_open_source'])) {
-            $badges[] = 'open-source';
-        }
-        if (isset($_POST['badge_in_development'])) {
-            $badges[] = 'in-development';
-        }
-        $p['badges'] = $badges;
-        $badgesJson = json_encode($badges, JSON_UNESCAPED_UNICODE);
+        $badgesJson = json_encode($p['badges'], JSON_UNESCAPED_UNICODE);
 
         if ($isEdit) {
             $sql = 'UPDATE projects SET title_es=?, title_en=?, summary_es=?, summary_en=?,

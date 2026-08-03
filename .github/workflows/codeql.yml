@@ -47,16 +47,16 @@ jobs:
       # v5 es la primera version que corre sobre Node 24. Con v4 el runner
       # avisa de que Node 20 esta en desuso.
       - name: Descargar el repositorio
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       # v4 es la version sobre Node 24; v3 queda obsoleta en diciembre de 2026.
       - name: Inicializar CodeQL
-        uses: github/codeql-action/init@v4
+        uses: github/codeql-action/init@v4.37.4
         with:
           languages: ${{ matrix.language }}
 
       - name: Analizar
-        uses: github/codeql-action/analyze@v4
+        uses: github/codeql-action/analyze@v4.37.4
         with:
           category: "/language:${{ matrix.language }}"
 
@@ -80,7 +80,7 @@ jobs:
 
     steps:
       - name: Descargar el repositorio
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       # pipx viene preinstalado en los runners de GitHub e instala la
       # herramienta aislada, sin chocar con el Python del sistema
@@ -110,7 +110,7 @@ jobs:
       # punto se sube igualmente en lugar de perderse.
       - name: Subir los resultados
         if: always()
-        uses: github/codeql-action/upload-sarif@v4
+        uses: github/codeql-action/upload-sarif@v4.37.4
         with:
           sarif_file: semgrep.sarif
           category: semgrep-php

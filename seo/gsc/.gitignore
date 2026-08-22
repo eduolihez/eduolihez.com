@@ -1,0 +1,6 @@
+# Los exports de Search Console llevan datos de trafico reales (consultas,
+# paginas, paises). No tienen por que estar en un repositorio publico, asi que
+# se ignora todo el contenido de la carpeta menos la documentacion.
+*
+!.gitignore
+!README.md

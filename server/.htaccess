@@ -26,6 +26,24 @@
   RewriteRule ^ https://%1%{REQUEST_URI} [L,R=301]
 
   # -------------------------------------------------------------------------
+  # /index.html -> /   (301 permanente)
+  #
+  # Son la MISMA pagina servida en dos URLs distintas, y Google tiene las dos
+  # indexadas: en Search Console aparece www.eduolihez.com/index.html con
+  # impresiones propias. Mientras existan las dos, las senales de una no suman
+  # a la otra.
+  #
+  # Se comprueba THE_REQUEST (la linea de peticion ORIGINAL del navegador) y no
+  # REQUEST_URI a proposito: cuando Apache resuelve "/" internamente via
+  # DirectoryIndex, REQUEST_URI pasa a valer "/index.html" y la regla se
+  # dispararia contra su propia salida, entrando en bucle de redirecciones.
+  # THE_REQUEST no cambia en las resoluciones internas, asi que solo se activa
+  # cuando el index.html viene escrito de fuera.
+  # -------------------------------------------------------------------------
+  RewriteCond %{THE_REQUEST} \s/+(.*/)?index\.html[\s?] [NC]
+  RewriteRule ^(.*/)?index\.html$ /$1 [L,R=301]
+
+  # -------------------------------------------------------------------------
   # Proyectos: estructura ANTIGUA -> NUEVA  (301 permanente)
   #
   # Hasta la reorganizacion, cada proyecto colgaba de la raiz (/fluence/,
@@ -37,6 +55,30 @@
   # El 301 traslada ademas el posicionamiento acumulado a la URL nueva.
   # -------------------------------------------------------------------------
   RewriteRule ^(fluence|followguard|passwdcentinel|promptmaster|zeora)(/.*)?$ /projects/$1$2 [L,R=301]
+
+  # -------------------------------------------------------------------------
+  # Carpeta /src/ de la web ANTIGUA -> ubicacion actual  (301 permanente)
+  #
+  # La version anterior del sitio servia los archivos desde /src/. Esas URLs
+  # siguen indexadas y hoy responden 404. No es un detalle menor: segun Search
+  # Console los diplomas de Trend Micro en /src/certs/ acumulan MAS impresiones
+  # que cualquier pagina del sitio, portada incluida. Los archivos existen y
+  # responden 200 en /certificaciones/; lo unico que cambio fue la ruta.
+  #
+  # Sin flag NE a proposito: los nombres llevan espacios y el simbolo (TM), y
+  # hace falta que Apache los vuelva a escapar al construir la cabecera
+  # Location. Con NE saldrian espacios literales y la redireccion seria
+  # invalida.
+  # -------------------------------------------------------------------------
+  RewriteRule ^src/certs/(.*)$ /certificaciones/$1 [L,R=301]
+
+  # El CV ya no se publica como PDF: el boton del Hero abre un aviso y lleva a
+  # LinkedIn. La URL antigua conserva impresiones, asi que se manda a portada
+  # en vez de dejarla en 404.
+  RewriteRule ^src/Edu_Olivares_CV\.pdf$ / [L,R=301]
+
+  # Cualquier otro resto de la carpeta antigua.
+  RewriteRule ^src(/.*)?$ / [L,R=301]
 </IfModule>
 
 # ---------------------------------------------------------------------------

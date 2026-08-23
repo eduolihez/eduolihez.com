@@ -6,7 +6,7 @@
  * las versiones en espanol, ingles y catalan comparten estructura y no pueden
  * descompasarse. Cada pagina solo aporta sus textos de cabecera.
  */
-import { techSections, stackRows } from '../data/about-tech';
+import { techSections, stackRows, pagespeedScores } from '../data/about-tech';
 import { pick } from '../i18n/utils';
 import type { Lang } from '../i18n/ui';
 import { SITE } from '../config';
@@ -40,6 +40,14 @@ const checkTones = {
   cyan: 'text-cyan',
   violet: 'text-violet',
 } as const;
+
+/** Mismos umbrales que usa el propio Lighthouse para colorear sus 4 categorias
+ * (90+ verde, 50-89 ambar, <50 rojo) -- no se inventa una escala nueva. */
+function scoreTone(score: number): string {
+  if (score >= 90) return 'border-accent/20 bg-accent/10 text-accent';
+  if (score >= 50) return 'border-warn/20 bg-warn/10 text-warn';
+  return 'border-danger/20 bg-danger/10 text-danger';
+}
 ---
 
 <!-- Resumen del stack -->
@@ -127,10 +135,10 @@ const checkTones = {
 
   <div class="grid grid-cols-2 gap-6 text-center sm:grid-cols-4">
     {
-      labels.metrics.map((name) => (
+      labels.metrics.map((name, i) => (
         <div class="flex flex-col items-center">
-          <div class="flex h-20 w-20 items-center justify-center rounded-full border border-accent/20 bg-accent/10 font-mono text-xl font-bold text-accent">
-            100
+          <div class={`flex h-20 w-20 items-center justify-center rounded-full border font-mono text-xl font-bold ${scoreTone(pagespeedScores.values[i])}`}>
+            {pagespeedScores.values[i]}
           </div>
           <span class="mt-2 text-xs font-medium text-text">{name}</span>
         </div>

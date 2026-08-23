@@ -529,3 +529,20 @@ export const stackRows: { label: Localized; value: string }[] = [
     value: 'Español · English · Català',
   },
 ];
+
+/**
+ * Puntuaciones reales de Lighthouse contra la produccion (https://eduolihez.com/),
+ * vista Movil -- la API de PageSpeed Insights sin clave da 429 (cuota diaria a
+ * 0), asi que se midio con `npx lighthouse` contra Chrome, que es el mismo
+ * motor y la misma escala 0-100 que ensena PageSpeed Insights.
+ *
+ * Orden fijo: Rendimiento, Accesibilidad, Buenas practicas, SEO -- coincide
+ * con el orden de `labels.metrics` en cada pagina que consume este archivo.
+ * No se recalculan en cada build: son una foto de un momento, tal como avisa
+ * metricsNote. Actualizar a mano si se vuelve a medir.
+ */
+export const pagespeedScores = {
+  measuredAt: '2026-08-23',
+  strategy: 'mobile' as const,
+  values: [66, 96, 92, 100],
+};

@@ -34,6 +34,12 @@ const tones = {
   cyan: 'bg-cyan/10 border-cyan/20 text-cyan',
   violet: 'bg-violet/10 border-violet/20 text-violet',
 } as const;
+/** Solo el color de texto, para el check delante de cada punto de la lista. */
+const checkTones = {
+  accent: 'text-accent',
+  cyan: 'text-cyan',
+  violet: 'text-violet',
+} as const;
 ---
 
 <!-- Resumen del stack -->
@@ -80,16 +86,25 @@ const tones = {
 
         <ul class="space-y-4 border-t border-bg-border pt-5">
           {section.items.map((item) => (
-            <li>
-              <p class="text-sm font-semibold text-text">{pick(item.term, lang)}</p>
-              <p class="mt-1 text-sm leading-relaxed text-text-muted">{pick(item.detail, lang)}</p>
-              {item.source && (
-                <p class="mt-1.5">
-                  <code class="rounded-sm bg-bg-soft px-1.5 py-0.5 font-mono text-[11px] text-text-faint">
-                    {item.source}
-                  </code>
-                </p>
-              )}
+            <li class="flex gap-3">
+              {/* Checklist, no prosa suelta: esta pagina es la prueba de que
+                  cada control existe, asi que debe leerse como una lista
+                  verificada antes de leer una sola palabra. */}
+              <Icon
+                name="check"
+                class={`h-4 w-4 shrink-0 translate-y-0.5 ${checkTones[section.tone]}`}
+              />
+              <div class="min-w-0">
+                <p class="text-sm font-semibold text-text">{pick(item.term, lang)}</p>
+                <p class="mt-1 text-sm leading-relaxed text-text-muted">{pick(item.detail, lang)}</p>
+                {item.source && (
+                  <p class="mt-1.5">
+                    <code class="rounded-sm bg-bg-soft px-1.5 py-0.5 font-mono text-[11px] text-text-faint">
+                      {item.source}
+                    </code>
+                  </p>
+                )}
+              </div>
             </li>
           ))}
         </ul>
@@ -114,7 +129,7 @@ const tones = {
     {
       labels.metrics.map((name) => (
         <div class="flex flex-col items-center">
-          <div class="flex h-20 w-20 items-center justify-center rounded-full border-4 border-accent font-mono text-xl font-bold text-accent shadow-[0_0_15px_rgba(74,222,128,0.2)]">
+          <div class="flex h-20 w-20 items-center justify-center rounded-full border border-accent/20 bg-accent/10 font-mono text-xl font-bold text-accent">
             100
           </div>
           <span class="mt-2 text-xs font-medium text-text">{name}</span>

@@ -43,6 +43,28 @@ y no después.
 - Los comentarios del código están en castellano y explican decisiones, no
   sintaxis. Si tocas algo con un motivo detrás, déjalo escrito.
 
+## Ramas y releases
+
+`master` está protegida: todo cambio entra por pull request, con
+`npm test` en verde como requisito (lo comprueba el workflow `Tests`), y se
+integra con squash (un commit por PR, historial lineal). Las ramas de feature
+se borran solas al mergear.
+
+Convención de nombres para ramas nuevas:
+
+| Prefijo  | Para qué |
+|----------|----------|
+| `feat/`  | Funcionalidad nueva |
+| `fix/`   | Corrección de un bug |
+| `chore/` | Mantenimiento, dependencias, configuración |
+| `docs/`  | Solo documentación |
+
+Cada versión real (no cada commit) queda como
+[Release](https://github.com/eduolihez/eduolihez.com/releases) con el sitio
+compilado (`dist/`) adjunto en zip, generada automáticamente al pushear un
+tag `vX.Y.Z.W` que coincida con [`VERSION`](VERSION). El
+[`CHANGELOG`](CHANGELOG.md) documenta qué cambió en cada una.
+
 ## Levantar el proyecto
 
 Está en el [README](README.md#puesta-en-marcha). Un aviso que ahorra

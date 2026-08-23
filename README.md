@@ -26,7 +26,7 @@ El sitio se ha diseñado siguiendo el principio de **defensa en profundidad** y 
 
 ---
 
-## 📖 Índice Wiki
+## 📖 Índice
 1. [Arquitectura y Flujo de Trabajo](#-arquitectura-y-flujo-de-trabajo)
 2. [Estructura del Proyecto](#-estructura-del-proyecto)
 3. [Seguridad Avanzada (Hardening)](#-seguridad-avanzada-hardening)
@@ -155,6 +155,8 @@ npm run dev
 
 Este repositorio tiene más documentación de la que cabe en este README:
 
+* [Wiki](https://github.com/eduolihez/eduolihez.com/wiki) — punto de entrada
+  a toda la documentación, incluido el plan de visibilidad IA/SEO.
 * [TESTING.md](TESTING.md) — framework de tests, cobertura y convenciones.
 * [CONTRIBUTING.md](CONTRIBUTING.md) — cómo reportar un fallo o proponer un cambio.
 * [SECURITY.md](SECURITY.md) — política de divulgación de vulnerabilidades.

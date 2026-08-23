@@ -26,7 +26,7 @@ The site has been designed following the principle of **defense in depth** and s
 
 ---
 
-## 📖 Wiki Index
+## 📖 Index
 1. [Architecture & Workflow](#-architecture--workflow)
 2. [Project Structure](#-project-structure)
 3. [Advanced Hardening (Security)](#-advanced-hardening-security)
@@ -157,6 +157,8 @@ This repository has more documentation than fits in this README. Most of it is
 written in Spanish (this is the author's personal site, not a library aimed at
 international contributors) — `SECURITY.md` is the exception, in English:
 
+* [Wiki](https://github.com/eduolihez/eduolihez.com/wiki) — entry point to
+  all the documentation, including the AI/SEO visibility plan.
 * [TESTING.md](TESTING.md) — test framework, coverage, and conventions.
 * [CONTRIBUTING.md](CONTRIBUTING.md) — how to report a bug or propose a change.
 * [SECURITY.md](SECURITY.md) — vulnerability disclosure policy.

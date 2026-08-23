@@ -26,7 +26,7 @@ El lloc s'ha dissenyat seguint el principi de **defensa en profunditat** i serve
 
 ---
 
-## 📖 Índex Wiki
+## 📖 Índex
 1. [Arquitectura i Flux de Treball](#-arquitectura-i-flux-de-treball)
 2. [Estructura del Projecte](#-estructura-del-projecte)
 3. [Seguretat Avançada (Hardening)](#-seguretat-avançada-hardening)
@@ -157,6 +157,8 @@ Aquest repositori té més documentació de la que cap en aquest README. La majo
 part està en castellà (és el web personal de l'autor, no una llibreria pensada
 per a col·laboradors internacionals) — `SECURITY.md` és l'excepció, en anglès:
 
+* [Wiki](https://github.com/eduolihez/eduolihez.com/wiki) — punt d'entrada
+  a tota la documentació, incloent el pla de visibilitat IA/SEO.
 * [TESTING.md](TESTING.md) — framework de tests, cobertura i convencions.
 * [CONTRIBUTING.md](CONTRIBUTING.md) — com reportar un error o proposar un canvi.
 * [SECURITY.md](SECURITY.md) — política de divulgació de vulnerabilitats.

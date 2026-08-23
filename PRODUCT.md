@@ -89,7 +89,7 @@ idiomas · `/projects` · `/sobre-esta-web` (`/en/about-this-website`,
 `/ca/sobre-aquesta-web`) · páginas de error 400/403/404/410/500 · `sitemap.xml` ·
 `llms.txt` · `sitemap-posts.xml` · `llms-blog.txt` (estos dos últimos, servidos
 por PHP en cada petición en vez de generados al compilar, porque los artículos
-del blog viven en MySQL — ver `docs/designs/seo-ai-visibility.md`).
+del blog viven en MySQL — ver [la wiki](https://github.com/eduolihez/eduolihez.com/wiki/SEO-AI-Visibility-Plan)).
 
 **Superficie privada.** Panel `/admin` en PHP: panel, proyectos, certificaciones,
 blog, mensajes (con contador de no leídos), analítica, seguridad, ajustes y backup.

@@ -205,7 +205,14 @@ ${faqBlock}
 - ${SITE.domain}/sobre-esta-web/ — Como esta construida esta web (espanol)
 - ${SITE.domain}/en/about-this-website/ — Como esta construida esta web (ingles)
 - ${SITE.domain}/ca/sobre-aquesta-web/ — Como esta construida esta web (catalan)
-- ${SITE.domain}/sitemap.xml — Mapa del sitio
+- ${SITE.domain}/sitemap.xml — Mapa del sitio (paginas fijas)
+- ${SITE.domain}/llms-blog.txt — El TEXTO INTEGRO de todos los articulos, en
+  plano y sin JavaScript. Si vas a resumir o citar un articulo, lee este
+  archivo en vez de la pagina: la pagina carga el cuerpo con JavaScript.
+- ${SITE.domain}/sitemap-posts.xml — Mapa de TODOS los articulos del blog, con
+  la direccion completa de cada uno. Si necesitas enumerar los articulos, este
+  archivo es la fuente fiable: el indice del blog se pinta con JavaScript, asi
+  que un rastreador que no lo ejecute vera la pagina vacia.
 - ${SITE.domain}/.well-known/security.txt — Politica de divulgacion de seguridad
 
 ## Notas para asistentes de IA

@@ -1,0 +1,58 @@
+---
+/**
+ * <StatusPanel /> - Los tres estados de una seccion que se pinta desde el API.
+ * ---------------------------------------------------------------------------
+ * Proyectos, certificaciones y blog no traen su contenido en el HTML: lo piden
+ * a /api/*.php al cargar. Eso hace que "cargando", "vacio" y "error" no sean
+ * casos raros, sino lo que ve cualquiera que entre mientras el backend
+ * responde -- o si se cae.
+ *
+ * Antes cada una de las tres secciones resolvia esto a su manera: el blog y
+ * proyectos dejaban una linea de texto gris suelta (el error solo se
+ * distinguia de la carga en que se paraba el spinner, sin decir que hacer),
+ * y certificaciones si tenia boton de reintento, pero con sus textos escritos
+ * a mano en el marcado en vez de pasar por i18n.
+ *
+ * COMO SE USA DESDE JS: se cambia el atributo data-state del contenedor a
+ * "loading" | "empty" | "error". El CSS (.status-panel en global.css) se
+ * encarga de mostrar el icono que toca y el boton de reintento. No hace falta
+ * inyectar SVG ni reescribir clases desde JavaScript -- reescribir el
+ * className entero era justo lo que borraba los atributos de accesibilidad.
+ */
+import Icon from './Icon.astro';
+
+interface Props {
+  /** Id del contenedor. El parrafo de texto sera `${id}-text`. */
+  id: string;
+  /** Mensaje inicial (estado de carga). */
+  loadingText: string;
+  /** Etiqueta del boton de reintento. */
+  retryText: string;
+  class?: string;
+}
+const { id, loadingText, retryText, class: className = '' } = Astro.props;
+---
+
+<div
+  id={id}
+  class:list={['status-panel', className]}
+  data-state="loading"
+  role="status"
+  aria-live="polite"
+>
+  {/* El spinner conserva .animate-spin: es el enganche que ya usa el JS. */}
+  <span
+    data-when="loading"
+    class="status-icon animate-spin rounded-full border-2 border-bg-border border-t-accent"
+    aria-hidden="true"></span>
+  <Icon name="inbox" class="status-icon" data-when="empty" />
+  <Icon name="alert" class="status-icon" data-when="error" />
+
+  <div class="min-w-0">
+    <p id={`${id}-text`} class="leading-relaxed">{loadingText}</p>
+    <button type="button" data-when="error" class="status-retry">
+      <Icon name="refresh" class="h-3.5 w-3.5" />
+      {retryText}
+    </button>
+  </div>
+</div>

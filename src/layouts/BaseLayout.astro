@@ -5,11 +5,24 @@
  * (reveal on scroll + registro de visita).
  */
 import '../styles/global.css';
+/*
+ * Las dos fuentes se precargan porque las DOS salen en el primer viewport: el
+ * nombre y el resumen van en Inter, y el rol y el badge de disponibilidad en
+ * JetBrains Mono. Sin precarga el navegador no descubre los .woff2 hasta que
+ * ha descargado y analizado el CSS, asi que el texto parpadea al cambiar de
+ * la fuente del sistema a la real (font-display: swap) y el LCP se retrasa.
+ *
+ * Se importan con ?url para que Vite devuelva la ruta con hash que realmente
+ * se publica; escribirla a mano se romperia en la siguiente compilacion.
+ */
+import interWoff2 from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
+import monoWoff2 from '@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2?url';
 import Seo from '../components/Seo.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Announcement from '../components/Announcement.astro';
 import type { Lang } from '../i18n/ui';
+import { useTranslations } from '../i18n/utils';
 
 interface Props {
   title: string;
@@ -38,6 +51,10 @@ const {
   breadcrumbs,
   breadcrumbName,
 } = Astro.props;
+
+// El enlace de salto estaba escrito a mano en castellano, asi que en /en/ y
+// /ca/ lo primero que anunciaba un lector de pantalla salia en otro idioma.
+const t = useTranslations(lang);
 ---
 
 <!doctype html>
@@ -46,6 +63,11 @@ const {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#0a0e14" />
+
+    {/* crossorigin es obligatorio en la precarga de fuentes, incluso siendo
+        del mismo origen: sin el, el navegador descarga el archivo dos veces. */}
+    <link rel="preload" href={interWoff2} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={monoWoff2} as="font" type="font/woff2" crossorigin />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="apple-touch-icon" href="/img/apple-touch-icon.png" />
@@ -68,7 +90,7 @@ const {
       href="#main"
       class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-accent focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-bg"
     >
-      Saltar al contenido
+      {t('nav.skip')}
     </a>
 
     <span id="top"></span>

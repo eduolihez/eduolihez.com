@@ -206,8 +206,8 @@ const messages = {
 
     function setFeedback(text, ok) {
       feedback.textContent = text;
-      feedback.classList.remove('hidden', 'text-accent', 'text-red-400');
-      feedback.classList.add(ok ? 'text-accent' : 'text-red-400');
+      feedback.classList.remove('hidden', 'text-accent', 'text-danger');
+      feedback.classList.add(ok ? 'text-accent' : 'text-danger');
     }
 
     // El formulario se puede apagar desde /admin -> Ajustes (util si llega

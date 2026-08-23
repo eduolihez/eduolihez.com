@@ -24,6 +24,8 @@ Disallow: /projects/zeora/templates/
 
 # El resumen en texto plano para modelos de lenguaje.
 Allow: /llms.txt
+Allow: /llms-blog.txt
+Allow: /sitemap-posts.xml
 
 # --- Buscadores tradicionales ----------------------------------------------
 User-agent: Googlebot
@@ -34,6 +36,8 @@ Disallow: /projects/zeora/templates/
 
 User-agent: Googlebot-Image
 Allow: /
+Disallow: /admin/
+Disallow: /api/
 
 User-agent: Bingbot
 Allow: /
@@ -43,6 +47,8 @@ Disallow: /projects/zeora/templates/
 
 User-agent: DuckDuckBot
 Allow: /
+Disallow: /admin/
+Disallow: /api/
 
 # --- Rastreadores de IA: PERMITIDOS a proposito -----------------------------
 # Cada uno de estos alimenta un asistente distinto. Si los bloqueas, esa IA
@@ -53,33 +59,51 @@ Allow: /
 # OpenAI — ChatGPT (rastreo general y busqueda en vivo)
 User-agent: GPTBot
 Allow: /
+Disallow: /admin/
+Disallow: /api/
 
 User-agent: OAI-SearchBot
 Allow: /
+Disallow: /admin/
+Disallow: /api/
 
 User-agent: ChatGPT-User
 Allow: /
+Disallow: /admin/
+Disallow: /api/
 
 # Anthropic — Claude
 User-agent: ClaudeBot
 Allow: /
+Disallow: /admin/
+Disallow: /api/
 
 User-agent: Claude-Web
 Allow: /
+Disallow: /admin/
+Disallow: /api/
 
 User-agent: anthropic-ai
 Allow: /
+Disallow: /admin/
+Disallow: /api/
 
 # Perplexity
 User-agent: PerplexityBot
 Allow: /
+Disallow: /admin/
+Disallow: /api/
 
 User-agent: Perplexity-User
 Allow: /
+Disallow: /admin/
+Disallow: /api/
 
 # Google — Gemini y AI Overviews
 User-agent: Google-Extended
 Allow: /
+Disallow: /admin/
+Disallow: /api/
 
 # Microsoft Copilot
 # No lleva grupo propio a proposito: Copilot rastrea con Bingbot, que ya tiene
@@ -92,37 +116,118 @@ Allow: /
 # Apple Intelligence
 User-agent: Applebot
 Allow: /
+Disallow: /admin/
+Disallow: /api/
 
 User-agent: Applebot-Extended
 Allow: /
+Disallow: /admin/
+Disallow: /api/
 
 # Common Crawl (base de datos que usan muchos modelos)
 User-agent: CCBot
 Allow: /
+Disallow: /admin/
+Disallow: /api/
 
 # Meta AI
 User-agent: meta-externalagent
 Allow: /
+Disallow: /admin/
+Disallow: /api/
 
 # Mistral
 User-agent: MistralAI-User
 Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+# Anthropic separo sus rastreadores: ClaudeBot indexa, Claude-User es una
+# peticion que nace de una pregunta del usuario, y Claude-SearchBot alimenta
+# la busqueda. Los tres deben poder leerte para que Claude te cite.
+User-agent: Claude-User
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+User-agent: Claude-SearchBot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+# ByteDance (TikTok / Doubao)
+User-agent: Bytespider
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+# Amazon (Alexa / Rufus)
+User-agent: Amazonbot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+# Meta: el fetcher que resuelve enlaces citados, distinto del rastreador
+User-agent: meta-externalfetcher
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+# DuckDuckGo AI
+User-agent: DuckAssistBot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+# Google Vertex AI (agentes empresariales)
+User-agent: Google-CloudVertexBot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+# Allen Institute for AI (datasets abiertos de investigacion)
+User-agent: AI2Bot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+# Cohere
+User-agent: cohere-ai
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+# You.com
+User-agent: YouBot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
 
 # --- Redes sociales (para que las tarjetas de enlace se generen bien) -------
 User-agent: LinkedInBot
 Allow: /
+Disallow: /admin/
+Disallow: /api/
 
 User-agent: Twitterbot
 Allow: /
+Disallow: /admin/
+Disallow: /api/
 
 User-agent: facebookexternalhit
 Allow: /
+Disallow: /admin/
+Disallow: /api/
 
 User-agent: WhatsApp
 Allow: /
+Disallow: /admin/
+Disallow: /api/
 
 User-agent: TelegramBot
 Allow: /
+Disallow: /admin/
+Disallow: /api/
 
 # --- Rastreadores agresivos de SEO comercial --------------------------------
 # No aportan visitas, solo consumen ancho de banda del hosting compartido.
@@ -141,5 +246,20 @@ Disallow: /
 User-agent: PetalBot
 Disallow: /
 
+User-agent: DataForSeoBot
+Disallow: /
+
+User-agent: BLEXBot
+Disallow: /
+
+User-agent: Barkrowler
+Disallow: /
+
+User-agent: serpstatbot
+Disallow: /
+
 # --- Mapa del sitio ---------------------------------------------------------
 Sitemap: https://eduolihez.com/sitemap.xml
+# Los articulos del blog van aparte: se publican desde el panel sin recompilar,
+# asi que este segundo sitemap lo genera PHP leyendo la base de datos.
+Sitemap: https://eduolihez.com/sitemap-posts.xml

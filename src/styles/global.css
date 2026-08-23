@@ -37,6 +37,23 @@
   --color-accent-soft: #134e2a; /* fondo tenue para badges */
   --color-accent-cyan: #22d3ee; /* acento secundario */
 
+  /* --- Estado ----------------------------------------------------------
+     El verde significa "vivo, disponible, accionable" (ver DESIGN.md, la
+     regla de la senal escasa), asi que NO puede significar tambien "ha
+     fallado". Antes cada pagina de error y cada formulario improvisaba su
+     propio rojo -- red-300, red-400, red-500, red-600, rose-900 -- cinco
+     valores para un unico significado. Estos dos son los unicos. */
+  --color-danger: #f87171; /* fallo, alerta, destructivo */
+  --color-warn: #f59e0b; /* aviso; tambien el badge "En Desarrollo" */
+
+  /* --- Estado de proyecto ----------------------------------------------
+     DESIGN.md ya documentaba estos tres, pero el codigo los escribia como
+     literales de Tailwind (bg-emerald-500, text-blue-400...). Coincidian
+     hoy; si el token cambiaba, la interfaz no. Ahora son tokens de verdad. */
+  --color-oss: #10b981; /* Open Source */
+  --color-wip: #f59e0b; /* En Desarrollo */
+  --color-closed: #60a5fa; /* Codigo Privado */
+
   /* Acentos sueltos para diferenciar bloques en "Sobre esta web".
      Tailwind trae las escalas `cyan-500`/`violet-500`, pero no un valor sin
      numero: `text-cyan` y `text-violet` no existirian sin estas dos lineas. */
@@ -46,7 +63,14 @@
   --color-text: #e6edf3; /* texto principal */
   --color-text-title: #f0f3f6; /* titulares (un punto por encima del cuerpo) */
   --color-text-muted: #9aa7b8; /* texto secundario */
-  --color-text-faint: #6b7688; /* texto terciario / metadatos */
+  /* Texto terciario / metadatos.
+     Era #6b7688 y no llegaba al minimo de WCAG AA: 4.21 sobre el fondo
+     principal, 4.14 sobre el pie, 4.02 sobre las secciones alternas y 3.80
+     sobre las tarjetas, para un minimo de 4.5. Afectaba a fechas, empresas
+     del timeline, encabezados de columna del pie y el copyright.
+     #78849a es el escalon minimo que pasa en el PEOR fondo (4.63 sobre
+     bg-card) y sigue claramente por debajo de --color-text-muted. */
+  --color-text-faint: #78849a;
 
   /* --- Tipografia ----------------------------------------------------- */
   --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
@@ -232,6 +256,55 @@
   .card {
     @apply rounded-lg border border-bg-border bg-bg-card transition-colors hover:border-text-faint/40;
   }
+
+  /* --- Panel de estado (cargando / vacio / error) ----------------------
+     Proyectos, certificaciones y blog se pintan desde el API PHP, asi que
+     sus tres estados no son casos raros: son lo que ve cualquiera que entre
+     mientras el backend tarda, o si se cae. Antes los tres eran la misma
+     linea de texto gris suelta, sin borde, sin icono y sin salida; el error
+     solo se distinguia de la carga en que se paraba el spinner.
+
+     El estado vive en data-state para que el JS cambie un atributo en vez de
+     reescribir clases (que era como se perdian los atributos de
+     accesibilidad al re-renderizar). */
+  .status-panel {
+    @apply flex items-start gap-3 rounded-lg border border-bg-border bg-bg-card/60
+           px-4 py-3.5 text-sm text-text-muted;
+  }
+  .status-panel[data-state='error'] {
+    @apply border-danger/30 bg-danger/5 text-text;
+  }
+  .status-panel[data-state='empty'] {
+    @apply border-dashed;
+  }
+
+  /* Cada icono se muestra solo en su estado. Asi el marcado lleva los tres
+     desde el principio y el JS no tiene que inyectar SVG (que la CSP con
+     hashes complica sin ninguna necesidad). */
+  .status-panel [data-when] {
+    @apply hidden;
+  }
+  .status-panel[data-state='loading'] [data-when='loading'],
+  .status-panel[data-state='empty'] [data-when='empty'],
+  .status-panel[data-state='error'] [data-when='error'] {
+    @apply block;
+  }
+  .status-panel[data-state='error'] [data-when='error'].status-retry {
+    @apply inline-flex;
+  }
+
+  .status-panel .status-icon {
+    @apply mt-px h-4 w-4 shrink-0;
+  }
+  .status-panel[data-state='error'] .status-icon {
+    @apply text-danger;
+  }
+
+  .status-retry {
+    @apply mt-2 items-center gap-1.5 rounded-md border border-bg-border px-2.5 py-1
+           text-xs font-medium text-text-muted transition-colors
+           hover:border-text-faint hover:text-text;
+  }
 }
 
 @layer utilities {
@@ -347,7 +420,9 @@
 .prose h3 {
   margin-top: 1.5rem;
   margin-bottom: 0.75rem;
-  font-size: 1.2rem;
+  /* 1.125rem es el escalon Title del sistema; antes era 1.2rem, un valor
+     suelto que no estaba en ninguna escala. */
+  font-size: 1.125rem;
   font-weight: 600;
   color: var(--color-text-title);
 }

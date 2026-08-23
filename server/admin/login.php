@@ -17,11 +17,13 @@ $lockMinutes = (int) (config()['security']['login_lockout_minutes'] ?? 15);
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     csrf_check();
 
-    // Bloqueo por fuerza bruta: demasiados fallos recientes desde esta IP.
-    if (login_is_locked($ip)) {
+    $username = trim((string) ($_POST['username'] ?? ''));
+
+    // Bloqueo por fuerza bruta: demasiados fallos recientes desde esta IP o
+    // contra esta cuenta (lo que salte primero — ver login_is_locked()).
+    if (login_is_locked($ip, $username)) {
         $error = "Demasiados intentos fallidos. Espera {$lockMinutes} minutos e intentalo de nuevo.";
     } else {
-        $username = trim((string) ($_POST['username'] ?? ''));
         $password = (string) ($_POST['password'] ?? '');
 
         // Pequena pausa para ralentizar la fuerza bruta.

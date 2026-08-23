@@ -2,7 +2,7 @@
 /**
  * <Footer /> - Pie minimalista con enlaces sociales y "volver arriba".
  */
-import { useTranslations } from '../i18n/utils';
+import { useTranslations, localeBase } from '../i18n/utils';
 import type { Lang } from '../i18n/ui';
 import { SITE } from '../config';
 import Icon from './Icon.astro';
@@ -12,6 +12,10 @@ interface Props {
 }
 const { lang } = Astro.props;
 const t = useTranslations(lang);
+// Los enlaces de este pie apuntaban todos a "/", asi que desde /en/ o /ca/
+// devolvian al visitante a la home castellana. <Header /> ya resolvia esto
+// con localeBase(); el pie no.
+const base = localeBase(lang);
 const year = new Date().getFullYear();
 const aboutPath = lang === 'en' ? '/en/about-this-website/' : (lang === 'ca' ? '/ca/sobre-aquesta-web/' : '/sobre-esta-web/');
 
@@ -99,12 +103,12 @@ const projects = [
               >
                 <span class="border-b border-transparent group-hover:border-accent/30">{p.name}</span>
                 {p.badgeKey && (
-                  <span class={`rounded-xs px-1.5 py-px text-[9px] font-semibold font-sans tracking-wide leading-normal border transition-colors ${
+                  <span class={`rounded-xs px-1.5 py-px text-[10px] font-semibold font-sans tracking-wide leading-normal border transition-colors ${
                     p.badgeType === 'open-source' 
-                      ? 'bg-emerald-500/5 text-emerald-500 border-emerald-500/15 group-hover:bg-emerald-500/10' 
+                      ? 'bg-oss/5 text-oss border-oss/15 group-hover:bg-oss/10' 
                       : p.badgeType === 'in-development'
-                      ? 'bg-amber-500/5 text-amber-500 border-amber-500/15 group-hover:bg-amber-500/10'
-                      : 'bg-blue-500/5 text-blue-400 border-blue-500/15 group-hover:bg-blue-500/10'
+                      ? 'bg-wip/5 text-wip border-wip/15 group-hover:bg-wip/10'
+                      : 'bg-closed/5 text-closed border-closed/15 group-hover:bg-closed/10'
                   }`}>
                     {t(p.badgeKey as any)}
                   </span>
@@ -116,28 +120,30 @@ const projects = [
       </ul>
     </div>
 
-    <!-- Columna 3: Navegación -->
-    <div>
+    {/* Columna 3: Navegación. Va en <nav> con nombre propio: la pagina solo
+        declaraba el landmark de la cabecera, asi que un lector de pantalla no
+        podia saltar a estos enlaces. El aria-label lo distingue del principal. */}
+    <nav aria-label={t('footer.nav')}>
       <p class="mb-5 font-mono text-[11px] uppercase tracking-widest text-text-faint font-semibold">
-        Navegación
+        {t('footer.nav')}
       </p>
       <ul class="grid grid-cols-2 gap-x-3 gap-y-3 font-mono text-xs">
-        <li><a href="/#perfil" class="text-text-muted hover:text-accent transition hover:no-underline flex items-center gap-1 group"><span class="opacity-0 group-hover:opacity-100 transition-opacity text-accent text-[10px]">&rarr;</span>{t('nav.about')}</a></li>
-        <li><a href="/#experiencia" class="text-text-muted hover:text-accent transition hover:no-underline flex items-center gap-1 group"><span class="opacity-0 group-hover:opacity-100 transition-opacity text-accent text-[10px]">&rarr;</span>{t('nav.experience')}</a></li>
-        <li><a href="/#habilidades" class="text-text-muted hover:text-accent transition hover:no-underline flex items-center gap-1 group"><span class="opacity-0 group-hover:opacity-100 transition-opacity text-accent text-[10px]">&rarr;</span>{t('nav.skills')}</a></li>
-        <li><a href="/#proyectos" class="text-text-muted hover:text-accent transition hover:no-underline flex items-center gap-1 group"><span class="opacity-0 group-hover:opacity-100 transition-opacity text-accent text-[10px]">&rarr;</span>{t('nav.projects')}</a></li>
-        <li><a href="/#certificaciones" class="text-text-muted hover:text-accent transition hover:no-underline flex items-center gap-1 group"><span class="opacity-0 group-hover:opacity-100 transition-opacity text-accent text-[10px]">&rarr;</span>{t('nav.certifications')}</a></li>
-        <li><a href="/#faq" class="text-text-muted hover:text-accent transition hover:no-underline flex items-center gap-1 group"><span class="opacity-0 group-hover:opacity-100 transition-opacity text-accent text-[10px]">&rarr;</span>{t('nav.faq')}</a></li>
-        <li><a href="/#contacto" class="text-text-muted hover:text-accent transition hover:no-underline flex items-center gap-1 group"><span class="opacity-0 group-hover:opacity-100 transition-opacity text-accent text-[10px]">&rarr;</span>{t('nav.contact')}</a></li>
-        <li><a href="/blog/" class="text-text-muted hover:text-accent transition hover:no-underline flex items-center gap-1 group"><span class="opacity-0 group-hover:opacity-100 transition-opacity text-accent text-[10px]">&rarr;</span>{t('nav.blog')}</a></li>
+        <li><a href={`${base}#perfil`} class="text-text-muted hover:text-accent transition hover:no-underline flex items-center gap-1 group"><span class="opacity-0 group-hover:opacity-100 transition-opacity text-accent text-[10px]">&rarr;</span>{t('nav.about')}</a></li>
+        <li><a href={`${base}#experiencia`} class="text-text-muted hover:text-accent transition hover:no-underline flex items-center gap-1 group"><span class="opacity-0 group-hover:opacity-100 transition-opacity text-accent text-[10px]">&rarr;</span>{t('nav.experience')}</a></li>
+        <li><a href={`${base}#habilidades`} class="text-text-muted hover:text-accent transition hover:no-underline flex items-center gap-1 group"><span class="opacity-0 group-hover:opacity-100 transition-opacity text-accent text-[10px]">&rarr;</span>{t('nav.skills')}</a></li>
+        <li><a href={`${base}#proyectos`} class="text-text-muted hover:text-accent transition hover:no-underline flex items-center gap-1 group"><span class="opacity-0 group-hover:opacity-100 transition-opacity text-accent text-[10px]">&rarr;</span>{t('nav.projects')}</a></li>
+        <li><a href={`${base}#certificaciones`} class="text-text-muted hover:text-accent transition hover:no-underline flex items-center gap-1 group"><span class="opacity-0 group-hover:opacity-100 transition-opacity text-accent text-[10px]">&rarr;</span>{t('nav.certifications')}</a></li>
+        <li><a href={`${base}#faq`} class="text-text-muted hover:text-accent transition hover:no-underline flex items-center gap-1 group"><span class="opacity-0 group-hover:opacity-100 transition-opacity text-accent text-[10px]">&rarr;</span>{t('nav.faq')}</a></li>
+        <li><a href={`${base}#contacto`} class="text-text-muted hover:text-accent transition hover:no-underline flex items-center gap-1 group"><span class="opacity-0 group-hover:opacity-100 transition-opacity text-accent text-[10px]">&rarr;</span>{t('nav.contact')}</a></li>
+        <li><a href={`${base}blog/`} class="text-text-muted hover:text-accent transition hover:no-underline flex items-center gap-1 group"><span class="opacity-0 group-hover:opacity-100 transition-opacity text-accent text-[10px]">&rarr;</span>{t('nav.blog')}</a></li>
       </ul>
-    </div>
+    </nav>
 
     <!-- Columna 4: Contacto & Redes -->
     <div class="flex flex-col gap-4">
       <div>
         <p class="mb-4 font-mono text-[11px] uppercase tracking-widest text-text-faint font-semibold">
-          Contacto
+          {t('footer.contact')}
         </p>
         <p class="text-xs text-text-muted font-mono leading-relaxed">
           <span class="not-italic block mb-1 text-text-faint">{t('footer.location')}</span>

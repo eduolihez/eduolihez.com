@@ -27,7 +27,7 @@ export const skillGroups: SkillGroup[] = [
       'Fortinet (FortiGate/FortiAnalyzer)',
       'Web Application Security',
       'Criptografia',
-      'Analisis de Phishing',
+      'Análisis de Phishing',
     ],
   },
   {

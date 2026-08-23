@@ -82,6 +82,30 @@
 </IfModule>
 
 # ---------------------------------------------------------------------------
+# Sitemap de los articulos del blog.
+#
+# /sitemap.xml lo genera Astro al compilar, y ahi los articulos no existen:
+# viven en MySQL y se publican desde /admin sin recompilar. Este segundo
+# sitemap lo sirve PHP leyendo la tabla en cada peticion, asi que un articulo
+# nuevo entra sin tocar nada.
+#
+# Se sirve con extension .xml porque es lo que esperan los buscadores, aunque
+# detras haya un .php. Va en la RAIZ a proposito: un sitemap solo puede listar
+# URLs de su propia carpeta hacia abajo, asi que uno en /api/ no valdria para
+# listar /blog/.
+# ---------------------------------------------------------------------------
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^sitemap-posts\.xml$ /sitemap-posts.php [L]
+
+  # /llms-blog.txt: el texto integro de los articulos, para los rastreadores
+  # de IA. La mayoria (GPTBot, ClaudeBot, PerplexityBot, CCBot) descargan el
+  # HTML crudo y no ejecutan JavaScript, asi que el cuerpo del articulo -- que
+  # se pinta en cliente -- les resulta invisible. Aqui lo tienen en plano.
+  RewriteRule ^llms-blog\.txt$ /llms-blog.php [L]
+</IfModule>
+
+# ---------------------------------------------------------------------------
 # BadaVeu y Mes Badalona: RETIRADOS
 #
 # Ambos proyectos se han eliminado del sitio. Sus URLs estaban indexadas, asi
@@ -160,6 +184,16 @@ Options -Indexes
   <FilesMatch "\.php$">
     Header always set X-Robots-Tag "noindex, nofollow, noarchive"
   </FilesMatch>
+
+  # Excepcion a la regla de arriba: llms-blog.php es justo el archivo pensado
+  # para que las IAs lo lean e indexen (ver el comentario "Deliberadamente SIN
+  # X-Robots-Tag: noindex" en el propio server/llms-blog.php). El FilesMatch
+  # generico de arriba lo alcanzaba igual porque el rewrite a /llms-blog.txt es
+  # interno (sin redireccion), asi que Apache aplicaba la cabecera al archivo
+  # .php real, anulando en silencio el proposito del archivo.
+  <Files "llms-blog.php">
+    Header unset X-Robots-Tag
+  </Files>
 
   # -------------------------------------------------------------------------
   # Content-Security-Policy (CSP):

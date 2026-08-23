@@ -167,11 +167,46 @@ function login_recent_failures(string $ip): int
     }
 }
 
-/** True si la IP ha superado el maximo de intentos y esta bloqueada. */
-function login_is_locked(string $ip): bool
+/**
+ * Igual que login_recent_failures() pero por nombre de usuario en vez de IP.
+ *
+ * client_ip() solo confia en X-Forwarded-For/CF-Connecting-IP cuando
+ * trust_proxy esta activo, y NO verifica que la peticion venga realmente de
+ * Cloudflare (no hay lista de rangos IP de Cloudflare en este proyecto). Si
+ * el origen del hosting es alcanzable sin pasar por Cloudflare, un atacante
+ * podria rotar esa cabecera en cada peticion y saltarse un bloqueo que
+ * dependiera solo de la IP. Contar tambien por username cierra ese hueco:
+ * falsificar la IP ya no sirve de nada si el contador de la cuenta objetivo
+ * sigue acumulando igual.
+ */
+function login_recent_failures_by_username(string $username): int
+{
+    $window = (int) (config()['security']['login_lockout_minutes'] ?? 15);
+    try {
+        $stmt = db()->prepare(
+            "SELECT COUNT(*) FROM login_attempts
+             WHERE username = ? AND success = 0
+               AND attempted_at > (NOW() - INTERVAL {$window} MINUTE)"
+        );
+        $stmt->execute([$username]);
+        return (int) $stmt->fetchColumn();
+    } catch (Throwable $e) {
+        return 0;
+    }
+}
+
+/**
+ * True si la IP o el usuario (el que sea) han superado el maximo de intentos.
+ * $username es opcional porque antes de que se envie el formulario todavia
+ * no se conoce que cuenta se va a intentar.
+ */
+function login_is_locked(string $ip, string $username = ''): bool
 {
     $max = (int) (config()['security']['login_max_attempts'] ?? 5);
-    return login_recent_failures($ip) >= $max;
+    if (login_recent_failures($ip) >= $max) {
+        return true;
+    }
+    return $username !== '' && login_recent_failures_by_username($username) >= $max;
 }
 
 /** Registra un intento de login (para el control de fuerza bruta). */

@@ -1,0 +1,439 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-23T00:02:33.619Z",
+  "title": "Design System: eduolihez.com",
+  "extensions": {
+    "colorMeta": {
+      "signal-green": {
+        "role": "primary",
+        "displayName": "Verde Señal",
+        "canonical": "oklch(83% 0.18 148)",
+        "tonalRamp": [
+          "oklch(15% 0.05 148)",
+          "oklch(26% 0.08 148)",
+          "oklch(37% 0.11 148)",
+          "oklch(48% 0.14 148)",
+          "oklch(59% 0.17 148)",
+          "oklch(70% 0.18 148)",
+          "oklch(83% 0.18 148)",
+          "oklch(95% 0.06 148)"
+        ]
+      },
+      "probe-cyan": {
+        "role": "secondary",
+        "displayName": "Cian de Sonda",
+        "canonical": "oklch(80% 0.13 208)",
+        "tonalRamp": [
+          "oklch(15% 0.04 208)",
+          "oklch(26% 0.06 208)",
+          "oklch(37% 0.08 208)",
+          "oklch(48% 0.10 208)",
+          "oklch(59% 0.12 208)",
+          "oklch(70% 0.13 208)",
+          "oklch(80% 0.13 208)",
+          "oklch(95% 0.05 208)"
+        ]
+      },
+      "trace-violet": {
+        "role": "tertiary",
+        "displayName": "Violeta de Traza",
+        "canonical": "oklch(72% 0.15 293)",
+        "tonalRamp": [
+          "oklch(15% 0.05 293)",
+          "oklch(26% 0.08 293)",
+          "oklch(37% 0.11 293)",
+          "oklch(48% 0.13 293)",
+          "oklch(59% 0.15 293)",
+          "oklch(72% 0.15 293)",
+          "oklch(83% 0.11 293)",
+          "oklch(95% 0.05 293)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Tinta",
+        "canonical": "oklch(15% 0.012 250)",
+        "tonalRamp": [
+          "oklch(15% 0.012 250)",
+          "oklch(19% 0.014 250)",
+          "oklch(24% 0.016 250)",
+          "oklch(37% 0.018 250)",
+          "oklch(50% 0.018 250)",
+          "oklch(64% 0.016 250)",
+          "oklch(80% 0.012 250)",
+          "oklch(95% 0.008 250)"
+        ]
+      },
+      "ink-soft": {
+        "role": "neutral",
+        "displayName": "Tinta Suave",
+        "canonical": "oklch(19% 0.014 250)"
+      },
+      "ink-card": {
+        "role": "neutral",
+        "displayName": "Tinta de Tarjeta",
+        "canonical": "oklch(24% 0.016 250)"
+      },
+      "hairline": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "oklch(26% 0.018 250)"
+      },
+      "hairline-hover": {
+        "role": "neutral",
+        "displayName": "Hairline Activa",
+        "canonical": "oklch(33% 0.020 250)"
+      },
+      "text-primary": {
+        "role": "neutral",
+        "displayName": "Texto Principal",
+        "canonical": "oklch(93% 0.012 240)"
+      },
+      "text-title": {
+        "role": "neutral",
+        "displayName": "Texto de Titular",
+        "canonical": "oklch(95% 0.008 240)"
+      },
+      "text-muted": {
+        "role": "neutral",
+        "displayName": "Texto Atenuado",
+        "canonical": "oklch(71% 0.024 250)"
+      },
+      "text-faint": {
+        "role": "neutral",
+        "displayName": "Texto Tenue",
+        "canonical": "oklch(60% 0.028 255)",
+        "note": "Subido de #6b7688 a #78849a: el valor anterior daba 3.80-4.21 y no llegaba al 4.5 de WCAG AA."
+      },
+      "danger": {
+        "role": "status",
+        "displayName": "Rojo de Fallo",
+        "canonical": "oklch(71% 0.16 22)",
+        "tonalRamp": [
+          "oklch(15% 0.05 22)",
+          "oklch(26% 0.08 22)",
+          "oklch(37% 0.11 22)",
+          "oklch(48% 0.14 22)",
+          "oklch(59% 0.16 22)",
+          "oklch(71% 0.16 22)",
+          "oklch(83% 0.11 22)",
+          "oklch(95% 0.04 22)"
+        ]
+      },
+      "warn": {
+        "role": "status",
+        "displayName": "Ámbar de Aviso",
+        "canonical": "oklch(76% 0.16 70)"
+      },
+      "veil": {
+        "role": "neutral",
+        "displayName": "Velo de Modal",
+        "canonical": "rgb(3 5 8 / 0.7)"
+      },
+      "oss": {
+        "role": "status",
+        "displayName": "Open Source",
+        "canonical": "oklch(70% 0.15 162)"
+      },
+      "wip": {
+        "role": "status",
+        "displayName": "En Desarrollo",
+        "canonical": "oklch(76% 0.16 70)"
+      },
+      "closed": {
+        "role": "status",
+        "displayName": "Codigo Privado",
+        "canonical": "oklch(72% 0.14 255)"
+      },
+      "print-paper": {
+        "role": "print",
+        "displayName": "Papel",
+        "canonical": "#ffffff"
+      },
+      "print-ink": {
+        "role": "print",
+        "displayName": "Tinta de Impresion",
+        "canonical": "#000000"
+      },
+      "print-rule": {
+        "role": "print",
+        "displayName": "Filete de Impresion",
+        "canonical": "#cccccc"
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "El nombre en el hero. Una vez por página, nunca más."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Títulos de sección (.section-title) y h1 de páginas interiores."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Títulos de tarjeta, encabezados de modal, puestos del timeline."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Párrafos y descripciones. Subtítulos de sección limitados a max-w-2xl."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Kickers de sección en mono versalita con 0.2em de tracking. La firma tipográfica más reconocible del sitio."
+      },
+      "meta": {
+        "displayName": "Meta",
+        "purpose": "Chips de tecnología, fechas, contadores, la marca >_ eduolihez, líneas de estado."
+      },
+      "subtitle": {
+        "displayName": "Subtitle",
+        "purpose": "Subtitulo de seccion (.section-subtitle), limitado a max-w-2xl. Un escalon por encima del cuerpo."
+      },
+      "micro": {
+        "displayName": "Micro",
+        "purpose": "Badges de estado de proyecto y etiquetas diminutas del pie. El escalon mas pequeno del sistema."
+      },
+      "title-lg": {
+        "displayName": "Title Large",
+        "purpose": "Encabezado de modal y h3 del cuerpo del blog. Un escalon por encima del titulo de tarjeta."
+      }
+    },
+    "shadows": [
+      {
+        "name": "modal-elevation",
+        "value": "0 25px 50px -12px rgb(0 0 0 / 0.25)",
+        "purpose": "La única elevación real del sistema. Separa los modales de proyecto y de CV del documento, siempre acompañada de un velo rgb(3 5 8 / 0.7) con backdrop-filter: blur(4px)."
+      },
+      {
+        "name": "availability-glow",
+        "value": "0 0 15px rgba(74, 222, 128, 0.4)",
+        "purpose": "El halo del badge \"Disponible para trabajar\". No es profundidad, es emisión: la única luz propia de la interfaz."
+      },
+      {
+        "name": "control-lift",
+        "value": "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+        "purpose": "Apoyo mínimo en botones de filtro, para despegarlos del fondo de la sección."
+      },
+      {
+        "name": "menu-elevation",
+        "value": "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
+        "purpose": "El desplegable del selector de idioma sobre la cabecera fija."
+      }
+    ],
+    "motion": [
+      {
+        "name": "fade-up",
+        "value": "fade-up 0.6s ease-out both",
+        "purpose": "Entrada del avatar del hero: 16px hacia arriba con opacidad."
+      },
+      {
+        "name": "reveal-on-scroll",
+        "value": "opacity 0.5s ease-out, transform 0.5s ease-out",
+        "purpose": "Entrada de sección al cruzar el viewport (18px). Siempre tras el gate .js-reveal: sin JS el contenido es visible."
+      },
+      {
+        "name": "pulse-dot",
+        "value": "pulse-dot 2s ease-in-out infinite",
+        "purpose": "El aro que late alrededor del avatar cuando open_to_work está activo. Único movimiento perpetuo del sitio."
+      },
+      {
+        "name": "state-color",
+        "value": "150ms cubic-bezier(0.4, 0, 0.2, 1)",
+        "purpose": "Transición por defecto de todo estado hover/focus. Solo color: nada se desplaza ni se escala."
+      },
+      {
+        "name": "modal-fade",
+        "value": "opacity 0.2s ease",
+        "purpose": "Aparición y salida del velo de modal. El cierre espera estos 200ms antes de aplicar [hidden]."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "animation-duration: 0.001ms !important; transition-duration: 0.001ms !important",
+        "purpose": "Bajo prefers-reduced-motion se anula toda animación, el scroll suave pasa a auto y .reveal queda visible sin transformar."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "La acción principal. Plano de Verde Señal con texto en Tinta: la superficie más brillante de la página. Máximo uno visible por bloque.",
+      "html": "<a class=\"ds-btn-primary\" href=\"#\">Contactar</a>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 16px; border-radius: 6px; background: var(--color-accent, #4ade80); color: var(--color-bg, #0a0e14); font-family: Inter, system-ui, sans-serif; font-size: 14px; font-weight: 500; text-decoration: none; border: none; cursor: pointer; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-btn-primary:hover { background: var(--color-accent-hover, #22c55e); } .ds-btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--color-bg, #0a0e14), 0 0 0 4px var(--color-accent, #4ade80); }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "El botón por defecto para todo lo que no sea la acción principal. Sin fondo, borde hairline, texto atenuado que sube al hover.",
+      "html": "<button class=\"ds-btn-ghost\" type=\"button\"><svg viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\"/><polyline points=\"7 10 12 15 17 10\"/><line x1=\"12\" y1=\"15\" x2=\"12\" y2=\"3\"/></svg>Descargar CV</button>",
+      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 16px; border-radius: 6px; background: transparent; color: var(--color-text-muted, #9aa7b8); border: 1px solid var(--color-bg-border, #1f2733); font-family: Inter, system-ui, sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1), border-color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-btn-ghost:hover { color: var(--color-text, #e6edf3); border-color: var(--color-text-faint, #6b7688); } .ds-btn-ghost:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--color-bg, #0a0e14), 0 0 0 4px var(--color-accent, #4ade80); }"
+    },
+    {
+      "name": "Tech Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "El chip por defecto del sistema: tecnologías en experiencia y stack de proyecto. Mono, sin fondo, radio de 4px.",
+      "html": "<span class=\"ds-chip\">Trend Micro Vision One</span>",
+      "css": ".ds-chip { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 4px; border: 1px solid var(--color-bg-border, #1f2733); background: transparent; color: var(--color-text-muted, #9aa7b8); font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12px; line-height: 1.5; }"
+    },
+    {
+      "name": "Project Status Badge",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Tres estados fijos de proyecto. Patrón invariable: texto sólido, fondo del mismo color al 10%, borde al 20%.",
+      "html": "<span class=\"ds-badge ds-badge--oss\">Open Source</span> <span class=\"ds-badge ds-badge--dev\">En Desarrollo</span> <span class=\"ds-badge ds-badge--private\">Código Privado</span>",
+      "css": ".ds-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-family: Inter, system-ui, sans-serif; font-size: 10px; font-weight: 600; border: 1px solid transparent; } .ds-badge--oss { color: #10b981; background: rgb(16 185 129 / 0.1); border-color: rgb(16 185 129 / 0.2); } .ds-badge--dev { color: #f59e0b; background: rgb(245 158 11 / 0.1); border-color: rgb(245 158 11 / 0.2); } .ds-badge--private { color: #60a5fa; background: rgb(59 130 246 / 0.1); border-color: rgb(59 130 246 / 0.2); }"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "La superficie de contenido del sistema. Plana en reposo; el hover solo aclara el borde. Sin sombra, nunca.",
+      "html": "<article class=\"ds-card\"><h3 class=\"ds-card__title\">Analizador de phishing</h3><p class=\"ds-card__body\">Clasificador de correo sospechoso en Python con reglas de cabecera y puntuación de reputación.</p><ul class=\"ds-card__stack\"><li>Python</li><li>ONNX</li></ul></article>",
+      "css": ".ds-card { display: flex; flex-direction: column; padding: 20px; border-radius: 8px; border: 1px solid var(--color-bg-border, #1f2733); background: var(--color-bg-card, #141a24); transition: border-color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-card:hover { border-color: rgb(107 118 136 / 0.4); } .ds-card__title { margin: 0; font-family: Inter, system-ui, sans-serif; font-size: 16px; font-weight: 600; color: var(--color-text, #e6edf3); } .ds-card__body { margin: 8px 0 0; font-family: Inter, system-ui, sans-serif; font-size: 14px; line-height: 1.625; color: var(--color-text-muted, #9aa7b8); } .ds-card__stack { display: flex; flex-wrap: wrap; gap: 6px; margin: 16px 0 0; padding: 0; list-style: none; } .ds-card__stack li { padding: 2px 6px; border-radius: 4px; border: 1px solid var(--color-bg-border, #1f2733); background: rgb(15 20 28 / 0.2); font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; color: var(--color-text-muted, #9aa7b8); }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "El campo se hunde en lugar de levantarse: su fondo es más oscuro que la tarjeta que lo contiene. Al enfocar, el borde se vuelve Verde Señal.",
+      "html": "<div class=\"ds-field\"><label class=\"ds-field__label\" for=\"ds-email\">Email <span class=\"ds-field__req\">*</span></label><input class=\"ds-input\" id=\"ds-email\" type=\"email\" placeholder=\"nombre@empresa.com\"></div>",
+      "css": ".ds-field__label { display: block; margin-bottom: 6px; font-family: Inter, system-ui, sans-serif; font-size: 14px; font-weight: 500; color: var(--color-text, #e6edf3); } .ds-field__req { color: var(--color-accent, #4ade80); } .ds-input { width: 100%; padding: 10px 14px; border-radius: 6px; border: 1px solid var(--color-bg-border, #1f2733); background: var(--color-bg, #0a0e14); color: var(--color-text, #e6edf3); font-family: Inter, system-ui, sans-serif; font-size: 14px; transition: border-color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-input::placeholder { color: var(--color-text-faint, #6b7688); } .ds-input:focus { outline: none; border-color: var(--color-accent, #4ade80); }"
+    },
+    {
+      "name": "Filter Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Filtros de proyectos y certificaciones. Altura mínima de 40px por objetivo táctil; el estado activo invierte a verde translúcido.",
+      "html": "<div class=\"ds-filters\"><button class=\"ds-filter is-active\" type=\"button\">Todos</button><button class=\"ds-filter\" type=\"button\">Open Source</button><button class=\"ds-filter\" type=\"button\">En Desarrollo</button></div>",
+      "css": ".ds-filters { display: flex; flex-wrap: wrap; gap: 6px; } .ds-filter { flex-shrink: 0; min-height: 40px; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--color-bg-border, #1f2733); background: var(--color-bg-card, #141a24); color: var(--color-text-muted, #9aa7b8); font-family: Inter, system-ui, sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; transition: color 150ms, border-color 150ms, background-color 150ms; } .ds-filter:hover { color: var(--color-text, #e6edf3); border-color: var(--color-text-faint, #6b7688); } .ds-filter.is-active { border-color: var(--color-accent, #4ade80); background: rgb(74 222 128 / 0.1); color: var(--color-accent, #4ade80); } .ds-filter:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--color-bg, #0a0e14), 0 0 0 4px var(--color-accent, #4ade80); }"
+    },
+    {
+      "name": "Section Header",
+      "kind": "custom",
+      "refersTo": "button-primary",
+      "description": "Componente de firma. El trío kicker mono versalita → título ceñido → subtítulo atenuado abre TODAS las secciones del sitio. Romperlo se nota de inmediato.",
+      "html": "<header class=\"ds-section-header\"><p class=\"ds-kicker\">Trabajo seleccionado</p><h2 class=\"ds-section-title\">Proyectos</h2><p class=\"ds-section-subtitle\">Trabajo técnico seleccionado y proyectos personales.</p></header>",
+      "css": ".ds-kicker { margin: 0 0 12px; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.2em; color: var(--color-accent, #4ade80); } .ds-section-title { margin: 0; font-family: Inter, system-ui, sans-serif; font-size: 30px; font-weight: 600; letter-spacing: -0.025em; color: var(--color-text, #e6edf3); } .ds-section-subtitle { margin: 12px 0 0; max-width: 42rem; font-family: Inter, system-ui, sans-serif; font-size: 15px; line-height: 1.625; color: var(--color-text-muted, #9aa7b8); }"
+    },
+    {
+      "name": "Availability Badge",
+      "kind": "custom",
+      "refersTo": "status-pill",
+      "description": "Componente de firma. El único punto emisivo del sitio: aro pulsante y halo verde alrededor del avatar. Se muestra por defecto si /api/settings.php falla.",
+      "html": "<div class=\"ds-avatar\"><div class=\"ds-avatar__ring\" aria-hidden=\"true\"></div><div class=\"ds-avatar__frame\"></div><span class=\"ds-avatar__badge\">Disponible para trabajar</span></div>",
+      "css": ".ds-avatar { position: relative; width: 160px; height: 160px; margin: 8px auto 20px; } .ds-avatar__ring { position: absolute; inset: -6px; border-radius: 14px; border: 2px solid rgb(74 222 128 / 0.4); animation: ds-pulse 2s ease-in-out infinite; } .ds-avatar__frame { position: absolute; inset: 0; border-radius: 12px; border: 1px solid rgb(74 222 128 / 0.4); background: linear-gradient(160deg, #141a24, #0f141c); } .ds-avatar__badge { position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); white-space: nowrap; padding: 4px 12px; border-radius: 9999px; background: var(--color-accent, #4ade80); color: var(--color-bg, #0a0e14); font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 0 15px rgba(74, 222, 128, 0.4); } @keyframes ds-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } } @media (prefers-reduced-motion: reduce) { .ds-avatar__ring { animation: none; } }"
+    },
+    {
+      "name": "Status Panel",
+      "kind": "custom",
+      "refersTo": "status-panel",
+      "description": "Los tres estados de una seccion servida por el API: cargando, vacio y error. El error nombra el problema y ofrece la salida.",
+      "html": "<div class=\"ds-status\" data-state=\"error\" role=\"status\" aria-live=\"polite\"><svg class=\"ds-status__icon\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path fill=\"currentColor\" d=\"M12 2 1 21h22L12 2m0 4.53L19.53 19H4.47L12 6.53M11 10v4h2v-4h-2m0 6v2h2v-2h-2Z\"/></svg><div><p class=\"ds-status__text\">No se pudieron cargar los artículos.</p><button type=\"button\" class=\"ds-status__retry\"><svg viewBox=\"0 0 24 24\" width=\"14\" height=\"14\" aria-hidden=\"true\"><path fill=\"currentColor\" d=\"M17.65 6.35A7.96 7.96 0 0 0 12 4a8 8 0 0 0-8 8 8 8 0 0 0 8 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18a6 6 0 0 1-6-6 6 6 0 0 1 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35Z\"/></svg>Reintentar</button></div></div>",
+      "css": ".ds-status { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; border-radius: 8px; border: 1px solid var(--color-bg-border, #1f2733); background: rgb(20 26 36 / 0.6); font-family: Inter, system-ui, sans-serif; font-size: 14px; color: var(--color-text-muted, #9aa7b8); } .ds-status[data-state=\"error\"] { border-color: rgb(248 113 113 / 0.3); background: rgb(248 113 113 / 0.05); color: var(--color-text, #e6edf3); } .ds-status[data-state=\"empty\"] { border-style: dashed; } .ds-status__icon { margin-top: 1px; width: 16px; height: 16px; flex-shrink: 0; } .ds-status[data-state=\"error\"] .ds-status__icon { color: var(--color-danger, #f87171); } .ds-status__text { margin: 0; line-height: 1.625; } .ds-status__retry { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; padding: 4px 10px; border-radius: 6px; border: 1px solid var(--color-bg-border, #1f2733); background: transparent; color: var(--color-text-muted, #9aa7b8); font-family: inherit; font-size: 12px; font-weight: 500; cursor: pointer; transition: color 150ms, border-color 150ms; } .ds-status__retry:hover { color: var(--color-text, #e6edf3); border-color: var(--color-text-faint, #6b7688); } .ds-status__retry:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--color-bg, #0a0e14), 0 0 0 4px var(--color-accent, #4ade80); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "La Consola de Guardia",
+    "overview": "Un puesto de vigilancia de madrugada. La pantalla está en penumbra porque el turno dura horas y la vista tiene que aguantar; todo se lee sin esfuerzo sobre un negro azulado que nunca llega al negro puro. El verde no decora: aparece exactamente donde algo está vivo, disponible o es accionable, igual que en un panel de operación. Cuando todo está en calma, la pantalla está casi en blanco y negro.\n\nEl dialecto de terminal está presente pero contenido. El prompt >_ en la marca, los kickers de sección en mono versalita con 0.2em de tracking, la línea Status: OPTIMIZING_CV // Severity: INFO del modal de CV, el punto que late junto al avatar cuando hay disponibilidad. Es una terminal ordenada y apagada, no una pantalla de película: ningún efecto simula ser algo que el sitio no es. Esa contención es coherente con la promesa del producto — si la web afirma algo, el repositorio lo respalda — y se extiende a lo visual: nada aparenta profundidad, actividad o volumen que no exista de verdad.\n\nLa densidad es media-alta pero respirada. Las secciones se separan por bloques de 80–112px y se distinguen por tono, no por marco: el fondo alterna entre #0a0e14 y #0f141c, y una hairline de 1px cierra cada bloque. La composición es de una sola columna centrada a 1024px, con rejillas de dos o tres celdas dentro. Todo el trabajo de jerarquía lo hacen el tono, el peso tipográfico y el espacio.",
+    "keyCharacteristics": [
+      "Negro azulado en tres capas tonales, jamás negro puro (#0a0e14 → #0f141c → #141a24)",
+      "Un solo verde señal (#4ade80), escaso por doctrina",
+      "Inter para lo que se lee, JetBrains Mono exclusivamente para metadatos, etiquetas y código",
+      "Superficie plana: separación por hairline de 1px y capa tonal, casi nunca por sombra",
+      "Radio contenido y creciente con el tamaño de la superficie (2px → 12px)",
+      "Movimiento mínimo: fade-up de entrada, transiciones de color de 150–300ms, nada más"
+    ],
+    "rules": [
+      {
+        "name": "La Regla de la Señal Escasa",
+        "body": "El verde no supera aproximadamente el 10% de la superficie visible de ninguna pantalla. Su rareza es exactamente lo que lo hace legible como señal: si todo es verde, nada avisa. Antes de añadir un elemento verde a una pantalla, comprueba qué otro deja de serlo.",
+        "section": "colors"
+      },
+      {
+        "name": "La Regla del Verde Único",
+        "body": "Hay un solo verde de marca: #4ade80. El panel /admin usa hoy #10b981 y un fondo #090e16 propios: eso es deriva, no un subsistema. La paleta pública es la normativa; cualquier trabajo en /admin converge hacia ella.",
+        "section": "colors"
+      },
+      {
+        "name": "La Regla del Tercer Tono",
+        "body": "El cian y el violeta tienen exactamente dos usos: separar los bloques tematicos de \"Sobre esta web\", y tenir los sellos de emisor de certificaciones cuando una credencial no trae logotipo. Ambos decorativos y acotados. Llevarlos a un titular, un boton o un enlace rompe el sistema.",
+        "section": "colors"
+      },
+      {
+        "name": "La Regla del Mono como Metadato",
+        "body": "JetBrains Mono nunca compone prosa. Se reserva a seis usos: la marca, los kickers de sección, los chips de tecnología, los números y contadores, las etiquetas de estado y el código. Un párrafo en mono es un error del sistema, no una variación.",
+        "section": "typography"
+      },
+      {
+        "name": "La Regla del Titular Ceñido",
+        "body": "Todo lo que sea Display o Headline lleva letter-spacing: -0.025em. Todo lo que sea Label mono en versalitas lleva 0.2em. No hay tracking intermedio en el sistema: o se ciñe o se abre del todo.",
+        "section": "typography"
+      },
+      {
+        "name": "La Regla de la Alternancia Tonal",
+        "body": "Las secciones consecutivas alternan ink / ink-soft y se cierran con border-b de hairline. Ese par —cambio de tono más línea de 1px— es el único separador de sección del sistema. No se usan divisores decorativos, ni ondas, ni degradados de transición.",
+        "section": "layout"
+      },
+      {
+        "name": "La Regla del Radio Creciente",
+        "body": "El radio escala con la superficie: cuanto más grande el contenedor, más blanda la esquina. Un chip a 12px o un modal a 4px rompen la escala. Si dudas, mira el tamaño del elemento, no su importancia.",
+        "section": "shapes"
+      },
+      {
+        "name": "La Regla de la Línea Única",
+        "body": "Toda estructura se dibuja con 1px. No hay bordes de 2px salvo el anillo de foco (ring-2 en signal-green) y el aro que late alrededor del avatar disponible — dos casos que son señal, no estructura.",
+        "section": "shapes"
+      },
+      {
+        "name": "La Regla del Verde que no Falla",
+        "body": "El verde significa \"vivo, disponible, accionable\". Por eso no puede significar tambien \"ha fallado\": un error nunca va del color de lo que funciona. Todo fallo usa danger; todo aviso usa warn.",
+        "section": "colors"
+      },
+      {
+        "name": "La Regla del Rojo Único",
+        "body": "Hay un solo rojo: #f87171. Historicamente el sitio improviso cinco (red-300, red-400, red-500, red-600, rose-900) mas un naranja y un amarillo, todos fuera de paleta. Un segundo rojo es deriva, no un matiz.",
+        "section": "colors"
+      }
+    ],
+    "dos": [
+      "Do separar bloques alternando ink / ink-soft más una border-b de hairline. Es el único separador de sección del sistema.",
+      "Do encabezar cada sección con el trío .section-kicker (mono versalita, 0.2em) → .section-title → .section-subtitle (limitado a max-w-2xl). Está en todas las secciones del sitio; romperlo se nota.",
+      "Do usar var(--color-*) en los <style> de componentes Astro. Tailwind 4 publica cada token de @theme en :root; ese bloque no importa Tailwind y theme() ya no existe.",
+      "Do dar a los controles táctiles un mínimo de 40px de alto, como hace .cert-filter-btn con min-height: 2.5rem.",
+      "Do poner cualquier animación de entrada tras un gate de JS, como .js-reveal: el contenido debe ser visible si el script no corre.",
+      "Do diseñar contando con tres longitudes de texto. Los mismos botones y etiquetas se pintan en español, inglés y catalán."
+    ],
+    "donts": [
+      "Don't introducir un segundo verde. #10b981 en /admin es deriva conocida, no una escala hermana: la referencia es #4ade80.",
+      "Don't llevar el cian (#22d3ee) ni el violeta (#a78bfa) fuera de \"Sobre esta web\". Existen solo para diferenciar los bloques de esa página.",
+      "Don't componer prosa en JetBrains Mono. La mono es metadato: marca, kickers, chips, números, estados y código.",
+      "Don't añadir sombras para dar jerarquía. La herramienta por defecto es la capa tonal más la hairline de 1px; la sombra queda para el modal y para el halo de disponibilidad.",
+      "Don't mover ni escalar elementos en hover. El sistema transiciona color (150–300ms) y nada más; las dos únicas excepciones vigentes son los iconos sociales del pie (-translate-y-0.5) y la flecha de los enlaces de navegación del pie.",
+      "Don't cargar fuentes, iconos, estilos o scripts desde un CDN. Las fuentes son @font-face locales con subconjuntos latinos; la CSP con hashes no admite otra cosa. El <link> a Google Fonts de server/admin/partials/layout.php:52-54 es una infracción vigente de esta regla y además está muerta: la CSP del panel (auth.php:20-22) es default-src 'self' sin font-src, así que la hoja se bloquea y el panel se pinta en system-ui, no en Inter.",
+      "Don't engrosar bordes para dar énfasis. La estructura es siempre 1px; los únicos 2px del sistema son el anillo de foco y el aro de disponibilidad, y ambos son señal.",
+      "Don't usar negro puro (#000) ni blanco puro (#fff) en pantalla. El sistema va de #0a0e14 a #f0f3f6; el blanco y el negro absolutos están reservados a la hoja de impresión.",
+      "Don't pintar un error de verde ni inventar un rojo nuevo. danger (#f87171) para fallos, warn (#f59e0b) para avisos, y nada mas.",
+      "Don't dejar un estado de carga, vacio o error como una linea de texto suelta. Usa <StatusPanel />: tiene los tres estados, el icono, role=\"status\" y la salida.",
+      "Don't usar texto con degradado (bg-clip-text) ni halos de color sin desplazamiento (drop-shadow a 0 0). El enfasis sale del peso, el tamano y el tono.",
+      "Don't escribir colores de estado como literales de Tailwind (bg-emerald-500). Usa los tokens oss / wip / closed, que es lo que la interfaz debe seguir si el token cambia."
+    ]
+  }
+}

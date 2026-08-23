@@ -49,15 +49,42 @@ function admin_header(string $title, string $active = ''): void
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title><?= e($title) ?> · Admin</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<?php /*
+  Las fuentes se sirven desde el propio dominio.
+
+  Antes habia aqui tres <link> a Google Fonts que NO cargaban: la CSP de
+  auth.php es "default-src 'self'" sin font-src propio, asi que tanto la hoja
+  de fonts.googleapis.com como los ficheros de fonts.gstatic.com quedaban
+  bloqueados y el panel se pintaba con la fuente del sistema. Ademas
+  contradecia el "no depende de ningun CDN" que dice la cabecera de este
+  mismo archivo.
+
+  Los .woff2 son los mismos que usa el sitio publico (Inter Variable y
+  JetBrains Mono Variable, subconjunto latino, licencia OFL). Se copian a
+  assets/fonts/ para que el panel siga siendo autonomo y sin compilacion.
+*/ ?>
+<style>
+  @font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+    src: url('assets/fonts/inter-latin-wght-normal.woff2') format('woff2-variations');
+  }
+  @font-face {
+    font-family: 'JetBrains Mono';
+    font-style: normal;
+    font-weight: 100 800;
+    font-display: swap;
+    src: url('assets/fonts/jetbrains-mono-latin-wght-normal.woff2') format('woff2-variations');
+  }
+</style>
 <style>
   :root {
-    --bg: #090e16; --soft: #121824; --card: rgba(19, 27, 38, 0.7); --border: rgba(255, 255, 255, 0.08);
-    --text: #f3f4f6; --muted: #9ca3af; --faint: #6b7280;
-    --accent: #10b981; --accent-hover: #059669; --danger: #f87171;
-    --cyan: #06b6d4; --warn: #f59e0b; --violet: #8b5cf6;
+    --bg: #0a0e14; --soft: #0f141c; --card: rgba(20, 26, 36, 0.72); --border: #1f2733;
+    --text: #e6edf3; --muted: #9aa7b8; --faint: #6b7688;
+    --accent: #4ade80; --accent-hover: #22c55e; --danger: #f87171;
+    --cyan: #22d3ee; --warn: #f59e0b; --violet: #a78bfa;
     --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   }
@@ -88,7 +115,7 @@ function admin_header(string $title, string $active = ''): void
 
   /* Sidebar */
   .sidebar {
-    background: #0e1420;
+    background: var(--soft);
     border-right: 1px solid var(--border);
     display: flex;
     flex-direction: column;
@@ -142,9 +169,9 @@ function admin_header(string $title, string $active = ''): void
   }
 
   .menu-item.active {
-    background: rgba(16, 185, 129, 0.08);
+    background: rgba(74, 222, 128, 0.08);
     color: var(--accent);
-    border-color: rgba(16, 185, 129, 0.15);
+    border-color: rgba(74, 222, 128, 0.18);
   }
 
   .menu-icon {
@@ -264,7 +291,7 @@ function admin_header(string $title, string $active = ''): void
     align-items: center;
     justify-content: space-between;
     padding: 1rem 2rem;
-    background: rgba(9, 14, 22, 0.8);
+    background: rgba(10, 14, 20, 0.8);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border);
   }
@@ -364,7 +391,7 @@ function admin_header(string $title, string $active = ''): void
     font-size: 0.72rem; font-weight: 700; margin-left: 0.5rem; padding: 0.15rem 0.4rem; 
     border-radius: 0.375rem; vertical-align: middle;
   }
-  .delta.up { color: var(--accent); background: rgba(16, 185, 129, 0.12); }
+  .delta.up { color: var(--accent); background: rgba(74, 222, 128, 0.12); }
   .delta.down { color: var(--danger); background: rgba(248, 113, 113, 0.12); }
   .delta.flat { color: var(--faint); background: rgba(255, 255, 255, 0.04); }
 
@@ -380,14 +407,14 @@ function admin_header(string $title, string $active = ''): void
   label { display: block; margin: 1rem 0 0.4rem; font-weight: 600; font-size: 0.85rem; color: var(--text); }
   input[type=text], input[type=email], input[type=password], input[type=url],
   input[type=number], input[type=date], input[type=search], textarea, select {
-    width: 100%; padding: 0.7rem 0.9rem; background: rgba(9, 14, 22, 0.7);
+    width: 100%; padding: 0.7rem 0.9rem; background: rgba(10, 14, 20, 0.7);
     border: 1px solid var(--border); border-radius: 0.5rem; color: var(--text);
     font-size: 0.92rem; font-family: inherit; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
   input:focus, textarea:focus, select:focus { 
     outline: none; border-color: var(--accent); 
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15); 
-    background: rgba(9, 14, 22, 0.9);
+    box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.18); 
+    background: rgba(10, 14, 20, 0.9);
   }
   textarea { resize: vertical; min-height: 120px; }
   
@@ -403,7 +430,7 @@ function admin_header(string $title, string $active = ''): void
   }
   .btn:hover { background: var(--accent-hover); box-shadow: var(--shadow); }
   .btn.ghost { background: transparent; color: var(--text); border-color: var(--border); }
-  .btn.ghost:hover { border-color: var(--accent); color: var(--accent); background: rgba(16, 185, 129, 0.03); }
+  .btn.ghost:hover { border-color: var(--accent); color: var(--accent); background: rgba(74, 222, 128, 0.05); }
   .btn.danger { background: transparent; color: var(--danger); border-color: rgba(248, 113, 113, 0.35); }
   .btn.danger:hover { background: rgba(248, 113, 113, 0.08); }
   .btn.sm { padding: 0.4rem 0.85rem; font-size: 0.8rem; border-radius: 0.375rem; }
@@ -416,14 +443,14 @@ function admin_header(string $title, string $active = ''): void
     font-size: 0.72rem; font-weight: 600; border: 1px solid var(--border); 
     background: var(--soft); color: var(--muted); 
   }
-  .pill.on { color: var(--accent); border-color: rgba(16, 185, 129, 0.25); background: rgba(16, 185, 129, 0.06); }
+  .pill.on { color: var(--accent); border-color: rgba(74, 222, 128, 0.28); background: rgba(74, 222, 128, 0.06); }
   .pill.off { color: var(--faint); background: rgba(255, 255, 255, 0.02); }
   .pill.warn { color: var(--warn); border-color: rgba(245, 158, 11, 0.25); background: rgba(245, 158, 11, 0.06); }
   .pill.danger { color: var(--danger); border-color: rgba(248, 113, 113, 0.25); background: rgba(248, 113, 113, 0.06); }
 
   .actions { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
   .flash { padding: 0.85rem 1.25rem; border-radius: 0.5rem; margin-bottom: 1.5rem; font-size: 0.88rem; font-weight: 500; }
-  .flash.ok { background: rgba(16, 185, 129, 0.08); color: var(--accent); border: 1px solid rgba(16, 185, 129, 0.15); }
+  .flash.ok { background: rgba(74, 222, 128, 0.08); color: var(--accent); border: 1px solid rgba(74, 222, 128, 0.18); }
   .flash.err { background: rgba(248, 113, 113, 0.08); color: var(--danger); border: 1px solid rgba(248, 113, 113, 0.15); }
   .flash.warn { background: rgba(245, 158, 11, 0.06); color: var(--warn); border: 1px solid rgba(245, 158, 11, 0.15); }
   .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 1.25rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
@@ -449,7 +476,7 @@ function admin_header(string $title, string $active = ''): void
   
   .tabs { display: flex; gap: 0.35rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
   .tabs a { padding: 0.45rem 1rem; border-radius: 0.5rem; font-size: 0.82rem; font-weight: 500; color: var(--muted); border: 1px solid var(--border); transition: all 0.2s; }
-  .tabs a.active { background: rgba(16, 185, 129, 0.08); color: var(--accent); border-color: rgba(16, 185, 129, 0.15); }
+  .tabs a.active { background: rgba(74, 222, 128, 0.08); color: var(--accent); border-color: rgba(74, 222, 128, 0.18); }
   .tabs a:hover { text-decoration: none; color: var(--text); border-color: var(--muted); }
   
   .checkline { display: flex; align-items: flex-start; gap: 0.75rem; margin: 0 0 1.25rem; font-weight: 400; cursor: pointer; }
@@ -525,7 +552,7 @@ function admin_header(string $title, string $active = ''): void
     
     <div class="sidebar-footer">
       <div class="user-info">
-        <div class="avatar"><?= strtoupper(substr($user, 0, 2)) ?></div>
+        <div class="avatar"><?= e(strtoupper(substr($user, 0, 2))) ?></div>
         <div class="details">
           <span class="username"><?= e($user) ?></span>
           <span class="role">Administrador</span>

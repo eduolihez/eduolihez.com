@@ -12,8 +12,14 @@ export function initReveal() {
   const elements = document.querySelectorAll<HTMLElement>('.reveal');
   if (elements.length === 0) return;
 
-  // Si el navegador no soporta IntersectionObserver, mostramos todo directamente.
-  if (!('IntersectionObserver' in window)) {
+  // Sin soporte de IntersectionObserver, o con "menos movimiento" pedido: se
+  // muestra todo de golpe. Sin este segundo caso, quien pide menos movimiento
+  // seguia teniendo que hacer scroll para que el contenido "apareciera" -- la
+  // transicion se acortaba a 0.001ms (global.css), pero el gate por scroll
+  // seguia ahi. De paso evita que una herramienta de captura de pantalla
+  // completa (sin scroll simulado) vea secciones en blanco.
+  const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  if (reduceMotion || !('IntersectionObserver' in window)) {
     elements.forEach((el) => el.classList.add('is-visible'));
     return;
   }

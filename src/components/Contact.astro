@@ -39,38 +39,46 @@ const messages = {
         <h2 class="section-title">{t('contact.title')}</h2>
         <p class="section-subtitle">{t('contact.subtitle')}</p>
 
-        <div class="mt-8 space-y-3">
+        <div class="mt-8 space-y-2">
           <a
             href={`mailto:${SITE.social.email}`}
-            class="flex items-center gap-3 text-sm text-text-muted transition hover:text-accent"
+            class="group flex items-center gap-3 rounded-lg p-1.5 text-sm text-text-muted transition duration-200 hover:text-accent"
           >
-            <Icon name="mail" class="h-5 w-5 text-text-faint" />
+            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-bg-border bg-bg-card/40 text-text-faint transition duration-200 group-hover:border-accent/30 group-hover:bg-accent/10 group-hover:text-accent">
+              <Icon name="mail" class="h-4 w-4" />
+            </span>
             {SITE.social.email}
           </a>
           <a
             href={SITE.social.linkedin}
             target="_blank"
             rel="noopener noreferrer"
-            class="flex items-center gap-3 text-sm text-text-muted transition hover:text-accent"
+            class="group flex items-center gap-3 rounded-lg p-1.5 text-sm text-text-muted transition duration-200 hover:text-accent"
           >
-            <Icon name="linkedin" class="h-5 w-5 text-text-faint" />
+            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-bg-border bg-bg-card/40 text-text-faint transition duration-200 group-hover:border-accent/30 group-hover:bg-accent/10 group-hover:text-accent">
+              <Icon name="linkedin" class="h-4 w-4" />
+            </span>
             LinkedIn
           </a>
           <a
             href={SITE.social.github}
             target="_blank"
             rel="noopener noreferrer"
-            class="flex items-center gap-3 text-sm text-text-muted transition hover:text-accent"
+            class="group flex items-center gap-3 rounded-lg p-1.5 text-sm text-text-muted transition duration-200 hover:text-accent"
           >
-            <Icon name="github" class="h-5 w-5 text-text-faint" />
+            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-bg-border bg-bg-card/40 text-text-faint transition duration-200 group-hover:border-accent/30 group-hover:bg-accent/10 group-hover:text-accent">
+              <Icon name="github" class="h-4 w-4" />
+            </span>
             GitHub
           </a>
           <a
             href={SITE.vcard}
             download
-            class="flex items-center gap-3 text-sm text-text-muted transition hover:text-accent"
+            class="group flex items-center gap-3 rounded-lg p-1.5 text-sm text-text-muted transition duration-200 hover:text-accent"
           >
-            <Icon name="download" class="h-5 w-5 text-text-faint" />
+            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-bg-border bg-bg-card/40 text-text-faint transition duration-200 group-hover:border-accent/30 group-hover:bg-accent/10 group-hover:text-accent">
+              <Icon name="download" class="h-4 w-4" />
+            </span>
             {t('contact.vcard')}
           </a>
         </div>

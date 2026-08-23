@@ -5,6 +5,15 @@ Todos los cambios notables de este proyecto se documentan en este archivo.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/),
 y el versionado usa cuatro números (`MAJOR.MINOR.PATCH.MICRO`).
 
+## [1.1.2.0] - 2026-08-23
+
+### Fixed
+
+- Las secciones con animación de aparición al hacer scroll ya no se quedan
+  invisibles para quien tiene activado "menos movimiento" en su sistema.
+- Los enlaces de contacto (email, LinkedIn, GitHub, vCard) usan el mismo
+  estilo de icono que el resto del sitio.
+
 ## [1.1.1.0] - 2026-08-23
 
 ### Added

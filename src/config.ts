@@ -22,9 +22,9 @@ export const SITE = {
   location: {
     city: 'Badalona',
     region: 'Barcelona',
-    regionCode: 'ES-CT', // Cataluna (ISO 3166-2)
+    regionCode: 'ES-CT', // Cataluña (ISO 3166-2)
     country: 'ES',
-    countryName: 'Espana',
+    countryName: 'España',
     postalCode: '08911',
     // Coordenadas aproximadas de Badalona (centro). No es tu direccion:
     // solo situa el municipio para las busquedas locales.
@@ -34,9 +34,9 @@ export const SITE = {
     areaServed: [
       'Badalona',
       'Barcelona',
-      'Area Metropolitana de Barcelona',
-      'Cataluna',
-      'Espana',
+      'Área Metropolitana de Barcelona',
+      'Cataluña',
+      'España',
       'Remoto / Teletrabajo',
     ],
   },
@@ -54,14 +54,14 @@ export const SITE = {
   knowsAbout: [
     'Security Operations Center (SOC)',
     'Blue Team',
-    'Deteccion de amenazas',
+    'Detección de amenazas',
     'Respuesta a incidentes',
     'SIEM y XDR',
     'Trend Micro Vision One',
     'Fortinet FortiGate y FortiAnalyzer',
-    'Analisis de phishing',
+    'Análisis de phishing',
     'Threat Intelligence',
-    'Automatizacion de seguridad con Python',
+    'Automatización de seguridad con Python',
     'Inteligencia artificial aplicada a ciberseguridad',
     'Active Directory y Windows Server',
     'Ciberseguridad en Badalona y Barcelona',
@@ -69,7 +69,7 @@ export const SITE = {
 
   /** Idiomas que hablas (codigo BCP-47 + nivel legible). */
   languages: [
-    { code: 'es', name: 'Espanol', level: 'Nativo' },
+    { code: 'es', name: 'Español', level: 'Nativo' },
     { code: 'ca', name: 'Catalan', level: 'Nativo' },
     { code: 'en', name: 'Ingles', level: 'B2' },
   ],

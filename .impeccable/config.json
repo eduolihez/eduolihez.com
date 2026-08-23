@@ -1,0 +1,23 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "inter",
+        "createdAt": "2026-08-22T23:58:32.413Z",
+        "reason": "User confirmed: Inter Variable is a brand commitment recorded in PRODUCT.md, self-hosted with latin subset; changing it would be a redesign, not a fix"
+      },
+      {
+        "rule": "em-dash-overuse",
+        "value": "*",
+        "files": [
+          "src/components/Seo.astro"
+        ],
+        "createdAt": "2026-08-22T23:58:44.987Z",
+        "reason": "Agent: 5 em-dashes, all of them title/meta separators (Nombre — Rol en Ciudad) in SEO templates, not body prose; the rule counted them as running text"
+      }
+    ]
+  }
+}

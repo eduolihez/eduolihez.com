@@ -9,6 +9,7 @@
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![PHP](https://img.shields.io/badge/PHP-8-777BB4?style=flat-square&logo=php&logoColor=white)](https://www.php.net)
 [![CodeQL](https://github.com/eduolihez/eduolihez.com/actions/workflows/codeql.yml/badge.svg)](https://github.com/eduolihez/eduolihez.com/actions/workflows/codeql.yml)
+[![Tests](https://github.com/eduolihez/eduolihez.com/actions/workflows/test.yml/badge.svg)](https://github.com/eduolihez/eduolihez.com/actions/workflows/test.yml)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
 
 ---
@@ -32,7 +33,8 @@ El sitio se ha diseñado siguiendo el principio de **defensa en profundidad** y 
 4. [Administración y Base de Datos](#-administración-y-base-de-datos)
 5. [SEO Técnico e IA-Friendliness](#-seo-técnico-e-ia-friendliness)
 6. [Instalación y Despliegue](#-instalación-y-despliegue)
-7. [Licencia](#-licencia)
+7. [Más Documentación](#-más-documentación)
+8. [Licencia](#-licencia)
 
 ---
 
@@ -64,7 +66,7 @@ El proyecto combina un generador de sitios estáticos (SSG) moderno con una infr
 El repositorio está organizado de forma modular para aislar responsabilidades:
 
 ```
-├── .github/workflows/   # CI/CD: Análisis estático (CodeQL y Semgrep)
+├── .github/workflows/   # CI/CD: Análisis estático (CodeQL y Semgrep) y tests (Vitest)
 ├── database/            # Esquema MySQL idempotente y migración de base de datos
 │   ├── schema.sql       # Tablas, índices, procedimientos de migración y seed inicial
 │   └── clean.sql        # Utilidad para vaciado de tablas
@@ -109,7 +111,8 @@ Como portfolio de un profesional de ciberseguridad, se han implementado riguroso
 * **Grafo Único JSON-LD**: Datos estructurados (`Person`, `WebSite`, `FAQPage`, `BreadcrumbList`) unificados mediante identificadores `@id` cruzados en vez de bloques dispersos.
 * **hreflang Recíproco**: La distribución multilingüe incluye referencias cruzadas y `x-default` únicamente en páginas con traducción activa.
 * **IA Rastreabilidad**: Cumple con la especificación de [llmstxt.org](https://llmstxt.org/) generando un archivo plano [`/llms.txt`](https://eduolihez.com/llms.txt) en cada build, ideal para que los modelos de lenguaje (LLM) indexen el portfolio sin HTML residual.
-* **Control de Bots**: Filtro selectivo en `robots.txt` que permite indexar a los rastreadores legítimos de IA (GPTBot, ClaudeBot, etc.) y bloquea los rastreadores agresivos de SEO de pago.
+* **Control de Bots**: Filtro selectivo en `robots.txt` que permite indexar a más de 20 rastreadores legítimos de IA y buscadores (GPTBot, ClaudeBot, PerplexityBot, Google-Extended, Amazonbot, entre otros), bloquea `/admin/` y `/api/` a todos ellos, y bloquea por completo a los rastreadores agresivos de SEO de pago (Semrush, Ahrefs, MJ12 y otros).
+* **Blog citable sin JavaScript**: Los artículos viven en MySQL y se publican sin recompilar, así que un rastreador que no ejecuta JS los vería vacíos. [`/llms-blog.txt`](https://eduolihez.com/llms-blog.txt) sirve su texto íntegro y `/sitemap-posts.xml` los enumera, ambos generados en cada petición.
 
 ---
 
@@ -136,6 +139,7 @@ npm run dev
 * `npm run build`: Compila el frontend estático a la carpeta `dist/`.
 * `npm run preview`: Lanza una vista previa local del directorio compilado.
 * `npm run icons`: Regenera la pila de favicons y gráficos de la web.
+* `npm test`: Ejecuta la suite de tests (Vitest) sobre el frontend en `src/`.
 
 ### Instrucciones de Despliegue en Servidor (CDMON / CPanel)
 1. Compila el sitio localmente con `npm run build`.
@@ -144,6 +148,20 @@ npm run dev
 4. Copia `server/config.example.php` a `server/config.php` y configura tus variables de conexión. **Importante**: No subas este archivo al control de versiones.
 5. Accede a phpMyAdmin e importa [schema.sql](file:///c:/Users/eduol/Documents/GitHub/eduolihez.com/database/schema.sql).
 6. Entra en `tudominio.com/admin/setup.php` para crear tu primera cuenta de administración. **Una vez creado el usuario, borra el archivo `setup.php` del servidor.**
+
+---
+
+## 📚 Más Documentación
+
+Este repositorio tiene más documentación de la que cabe en este README:
+
+* [TESTING.md](TESTING.md) — framework de tests, cobertura y convenciones.
+* [CONTRIBUTING.md](CONTRIBUTING.md) — cómo reportar un fallo o proponer un cambio.
+* [SECURITY.md](SECURITY.md) — política de divulgación de vulnerabilidades.
+* [CHANGELOG.md](CHANGELOG.md) — historial de versiones.
+* [PRODUCT.md](PRODUCT.md) — para quién es esta web y qué problema resuelve.
+* [DESIGN.md](DESIGN.md) — sistema de diseño (tipografía, color, espaciado, motion).
+* [TODOS.md](TODOS.md) — trabajo pendiente conocido, con contexto de por qué no se hizo ya.
 
 ---
 

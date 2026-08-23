@@ -10,6 +10,7 @@
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { useTranslations } from '../../../i18n/utils';
 import { api } from '../../../config';
+import StatusPanel from '../../../components/StatusPanel.astro';
 
 const lang = 'ca';
 const t = useTranslations(lang);
@@ -47,11 +48,12 @@ const alternates = { es: '/blog/', en: '/en/blog/', ca: '/ca/blog/' };
       </div>
 
       <!-- Estat de carrega -->
-      <div id="blog-status" class="mb-8 flex items-center gap-3 text-sm text-text-muted">
-        <span class="h-4 w-4 animate-spin rounded-full border-2 border-bg-border border-t-accent"
-        ></span>
-        <span id="blog-status-text">{t('blog.loading')}</span>
-      </div>
+      <StatusPanel
+        id="blog-status"
+        class="mb-8"
+        loadingText={t('blog.loading')}
+        retryText={t('status.retry')}
+      />
 
       <!-- Llistat d'articles (l'omple blog.ts) -->
       <div

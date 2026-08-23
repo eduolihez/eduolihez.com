@@ -92,7 +92,7 @@ interface Post {
 
 export function initBlogList(): void {
   const grid = document.getElementById('blog-grid');
-  if (!grid) return;
+  if (!grid || grid.dataset.loaded) return;
 
   const status = document.getElementById('blog-status');
   const statusText = document.getElementById('blog-status-text');
@@ -104,35 +104,43 @@ export function initBlogList(): void {
   const lang = grid.dataset.lang || 'es';
   const detailBase = grid.dataset.detail || '/blog/post/';
 
-  const fail = (msg: string) => {
+  // El panel de estado se controla con data-state; el CSS decide que icono
+  // sale y si aparece el boton de reintento (ver StatusPanel.astro).
+  const setState = (state: 'empty' | 'error', msg: string) => {
     if (statusText) statusText.textContent = msg;
-    status?.querySelector('.animate-spin')?.classList.add('hidden');
+    status?.setAttribute('data-state', state);
+    status?.classList.remove('hidden');
   };
 
-  fetch(apiUrl)
-    .then((res) => {
-      if (!res.ok) throw new Error('http');
-      return res.json();
-    })
-    .then((posts: Post[]) => {
-      status?.classList.add('hidden');
-      grid.classList.remove('hidden');
+  function loadPosts(): void {
+    if (!grid) return;
+    grid.innerHTML = '';
+    fetch(apiUrl)
+      .then((res) => {
+        if (!res.ok) throw new Error('http');
+        return res.json();
+      })
+      .then((posts: Post[]) => {
+        grid.dataset.loaded = '1';
+        if (!Array.isArray(posts) || posts.length === 0) {
+          setState('empty', emptyMsg);
+          return;
+        }
 
-      if (!Array.isArray(posts) || posts.length === 0) {
-        const p = document.createElement('div');
-        p.className = 'col-span-full py-16 text-center text-text-muted italic';
-        p.textContent = emptyMsg;
-        grid.appendChild(p);
-        return;
-      }
+        status?.classList.add('hidden');
+        grid.classList.remove('hidden');
 
-      posts.forEach((post) => grid.appendChild(card(post, { lang, readMore, detailBase })));
+        posts.forEach((post) => grid.appendChild(card(post, { lang, readMore, detailBase })));
 
-      // Las tarjetas nacen despues de que initReveal() haya observado el DOM,
-      // asi que se marcan visibles a mano en lugar de quedarse en opacidad 0.
-      grid.querySelectorAll('.reveal').forEach((el) => el.classList.add('is-visible'));
-    })
-    .catch(() => fail(errorMsg));
+        // Las tarjetas nacen despues de que initReveal() haya observado el DOM,
+        // asi que se marcan visibles a mano en lugar de quedarse en opacidad 0.
+        grid.querySelectorAll('.reveal').forEach((el) => el.classList.add('is-visible'));
+      })
+      .catch(() => setState('error', errorMsg));
+  }
+
+  status?.querySelector('.status-retry')?.addEventListener('click', loadPosts);
+  loadPosts();
 }
 
 /** Tarjeta de UN articulo. Construida con nodos, nunca con innerHTML. */

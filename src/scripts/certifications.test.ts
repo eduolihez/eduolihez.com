@@ -7,7 +7,7 @@ function setupGrid() {
     <div id="certs-counter" data-target="0">0</div>
     <div id="certs-status" class="hidden">
       <span id="certs-status-text"></span>
-      <button id="certs-retry-btn">Reintentar</button>
+      <button class="status-retry">Reintentar</button>
     </div>
     <input id="certs-search" />
     <div id="certs-filter-container">
@@ -128,7 +128,7 @@ describe('initCerts()', () => {
       expect(status.getAttribute('data-state')).toBe('error');
 
       vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce({ ok: true, json: () => Promise.resolve([sampleCert]) }));
-      document.getElementById('certs-retry-btn')?.click();
+      status.querySelector<HTMLButtonElement>('.status-retry')?.click();
       await vi.runAllTimersAsync();
 
       expect(status.getAttribute('data-state')).not.toBe('error');

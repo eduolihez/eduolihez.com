@@ -10,7 +10,6 @@ interface CertLabels {
   error: string;
   empty: string;
   countLabel: string;
-  showMore: string;
   credentials: string;
   credential: string;
   back: string;
@@ -49,7 +48,6 @@ export function initCerts(): void {
   const grid = document.getElementById('certs-grid');
   const status = document.getElementById('certs-status');
   const statusText = document.getElementById('certs-status-text');
-  const retryBtn = document.getElementById('certs-retry-btn');
   const counter = document.getElementById('certs-counter');
   const searchInput = document.getElementById('certs-search') as HTMLInputElement | null;
   const filterButtons = document.querySelectorAll<HTMLButtonElement>('.cert-filter-btn');
@@ -69,7 +67,8 @@ export function initCerts(): void {
   let searchQuery = '';
   let animationFrameId: number | null = null;
   let hasAnimatedOnce = false;
-  let limit = 12; // multiplo de 2 y 3: no parte la ultima fila del grid
+  const DEFAULT_LIMIT = 12; // multiplo de 2 y 3: no parte la ultima fila del grid
+  let limit = DEFAULT_LIMIT;
 
   /**
    * Sube la vista a la cabecera de la seccion al entrar o salir de un emisor.
@@ -311,7 +310,7 @@ export function initCerts(): void {
 
     btn.addEventListener('click', () => {
       activeIssuer = issuer;
-      limit = 12;
+      limit = DEFAULT_LIMIT;
       render();
       revealSection();
       grid?.querySelector<HTMLElement>('a, button')?.focus({ preventScroll: true });
@@ -406,12 +405,12 @@ export function initCerts(): void {
       .catch(() => setState('error', labels.error));
   }
 
-  retryBtn?.addEventListener('click', loadData);
+  status?.querySelector<HTMLButtonElement>('.status-retry')?.addEventListener('click', loadData);
 
   searchInput?.addEventListener('input', (e) => {
     searchQuery = (e.target as HTMLInputElement).value;
     activeIssuer = null; // buscar sale del detalle de un emisor
-    limit = 12;
+    limit = DEFAULT_LIMIT;
     render();
   });
 
@@ -419,14 +418,14 @@ export function initCerts(): void {
     btn.addEventListener('click', () => {
       activeFilter = btn.dataset.filter || 'all';
       activeIssuer = null;
-      limit = 12;
+      limit = DEFAULT_LIMIT;
       render();
     });
   });
 
   backBtn?.addEventListener('click', () => {
     activeIssuer = null;
-    limit = 12;
+    limit = DEFAULT_LIMIT;
     render();
     revealSection();
   });

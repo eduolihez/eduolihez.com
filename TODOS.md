@@ -132,3 +132,68 @@ alcance de un refactor de extracción para tests.
 **Effort:** S
 **Priority:** P3
 **Depends on:** Ninguno.
+
+## Calidad de código / Tests
+
+### Cobertura de tests para modal, filtros y drill-down de emisor
+
+**What:** Añadir tests para `openModal()`/`closeModal()` (foco, backdrop,
+Escape, enlaces demo/repo) y el filtro por badge en `src/scripts/projects.ts`;
+para los filtros por categoría (cyber/ai-cloud/cisco/tryhackme/sys-dev) y el
+drill-down de emisor (entrar/salir con el breadcrumb) en
+`src/scripts/certifications.ts`.
+
+**Why:** Auditoría de `/ship` del 2026-08-23 (specialist de Testing): son 4
+huecos CRITICAL de cobertura en la lógica interactiva principal de los
+componentes que se extrajeron esta misma sesión explícitamente para poder
+testearlos — hoy siguen sin ejercerse por ningún test.
+
+**Context:** Los 38 tests actuales cubren carga/vacío/error/reintento/
+agrupación por emisor/búsqueda, pero ningún test hace click en un botón de
+filtro, abre el modal de detalle, ni navega emisor↔resumen. No se detectó
+ningún bug de comportamiento real, solo ausencia de red de seguridad.
+
+**Effort:** M
+**Priority:** P2
+**Depends on:** Ninguno.
+
+### Huecos menores de cobertura: reintento sin red, paginación y listeners de test
+
+**What:** Tres hallazgos informativos del mismo audit: (1) el camino de
+rechazo de `fetchWithRetry()` (promesa de `fetch()` rechazada, no solo
+`res.ok:false`) solo está testeado en `blog.test.ts`, no en
+`certifications.test.ts`/`projects.test.ts`; (2) la paginación (`limit`/
+"cargar más") de certificaciones no se ejerce porque los fixtures de test usan
+pocos elementos; (3) `projects.test.ts` acumula listeners `keydown` en
+`document` entre tests porque cada `initProjects()` registra uno nuevo sin que
+el test anterior lo limpie.
+
+**Why:** Ninguno es un bug de producción confirmado, pero el (3) podría
+enmascarar una fuga real si `initProjects()` se invoca varias veces en
+producción (ej. tras `astro:page-load`) — hoy el listener se registra en
+`document` en vez de en el propio modal.
+
+**Effort:** S
+**Priority:** P3
+**Depends on:** Ninguno.
+
+### Extraer safeUrl()/fetchWithRetry()/setState() a un módulo compartido
+
+**What:** `safeUrl()`, `fetchWithRetry()` y `setState()` están duplicados casi
+literalmente (mismo cuerpo, mismos comentarios) entre `src/scripts/blog.ts`,
+`projects.ts` y `certifications.ts`.
+
+**Why:** Auditoría de `/ship` del 2026-08-23 (specialist de Maintainability):
+la extracción de scripts de esta sesión creó dos copias nuevas de cada helper
+en vez de compartir uno. Cualquier cambio futuro (ej. añadir un esquema de URL
+permitido, ajustar el backoff de reintentos) requiere tocar 2-3 sitios en
+sincronía.
+
+**Context:** Decisión explícita del 2026-08-23: no hacerlo en esta sesión para
+no añadir más churn justo antes de aterrizar un diff ya grande. Encaja con el
+TODO de rendimiento de `fetchWithRetry()` de esta misma sección — al extraer,
+revisar también ese timing.
+
+**Effort:** S
+**Priority:** P3
+**Depends on:** Ninguno.

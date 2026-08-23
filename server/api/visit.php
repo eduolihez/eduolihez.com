@@ -77,8 +77,13 @@ if (preg_match('#^/(en|ca)(/|$)#', $path, $m)) {
     $lang = $m[1];
 }
 
-// Hash de la IP con sal (privacidad).
-$salt   = config()['security']['ip_salt'] ?? 'default_salt';
+// Hash de la IP con sal (privacidad). Sin sal propia no hay caida silenciosa
+// a un valor adivinable: si falta en config(), el hash de IP se debilitaria
+// sin que nadie se entere, asi que preferimos un error 500 explicito.
+$salt = config()['security']['ip_salt'] ?? '';
+if ($salt === '') {
+    json(['error' => 'Configuracion incompleta.'], 500);
+}
 $ipHash = hash('sha256', client_ip() . '|' . $salt);
 
 try {

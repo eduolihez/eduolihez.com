@@ -5,6 +5,13 @@ Todos los cambios notables de este proyecto se documentan en este archivo.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/),
 y el versionado usa cuatro números (`MAJOR.MINOR.PATCH.MICRO`).
 
+## [1.1.1.0] - 2026-08-23
+
+### Added
+
+- Enlace directo al repositorio de código en la cabecera (y en el menú
+  móvil), junto al selector de idioma.
+
 ## [1.1.0.0] - 2026-08-23
 
 ### Added

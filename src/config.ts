@@ -133,6 +133,11 @@ export const SITE = {
     email: 'eduardo@eduolihez.com',
   },
 
+  // Repositorio de ESTA web (distinto del perfil de github.eduolihez de
+  // arriba). Enlazado desde la cabecera: la web es la demostracion, el
+  // repositorio es la prueba (ver PRODUCT.md, seccion Positioning).
+  githubRepo: 'https://github.com/eduolihez/eduolihez.com',
+
   /**
    * Base del backend PHP en CDMON.
    * - En LOCAL (npm run dev) no hay PHP, asi que las llamadas fallaran de forma

@@ -5,6 +5,14 @@ Todos los cambios notables de este proyecto se documentan en este archivo.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/),
 y el versionado usa cuatro números (`MAJOR.MINOR.PATCH.MICRO`).
 
+## [1.1.4.0] - 2026-08-23
+
+### Fixed
+
+- Las 4 puntuaciones de rendimiento en "Cómo está construida esta web"
+  (antes fijas en 100) muestran ahora una medición real contra producción,
+  cada una con su color según el umbral que usa el propio Lighthouse.
+
 ## [1.1.3.0] - 2026-08-23
 
 ### Added

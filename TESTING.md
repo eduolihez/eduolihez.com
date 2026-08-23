@@ -25,11 +25,14 @@ Corre en CI en cada push/PR a `master` (`.github/workflows/test.yml`).
 
 ## Capas de test
 
-- **Unit / smoke tests** (`src/**/*.test.ts`): por ahora, el endpoint
-  `/llms.txt` — verifica que el texto generado incluye los datos reales de
-  identidad, que ninguna interpolación queda como `undefined`/
-  `[object Object]`, y que las secciones que dependen de arrays
-  (experiencia, FAQ) no salen vacías.
+- **Unit / smoke tests** (`src/**/*.test.ts`): el endpoint `/llms.txt` —
+  verifica que el texto generado incluye los datos reales de identidad, que
+  ninguna interpolación queda como `undefined`/`[object Object]`, y que las
+  secciones que dependen de arrays (experiencia, FAQ) no salen vacías. Y los
+  scripts extraídos de Blog, Proyectos y Certificaciones (`blog.ts`,
+  `projects.ts`, `certifications.ts`) — carga/vacío/error/reintento sin
+  duplicar listeners, `safeUrl()` bloqueando esquemas ejecutables, y (en
+  Certificaciones) agrupación por emisor y filtro de búsqueda.
 - **Integration / E2E:** no hay todavía. El sitio es principalmente
   contenido estático + un backend PHP que no se puede correr en local sin
   PHP instalado (ver `PRODUCT.md`, sección "Operating Context").

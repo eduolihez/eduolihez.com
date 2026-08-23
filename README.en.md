@@ -9,6 +9,7 @@
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![PHP](https://img.shields.io/badge/PHP-8-777BB4?style=flat-square&logo=php&logoColor=white)](https://www.php.net)
 [![CodeQL](https://github.com/eduolihez/eduolihez.com/actions/workflows/codeql.yml/badge.svg)](https://github.com/eduolihez/eduolihez.com/actions/workflows/codeql.yml)
+[![Tests](https://github.com/eduolihez/eduolihez.com/actions/workflows/test.yml/badge.svg)](https://github.com/eduolihez/eduolihez.com/actions/workflows/test.yml)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
 
 ---
@@ -32,7 +33,8 @@ The site has been designed following the principle of **defense in depth** and s
 4. [Admin Console & Database](#-admin-console--database)
 5. [Technical SEO & AI-Friendliness](#-technical-seo--ai-friendliness)
 6. [Installation & Deployment](#-installation--deployment)
-7. [License](#-license)
+7. [More Documentation](#-more-documentation)
+8. [License](#-license)
 
 ---
 
@@ -64,7 +66,7 @@ The project combines a modern Static Site Generator (SSG) with a robust backend 
 The repository is modularly structured to enforce separation of concerns:
 
 ```
-├── .github/workflows/   # CI/CD: Static analysis (CodeQL and Semgrep)
+├── .github/workflows/   # CI/CD: Static analysis (CodeQL and Semgrep) and tests (Vitest)
 ├── database/            # Idempotent MySQL schema and migrations
 │   ├── schema.sql       # Tables, indexes, migration procedures, and initial seed
 │   └── clean.sql        # Table-emptying utility script
@@ -109,7 +111,8 @@ As the portfolio of a cybersecurity professional, strict controls have been impl
 * **Unified JSON-LD Graph**: Structured data entities (`Person`, `WebSite`, `FAQPage`, `BreadcrumbList`) are unified using interconnected `@id` properties rather than scattered blocks.
 * **Reciprocal hreflang**: Multi-language distribution specifies localized alternatives and `x-default` strictly for pages with active translations.
 * **AI Machine-Readable Profile**: Implements the [llmstxt.org](https://llmstxt.org/) specification by generating a plain-text [`/llms.txt`](https://eduolihez.com/llms.txt) summary file on each build, enabling AI assistants to index the portfolio cleanly.
-* **Crawler Control**: A custom `robots.txt` configuration explicitly permits indexation by legitimate AI agents (GPTBot, ClaudeBot) while blocking aggressive, non-beneficial SEO scrapers.
+* **Crawler Control**: A custom `robots.txt` configuration explicitly permits indexation by legitimate AI agents (GPTBot, ClaudeBot), blocks `/admin/` and `/api/` for all of them, and blocks aggressive, non-beneficial SEO scrapers outright.
+* **Blog citability without JavaScript**: Blog entries live in MySQL and publish without a rebuild, so a crawler that doesn't run JS would see them empty. [`/llms-blog.txt`](https://eduolihez.com/llms-blog.txt) serves their full text and `/sitemap-posts.xml` lists them, both generated on each request.
 
 ---
 
@@ -136,6 +139,7 @@ npm run dev
 * `npm run build`: Compiles the static frontend to `dist/`.
 * `npm run preview`: Launches a local preview server for the compiled site.
 * `npm run icons`: Regenerates the site icon set.
+* `npm test`: Runs the test suite (Vitest) for the `src/` frontend.
 
 ### Production Deployment Instructions (CDMON / CPanel)
 1. Build the site locally using `npm run build`.
@@ -144,6 +148,22 @@ npm run dev
 4. Copy `server/config.example.php` to `server/config.php` and configure your credentials. **Important**: Keep this file out of Git.
 5. Import [schema.sql](file:///c:/Users/eduol/Documents/GitHub/eduolihez.com/database/schema.sql) into your database using phpMyAdmin.
 6. Access `yourdomain.com/admin/setup.php` to register the primary admin account. **Delete `setup.php` from your server immediately after.**
+
+---
+
+## 📚 More Documentation
+
+This repository has more documentation than fits in this README. Most of it is
+written in Spanish (this is the author's personal site, not a library aimed at
+international contributors) — `SECURITY.md` is the exception, in English:
+
+* [TESTING.md](TESTING.md) — test framework, coverage, and conventions.
+* [CONTRIBUTING.md](CONTRIBUTING.md) — how to report a bug or propose a change.
+* [SECURITY.md](SECURITY.md) — vulnerability disclosure policy.
+* [CHANGELOG.md](CHANGELOG.md) — version history.
+* [PRODUCT.md](PRODUCT.md) — who this site is for and what problem it solves.
+* [DESIGN.md](DESIGN.md) — design system (typography, color, spacing, motion).
+* [TODOS.md](TODOS.md) — known pending work, with context on why it wasn't done yet.
 
 ---
 

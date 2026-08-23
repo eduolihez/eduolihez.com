@@ -26,23 +26,21 @@ esto es puramente una optimización de carga, no un fix de fiabilidad.
 **Depends on:** Resultado de Approach A en `docs/designs/seo-ai-visibility.md` —
 solo tiene sentido revisar esto si el umbral realmente se dispara.
 
-### Cobertura de tests para los endpoints que generan contenido para IA
+### Cobertura de tests para server/llms-blog.php
 
-**What:** Añadir un smoke test (Vitest, encaja con el stack Astro/Vite ya
-existente) para `src/pages/llms.txt.ts` y `server/llms-blog.php` que verifique
-que el output no rompe con datos vacíos o nulos.
+**What:** Añadir un smoke test para `server/llms-blog.php` que verifique que
+el output no rompe con datos vacíos o nulos.
 
-**Why:** Son las dos piezas centrales de la apuesta de citabilidad-IA del
-proyecto y hoy tienen cero red de seguridad. Un cambio futuro en `config.ts`, en
-`experience.ts`/`skills.ts`/`faq.ts`, o en el esquema de la tabla `posts` podría
-romper el output sin que nadie lo note hasta que una IA reciba una respuesta
-rota o vacía.
+**Why:** Es una de las piezas centrales de la apuesta de citabilidad-IA del
+proyecto y hoy tiene cero red de seguridad. Un cambio futuro en el esquema de
+la tabla `posts` podría romper el output sin que nadie lo note hasta que una
+IA reciba una respuesta rota o vacía.
 
-**Context:** El proyecto no tiene framework de test en absoluto hoy (verificado
-2026-08-23: sin `jest.config`/`vitest.config`/`playwright.config`, sin script
-`test` en `package.json`, cero archivos de test en el repo). Instalar Vitest y
-escribir estos dos smoke tests es el primer paso razonable, no una migración
-completa a testing.
+**Context:** Ya no aplica a `src/pages/llms.txt.ts` — Vitest se instaló esta
+misma sesión (`chore: bootstrap test framework`) y ese endpoint ya tiene smoke
+test en `src/test/pages/llms.txt.test.ts` (ver `TESTING.md`). Lo que queda
+pendiente es solo el lado PHP: `server/` no tiene test runner todavía (sería
+Composer + PHPUnit, iniciativa aparte, no algo que Vitest pueda tocar).
 
 **Effort:** M
 **Priority:** P2
@@ -148,7 +146,7 @@ huecos CRITICAL de cobertura en la lógica interactiva principal de los
 componentes que se extrajeron esta misma sesión explícitamente para poder
 testearlos — hoy siguen sin ejercerse por ningún test.
 
-**Context:** Los 38 tests actuales cubren carga/vacío/error/reintento/
+**Context:** Los 39 tests actuales cubren carga/vacío/error/reintento/
 agrupación por emisor/búsqueda, pero ningún test hace click en un botón de
 filtro, abre el modal de detalle, ni navega emisor↔resumen. No se detectó
 ningún bug de comportamiento real, solo ausencia de red de seguridad.

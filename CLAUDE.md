@@ -2,7 +2,11 @@
 ## Testing
 
 Run: `npm test` (Vitest). Test files live next to the source they test:
-`src/pages/llms.txt.ts` → `src/pages/llms.txt.test.ts`. Full context in
+`src/scripts/blog.ts` → `src/scripts/blog.test.ts` — **except** anything
+under `src/pages/`, which Astro treats as a route: a test file placed there
+breaks `npm run build` silently. Tests for `src/pages/` files go in
+`src/test/pages/` instead, mirroring the relative path (e.g.
+`src/pages/llms.txt.ts` → `src/test/pages/llms.txt.test.ts`). Full context in
 `TESTING.md`.
 
 Only covers `src/` (TypeScript/Astro). `server/` (PHP) has no test runner yet.

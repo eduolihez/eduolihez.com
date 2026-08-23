@@ -16,7 +16,11 @@ y el versionado usa cuatro números (`MAJOR.MINOR.PATCH.MICRO`).
   Certificaciones cuando falla la petición al servidor.
 - Enlace "saltar al contenido" y textos de navegación del pie traducidos en
   los tres idiomas (antes solo existían en español).
-- Cobertura de tests automatizados y verificación de build en cada cambio.
+
+### Para colaboradores
+
+- Suite de tests automatizados (Vitest) para el frontend en `src/`, con
+  verificación de build en cada push/PR (`npm test`, ver `TESTING.md`).
 
 ### Changed
 

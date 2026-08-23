@@ -9,6 +9,7 @@
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 [![PHP](https://img.shields.io/badge/PHP-8-777BB4?style=flat-square&logo=php&logoColor=white)](https://www.php.net)
 [![CodeQL](https://github.com/eduolihez/eduolihez.com/actions/workflows/codeql.yml/badge.svg)](https://github.com/eduolihez/eduolihez.com/actions/workflows/codeql.yml)
+[![Tests](https://github.com/eduolihez/eduolihez.com/actions/workflows/test.yml/badge.svg)](https://github.com/eduolihez/eduolihez.com/actions/workflows/test.yml)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
 
 ---
@@ -32,7 +33,8 @@ El lloc s'ha dissenyat seguint el principi de **defensa en profunditat** i serve
 4. [Administració i Base de Dades](#-administració-i-base-de-dades)
 5. [SEO Tècnic i IA-Friendliness](#-seo-tècnic-i-ia-friendliness)
 6. [Instal·lació i Desplegament](#-instal·lació-i-desplegament)
-7. [Llicència](#-llicència)
+7. [Més Documentació](#-més-documentació)
+8. [Llicència](#-llicència)
 
 ---
 
@@ -64,7 +66,7 @@ El projecte combina un generador de llocs estàtics (SSG) modern amb una infraes
 El repositori està organitzat de forma modular per aïllar responsabilitats:
 
 ```
-├── .github/workflows/   # CI/CD: Anàlisi estàtica (CodeQL i Semgrep)
+├── .github/workflows/   # CI/CD: Anàlisi estàtica (CodeQL i Semgrep) i tests (Vitest)
 ├── database/            # Esquema MySQL idempotent i migració de base de dades
 │   ├── schema.sql       # Taules, índexs, procediments de migració i llavor inicial
 │   └── clean.sql        # Utilitat per buidar les taules
@@ -109,7 +111,8 @@ Com a portfolio d'un professional de ciberseguretat, s'han implementat rigurosos
 * **Graf Únic JSON-LD**: Dades estructurades (`Person`, `WebSite`, `FAQPage`, `BreadcrumbList`) unificades mitjançant identificadors `@id` creuats en comptes de blocs dispersos.
 * **hreflang Recíproc**: La distribució multilingüe inclou referències creuades i `x-default` únicament en pàgines amb traducció activa.
 * **IA Rastreabilitat**: Compleix amb l'especificació de [llmstxt.org](https://llmstxt.org/) generant un fitxer pla [`/llms.txt`](https://eduolihez.com/llms.txt) a cada build, ideal perquè els models de llenguatge (LLM) indexin el portfolio sense HTML residual.
-* **Control de Bots**: Filtre selectiu a `robots.txt` que permet indexar als rastrejadors legítims d'IA (GPTBot, ClaudeBot, etc.) i bloqueja els rastrejadors agressius de SEO de pagament.
+* **Control de Bots**: Filtre selectiu a `robots.txt` que permet indexar als rastrejadors legítims d'IA (GPTBot, ClaudeBot, etc.), bloqueja `/admin/` i `/api/` a tots ells, i bloqueja del tot els rastrejadors agressius de SEO de pagament.
+* **Blog citable sense JavaScript**: Els articles viuen a MySQL i es publiquen sense recompilar, així que un rastrejador que no executa JS els veuria buits. [`/llms-blog.txt`](https://eduolihez.com/llms-blog.txt) en serveix el text íntegre i `/sitemap-posts.xml` els enumera, tots dos generats a cada petició.
 
 ---
 
@@ -136,6 +139,7 @@ npm run dev
 * `npm run build`: Compila el frontend estàtic a la carpeta `dist/`.
 * `npm run preview`: Llança una vista prèvia local del directori compilat.
 * `npm run icons`: Regenera la pila de favicons i gràfics del web.
+* `npm test`: Executa la suite de tests (Vitest) sobre el frontend a `src/`.
 
 ### Instruccions de Desplegament en Servidor (CDMON / CPanel)
 1. Compila el lloc localment amb `npm run build`.
@@ -144,6 +148,22 @@ npm run dev
 4. Còpia `server/config.example.php` a `server/config.php` i configura les teves variables de connexió. **Important**: No pugis aquest fitxer al control de versions.
 5. Accedeix a phpMyAdmin i importa [schema.sql](file:///c:/Users/eduol/Documents/GitHub/eduolihez.com/database/schema.sql).
 6. Entra a `tudomini.com/admin/setup.php` per crear el teu primer compte d'administració. **Un cop creat l'usuari, esborra el fitxer `setup.php` del servidor.**
+
+---
+
+## 📚 Més Documentació
+
+Aquest repositori té més documentació de la que cap en aquest README. La major
+part està en castellà (és el web personal de l'autor, no una llibreria pensada
+per a col·laboradors internacionals) — `SECURITY.md` és l'excepció, en anglès:
+
+* [TESTING.md](TESTING.md) — framework de tests, cobertura i convencions.
+* [CONTRIBUTING.md](CONTRIBUTING.md) — com reportar un error o proposar un canvi.
+* [SECURITY.md](SECURITY.md) — política de divulgació de vulnerabilitats.
+* [CHANGELOG.md](CHANGELOG.md) — historial de versions.
+* [PRODUCT.md](PRODUCT.md) — per a qui és aquest web i quin problema resol.
+* [DESIGN.md](DESIGN.md) — sistema de disseny (tipografia, color, espaiat, motion).
+* [TODOS.md](TODOS.md) — treball pendent conegut, amb context de per què no s'ha fet encara.
 
 ---
 

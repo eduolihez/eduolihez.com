@@ -9,6 +9,7 @@
  */
 
 interface ProjectLabels {
+  loading: string;
   empty: string;
   error: string;
   featured: string;
@@ -258,7 +259,7 @@ export function initProjects(): void {
 
   // El panel de estado se controla con data-state; el CSS decide el icono y
   // si sale el boton de reintento (ver StatusPanel.astro).
-  function setState(state: 'empty' | 'error', text: string): void {
+  function setState(state: 'loading' | 'empty' | 'error', text: string): void {
     if (statusText) statusText.textContent = text;
     if (status) {
       status.setAttribute('data-state', state);
@@ -294,6 +295,7 @@ export function initProjects(): void {
   }
 
   function loadProjects(): void {
+    setState('loading', labels.loading);
     grid.innerHTML = '';
     fetchWithRetry(apiUrl, { headers: { Accept: 'application/json' } })
       .then((data) => {

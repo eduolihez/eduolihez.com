@@ -11,7 +11,7 @@ function setupGrid() {
     <div
       id="projects-grid"
       data-api="/api/projects.php"
-      data-labels='{"empty":"Sin proyectos","error":"Error","details":"Ver detalles","demo":"Demo","repo":"Codigo","featured":"Destacado"}'
+      data-labels='{"loading":"Cargando","empty":"Sin proyectos","error":"Error","details":"Ver detalles","demo":"Demo","repo":"Codigo","featured":"Destacado"}'
     ></div>
     <div id="project-modal" hidden>
       <img id="pm-image" class="hidden" />
@@ -132,6 +132,36 @@ describe('initProjects()', () => {
       // listener estuviera duplicado, la segunda llamada agotaria el
       // mockResolvedValueOnce y la carga habria fallado en vez de pintar tarjetas.
       expect(fetch).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('el reintento vuelve a mostrar el estado de carga en vez de quedarse en error', async () => {
+    vi.useFakeTimers();
+    try {
+      setupGrid();
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false }));
+      initProjects();
+      await vi.runAllTimersAsync();
+
+      const status = document.getElementById('projects-status') as HTMLElement;
+      expect(status.getAttribute('data-state')).toBe('error');
+
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValueOnce({ ok: true, json: () => Promise.resolve([sampleProject]) }),
+      );
+      status.querySelector<HTMLButtonElement>('.status-retry')?.click();
+
+      // setState('loading', ...) se ejecuta de forma sincrona al inicio de
+      // loadProjects(), antes de esperar la respuesta de fetch.
+      expect(status.getAttribute('data-state')).toBe('loading');
+
+      // Al exito el panel se oculta (igual que certifications.ts); data-state
+      // no se reescribe porque ya no es visible.
+      await vi.runAllTimersAsync();
+      expect(status.classList.contains('hidden')).toBe(true);
     } finally {
       vi.useRealTimers();
     }

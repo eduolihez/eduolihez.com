@@ -1,6 +1,6 @@
 {
   "name": "eduardo-olivares-portfolio",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Portfolio profesional bilingue (ES/EN) de Eduardo Olivares - SOC Analyst / Blue Team. Frontend Astro estatico + backend PHP/MySQL para CDMON.",
   "type": "module",
   "author": "Eduardo Olivares Hernandez",

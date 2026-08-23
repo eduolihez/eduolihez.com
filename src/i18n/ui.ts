@@ -32,6 +32,7 @@ export const ui = {
     'nav.skip': 'Saltar al contenido',
     'nav.language': 'Idioma',
     'nav.blog': 'Blog',
+    'nav.githubRepo': 'Ver el código en GitHub',
 
     'hero.status': 'Disponible para trabajar',
     'hero.role': 'SOC Analyst · Blue Team · Detección de Amenazas con IA',
@@ -148,6 +149,7 @@ export const ui = {
     'nav.skip': 'Skip to content',
     'nav.language': 'Language',
     'nav.blog': 'Blog',
+    'nav.githubRepo': 'View source on GitHub',
 
     'hero.status': 'Open to work',
     'hero.role': 'SOC Analyst · Blue Team · AI-Driven Threat Detection',
@@ -262,6 +264,7 @@ export const ui = {
     'nav.skip': 'Salta al contingut',
     'nav.language': 'Idioma',
     'nav.blog': 'Blog',
+    'nav.githubRepo': 'Veure el codi a GitHub',
 
     'hero.status': 'Disponible per treballar',
     'hero.role': "SOC Analyst · Blue Team · Detecció d'Amenaces amb IA",

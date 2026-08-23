@@ -6,7 +6,9 @@
  */
 import { useTranslations, localeBase } from '../i18n/utils';
 import { languages, type Lang } from '../i18n/ui';
+import { SITE } from '../config';
 import Announcement from './Announcement.astro';
+import Icon from './Icon.astro';
 
 interface Props {
   lang: Lang;
@@ -78,6 +80,19 @@ const flagSvgs = {
     </ul>
 
     <div class="flex items-center gap-1">
+      <!-- Repositorio de esta web: la demostracion vive en el sitio, la
+           prueba en el codigo (ver PRODUCT.md, seccion Positioning). -->
+      <a
+        href={SITE.githubRepo}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="hidden sm:inline-flex items-center justify-center rounded-md p-2 text-text-muted transition hover:text-accent"
+        aria-label={t('nav.githubRepo')}
+        title={t('nav.githubRepo')}
+      >
+        <Icon name="github" class="h-4 w-4" />
+      </a>
+
       <!-- Selector de idioma (dropdown) -->
       <div class="relative">
         <button
@@ -151,6 +166,17 @@ const flagSvgs = {
           </li>
         ))
       }
+      <li class="mt-1 border-t border-bg-border/50 pt-1">
+        <a
+          href={SITE.githubRepo}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="mobile-link flex items-center gap-2 rounded-md px-3 py-2.5 text-base text-text-muted transition hover:bg-bg-soft hover:text-text"
+        >
+          <Icon name="github" class="h-4 w-4" />
+          {t('nav.githubRepo')}
+        </a>
+      </li>
     </ul>
   </div>
 </header>

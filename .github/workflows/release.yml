@@ -1,0 +1,81 @@
+name: "Release"
+
+# POR QUE EXISTE: cada version real (VERSION + entrada en CHANGELOG.md) queda
+# como una Release en GitHub con el /dist ya compilado adjunto. Asi quien
+# necesite desplegar a mano (o un futuro job de FTP) descarga el zip listo
+# para subir, sin tener que clonar el repo ni correr "npm run build" el
+# mismo. Se dispara con un tag de version, no con cada commit a master, para
+# no llenar la pestana Releases con un release por cada arreglo pequeno.
+#
+# COMO SE ETIQUETA: el tag debe coincidir EXACTO con el contenido de
+# VERSION, con "v" delante (VERSION="1.1.0.0" -> tag "v1.1.0.0").
+#   git tag v$(cat VERSION) && git push origin v$(cat VERSION)
+
+on:
+  push:
+    tags:
+      - "v*.*.*.*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar el repositorio
+        uses: actions/checkout@v7
+
+      - name: Configurar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Ejecutar tests
+        run: npm test
+
+      - name: Compilar el sitio (astro build)
+        run: npm run build
+
+      - name: Verificar que el tag coincide con VERSION
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          FILE_VERSION="$(cat VERSION)"
+          if [ "$TAG" != "$FILE_VERSION" ]; then
+            echo "::error::El tag v$TAG no coincide con VERSION ($FILE_VERSION)"
+            exit 1
+          fi
+
+      - name: Empaquetar dist/
+        run: |
+          cd dist
+          zip -r "../eduolihez.com-${{ github.ref_name }}.zip" .
+
+      - name: Extraer la seccion del CHANGELOG para este tag
+        id: changelog
+        run: |
+          VERSION_HEADER="## \[${GITHUB_REF_NAME#v}\]"
+          awk -v header="$VERSION_HEADER" '
+            $0 ~ "^" header { found=1; next }
+            found && /^## \[/ { exit }
+            found { print }
+          ' CHANGELOG.md > release-notes.md
+          if [ ! -s release-notes.md ]; then
+            echo "_Sin entrada en CHANGELOG.md para ${{ github.ref_name }}._" > release-notes.md
+          fi
+
+      - name: Crear la Release en GitHub
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "${{ github.ref_name }}"
+          body_path: release-notes.md
+          files: "eduolihez.com-${{ github.ref_name }}.zip"
+          fail_on_unmatched_files: true

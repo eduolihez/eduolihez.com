@@ -197,3 +197,5 @@ revisar también ese timing.
 **Effort:** S
 **Priority:** P3
 **Depends on:** Ninguno.
+
+## Completed

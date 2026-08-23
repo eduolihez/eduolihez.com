@@ -1,0 +1,18 @@
+# Normaliza los finales de linea a LF en el repositorio, independientemente
+# del sistema operativo o editor que toque el archivo. Sin esto, un editor de
+# Windows que guarde en CRLF genera diffs que reescriben el archivo entero
+# aunque el cambio real sea de una linea.
+* text=auto eol=lf
+
+# Binarios: nunca normalizar.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.svg binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+*.pdf binary

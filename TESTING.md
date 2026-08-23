@@ -37,7 +37,17 @@ Corre en CI en cada push/PR a `master` (`.github/workflows/test.yml`).
 ## Convenciones
 
 - Un archivo de test por cada archivo fuente que se testea: `foo.ts` →
-  `foo.test.ts`, en el mismo directorio.
+  `foo.test.ts`, en el mismo directorio — **excepto dentro de `src/pages/`**
+  (ver aviso justo abajo).
+- **`src/pages/` es zona prohibida para archivos de test.** Astro trata
+  CUALQUIER archivo dentro de `src/pages/` como una ruta a compilar. Un
+  `describe()`/`it()` de Vitest ahí dentro rompe `npm run build` en
+  silencio durante el prerender (Astro intenta evaluar el módulo de test
+  como si fuera un endpoint). Los tests de algo que vive en `src/pages/`
+  van en `src/test/pages/`, con la misma ruta relativa (ej.
+  `src/pages/llms.txt.ts` → `src/test/pages/llms.txt.test.ts`). Antes de
+  dar por bueno un cambio en los tests, corre `npm run build` además de
+  `npm test` — un test roto falla ruidoso, pero esto fallaba en silencio.
 - `describe()` con el nombre del endpoint/función; `it()` en español,
   describiendo el comportamiento esperado, no la implementación.
 - No mockear `src/config.ts`/`data/*.ts` a propósito en los smoke tests del

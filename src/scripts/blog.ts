@@ -98,6 +98,7 @@ export function initBlogList(): void {
   const statusText = document.getElementById('blog-status-text');
 
   const apiUrl = grid.dataset.api || '';
+  const loadingMsg = grid.dataset.loading || '';
   const emptyMsg = grid.dataset.empty || '';
   const errorMsg = grid.dataset.error || '';
   const readMore = grid.dataset.readmore || '';
@@ -106,7 +107,7 @@ export function initBlogList(): void {
 
   // El panel de estado se controla con data-state; el CSS decide que icono
   // sale y si aparece el boton de reintento (ver StatusPanel.astro).
-  const setState = (state: 'empty' | 'error', msg: string) => {
+  const setState = (state: 'loading' | 'empty' | 'error', msg: string) => {
     if (statusText) statusText.textContent = msg;
     status?.setAttribute('data-state', state);
     status?.classList.remove('hidden');
@@ -114,6 +115,7 @@ export function initBlogList(): void {
 
   function loadPosts(): void {
     if (!grid) return;
+    setState('loading', loadingMsg);
     grid.innerHTML = '';
     fetch(apiUrl)
       .then((res) => {

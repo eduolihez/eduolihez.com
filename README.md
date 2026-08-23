@@ -111,7 +111,7 @@ Como portfolio de un profesional de ciberseguridad, se han implementado riguroso
 * **Grafo Único JSON-LD**: Datos estructurados (`Person`, `WebSite`, `FAQPage`, `BreadcrumbList`) unificados mediante identificadores `@id` cruzados en vez de bloques dispersos.
 * **hreflang Recíproco**: La distribución multilingüe incluye referencias cruzadas y `x-default` únicamente en páginas con traducción activa.
 * **IA Rastreabilidad**: Cumple con la especificación de [llmstxt.org](https://llmstxt.org/) generando un archivo plano [`/llms.txt`](https://eduolihez.com/llms.txt) en cada build, ideal para que los modelos de lenguaje (LLM) indexen el portfolio sin HTML residual.
-* **Control de Bots**: Filtro selectivo en `robots.txt` que permite indexar a los rastreadores legítimos de IA (GPTBot, ClaudeBot, etc.), bloquea `/admin/` y `/api/` a todos ellos, y bloquea por completo los rastreadores agresivos de SEO de pago.
+* **Control de Bots**: Filtro selectivo en `robots.txt` que permite indexar a más de 20 rastreadores legítimos de IA y buscadores (GPTBot, ClaudeBot, PerplexityBot, Google-Extended, Amazonbot, entre otros), bloquea `/admin/` y `/api/` a todos ellos, y bloquea por completo a los rastreadores agresivos de SEO de pago (Semrush, Ahrefs, MJ12 y otros).
 * **Blog citable sin JavaScript**: Los artículos viven en MySQL y se publican sin recompilar, así que un rastreador que no ejecuta JS los vería vacíos. [`/llms-blog.txt`](https://eduolihez.com/llms-blog.txt) sirve su texto íntegro y `/sitemap-posts.xml` los enumera, ambos generados en cada petición.
 
 ---

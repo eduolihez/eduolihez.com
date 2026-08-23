@@ -111,7 +111,7 @@ As the portfolio of a cybersecurity professional, strict controls have been impl
 * **Unified JSON-LD Graph**: Structured data entities (`Person`, `WebSite`, `FAQPage`, `BreadcrumbList`) are unified using interconnected `@id` properties rather than scattered blocks.
 * **Reciprocal hreflang**: Multi-language distribution specifies localized alternatives and `x-default` strictly for pages with active translations.
 * **AI Machine-Readable Profile**: Implements the [llmstxt.org](https://llmstxt.org/) specification by generating a plain-text [`/llms.txt`](https://eduolihez.com/llms.txt) summary file on each build, enabling AI assistants to index the portfolio cleanly.
-* **Crawler Control**: A custom `robots.txt` configuration explicitly permits indexation by legitimate AI agents (GPTBot, ClaudeBot), blocks `/admin/` and `/api/` for all of them, and blocks aggressive, non-beneficial SEO scrapers outright.
+* **Crawler Control**: A custom `robots.txt` configuration explicitly permits indexation by 20+ legitimate AI and search crawlers (GPTBot, ClaudeBot, PerplexityBot, Google-Extended, Amazonbot, among others), blocks `/admin/` and `/api/` for all of them, and blocks aggressive, non-beneficial SEO scrapers outright (Semrush, Ahrefs, MJ12, and others).
 * **Blog citability without JavaScript**: Blog entries live in MySQL and publish without a rebuild, so a crawler that doesn't run JS would see them empty. [`/llms-blog.txt`](https://eduolihez.com/llms-blog.txt) serves their full text and `/sitemap-posts.xml` lists them, both generated on each request.
 
 ---

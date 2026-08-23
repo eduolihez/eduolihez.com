@@ -1,4 +1,20 @@
 
+## Testing
+
+Run: `npm test` (Vitest). Test files live next to the source they test:
+`src/pages/llms.txt.ts` → `src/pages/llms.txt.test.ts`. Full context in
+`TESTING.md`.
+
+Only covers `src/` (TypeScript/Astro). `server/` (PHP) has no test runner yet.
+
+Expectations:
+- 100% coverage is the goal — tests make changes safe to make quickly.
+- New function → write a corresponding test.
+- Bug fix → write a regression test that would have caught it.
+- New error handling → write a test that triggers the error path.
+- New conditional (if/else, switch) → test both branches.
+- Never commit code that makes an existing test fail.
+
 ## Skill routing
 
 When the user's request matches an available skill, invoke it via the Skill tool. When in doubt, invoke the skill.

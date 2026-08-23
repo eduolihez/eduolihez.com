@@ -10,6 +10,7 @@ function setupGrid(overrides: Partial<Record<string, string>> = {}) {
     <div
       id="blog-grid"
       data-api="/api/posts.php"
+      data-loading="Cargando"
       data-empty="No hay articulos"
       data-error="Error al cargar"
       data-readmore="Leer mas"
@@ -135,6 +136,29 @@ describe('initBlogList()', () => {
     // veces con el mismo mockResolvedValueOnce y la segunda habria fallado
     // por falta de valor (mock agotado), rompiendo el test.
     expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('el reintento vuelve a mostrar el estado de carga en vez de quedarse en error (regresion)', async () => {
+    const grid = setupGrid();
+    mockFetchOnce({ ok: false });
+    initBlogList();
+
+    const status = document.getElementById('blog-status') as HTMLElement;
+    await vi.waitFor(() => expect(status.getAttribute('data-state')).toBe('error'));
+
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValueOnce({ ok: true, json: () => Promise.resolve([samplePost]) }),
+    );
+    status.querySelector<HTMLButtonElement>('.status-retry')?.click();
+
+    // setState('loading', ...) se ejecuta de forma sincrona al inicio de
+    // loadPosts(), antes de esperar la respuesta de fetch.
+    expect(status.getAttribute('data-state')).toBe('loading');
+    expect(document.getElementById('blog-status-text')?.textContent).toBe('Cargando');
+
+    await vi.waitFor(() => expect(grid.children.length).toBeGreaterThan(0));
+    expect(status.classList.contains('hidden')).toBe(true);
   });
 });
 

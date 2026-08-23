@@ -300,6 +300,20 @@
     @apply text-danger;
   }
 
+  /* Prompt "cargando" a juego con el >_ del logo y las paginas de error, en
+     vez de un spinner que podria ser el de cualquier sitio. */
+  .status-prompt {
+    @apply flex items-center justify-center font-mono text-sm font-bold leading-none text-accent;
+  }
+  .status-cursor {
+    @apply inline-block h-3.5 w-[7px] shrink-0 bg-accent;
+    animation: status-cursor-blink 1.1s step-end infinite;
+  }
+  @keyframes status-cursor-blink {
+    0%, 49% { opacity: 1; }
+    50%, 100% { opacity: 0; }
+  }
+
   .status-retry {
     @apply mt-2 items-center gap-1.5 rounded-md border border-bg-border px-2.5 py-1
            text-xs font-medium text-text-muted transition-colors

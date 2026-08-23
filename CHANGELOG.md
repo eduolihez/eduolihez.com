@@ -5,6 +5,23 @@ Todos los cambios notables de este proyecto se documentan en este archivo.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/),
 y el versionado usa cuatro números (`MAJOR.MINOR.PATCH.MICRO`).
 
+## [1.1.3.0] - 2026-08-23
+
+### Added
+
+- El aviso de "cargando" en Blog, Proyectos y Certificaciones ahora tiene
+  voz propia (`>_ cargando...`) en vez de un spinner genérico.
+- La página "Cómo está construida esta web" presenta cada control como una
+  lista verificada, no como texto corrido.
+
+### Fixed
+
+- El aviso de reintento en el Blog se quedaba mostrando el error mientras
+  reintentaba, sin indicar que algo estaba pasando (mismo fallo ya corregido
+  antes en Proyectos).
+- Los círculos de métricas de rendimiento ya no llevan un borde grueso ni
+  un resplandor de color, para ir en línea con el resto del sitio.
+
 ## [1.1.2.0] - 2026-08-23
 
 ### Fixed

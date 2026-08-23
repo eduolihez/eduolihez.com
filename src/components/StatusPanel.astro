@@ -40,16 +40,20 @@ const { id, loadingText, retryText, class: className = '' } = Astro.props;
   role="status"
   aria-live="polite"
 >
-  {/* El spinner conserva .animate-spin: es el enganche que ya usa el JS. */}
-  <span
-    data-when="loading"
-    class="status-icon animate-spin rounded-full border-2 border-bg-border border-t-accent"
-    aria-hidden="true"></span>
+  {/* Prompt de terminal en vez de spinner generico: coherente con el >_ del
+      logo y las paginas de error. El cursor que "parpadea" es un span aparte
+      (ver mas abajo), no texto dentro del parrafo -- setState() reescribe
+      #status-text con textContent en cada reintento, y eso borraria cualquier
+      hijo que viviera dentro del propio parrafo. */}
+  <span data-when="loading" class="status-icon status-prompt" aria-hidden="true">&gt;_</span>
   <Icon name="inbox" class="status-icon" data-when="empty" />
   <Icon name="alert" class="status-icon" data-when="error" />
 
   <div class="min-w-0">
-    <p id={`${id}-text`} class="leading-relaxed">{loadingText}</p>
+    <div class="flex items-baseline gap-0.5">
+      <p id={`${id}-text`} class="leading-relaxed">{loadingText}</p>
+      <span data-when="loading" class="status-cursor" aria-hidden="true"></span>
+    </div>
     <button type="button" data-when="error" class="status-retry">
       <Icon name="refresh" class="h-3.5 w-3.5" />
       {retryText}

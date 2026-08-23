@@ -6,7 +6,7 @@
 
 **What:** Añadir una caché de fichero con TTL corto (5-10 min) a
 `server/llms-blog.php` si el umbral de ~50 peticiones/día no provenientes de un
-bot de IA reconocido (definido en `docs/designs/seo-ai-visibility.md`, sección
+bot de IA reconocido (definido en [la wiki](https://github.com/eduolihez/eduolihez.com/wiki/SEO-AI-Visibility-Plan), sección
 Open Questions) se llega a disparar.
 
 **Why:** El archivo regenera el texto íntegro del blog en cada request (consulta
@@ -23,7 +23,7 @@ esto es puramente una optimización de carga, no un fix de fiabilidad.
 
 **Effort:** S
 **Priority:** P3
-**Depends on:** Resultado de Approach A en `docs/designs/seo-ai-visibility.md` —
+**Depends on:** Resultado de Approach A en [la wiki](https://github.com/eduolihez/eduolihez.com/wiki/SEO-AI-Visibility-Plan) —
 solo tiene sentido revisar esto si el umbral realmente se dispara.
 
 ### Cobertura de tests para server/llms-blog.php
@@ -50,7 +50,7 @@ Composer + PHPUnit, iniciativa aparte, no algo que Vitest pueda tocar).
 
 **What:** Correr `/office-hours` (o una sesión dedicada) enfocada en el segundo
 público de `PRODUCT.md` — comunidad técnica SOC/blue team — que
-`docs/designs/seo-ai-visibility.md` dejó explícitamente fuera de alcance.
+[la wiki](https://github.com/eduolihez/eduolihez.com/wiki/SEO-AI-Visibility-Plan) dejó explícitamente fuera de alcance.
 
 **Why:** `PRODUCT.md` declara los dos públicos (reclutador y comunidad técnica)
 con el mismo peso, pero el diagnóstico de la sesión del 2026-08-23 se centró
@@ -59,7 +59,7 @@ distintas (ej. cómo se descubre y valora el repositorio público) sin
 diagnosticar todavía.
 
 **Context:** Ver "Target User & Narrowest Wedge" y "Open Questions" en
-`docs/designs/seo-ai-visibility.md` para el razonamiento completo de por qué se
+[la wiki](https://github.com/eduolihez/eduolihez.com/wiki/SEO-AI-Visibility-Plan) para el razonamiento completo de por qué se
 dejó fuera de esa sesión.
 
 **Effort:** S

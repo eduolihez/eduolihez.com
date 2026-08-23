@@ -9,6 +9,7 @@
 import { techSections, stackRows } from '../data/about-tech';
 import { pick } from '../i18n/utils';
 import type { Lang } from '../i18n/ui';
+import { SITE } from '../config';
 import Icon from './Icon.astro';
 
 interface Props {
@@ -130,7 +131,7 @@ const tones = {
 <!-- Acciones -->
 <div class="reveal mt-12 flex flex-col items-center justify-center gap-4 sm:flex-row">
   <a
-    href="https://github.com/eduolihez/eduolihez.com"
+    href={SITE.githubRepo}
     target="_blank"
     rel="noopener noreferrer"
     class="btn-primary flex w-full items-center justify-center gap-2 text-xs font-semibold sm:w-auto"

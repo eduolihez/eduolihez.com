@@ -340,6 +340,19 @@ export const techSections: TechSection[] = [
       },
       {
         term: {
+          es: 'La sesión vive y muere con la pestaña',
+          en: 'The session lives and dies with the tab',
+          ca: 'La sessió viu i mor amb la pestanya',
+        },
+        detail: {
+          es: 'Para saber si dos páginas vistas son la misma visita, el navegador guarda un identificador aleatorio en sessionStorage (no localStorage, no una cookie). Técnicamente sigue siendo "almacenamiento en el equipo" bajo la ePrivacy, pero al morir al cerrar la pestaña y no combinarse nunca con otra visita, encaja en la excepción de medición de audiencia que reconocen la mayoría de autoridades de protección de datos de la UE: por eso no cambia la respuesta de arriba.',
+          en: 'To know whether two pageviews belong to the same visit, the browser keeps a random id in sessionStorage (not localStorage, not a cookie). That is technically still "storage on the device" under ePrivacy, but since it dies when the tab closes and is never combined with another visit, it fits the audience-measurement exemption most EU data protection authorities recognise — which is why the answer above still holds.',
+          ca: 'Per saber si dues pàgines vistes són la mateixa visita, el navegador desa un identificador aleatori a sessionStorage (no localStorage, no una galeta). Tècnicament segueix sent "emmagatzematge a l\'equip" sota l\'ePrivacy, però en morir en tancar la pestanya i no combinar-se mai amb una altra visita, encaixa en l\'excepció de mesura d\'audiència que reconeixen la majoria d\'autoritats de protecció de dades de la UE: per això no canvia la resposta d\'aquí dalt.',
+        },
+        source: 'src/scripts/analytics.ts',
+      },
+      {
+        term: {
           es: 'Del referrer se descarta la query',
           en: 'Query strings are dropped from the referrer',
           ca: 'Del referrer es descarta la query',

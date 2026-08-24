@@ -2,10 +2,12 @@
 /**
  * analytics.php - Analitica propia, sin terceros y sin cookies.
  *
- * Todo sale de la tabla `visits` (IP hasheada con sal, nunca la IP real).
- * Incluye: KPIs con comparativa, grafico diario, franjas horarias, dias de la
- * semana, paginas, idiomas, canales de trafico, referrers, paises,
- * dispositivos, navegadores, sistemas operativos y bots. Export a CSV.
+ * Todo sale de la tabla `visits` (IP hasheada con sal + user-agent, nunca la
+ * IP real). Incluye: KPIs con comparativa, rebote/duracion/scroll, grafico
+ * diario, franjas horarias, dias de la semana, paginas, idiomas (de pagina y
+ * de navegador), canales de trafico, atribucion UTM, referrers, paises,
+ * dispositivos, navegadores, sistemas operativos, tamano de pantalla,
+ * paginas de entrada/salida y bots. Export a CSV.
  */
 require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/partials/layout.php';
@@ -35,6 +37,25 @@ function q_rows(string $sql, array $params = []): array
     }
 }
 
+/**
+ * Dado un conjunto de IDs de `visits` (p.ej. el primer o ultimo hit de cada
+ * sesion), devuelve las rutas mas frecuentes entre esas filas. $limit es
+ * siempre un literal fijo del propio codigo, nunca dato de usuario -- se
+ * interpola igual que el resto de LIMIT de este archivo.
+ */
+function paths_for_ids(array $ids, int $limit): array
+{
+    if (!$ids) {
+        return [];
+    }
+    $placeholders = implode(',', array_fill(0, count($ids), '?'));
+    return q_rows(
+        "SELECT path, COUNT(*) AS c FROM visits WHERE id IN ($placeholders)
+         GROUP BY path ORDER BY c DESC LIMIT $limit",
+        $ids
+    );
+}
+
 /** Igual, pero devuelve un unico valor entero. */
 function q_int(string $sql, array $params = []): int
 {
@@ -50,7 +71,8 @@ function q_int(string $sql, array $params = []): int
 // --- Exportacion CSV --------------------------------------------------------
 if (($_GET['export'] ?? '') === 'csv') {
     $rows = q_rows(
-        "SELECT visited_at, path, lang, referrer, country, device, browser, os, is_bot
+        "SELECT visited_at, path, lang, referrer, country, device, browser, os, is_bot,
+                duration_s, scroll_pct, utm_source, utm_medium, utm_campaign, viewport, browser_lang
          FROM visits
          WHERE visited_at > (NOW() - INTERVAL ? DAY)
          ORDER BY visited_at DESC
@@ -59,11 +81,14 @@ if (($_GET['export'] ?? '') === 'csv') {
     );
     csv_download(
         'visitas-' . $days . 'd-' . date('Y-m-d') . '.csv',
-        ['Fecha', 'Pagina', 'Idioma', 'Referrer', 'Pais', 'Dispositivo', 'Navegador', 'SO', 'Bot'],
+        ['Fecha', 'Pagina', 'Idioma', 'Referrer', 'Pais', 'Dispositivo', 'Navegador', 'SO', 'Bot',
+         'Duracion (s)', 'Scroll (%)', 'UTM origen', 'UTM medio', 'UTM campana', 'Viewport', 'Idioma navegador'],
         array_map(static fn(array $r): array => [
             $r['visited_at'], $r['path'], $r['lang'], $r['referrer'],
             $r['country'], $r['device'], $r['browser'], $r['os'],
             $r['is_bot'] ? 'si' : 'no',
+            $r['duration_s'], $r['scroll_pct'], $r['utm_source'], $r['utm_medium'],
+            $r['utm_campaign'], $r['viewport'], $r['browser_lang'],
         ], $rows)
     );
 }
@@ -205,6 +230,72 @@ $topBots = q_rows(
     [$days]
 );
 
+// --- Comportamiento: rebote, duracion y scroll -------------------------------
+// session_id agrupa las paginas vistas en una misma pestana (vive en
+// sessionStorage, no es un identificador persistente). Una sesion de un solo
+// "hit" es un rebote.
+$totalSessions = q_int(
+    "SELECT COUNT(DISTINCT session_id) FROM visits
+     WHERE $botFilter AND session_id IS NOT NULL AND visited_at > (NOW() - INTERVAL ? DAY)",
+    [$days]
+);
+$bouncedSessions = q_int(
+    "SELECT COUNT(*) FROM (
+        SELECT session_id FROM visits
+        WHERE $botFilter AND session_id IS NOT NULL AND visited_at > (NOW() - INTERVAL ? DAY)
+        GROUP BY session_id HAVING COUNT(*) = 1
+     ) t",
+    [$days]
+);
+$bounceRate = $totalSessions > 0 ? round(($bouncedSessions / $totalSessions) * 100) : 0;
+
+$avgDuration = (float) (q_rows(
+    "SELECT AVG(duration_s) AS v FROM visits
+     WHERE $botFilter AND duration_s IS NOT NULL AND visited_at > (NOW() - INTERVAL ? DAY)",
+    [$days]
+)[0]['v'] ?? 0);
+$avgScroll = (float) (q_rows(
+    "SELECT AVG(scroll_pct) AS v FROM visits
+     WHERE $botFilter AND scroll_pct IS NOT NULL AND visited_at > (NOW() - INTERVAL ? DAY)",
+    [$days]
+)[0]['v'] ?? 0);
+
+// Paginas de entrada / salida: primer y ultimo "hit" de cada sesion. Un solo
+// GROUP BY por session_id calcula ambos extremos a la vez (antes eran dos
+// consultas identicas salvo MIN/MAX, cada una recorriendo y agrupando el
+// mismo conjunto de filas por separado).
+$sessionEdges = q_rows(
+    "SELECT MIN(id) AS first_id, MAX(id) AS last_id FROM visits
+     WHERE $botFilter AND session_id IS NOT NULL AND visited_at > (NOW() - INTERVAL ? DAY)
+     GROUP BY session_id",
+    [$days]
+);
+$entryPages = paths_for_ids(array_column($sessionEdges, 'first_id'), 10);
+$exitPages  = paths_for_ids(array_column($sessionEdges, 'last_id'), 10);
+
+// --- Atribucion: UTM de la propia URL de aterrizaje --------------------------
+$utmRows = q_rows(
+    "SELECT utm_source, utm_medium, utm_campaign, COUNT(*) AS c FROM visits
+     WHERE $botFilter AND utm_source IS NOT NULL AND utm_source <> ''
+       AND visited_at > (NOW() - INTERVAL ? DAY)
+     GROUP BY utm_source, utm_medium, utm_campaign ORDER BY c DESC LIMIT 12",
+    [$days]
+);
+
+// --- Datos tecnicos: idioma del navegador y tamano de pantalla ---------------
+$browserLangs = q_rows(
+    "SELECT COALESCE(browser_lang,'?') AS k, COUNT(*) AS c FROM visits
+     WHERE $botFilter AND visited_at > (NOW() - INTERVAL ? DAY)
+     GROUP BY k ORDER BY c DESC LIMIT 8",
+    [$days]
+);
+$viewports = q_rows(
+    "SELECT COALESCE(viewport,'?') AS k, COUNT(*) AS c FROM visits
+     WHERE $botFilter AND visited_at > (NOW() - INTERVAL ? DAY)
+     GROUP BY k ORDER BY FIELD(k,'xs','sm','md','lg','xl','?')",
+    [$days]
+);
+
 $maxPage = $topPages ? max(array_column($topPages, 'c')) : 0;
 $maxRef  = $topRefs ? max(array_column($topRefs, 'c')) : 0;
 $maxCty  = $countries ? max(array_column($countries, 'c')) : 0;
@@ -213,9 +304,18 @@ $maxBro  = $browsers ? max(array_column($browsers, 'c')) : 0;
 $maxSys  = $systems ? max(array_column($systems, 'c')) : 0;
 $maxLang = $langs ? max(array_column($langs, 'c')) : 0;
 $maxBot  = $topBots ? max(array_column($topBots, 'c')) : 0;
+$maxEntry = $entryPages ? max(array_column($entryPages, 'c')) : 0;
+$maxExit  = $exitPages ? max(array_column($exitPages, 'c')) : 0;
+$maxUtm   = $utmRows ? max(array_column($utmRows, 'c')) : 0;
+$maxBroLang = $browserLangs ? max(array_column($browserLangs, 'c')) : 0;
+$maxViewport = $viewports ? max(array_column($viewports, 'c')) : 0;
 
-$deviceLabels = ['desktop' => 'Escritorio', 'mobile' => 'Movil', 'tablet' => 'Tablet', 'desconocido' => 'Desconocido'];
-$langLabels   = ['es' => 'Espanol', 'en' => 'Ingles', 'ca' => 'Catalan', '?' => 'Desconocido'];
+$deviceLabels  = ['desktop' => 'Escritorio', 'mobile' => 'Movil', 'tablet' => 'Tablet', 'desconocido' => 'Desconocido'];
+$langLabels    = ['es' => 'Espanol', 'en' => 'Ingles', 'ca' => 'Catalan', '?' => 'Desconocido'];
+// Los cortes (480/768/1024/1440) tienen que coincidir con bucketViewport()
+// en src/scripts/analytics.ts: si cambian alli, cambiar tambien aqui.
+$viewportLabels = ['xs' => '< 480 px', 'sm' => '480–767 px', 'md' => '768–1023 px',
+                    'lg' => '1024–1439 px', 'xl' => '≥ 1440 px', '?' => 'Desconocido'];
 
 admin_header('Analitica', 'analytics.php');
 ?>
@@ -251,6 +351,21 @@ admin_header('Analitica', 'analytics.php');
   <div class="card stat">
     <div class="num warn"><?= number_format($botCount) ?></div>
     <div class="lbl">Visitas de bots<br><span class="faint"><?= number_format($total) ?> humanas en total</span></div>
+  </div>
+</div>
+
+<div class="grid4">
+  <div class="card stat">
+    <div class="num"><?= $bounceRate ?>%</div>
+    <div class="lbl">Rebote<br><span class="faint">sesiones de una sola pagina</span></div>
+  </div>
+  <div class="card stat">
+    <div class="num cyan"><?= $avgDuration >= 60 ? sprintf('%d:%02d', (int) ($avgDuration / 60), (int) $avgDuration % 60) : round($avgDuration) . 's' ?></div>
+    <div class="lbl">Duracion media<br><span class="faint">tiempo visible en pantalla</span></div>
+  </div>
+  <div class="card stat">
+    <div class="num violet"><?= round($avgScroll) ?>%</div>
+    <div class="lbl">Scroll medio<br><span class="faint">profundidad alcanzada</span></div>
   </div>
 </div>
 
@@ -327,6 +442,50 @@ admin_header('Analitica', 'analytics.php');
 
 <div class="row2">
   <div>
+    <h2>Idioma del navegador</h2>
+    <div class="card">
+      <?php if (!$browserLangs): ?><p class="muted">Sin datos.</p><?php endif; ?>
+      <?php foreach ($browserLangs as $r): ?>
+        <?php bar_row($langLabels[$r['k']] ?? strtoupper((string) $r['k']), (int) $r['c'], $maxBroLang, ''); ?>
+      <?php endforeach; ?>
+      <p class="hint">Idioma declarado por el navegador, no el de la pagina servida:
+        una demanda visible de un idioma que aun no ofreces se veria aqui.</p>
+    </div>
+  </div>
+  <div>
+    <h2>Tamano de pantalla</h2>
+    <div class="card">
+      <?php if (!$viewports): ?><p class="muted">Sin datos.</p><?php endif; ?>
+      <?php foreach ($viewports as $r): ?>
+        <?php bar_row($viewportLabels[$r['k']] ?? $r['k'], (int) $r['c'], $maxViewport, 'violet'); ?>
+      <?php endforeach; ?>
+    </div>
+  </div>
+</div>
+
+<div class="row2">
+  <div>
+    <h2>Paginas de entrada</h2>
+    <div class="card">
+      <?php if (!$entryPages): ?><p class="muted">Sin datos.</p><?php endif; ?>
+      <?php foreach ($entryPages as $r): ?>
+        <?php bar_row($r['path'], (int) $r['c'], $maxEntry, 'green'); ?>
+      <?php endforeach; ?>
+    </div>
+  </div>
+  <div>
+    <h2>Paginas de salida</h2>
+    <div class="card">
+      <?php if (!$exitPages): ?><p class="muted">Sin datos.</p><?php endif; ?>
+      <?php foreach ($exitPages as $r): ?>
+        <?php bar_row($r['path'], (int) $r['c'], $maxExit, 'violet'); ?>
+      <?php endforeach; ?>
+    </div>
+  </div>
+</div>
+
+<div class="row2">
+  <div>
     <h2>Paginas mas vistas</h2>
     <div class="card">
       <?php if (!$topPages): ?><p class="muted">Sin datos.</p><?php endif; ?>
@@ -383,6 +542,32 @@ admin_header('Analitica', 'analytics.php');
   </div>
 </div>
 
+<h2>Atribucion (UTM)</h2>
+<div class="card" style="padding:0;">
+  <div class="scroll-x">
+    <table>
+      <thead><tr><th>Origen</th><th>Medio</th><th>Campana</th><th style="text-align:right;">Visitas</th></tr></thead>
+      <tbody>
+        <?php if (!$utmRows): ?>
+          <tr><td colspan="4" class="empty">Sin datos: ningun enlace de entrada trae parametros utm_*.</td></tr>
+        <?php endif; ?>
+        <?php foreach ($utmRows as $r): ?>
+          <tr>
+            <td><?= e((string) $r['utm_source']) ?></td>
+            <td><?= e((string) ($r['utm_medium'] ?? '—')) ?></td>
+            <td><?= e((string) ($r['utm_campaign'] ?? '—')) ?></td>
+            <td style="text-align:right;"><?= (int) $r['c'] ?></td>
+          </tr>
+        <?php endforeach; ?>
+      </tbody>
+    </table>
+  </div>
+</div>
+<p class="hint" style="margin-top:.5rem;">
+  De <code>utm_source</code>/<code>utm_medium</code>/<code>utm_campaign</code> en la URL de
+  aterrizaje, nunca del referrer de otra web (ese se guarda sin query, ver nota de privacidad).
+</p>
+
 <h2>Origen del trafico (referrers)</h2>
 <div class="card" style="padding:0;">
   <div class="scroll-x">
@@ -431,9 +616,12 @@ admin_header('Analitica', 'analytics.php');
 </p>
 
 <p class="hint" style="margin-top:1.5rem;">
-  <strong>Privacidad:</strong> las IPs se guardan hasheadas con sal, no se usan cookies
-  de seguimiento y no se comparte nada con terceros. Los referrers se almacenan sin
-  parametros de query. Compatible con RGPD sin banner de cookies.
+  <strong>Privacidad:</strong> las IPs se guardan hasheadas con sal (mas user-agent), no se
+  usan cookies de seguimiento y no se comparte nada con terceros. Los referrers se almacenan
+  sin parametros de query. La sesion (rebote, entrada/salida) se identifica con un id que vive
+  solo en <code>sessionStorage</code> mientras la pestana esta abierta: no persiste, no se cruza
+  con otras visitas y no sale del navegador salvo para contar "estas paginas son la misma
+  visita". Compatible con RGPD sin banner de cookies.
 </p>
 
 <?php admin_footer(); ?>

@@ -53,6 +53,13 @@ const projects = [
     badgeType: 'open-source'
   },
   {
+    name: 'Blue Team Hub',
+    href: 'https://eduolihez.github.io/',
+    badgeKey: 'projects.badge.openSource',
+    badgeType: 'open-source',
+    external: true
+  },
+  {
     name: 'Fluence',
     href: '/projects/fluence/',
     badgeKey: 'projects.badge.privateCode',
@@ -99,6 +106,8 @@ const projects = [
             <li>
               <a
                 href={p.href}
+                target={p.external ? '_blank' : undefined}
+                rel={p.external ? 'noopener noreferrer' : undefined}
                 class="group inline-flex items-center gap-2 font-mono text-xs text-text-muted transition hover:text-accent hover:no-underline"
               >
                 <span class="border-b border-transparent group-hover:border-accent/30">{p.name}</span>

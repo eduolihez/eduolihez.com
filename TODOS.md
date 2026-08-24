@@ -196,4 +196,25 @@ revisar también ese timing.
 **Priority:** P3
 **Depends on:** Ninguno.
 
+### Extraer el patrón `max(array_column($rows, 'c'))` en server/admin/analytics.php
+
+**What:** `server/admin/analytics.php` repite 13 veces el mismo patrón
+(`$rows ? max(array_column($rows, 'c')) : 0`) para calcular el máximo de
+cada desglose antes de dibujar sus barras.
+
+**Why:** Auditoría de `/ship` del 2026-08-24 (specialist de Maintainability):
+son 13 líneas casi idénticas que existen solo para escalar el ancho de las
+barras. Un helper `max_count(array $rows): int` las sustituiría todas.
+
+**Context:** No se toca en esta sesión porque 8 de las 13 instancias son
+código preexistente fuera del diff de esta feature (analítica de
+comportamiento/UTM); tocar solo las 5 nuevas habría creado una
+inconsistencia peor dentro del mismo archivo. Mismo criterio que el TODO de
+`safeUrl()`/`fetchWithRetry()`/`setState()` de más arriba: evitar churn
+fuera de alcance justo antes de aterrizar un diff ya grande.
+
+**Effort:** S
+**Priority:** P4
+**Depends on:** Ninguno.
+
 ## Completed

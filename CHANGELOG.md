@@ -5,6 +5,32 @@ Todos los cambios notables de este proyecto se documentan en este archivo.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/),
 y el versionado usa cuatro números (`MAJOR.MINOR.PATCH.MICRO`).
 
+## [1.3.0.0] - 2026-08-24
+
+### Added
+
+- La analítica propia del panel (`/admin/analytics.php`) ahora mide
+  comportamiento, no solo tráfico: tasa de rebote, duración media en
+  pantalla y profundidad de scroll alcanzada, además de qué páginas abren y
+  cierran cada visita (entrada / salida).
+- Atribución de campañas: si un enlace de entrada trae `utm_source`,
+  `utm_medium` o `utm_campaign`, el panel los agrupa en una tabla nueva
+  ("Atribución UTM").
+- Dos desgloses técnicos nuevos: idioma declarado por el navegador (para ver
+  si hay demanda de un idioma que la web aún no ofrece) y tamaño de
+  pantalla por rango.
+- La exportación CSV incluye ahora todos estos campos nuevos.
+
+### Changed
+
+- El hash de IP con el que se cuentan visitantes únicos ahora incorpora
+  también el user-agent, para distinguir mejor visitantes que comparten IP
+  (oficina, wifi doméstica, CGNAT) sin guardar ningún dato nuevo.
+- La nota de privacidad de `/sobre-esta-web/` y del propio panel explica el
+  nuevo identificador de sesión: vive solo en `sessionStorage` mientras la
+  pestaña está abierta, nunca es persistente ni se cruza entre visitas —
+  sigue sin hacer falta banner de cookies.
+
 ## [1.2.0.0] - 2026-08-24
 
 ### Added

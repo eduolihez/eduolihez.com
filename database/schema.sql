@@ -246,7 +246,10 @@ CREATE TABLE IF NOT EXISTS `messages` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Visitas (analitica propia, sin terceros).
--- PRIVACIDAD: no se guarda la IP, solo su SHA-256 con sal (config.php).
+-- PRIVACIDAD: no se guarda la IP, solo su SHA-256 con sal + user-agent
+-- (config.php). Las columnas de comportamiento (session_id, hit_id,
+-- duration_s, scroll_pct) se anaden mas abajo, en la seccion 5, junto con
+-- el resto de columnas que no vinieron en la version original de esta tabla.
 -- Se purga sola: se borran las visitas de mas de 400 dias.
 CREATE TABLE IF NOT EXISTS `visits` (
   `id`         BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -299,6 +302,25 @@ CALL add_column_if_missing('visits', 'is_bot',  "TINYINT(1) NOT NULL DEFAULT 0 A
 CALL add_index_if_missing('visits', 'idx_hash_time', '`ip_hash`, `visited_at`');
 CALL add_index_if_missing('visits', 'idx_bot_time',  '`is_bot`, `visited_at`');
 CALL add_index_if_missing('visits', 'idx_country',   '`country`');
+
+-- Analitica de comportamiento y atribucion. Nada de esto es persistente ni
+-- identifica a nadie: session_id vive solo en sessionStorage (muere al
+-- cerrar la pestana) y solo sirve para agrupar las paginas vistas en una
+-- misma visita; hit_id es un token de un solo uso por pagina que existe
+-- unicamente para que el navegador pueda decirle a esta fila "el visitante
+-- se quedo X segundos y bajo hasta el Y%" sin tener que reenviar nada mas.
+-- Ninguno de los dos se reutiliza entre visitas ni se cruza con otra tabla.
+CALL add_column_if_missing('visits', 'session_id',   "CHAR(16) NULL AFTER `is_bot`");
+CALL add_column_if_missing('visits', 'hit_id',       "CHAR(16) NULL AFTER `session_id`");
+CALL add_column_if_missing('visits', 'duration_s',   "SMALLINT UNSIGNED NULL AFTER `hit_id`");
+CALL add_column_if_missing('visits', 'scroll_pct',   "TINYINT UNSIGNED NULL AFTER `duration_s`");
+CALL add_column_if_missing('visits', 'utm_source',   "VARCHAR(60) NULL AFTER `scroll_pct`");
+CALL add_column_if_missing('visits', 'utm_medium',   "VARCHAR(60) NULL AFTER `utm_source`");
+CALL add_column_if_missing('visits', 'utm_campaign', "VARCHAR(60) NULL AFTER `utm_medium`");
+CALL add_column_if_missing('visits', 'viewport',     "VARCHAR(2) NULL AFTER `utm_campaign`");
+CALL add_column_if_missing('visits', 'browser_lang', "CHAR(2) NULL AFTER `viewport`");
+CALL add_index_if_missing('visits', 'idx_session', '`session_id`, `visited_at`');
+CALL add_index_if_missing('visits', 'idx_hit',     '`hit_id`');
 
 -- Buzon: destacar y archivar mensajes.
 CALL add_column_if_missing('messages', 'is_starred',  'TINYINT(1) NOT NULL DEFAULT 0');

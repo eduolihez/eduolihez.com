@@ -20,26 +20,44 @@ function admin_header(string $title, string $active = ''): void
 {
     $user = function_exists('current_admin') ? current_admin() : '';
 
-    // Contadores para los "badges" del menu.
-    $unread = 0;
-    try {
-        $unread = (int) db()->query(
-            'SELECT COUNT(*) FROM messages WHERE is_read = 0 AND is_archived = 0'
-        )->fetchColumn();
-    } catch (Throwable $e) {
-        // ignora si la tabla o las columnas nuevas aun no existen
-    }
+    // Contadores para los "badges" del menu. Cada uno tolera que falte la
+    // tabla (BD recien creada, migracion a medias) devolviendo 0 en vez de
+    // tumbar el panel entero -- por eso el conteo pasa por un closure que
+    // atrapa el Throwable de cada query por separado en lugar de una sola
+    // vez alrededor de las cuatro.
+    $countSafe = static function (string $sql): int {
+        try {
+            return (int) db()->query($sql)->fetchColumn();
+        } catch (Throwable $e) {
+            return 0;
+        }
+    };
+    $unread             = $countSafe('SELECT COUNT(*) FROM messages WHERE is_read = 0 AND is_archived = 0');
+    $publishedProjects  = $countSafe("SELECT COUNT(*) FROM projects WHERE status = 'published'");
+    $visibleCerts       = $countSafe('SELECT COUNT(*) FROM certifications WHERE visible = 1');
+    $visiblePosts       = $countSafe('SELECT COUNT(*) FROM posts WHERE visible = 1');
 
-    $nav = [
-        'index.php'          => ['Panel', '', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>'],
-        'projects.php'       => ['Proyectos', '', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>'],
-        'certifications.php' => ['Certificaciones', '', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg>'],
-        'posts.php'          => ['Blog', '', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 4a2 2 0 012 2v6a2 2 0 01-2 2h-2m-4-6h.01M9 16h.01M9 12h.01M12 12h.01M12 16h.01M16 16h.01M16 12h.01" /></svg>'],
-        'messages.php'       => ['Mensajes', $unread > 0 ? (string) $unread : '', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>'],
-        'analytics.php'      => ['Analítica', '', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>'],
-        'security.php'       => ['Seguridad', '', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>'],
-        'settings.php'       => ['Ajustes', '', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>'],
-        'backup.php'         => ['Backup', '', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" /></svg>'],
+    // [etiqueta_grupo, url, [titulo, badge, icono, tipo_badge]]. tipo_badge:
+    // 'alert' (verde/llamada a la accion, como Mensajes) o 'count' (gris,
+    // solo informativo). Grupo '' no imprime cabecera (Panel va suelto).
+    $navGroups = [
+        '' => [
+            'index.php' => ['Panel', '', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>', 'count'],
+        ],
+        'Contenido' => [
+            'projects.php'       => ['Proyectos', (string) $publishedProjects, '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>', 'count'],
+            'certifications.php' => ['Certificaciones', (string) $visibleCerts, '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg>', 'count'],
+            'posts.php'          => ['Blog', (string) $visiblePosts, '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 4a2 2 0 012 2v6a2 2 0 01-2 2h-2m-4-6h.01M9 16h.01M9 12h.01M12 12h.01M12 16h.01M16 16h.01M16 12h.01" /></svg>', 'count'],
+        ],
+        'Actividad' => [
+            'messages.php'  => ['Mensajes', $unread > 0 ? (string) $unread : '', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>', 'alert'],
+            'analytics.php' => ['Analítica', '', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>', 'count'],
+        ],
+        'Sistema' => [
+            'security.php' => ['Seguridad', '', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>', 'count'],
+            'settings.php' => ['Ajustes', '', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>', 'count'],
+            'backup.php'   => ['Backup', '', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" /></svg>', 'count'],
+        ],
     ];
     ?>
 <!doctype html>
@@ -105,6 +123,12 @@ function admin_header(string $title, string $active = ''): void
 
   a { color: var(--accent); text-decoration: none; transition: color 0.15s ease; }
   a:hover { color: var(--accent-hover); }
+  /* Foco general para enlaces y botones sueltos (los que no tienen ya un
+     anillo propio, como .menu-item o los campos de formulario mas abajo). */
+  a:focus-visible, button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
 
   /* Grid Layout Principal */
   .admin-layout {
@@ -146,21 +170,53 @@ function admin_header(string $title, string $active = ''): void
   .sidebar-menu {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 0.15rem;
     flex: 1;
   }
 
+  /* Cabecera de grupo (Contenido / Actividad / Sistema): mismo patron mono
+     versalita que el "section-kicker" del sitio publico, para que el panel
+     no se sienta un sistema aparte. */
+  .nav-group-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--faint);
+    margin: 1.1rem 0 0.4rem 0.85rem;
+  }
+  .nav-group-label:first-child {
+    margin-top: 0;
+  }
+
   .menu-item {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    padding: 0.65rem 0.85rem;
+    padding: 0.6rem 0.85rem 0.6rem 1.05rem;
     border-radius: 0.5rem;
     color: var(--muted);
     font-weight: 500;
     font-size: 0.88rem;
-    transition: all 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
     border: 1px solid transparent;
+  }
+
+  /* Barra de acento a la izquierda en vez de solo el tinte de fondo: se
+     reconoce la seccion activa incluso pasando la vista rapido por el menu. */
+  .menu-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.25rem;
+    bottom: 0.25rem;
+    width: 2px;
+    border-radius: 99px;
+    background: var(--accent);
+    opacity: 0;
+    transition: opacity 0.2s ease;
   }
 
   .menu-item:hover {
@@ -172,6 +228,14 @@ function admin_header(string $title, string $active = ''): void
     background: rgba(74, 222, 128, 0.08);
     color: var(--accent);
     border-color: rgba(74, 222, 128, 0.18);
+  }
+  .menu-item.active::before {
+    opacity: 1;
+  }
+
+  .menu-item:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
   }
 
   .menu-icon {
@@ -195,6 +259,24 @@ function admin_header(string $title, string $active = ''): void
     padding: 0.05rem 0.4rem;
     min-width: 18px;
     text-align: center;
+  }
+
+  /* Contador informativo (cuantos hay), distinto del aviso de "hay algo que
+     mirar" (badge-count, verde): mismo hueco, tono neutro. */
+  .badge-muted {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--faint);
+    font-size: 0.7rem;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    border-radius: 99px;
+    padding: 0.05rem 0.45rem;
+    min-width: 18px;
+    text-align: center;
+  }
+  .menu-item.active .badge-muted {
+    color: var(--accent);
+    background: rgba(74, 222, 128, 0.14);
   }
 
   .sidebar-footer {
@@ -268,6 +350,11 @@ function admin_header(string $title, string $active = ''): void
   .action-btn:hover {
     background: rgba(255, 255, 255, 0.02);
     color: var(--text);
+  }
+
+  .action-btn:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
   }
 
   .action-btn.danger-text:hover {
@@ -436,6 +523,7 @@ function admin_header(string $title, string $active = ''): void
   .btn.sm { padding: 0.4rem 0.85rem; font-size: 0.8rem; border-radius: 0.375rem; }
   .btn.icon { padding: 0.4rem 0.55rem; font-size: 0.85rem; border-radius: 0.375rem; }
   .btn[disabled] { opacity: 0.35; pointer-events: none; }
+  .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
   /* Badges */
   .pill { 
@@ -478,6 +566,7 @@ function admin_header(string $title, string $active = ''): void
   .tabs a { padding: 0.45rem 1rem; border-radius: 0.5rem; font-size: 0.82rem; font-weight: 500; color: var(--muted); border: 1px solid var(--border); transition: all 0.2s; }
   .tabs a.active { background: rgba(74, 222, 128, 0.08); color: var(--accent); border-color: rgba(74, 222, 128, 0.18); }
   .tabs a:hover { text-decoration: none; color: var(--text); border-color: var(--muted); }
+  .tabs a:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
   
   .checkline { display: flex; align-items: flex-start; gap: 0.75rem; margin: 0 0 1.25rem; font-weight: 400; cursor: pointer; }
   .checkline input { width: auto; margin-top: 0.25rem; cursor: pointer; }
@@ -485,6 +574,44 @@ function admin_header(string $title, string $active = ''): void
   .empty { padding: 3rem; color: var(--muted); text-align: center; font-style: italic; }
   .scroll-x { overflow-x: auto; border-radius: 0.5rem; border: 1px solid var(--border); background: var(--card); }
   .nowrap { white-space: nowrap; }
+
+  /* Titulo de seccion con icono: mismo peso visual que h2 pero mas facil de
+     escanear en una pagina con muchas secciones (dashboard). */
+  .h2-icon { display: flex; align-items: center; gap: 0.55rem; }
+  .h2-icon svg { flex-shrink: 0; color: var(--accent); opacity: 0.9; }
+
+  /* Mini grafico de tendencia embebido en una stat card: mismas barras que
+     .chart pero sin ejes ni etiquetas, para no competir con el numero grande. */
+  .spark { display: flex; align-items: flex-end; gap: 2px; height: 26px; margin-top: 0.85rem; }
+  .spark i { flex: 1; display: block; background: var(--accent); opacity: 0.28; border-radius: 2px 2px 0 0; min-height: 2px; font-style: normal; }
+  .spark i:last-child { opacity: 1; }
+  .spark.cyan i { background: var(--cyan); }
+  .spark.violet i { background: var(--violet); }
+  .spark.warn i { background: var(--warn); }
+
+  /* Rejilla de "casillas" de estado (salud del sistema, seguridad): se lee de
+     un vistazo mucho mas rapido que una tabla de filas clave/valor. */
+  .health-grid { display: grid; gap: 0.75rem; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); }
+  .health-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.85rem 1rem; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); border-radius: 0.6rem; }
+  .health-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; background: var(--faint); box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.03); }
+  .health-dot.ok { background: var(--accent); box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.15); }
+  .health-dot.warn { background: var(--warn); box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15); }
+  .health-dot.danger { background: var(--danger); box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.15); }
+  .health-body { min-width: 0; }
+  .health-val { font-size: 0.86rem; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .health-lbl { font-size: 0.72rem; color: var(--faint); margin-top: 0.1rem; }
+
+  /* Linea de tiempo para actividad reciente: mas facil de seguir que filas de
+     tabla sueltas, y el color del punto adelanta el tipo de accion. */
+  .timeline-item { display: flex; gap: 0.85rem; padding: 0.8rem 0; border-bottom: 1px solid var(--border); }
+  .timeline-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .timeline-item:first-child { padding-top: 0; }
+  .timeline-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); flex-shrink: 0; margin-top: 0.4rem; }
+  .timeline-dot.green { background: var(--accent); }
+  .timeline-dot.cyan { background: var(--cyan); }
+  .timeline-dot.violet { background: var(--violet); }
+  .timeline-dot.danger { background: var(--danger); }
+  .timeline-body { flex: 1; min-width: 0; }
 
   /* Responsive Sidebar rules */
   @media (max-width: 900px) {
@@ -541,12 +668,19 @@ function admin_header(string $title, string $active = ''): void
     </div>
     
     <nav class="sidebar-menu">
-      <?php foreach ($nav as $file => [$label, $badge, $icon]): ?>
-        <a href="<?= e($file) ?>" class="menu-item <?= $active === $file ? 'active' : '' ?>">
-          <span class="menu-icon"><?= $icon ?></span>
-          <span class="menu-label"><?= e($label) ?></span>
-          <?php if ($badge !== ''): ?><span class="badge-count"><?= e($badge) ?></span><?php endif; ?>
-        </a>
+      <?php foreach ($navGroups as $groupLabel => $items): ?>
+        <?php if ($groupLabel !== ''): ?>
+          <p class="nav-group-label"><?= e($groupLabel) ?></p>
+        <?php endif; ?>
+        <?php foreach ($items as $file => [$label, $badge, $icon, $badgeType]): ?>
+          <a href="<?= e($file) ?>" class="menu-item <?= $active === $file ? 'active' : '' ?>">
+            <span class="menu-icon"><?= $icon ?></span>
+            <span class="menu-label"><?= e($label) ?></span>
+            <?php if ($badge !== ''): ?>
+              <span class="badge-<?= $badgeType === 'alert' ? 'count' : 'muted' ?>"><?= e($badge) ?></span>
+            <?php endif; ?>
+          </a>
+        <?php endforeach; ?>
       <?php endforeach; ?>
     </nav>
     
@@ -669,6 +803,40 @@ function delta_badge(int $now, int $before): string
     $cls = $pct > 0 ? 'up' : ($pct < 0 ? 'down' : 'flat');
     $sig = $pct > 0 ? '+' : '';
     return '<span class="delta ' . $cls . '">' . $sig . $pct . '%</span>';
+}
+
+/** Titulo de seccion con icono SVG delante (mismo tamano que h2). */
+function h2_icon(string $svg, string $text): void
+{
+    echo '<h2 class="h2-icon">' . $svg . '<span>' . e($text) . '</span></h2>';
+}
+
+/**
+ * Mini grafico de tendencia para embeber dentro de una stat card.
+ * $color: '' (verde) | cyan | violet | warn.
+ */
+function sparkline(array $values, string $color = ''): string
+{
+    if (!$values) {
+        return '';
+    }
+    $max = max(1, max($values));
+    $bars = '';
+    foreach ($values as $v) {
+        $h = max(2, (int) round(((float) $v / $max) * 26));
+        $bars .= '<i style="height:' . $h . 'px" title="' . (int) $v . '"></i>';
+    }
+    return '<div class="spark ' . e($color) . '">' . $bars . '</div>';
+}
+
+/** Casilla de estado para rejillas de salud/seguridad. $state: ok|warn|danger|neutral. */
+function status_tile(string $label, string $value, string $state = 'neutral'): void
+{
+    echo '<div class="health-item">'
+        . '<span class="health-dot ' . e($state) . '"></span>'
+        . '<div class="health-body"><div class="health-val">' . e($value) . '</div>'
+        . '<div class="health-lbl">' . e($label) . '</div></div>'
+        . '</div>';
 }
 
 /** Fila de barra horizontal con etiqueta y valor. */

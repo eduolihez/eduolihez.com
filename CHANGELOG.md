@@ -5,6 +5,36 @@ Todos los cambios notables de este proyecto se documentan en este archivo.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/),
 y el versionado usa cuatro números (`MAJOR.MINOR.PATCH.MICRO`).
 
+## [1.2.0.0] - 2026-08-24
+
+### Added
+
+- El panel de administrador muestra muchos más datos de un vistazo: entradas
+  de blog (antes ausentes del panel), canales de tráfico y dispositivos de
+  los últimos 30 días, tendencia de visitantes únicos, mensajes destacados y
+  archivados con su tendencia semanal, y qué tan reciente es cada tipo de
+  contenido (último proyecto, certificación y entrada de blog tocados).
+- Cada tarjeta de tráfico del panel incluye ahora un mini-gráfico de
+  tendencia.
+- Acceso rápido para crear una nueva entrada de blog desde el panel.
+
+### Changed
+
+- "Salud del sistema" pasa de tabla a una rejilla de casillas con indicador
+  de color, más fácil de leer de un vistazo; ahora incluye también los
+  intentos de acceso fallidos (7 y 30 días).
+- "Actividad reciente" pasa de tabla a línea de tiempo con color según el
+  tipo de acción.
+- El menú lateral del panel se reorganiza en grupos (Contenido, Actividad,
+  Sistema) con indicadores de recuento junto a cada sección.
+
+### Fixed
+
+- Las nuevas casillas de accesos fallidos ya no muestran "todo en orden"
+  cuando la consulta a la base de datos falla; ahora distinguen "0
+  incidentes" de "no se pudo comprobar", para no ocultar un ataque de fuerza
+  bruta real detrás de un fallo transitorio de BD.
+
 ## [1.1.4.0] - 2026-08-23
 
 ### Fixed

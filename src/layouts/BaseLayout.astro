@@ -106,34 +106,6 @@ const t = useTranslations(lang);
     <script src="../scripts/reveal.ts"></script>
 
     <!-- Registro de visita (analitica propia via PHP/MySQL) -->
-    <script>
-      import { api } from '../config';
-      function trackVisit() {
-        try {
-          // No registramos si el usuario pide "Do Not Track".
-          if (navigator.doNotTrack === '1') return;
-          const body = JSON.stringify({
-            path: location.pathname,
-            referrer: document.referrer || '',
-          });
-          // sendBeacon no bloquea la carga; si no existe, usamos fetch.
-          const url = api('/api/visit.php');
-          if (navigator.sendBeacon) {
-            navigator.sendBeacon(url, body);
-          } else {
-            fetch(url, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body,
-              keepalive: true,
-            }).catch(() => {});
-          }
-        } catch {
-          /* silencioso: la analitica nunca debe romper la web */
-        }
-      }
-      trackVisit();
-      document.addEventListener('astro:page-load', trackVisit);
-    </script>
+    <script src="../scripts/analytics.ts"></script>
   </body>
 </html>

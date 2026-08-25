@@ -5,6 +5,11 @@
  * <script> de un .astro.
  */
 
+import { safeUrl, setStatusPanel, fetchWithRetry } from './shared';
+
+// Re-exportado por compatibilidad: los tests importan safeUrl desde './certifications'.
+export { safeUrl };
+
 interface CertLabels {
   loading: string;
   error: string;
@@ -23,14 +28,6 @@ interface Certification {
   logo_url?: string;
   credential_url?: string;
   issue_date?: string;
-}
-
-// --- Seguridad (S3): solo se aceptan URLs de esquema seguro ---
-export function safeUrl(url: unknown): string {
-  if (typeof url !== 'string') return '';
-  const u = url.trim();
-  if (/^(https?:\/\/|mailto:|\/)/i.test(u)) return u;
-  return '';
 }
 
 // Solo tokens del sistema. Antes eran siete tonos, dos de ellos fuera de la
@@ -362,31 +359,8 @@ export function initCerts(): void {
     grid.appendChild(p);
   }
 
-  function fetchWithRetry(url: string, options: RequestInit = {}, retries = 3, delay = 500): Promise<unknown> {
-    return fetch(url, options)
-      .then((res) => {
-        if (!res.ok) {
-          if (retries > 0) {
-            return new Promise((r) => setTimeout(r, delay)).then(() => fetchWithRetry(url, options, retries - 1, delay * 1.5));
-          }
-          throw new Error('HTTP ' + res.status);
-        }
-        return res.json();
-      })
-      .catch((err) => {
-        if (retries > 0) {
-          return new Promise((r) => setTimeout(r, delay)).then(() => fetchWithRetry(url, options, retries - 1, delay * 1.5));
-        }
-        throw err;
-      });
-  }
-
-  // El panel de estado se controla con data-state; el CSS decide el icono y
-  // si sale el boton de reintento (ver StatusPanel.astro).
   function setState(state: 'loading' | 'empty' | 'error', text: string): void {
-    if (statusText) statusText.textContent = text;
-    status?.setAttribute('data-state', state);
-    status?.classList.remove('hidden');
+    setStatusPanel(status, statusText, state, text);
   }
 
   function loadData(): void {

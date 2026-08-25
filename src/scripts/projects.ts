@@ -8,6 +8,11 @@
  * lo invoca.
  */
 
+import { safeUrl, setStatusPanel, fetchWithRetry } from './shared';
+
+// Re-exportado por compatibilidad: los tests importan safeUrl desde './projects'.
+export { safeUrl };
+
 interface ProjectLabels {
   loading: string;
   empty: string;
@@ -37,14 +42,6 @@ const githubSvg = `<svg class="h-3.5 w-3.5 fill-current" viewBox="0 0 24 24" ari
 const externalSvg = `<svg class="h-3.5 w-3.5 stroke-current" fill="none" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/></svg>`;
 const eyeSvg = `<svg class="h-3.5 w-3.5 stroke-current" fill="none" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>`;
 
-// --- Seguridad (S3): solo se aceptan URLs de esquema seguro ---
-export function safeUrl(url: unknown): string {
-  if (typeof url !== 'string') return '';
-  const u = url.trim();
-  if (/^(https?:\/\/|mailto:|\/)/i.test(u)) return u;
-  return '';
-}
-
 function badgeMeta(b: string, labels: ProjectLabels): { className: string; text: string } | null {
   if (b === 'open-source') {
     return { className: 'bg-oss/10 text-oss border-oss/20', text: labels.badgeOpenSource || 'Open Source' };
@@ -56,6 +53,27 @@ function badgeMeta(b: string, labels: ProjectLabels): { className: string; text:
     return { className: 'bg-closed/10 text-closed border-closed/20', text: labels.badgePrivateCode || 'Código Privado' };
   }
   return null;
+}
+
+/**
+ * initProjects() puede correr varias veces en produccion (Astro dispara
+ * astro:page-load en cada transicion cliente, y el grid de la nueva pagina
+ * llega sin data-loaded). El listener de Escape se ponia con
+ * `document.addEventListener('keydown', ...)` en CADA llamada, y como
+ * `document` sobrevive a las transiciones, los listeners se iban acumulando
+ * -- cada uno cerrando sobre un `modal`/`closeModal` de una ejecucion vieja.
+ * Estas dos variables de modulo hacen que solo se registre UN listener en
+ * toda la vida de la pagina, que siempre delega en el cierre mas reciente.
+ */
+let currentModalCloseHandler: (() => void) | null = null;
+let escapeListenerBound = false;
+
+function bindGlobalEscapeHandler(): void {
+  if (escapeListenerBound) return;
+  escapeListenerBound = true;
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') currentModalCloseHandler?.();
+  });
 }
 
 export function initProjects(): void {
@@ -157,9 +175,10 @@ export function initProjects(): void {
     modal.addEventListener('click', (e) => {
       if (e.target === modal) closeModal();
     });
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !modal.hidden) closeModal();
-    });
+    currentModalCloseHandler = () => {
+      if (!modal.hidden) closeModal();
+    };
+    bindGlobalEscapeHandler();
   }
 
   // --- Tarjeta ---
@@ -257,41 +276,12 @@ export function initProjects(): void {
     return card;
   }
 
-  // El panel de estado se controla con data-state; el CSS decide el icono y
-  // si sale el boton de reintento (ver StatusPanel.astro).
   function setState(state: 'loading' | 'empty' | 'error', text: string): void {
-    if (statusText) statusText.textContent = text;
-    if (status) {
-      status.setAttribute('data-state', state);
-      status.classList.remove('hidden');
-    }
+    setStatusPanel(status, statusText, state, text);
   }
 
   function message(text: string): void {
     setState('empty', text);
-  }
-
-  function fetchWithRetry(url: string, options: RequestInit = {}, retries = 3, delay = 500): Promise<unknown> {
-    return fetch(url, options)
-      .then((res) => {
-        if (!res.ok) {
-          if (retries > 0) {
-            return new Promise((resolve) => setTimeout(resolve, delay)).then(() =>
-              fetchWithRetry(url, options, retries - 1, delay * 1.5),
-            );
-          }
-          throw new Error('HTTP ' + res.status);
-        }
-        return res.json();
-      })
-      .catch((err) => {
-        if (retries > 0) {
-          return new Promise((resolve) => setTimeout(resolve, delay)).then(() =>
-            fetchWithRetry(url, options, retries - 1, delay * 1.5),
-          );
-        }
-        throw err;
-      });
   }
 
   function loadProjects(): void {

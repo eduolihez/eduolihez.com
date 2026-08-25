@@ -23,6 +23,11 @@
  *     Schema.org con los datos reales del articulo.
  */
 
+import { safeUrl, setStatusPanel } from './shared';
+
+// Re-exportado por compatibilidad: los tests importan safeUrl desde './blog'.
+export { safeUrl };
+
 // ---------------------------------------------------------------------------
 // Utilidades
 // ---------------------------------------------------------------------------
@@ -35,17 +40,6 @@ export function escapeHtml(value: unknown): string {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
-}
-
-/**
- * Deja pasar solo URLs que no pueden ejecutar codigo.
- * Bloquea javascript:, data: y vbscript: en atributos href/src.
- * Misma regla que usan Proyectos y Certificaciones.
- */
-export function safeUrl(url: unknown): string {
-  if (typeof url !== 'string') return '';
-  const u = url.trim();
-  return /^(https?:\/\/|\/)/i.test(u) ? u : '';
 }
 
 /** Fecha legible en el idioma de la pagina. */
@@ -105,12 +99,8 @@ export function initBlogList(): void {
   const lang = grid.dataset.lang || 'es';
   const detailBase = grid.dataset.detail || '/blog/post/';
 
-  // El panel de estado se controla con data-state; el CSS decide que icono
-  // sale y si aparece el boton de reintento (ver StatusPanel.astro).
   const setState = (state: 'loading' | 'empty' | 'error', msg: string) => {
-    if (statusText) statusText.textContent = msg;
-    status?.setAttribute('data-state', state);
-    status?.classList.remove('hidden');
+    setStatusPanel(status, statusText, state, msg);
   };
 
   function loadPosts(): void {

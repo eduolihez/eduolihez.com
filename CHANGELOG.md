@@ -5,6 +5,61 @@ Todos los cambios notables de este proyecto se documentan en este archivo.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/),
 y el versionado usa cuatro números (`MAJOR.MINOR.PATCH.MICRO`).
 
+## [1.5.0.0] - 2026-08-25
+
+### Security
+
+- Cerrado un fallo real en la validación de URLs de los formularios de
+  `/admin` (logo/imagen/repo/demo/tienda/credencial) y en el equivalente del
+  frontend público (`safeUrl()`): un valor como `/\evil.example/x` empezaba
+  por `/` y pasaba el check, pero los navegadores tratan `\` como `/` al
+  interpretar una URL con esquema http(s) — compatibilidad heredada de
+  Internet Explorer, parte del propio estándar WHATWG URL — así que se
+  resolvía como `//evil.example/x`: un dominio externo, no una ruta interna.
+  Una segunda ronda de revisión encontró una variante del mismo problema con
+  tabuladores/saltos de línea incrustados en la URL (`/\t/evil.example/x`),
+  que el navegador también reduce a `//evil.example/x` aunque el texto no
+  contenga `\` ni `//` de forma literal. Corregido en los dos sitios, con
+  tests que fijan el comportamiento para ambas variantes.
+- El modo "reemplazar todo" de la copia de seguridad (`/admin/backup.php`)
+  exige ahora escribir `BORRAR` en un campo de confirmación además de subir
+  el archivo — antes, un envío accidental del formulario ya bastaba para
+  vaciar y reimportar toda la base de datos.
+- La regla de esquema de URL (antes copiada tres veces, una por formulario)
+  vive ahora en un único sitio (`server/lib/validate.php`), para que futuras
+  correcciones no se apliquen a un formulario sí y a otro no.
+
+### Added
+
+- Primera suite de tests de PHP del proyecto (PHPUnit), cubriendo la
+  limpieza de texto del blog para IA (`llms-blog.php`) y la validación de
+  URLs de `/admin` — ver `TESTING.md`. Instalación e infraestructura
+  separadas de los tests de TypeScript (`npm test`), sin CI todavía: hay que
+  correr `composer install && composer test` una vez en una máquina con PHP
+  8.1+ para confirmar que la suite pasa de verdad (se escribió sin intérprete
+  de PHP a mano en esta sesión).
+- Cobertura de tests ampliada en Proyectos y Certificaciones: apertura/cierre
+  de modal, los 5 filtros por categoría, drill-down de emisor con migas de
+  pan, y paginación ("cargar más").
+
+### Fixed
+
+- `fetchWithRetry()` (usado por Blog, Proyectos y Certificaciones al cargar
+  datos) podía reintentar más veces de las configuradas si el fallo persistía
+  en todos los intentos, por un `.catch()` duplicado en la cadena de
+  reintentos.
+- El listener de tecla Escape para cerrar el modal de Proyectos se
+  acumulaba en `document` cada vez que la página se recargaba vía
+  transición de cliente de Astro, en vez de reemplazarse.
+
+### Changed
+
+- `safeUrl()`, `fetchWithRetry()` y el helper de estado de carga —antes
+  triplicados en `blog.ts`, `projects.ts` y `certifications.ts`— viven ahora
+  en un único módulo compartido (`src/scripts/shared.ts`).
+- `server/admin/analytics.php`: el patrón `max(array_column($rows, 'c'))`,
+  repetido 13 veces, se consolidó en un helper (`max_count()`).
+
 ## [1.4.0.0] - 2026-08-25
 
 ### Added

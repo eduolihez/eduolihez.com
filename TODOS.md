@@ -26,26 +26,6 @@ esto es puramente una optimización de carga, no un fix de fiabilidad.
 **Depends on:** Resultado de Approach A en [la wiki](https://github.com/eduolihez/eduolihez.com/wiki/SEO-AI-Visibility-Plan) —
 solo tiene sentido revisar esto si el umbral realmente se dispara.
 
-### Cobertura de tests para server/llms-blog.php
-
-**What:** Añadir un smoke test para `server/llms-blog.php` que verifique que
-el output no rompe con datos vacíos o nulos.
-
-**Why:** Es una de las piezas centrales de la apuesta de citabilidad-IA del
-proyecto y hoy tiene cero red de seguridad. Un cambio futuro en el esquema de
-la tabla `posts` podría romper el output sin que nadie lo note hasta que una
-IA reciba una respuesta rota o vacía.
-
-**Context:** Ya no aplica a `src/pages/llms.txt.ts` — Vitest se instaló esta
-misma sesión (`chore: bootstrap test framework`) y ese endpoint ya tiene smoke
-test en `src/test/pages/llms.txt.test.ts` (ver `TESTING.md`). Lo que queda
-pendiente es solo el lado PHP: `server/` no tiene test runner todavía (sería
-Composer + PHPUnit, iniciativa aparte, no algo que Vitest pueda tocar).
-
-**Effort:** M
-**Priority:** P2
-**Depends on:** Ninguno.
-
 ### Sesión de diagnóstico para el público técnico SOC
 
 **What:** Correr `/office-hours` (o una sesión dedicada) enfocada en el segundo
@@ -68,153 +48,102 @@ dejó fuera de esa sesión.
 
 ## Seguridad
 
-### Validar esquema de logo_url / image_url en cert-edit.php y project-edit.php
+### Validar esquema de URL en el import JSON de backup.php
 
-**What:** `server/admin/cert-edit.php` y `server/admin/project-edit.php` guardan
-`logo_url`/`image_url` como texto libre (solo `trim()` + tope de longitud), sin
-validar que sea una URL http(s)/ruta relativa como ya hace `announcement_url`
-en `server/admin/settings.php`.
+**What:** `server/admin/backup.php` en modo importación escribe `image_url`,
+`repo_url`, `demo_url`, `store_url`, `credential_url` y `logo_url`
+directamente desde el JSON subido (solo `mb_substr()` de longitud, sin pasar
+por `validate_public_url()`), tanto en modo `add` como `replace`.
 
-**Why:** Auditoría VibeSec del 2026-08-23: un admin autenticado podría guardar
-un `javascript:` URI. Hoy no es explotable porque `e()` escapa el valor en el
-contexto de atributo HTML tanto en las vistas de `/admin` como (a confirmar) en
-el frontend público — pero no se verificó el lado público en esta pasada.
+**Why:** Adversarial review de `/ship` del 2026-08-25: hoy no es explotable
+porque el frontend público (`safeUrl()` en `src/scripts/shared.ts`) filtra
+estos campos igualmente antes de usarlos como `href`/`src` — pero si algún
+día una vista de `/admin` imprime alguno de estos campos sin pasar por ahí,
+o si se usa el import con un archivo de backup no confiable, deja de estar
+cubierto. Es la única vía de escritura de estos campos que no pasa por la
+validación que sí tienen `project-edit.php`/`cert-edit.php`.
 
-**Context:** Antes de arreglar, confirmar cómo se renderiza `logo_url`/
-`image_url` en el frontend público (`src/components/Certifications.astro`,
-`src/components/Projects.astro`) — si ya usa `src={...}`/`href={...}` de Astro
-(que escapa por defecto), el riesgo real es aún menor y el fix es solo higiene.
-
-**Effort:** S
-**Priority:** P3
-**Depends on:** Ninguno.
-
-### Confirmación adicional para el modo "replace" de backup.php
-
-**What:** El import de `server/admin/backup.php` en modo `replace` borra sin
-condición todos los proyectos/certificaciones existentes, protegido solo por
-CSRF + un `confirm()` de JavaScript en el cliente.
-
-**Why:** Auditoría VibeSec del 2026-08-23: no hay un segundo factor
-server-side (ej. "escribe BORRAR para confirmar") para una operación
-destructiva e irreversible. Riesgo bajo (app de un solo admin, ya protegida
-por CSRF+login), pero es una herramienta de restauración explícitamente
-destructiva.
-
-**Effort:** S
-**Priority:** P4
-**Depends on:** Ninguno.
-
-## Rendimiento
-
-### fetchWithRetry() reintenta más de lo previsto en fallo total
-
-**What:** `src/scripts/projects.ts` y `src/scripts/certifications.ts` (extraído
-de la lógica inline original) definen `fetchWithRetry()` encadenando
-`.then().catch()` en cada nivel de recursión. Cuando el intento más profundo
-falla, ese rechazo sube por cada `.then()` padre, y cada `.catch()` propio
-vuelve a aplicar SU presupuesto de reintentos (ya gastado), así que un fallo
-total tarda notablemente más que los 3 reintentos previstos.
-
-**Why:** Descubierto escribiendo los tests de reintento con temporizadores
-reales — tardaban tanto que hubo que pasar a `vi.useFakeTimers()` para que el
-test terminara en tiempo razonable. No es un bucle infinito (termina,
-confirmado con `vi.runAllTimersAsync()`), pero la latencia real del camino de
-fallo es peor de lo que sugiere leer el código.
-
-**Context:** Arreglo: que el `.then()` de cada nivel NO tenga su propio
-`.catch()` — solo el nivel más externo debería capturar el rechazo final. No
-se arregla aquí porque cambia el comportamiento de timing real, fuera de
-alcance de un refactor de extracción para tests.
+**Context:** El fix natural es llamar a `validate_public_url()` (o saltar la
+fila) por cada campo de URL dentro del `foreach` de proyectos/certificaciones
+del import. No se hizo en la misma sesión que introdujo `validate_public_url()`
+para no seguir ampliando un diff ya grande con cambios en el flujo
+transaccional de una operación destructiva.
 
 **Effort:** S
 **Priority:** P3
-**Depends on:** Ninguno.
-
-## Calidad de código / Tests
-
-### Cobertura de tests para modal, filtros y drill-down de emisor
-
-**What:** Añadir tests para `openModal()`/`closeModal()` (foco, backdrop,
-Escape, enlaces demo/repo) y el filtro por badge en `src/scripts/projects.ts`;
-para los filtros por categoría (cyber/ai-cloud/cisco/tryhackme/sys-dev) y el
-drill-down de emisor (entrar/salir con el breadcrumb) en
-`src/scripts/certifications.ts`.
-
-**Why:** Auditoría de `/ship` del 2026-08-23 (specialist de Testing): son 4
-huecos CRITICAL de cobertura en la lógica interactiva principal de los
-componentes que se extrajeron esta misma sesión explícitamente para poder
-testearlos — hoy siguen sin ejercerse por ningún test.
-
-**Context:** Los 39 tests actuales cubren carga/vacío/error/reintento/
-agrupación por emisor/búsqueda, pero ningún test hace click en un botón de
-filtro, abre el modal de detalle, ni navega emisor↔resumen. No se detectó
-ningún bug de comportamiento real, solo ausencia de red de seguridad.
-
-**Effort:** M
-**Priority:** P2
-**Depends on:** Ninguno.
-
-### Huecos menores de cobertura: reintento sin red, paginación y listeners de test
-
-**What:** Tres hallazgos informativos del mismo audit: (1) el camino de
-rechazo de `fetchWithRetry()` (promesa de `fetch()` rechazada, no solo
-`res.ok:false`) solo está testeado en `blog.test.ts`, no en
-`certifications.test.ts`/`projects.test.ts`; (2) la paginación (`limit`/
-"cargar más") de certificaciones no se ejerce porque los fixtures de test usan
-pocos elementos; (3) `projects.test.ts` acumula listeners `keydown` en
-`document` entre tests porque cada `initProjects()` registra uno nuevo sin que
-el test anterior lo limpie.
-
-**Why:** Ninguno es un bug de producción confirmado, pero el (3) podría
-enmascarar una fuga real si `initProjects()` se invoca varias veces en
-producción (ej. tras `astro:page-load`) — hoy el listener se registra en
-`document` en vez de en el propio modal.
-
-**Effort:** S
-**Priority:** P3
-**Depends on:** Ninguno.
-
-### Extraer safeUrl()/fetchWithRetry()/setState() a un módulo compartido
-
-**What:** `safeUrl()`, `fetchWithRetry()` y `setState()` están duplicados casi
-literalmente (mismo cuerpo, mismos comentarios) entre `src/scripts/blog.ts`,
-`projects.ts` y `certifications.ts`.
-
-**Why:** Auditoría de `/ship` del 2026-08-23 (specialist de Maintainability):
-la extracción de scripts de esta sesión creó dos copias nuevas de cada helper
-en vez de compartir uno. Cualquier cambio futuro (ej. añadir un esquema de URL
-permitido, ajustar el backoff de reintentos) requiere tocar 2-3 sitios en
-sincronía.
-
-**Context:** Decisión explícita del 2026-08-23: no hacerlo en esta sesión para
-no añadir más churn justo antes de aterrizar un diff ya grande. Encaja con el
-TODO de rendimiento de `fetchWithRetry()` de esta misma sección — al extraer,
-revisar también ese timing.
-
-**Effort:** S
-**Priority:** P3
-**Depends on:** Ninguno.
-
-### Extraer el patrón `max(array_column($rows, 'c'))` en server/admin/analytics.php
-
-**What:** `server/admin/analytics.php` repite 13 veces el mismo patrón
-(`$rows ? max(array_column($rows, 'c')) : 0`) para calcular el máximo de
-cada desglose antes de dibujar sus barras.
-
-**Why:** Auditoría de `/ship` del 2026-08-24 (specialist de Maintainability):
-son 13 líneas casi idénticas que existen solo para escalar el ancho de las
-barras. Un helper `max_count(array $rows): int` las sustituiría todas.
-
-**Context:** No se toca en esta sesión porque 8 de las 13 instancias son
-código preexistente fuera del diff de esta feature (analítica de
-comportamiento/UTM); tocar solo las 5 nuevas habría creado una
-inconsistencia peor dentro del mismo archivo. Mismo criterio que el TODO de
-`safeUrl()`/`fetchWithRetry()`/`setState()` de más arriba: evitar churn
-fuera de alcance justo antes de aterrizar un diff ya grande.
-
-**Effort:** S
-**Priority:** P4
 **Depends on:** Ninguno.
 
 ## Completed
+
+### Validar esquema de logo_url / image_url en cert-edit.php y project-edit.php
+Añadida la misma regla que ya usaba `announcement_url` en settings.php —
+consolidada en `server/lib/validate.php` (`validate_public_url()`) para que
+las tres copias no diverjan, con tests de PHPUnit en
+`server/tests/ValidateTest.php`. La revisión de `/ship` encontró un bypass
+real en el check inicial: un valor como `/\evil.example/x` empieza por `/`
+(pasaba la regla), pero los navegadores tratan `\` como `/` al parsear un
+esquema especial (compat heredada de IE, parte del estándar WHATWG URL), así
+que se resuelve como `//evil.example/x` — dominio externo, no ruta interna.
+Corregido bloqueando barra invertida y `//` inicial antes del check de
+esquema; mismo fix aplicado a `safeUrl()` en `src/scripts/shared.ts`
+(afecta también al frontend público). El Red Team de la misma revisión
+encontró una segunda variante del mismo bypass: el parser WHATWG también
+quita tabulador/salto de línea/retorno de carro de *cualquier* posición de
+la URL (no solo de los extremos, que `trim()` ya cubría) antes de
+interpretarla — `/\t/evil.example/x` no tenía `\` literal ni empezaba por
+`//` tal cual, pero el navegador lo reduce a `//evil.example/x` igual que el
+primer caso. Corregido en los mismos dos sitios, con tests para las tres
+variantes (`\t`, `\n`, `\r`).
+**Completed:** pendiente de versión (2026-08-25)
+
+### Confirmación adicional para el modo "replace" de backup.php
+Segundo factor server-side: hay que escribir `BORRAR` en un campo nuevo para
+que el modo "reemplazar" se ejecute; sin eso, ni siquiera se toca el archivo
+subido.
+**Completed:** pendiente de versión (2026-08-25)
+
+### fetchWithRetry() reintenta más de lo previsto en fallo total
+Arreglado como parte de la extracción a `src/scripts/shared.ts`: un solo
+`.catch()` por nivel de recursión en vez de uno por cada `.then()` padre.
+Test de regresión que fija el número exacto de llamadas (`retries + 1`, ni
+una más) en `shared.test.ts`.
+**Completed:** pendiente de versión (2026-08-25)
+
+### Cobertura de tests para modal, filtros y drill-down de emisor
+Añadidos: apertura/cierre de modal (foco, backdrop, Escape), filtro por badge
+en Proyectos; los 5 filtros por categoría, drill-down de emisor (entrar/salir
+con migas) y paginación ("cargar más") en Certificaciones.
+**Completed:** pendiente de versión (2026-08-25)
+
+### Huecos menores de cobertura: reintento sin red, paginación y listeners de test
+Los 3 arreglados: rechazo de red testeado en los 3 módulos (antes solo
+blog.test.ts), paginación ejercida con un fixture de 15 elementos, y el
+listener `keydown` de Proyectos ya no se acumula (ver el TODO de módulo
+compartido — el fix vive ahí) — más un test que lo demuestra llamando a
+`initProjects()` dos veces seguidas.
+**Completed:** pendiente de versión (2026-08-25)
+
+### Extraer safeUrl()/fetchWithRetry()/setState() a un módulo compartido
+Nuevo `src/scripts/shared.ts`; `blog.ts`/`projects.ts`/`certifications.ts` lo
+importan y re-exportan `safeUrl` para no romper los tests existentes. De
+paso, `initProjects()` dejó de acumular un listener `keydown` en `document`
+en cada re-init (guardado con una variable de módulo).
+**Completed:** pendiente de versión (2026-08-25)
+
+### Extraer el patrón `max(array_column($rows, 'c'))` en server/admin/analytics.php
+Nuevo helper `max_count(array $rows): int`; sustituidas las 13 instancias.
+**Completed:** pendiente de versión (2026-08-25)
+
+### Cobertura de tests para server/llms-blog.php
+Bootstrapeado PHPUnit desde cero (`composer.json`, `phpunit.xml`,
+`server/tests/`) — la iniciativa que este TODO daba por "aparte". Extraída
+`to_plain_text()` (la lógica real de limpieza HTML→texto, y la pieza con más
+superficie de fallo del archivo) a `server/lib/text.php`, con 11 tests que
+cubren string vacía, script/style, bloques→salto de línea, listas,
+entidades, colapso de líneas en blanco y un artículo realista combinado.
+**No** cubre el resto del script (la consulta SQL en sí, el manejo de fallo
+de DB) — eso necesitaría una base de datos de test, fuera de alcance de un
+smoke test. Sin PHP disponible en el entorno de esta sesión para ejecutar la
+suite: revisar corriendo `composer install && composer test` antes de darla
+por buena.
+**Completed:** pendiente de versión (2026-08-25)

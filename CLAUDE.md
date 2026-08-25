@@ -9,7 +9,10 @@ breaks `npm run build` silently. Tests for `src/pages/` files go in
 `src/pages/llms.txt.ts` → `src/test/pages/llms.txt.test.ts`). Full context in
 `TESTING.md`.
 
-Only covers `src/` (TypeScript/Astro). `server/` (PHP) has no test runner yet.
+Covers `src/` (TypeScript/Astro) via Vitest. `server/` (PHP) has a separate
+PHPUnit suite: `composer install` then `composer test`. Only tests code with
+no DB dependency (`server/tests/bootstrap.php` explains why). Full context in
+`TESTING.md`.
 
 Expectations:
 - 100% coverage is the goal — tests make changes safe to make quickly.

@@ -76,7 +76,21 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     if ($action === 'import') {
         $mode = ($_POST['mode'] ?? 'add') === 'replace' ? 'replace' : 'add';
 
-        if (empty($_FILES['backup']) || ($_FILES['backup']['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
+        // Segundo factor server-side para el modo destructivo (auditoria
+        // VibeSec del 2026-08-25): el CSRF + confirm() de JS protegen contra
+        // un envio ajeno, pero no contra un click propio sin querer -- borrar
+        // TODOS los proyectos/certificaciones es irreversible salvo que
+        // tengas backup, y hoy nada pedia una segunda confirmacion explicita.
+        if ($mode === 'replace' && trim((string) ($_POST['confirm_replace'] ?? '')) !== 'BORRAR') {
+            $errors[] = 'Para el modo "reemplazar" escribe BORRAR (en mayusculas) en el campo de confirmacion.';
+        }
+
+        // El chequeo de arriba solo ANADE a $errors -- sin este guard, un
+        // confirm_replace incorrecto no impedia que el codigo de mas abajo
+        // (que SI borra la tabla) se ejecutara igualmente.
+        if ($errors) {
+            // no hacer nada: cae directo al render de abajo con el error visible
+        } elseif (empty($_FILES['backup']) || ($_FILES['backup']['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
             $errors[] = 'Selecciona un archivo .json de copia de seguridad.';
         } elseif ($_FILES['backup']['size'] > 5 * 1024 * 1024) {
             $errors[] = 'El archivo es demasiado grande (maximo 5 MB).';
@@ -243,6 +257,10 @@ show_flash();
       <option value="replace">Reemplazar — borra proyectos y certificaciones actuales</option>
     </select>
     <div class="hint">Los ajustes siempre se sobrescriben con los de la copia.</div>
+
+    <label for="confirm_replace" style="margin-top:1rem;">Confirmacion (solo si eliges "Reemplazar")</label>
+    <input type="text" id="confirm_replace" name="confirm_replace" maxlength="20" placeholder="BORRAR" autocomplete="off">
+    <div class="hint">Si el modo es "Reemplazar", escribe <code>BORRAR</code> aqui para confirmar. En modo "Anadir" este campo no hace nada.</div>
 
     <div style="margin-top:1.4rem;">
       <button type="submit" class="btn">Restaurar copia</button>

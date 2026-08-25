@@ -15,3 +15,10 @@ if (typeof window !== 'undefined' && !window.matchMedia) {
       dispatchEvent: () => false,
     }) as MediaQueryList;
 }
+
+// Mismo motivo: jsdom tampoco implementa Element.scrollIntoView (requiere
+// layout real, que jsdom no calcula). certifications.ts lo llama al entrar o
+// salir del detalle de un emisor.
+if (typeof Element !== 'undefined' && !Element.prototype.scrollIntoView) {
+  Element.prototype.scrollIntoView = () => {};
+}

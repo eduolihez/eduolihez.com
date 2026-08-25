@@ -80,6 +80,10 @@ node_modules/
 .temp/
 .vite/
 
+# Dependencias de Composer (PHPUnit para server/tests/). Se reinstalan con
+# "composer install" a partir de composer.json + composer.lock.
+/vendor/
+
 # Estado de sesion local de la herramienta de lint de diseno (Impeccable):
 # roots.json guarda rutas absolutas de esta maquina. config.json y
 # design.json SI se versionan (son configuracion real del proyecto).

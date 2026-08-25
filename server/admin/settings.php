@@ -8,6 +8,7 @@
  */
 require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/partials/layout.php';
+require_once __DIR__ . '/../lib/validate.php';
 require_login();
 
 // Ajustes gestionados desde esta pantalla: clave => tipo.
@@ -31,8 +32,8 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     // Validamos el enlace del banner antes de guardar nada: solo rutas
     // internas o https. Asi el frontend nunca recibe un javascript:...
     $url = trim((string) ($_POST['announcement_url'] ?? ''));
-    if ($url !== '' && !preg_match('#^(https://|/)#i', $url)) {
-        $errors[] = 'El enlace del aviso debe empezar por https:// o por / (ruta interna).';
+    if ($err = validate_public_url($url, 'El enlace del aviso')) {
+        $errors[] = $err;
     }
 
     if (!$errors) {

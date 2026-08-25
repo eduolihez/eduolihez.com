@@ -1,0 +1,4 @@
+# Bloquea el acceso web directo a la suite de PHPUnit.
+# No hace falta subirla por FTP (es solo para desarrollo), pero si se sube
+# junto al resto de server/ por accidente, esto evita que quede accesible.
+Require all denied

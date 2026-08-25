@@ -10,29 +10,55 @@ nadie lo nota hasta que la respuesta ya salió mal.
 
 **Vitest**, vía el helper oficial `getViteConfig()` de Astro (`vitest.config.ts`).
 Reutiliza el `vite.config` real del proyecto — sin configuración duplicada.
+Cubre el lado **TypeScript/Astro** (`src/`).
 
-Cubre el lado **TypeScript/Astro** (`src/`). El backend en PHP (`server/`) no
-tiene test runner todavía — sería una iniciativa aparte con Composer +
-PHPUnit, no algo que Vitest pueda tocar.
+El backend en PHP (`server/`) usa **PHPUnit** (`composer.json` +
+`phpunit.xml`, raíz del repo) — instalación e iniciativa separadas de Vitest,
+sin relación entre ambos runners. Cubre solo código SIN dependencias externas
+(de momento: `server/lib/text.php` y `server/lib/validate.php`) —
+`server/tests/bootstrap.php` deja claro por qué no arranca
+`server/lib/http.php` ni `config.php`: eso abriría una conexión real a MySQL
+de producción, que no existe (ni debe existir) en un entorno de test o CI, y
+`db()` corta el proceso entero con `exit;` si lo intenta. Testear algo que sí
+necesite DB requeriría una base de datos de test propia, inyectada aparte.
 
 ## Cómo correr los tests
 
 ```bash
-npm test
+npm test              # TypeScript/Astro (Vitest)
+composer install       # PHP: instala PHPUnit (solo la primera vez)
+composer test          # PHP (PHPUnit)
 ```
 
-Corre en CI en cada push/PR a `master` (`.github/workflows/test.yml`).
+`npm test` corre en CI en cada push/PR a `master`
+(`.github/workflows/test.yml`, check "Vitest"). La suite de PHPUnit **no**
+está todavía en ese workflow — se montó en esta misma sesión sin un entorno
+PHP a mano para verificarla en ejecución real, así que antes de darla por
+buena en CI hay que correr `composer test` una vez en una máquina con PHP
+8.1+ y confirmar que pasa.
 
 ## Capas de test
 
 - **Unit / smoke tests** (`src/**/*.test.ts`): el endpoint `/llms.txt` —
   verifica que el texto generado incluye los datos reales de identidad, que
   ninguna interpolación queda como `undefined`/`[object Object]`, y que las
-  secciones que dependen de arrays (experiencia, FAQ) no salen vacías. Y los
-  scripts extraídos de Blog, Proyectos y Certificaciones (`blog.ts`,
-  `projects.ts`, `certifications.ts`) — carga/vacío/error/reintento sin
-  duplicar listeners, `safeUrl()` bloqueando esquemas ejecutables, y (en
-  Certificaciones) agrupación por emisor y filtro de búsqueda.
+  secciones que dependen de arrays (experiencia, FAQ) no salen vacías.
+  `src/scripts/shared.ts` (`safeUrl()`, `fetchWithRetry()`,
+  `setStatusPanel()` — compartidas por Blog, Proyectos y Certificaciones):
+  esquemas bloqueados/permitidos incluidos los bypass de `\`/`//`/tabulador
+  incrustado en la URL (ver el comentario del propio archivo), número exacto
+  de reintentos en fallo total (regresión del bug de cascada). Y los scripts
+  de cada isla (`blog.ts`, `projects.ts`, `certifications.ts`): carga/vacío/
+  error/reintento (incluido el rechazo directo de `fetch()`, no solo
+  `!res.ok`) sin duplicar listeners, apertura/cierre de modal (foco,
+  backdrop, Escape) en Proyectos, y en Certificaciones los 5 filtros por
+  categoría, drill-down de emisor con migas de pan, y paginación
+  ("cargar más").
+- **PHPUnit** (`server/tests/*.php`): `to_plain_text()` (limpieza HTML→texto
+  de los artículos del blog) y `validate_public_url()` (el esquema de URL
+  permitido en los formularios de `/admin`, incluidos los mismos bypass de
+  `\`/`//`/tabulador que en `safeUrl()` — misma regla, dos implementaciones
+  independientes que no comparten fuente).
 - **Integration / E2E:** no hay todavía. El sitio es principalmente
   contenido estático + un backend PHP que no se puede correr en local sin
   PHP instalado (ver `PRODUCT.md`, sección "Operating Context").

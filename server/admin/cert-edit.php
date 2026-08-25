@@ -5,6 +5,7 @@
 require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/partials/layout.php';
 require_once __DIR__ . '/../lib/upload.php';
+require_once __DIR__ . '/../lib/validate.php';
 require_login();
 
 $id = (int) ($_GET['id'] ?? 0);
@@ -49,6 +50,23 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
         }
     } catch (Throwable $ex) {
         $errors[] = $ex->getMessage();
+    }
+
+    // Mismo esquema que announcement_url en settings.php (server/lib/validate.php):
+    // solo https:// o ruta interna. Sin esto, un campo de texto libre
+    // admitiria un javascript:... (auditoria VibeSec del 2026-08-25; hoy no
+    // era explotable porque e() escapa el valor, pero esto lo cierra en
+    // origen en vez de depender solo del escape en cada sitio donde se
+    // imprime). Los dos campos de URL del formulario pasan por aqui, no
+    // solo logo_url -- si alguno se te olvida, deja de ser cierto que esto
+    // "se cierra en origen".
+    foreach ([
+        'logo_url'       => 'La URL del logo',
+        'credential_url' => 'La URL de verificacion',
+    ] as $field => $label) {
+        if ($err = validate_public_url($c[$field], $label)) {
+            $errors[] = $err;
+        }
     }
 
     if (!$errors) {
@@ -124,7 +142,8 @@ if (!empty($errors)) {
 
   <label for="logo_url" style="margin-top:1rem;">...o URL del logo (opcional)</label>
   <input type="text" id="logo_url" name="logo_url" maxlength="255" value="<?= e($c['logo_url']) ?>" placeholder="/uploads/certs/logo.png">
-  <div class="hint">Si lo dejas vacio se muestra la inicial del emisor.</div>
+  <div class="hint">Si lo dejas vacio se muestra la inicial del emisor. Si pegas una URL externa,
+  debe empezar por <code>https://</code> o por <code>/</code> (ruta interna).</div>
 
   <div class="row2">
     <div>

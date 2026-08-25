@@ -38,6 +38,15 @@ function q_rows(string $sql, array $params = []): array
 }
 
 /**
+ * Maximo de la columna 'c' de un desglose (o 0 si esta vacio). Cada grafico
+ * de barras la usa para escalar el ancho de la barra mas larga al 100%.
+ */
+function max_count(array $rows): int
+{
+    return $rows ? (int) max(array_column($rows, 'c')) : 0;
+}
+
+/**
  * Dado un conjunto de IDs de `visits` (p.ej. el primer o ultimo hit de cada
  * sesion), devuelve las rutas mas frecuentes entre esas filas. $limit es
  * siempre un literal fijo del propio codigo, nunca dato de usuario -- se
@@ -296,19 +305,19 @@ $viewports = q_rows(
     [$days]
 );
 
-$maxPage = $topPages ? max(array_column($topPages, 'c')) : 0;
-$maxRef  = $topRefs ? max(array_column($topRefs, 'c')) : 0;
-$maxCty  = $countries ? max(array_column($countries, 'c')) : 0;
-$maxDev  = $devices ? max(array_column($devices, 'c')) : 0;
-$maxBro  = $browsers ? max(array_column($browsers, 'c')) : 0;
-$maxSys  = $systems ? max(array_column($systems, 'c')) : 0;
-$maxLang = $langs ? max(array_column($langs, 'c')) : 0;
-$maxBot  = $topBots ? max(array_column($topBots, 'c')) : 0;
-$maxEntry = $entryPages ? max(array_column($entryPages, 'c')) : 0;
-$maxExit  = $exitPages ? max(array_column($exitPages, 'c')) : 0;
-$maxUtm   = $utmRows ? max(array_column($utmRows, 'c')) : 0;
-$maxBroLang = $browserLangs ? max(array_column($browserLangs, 'c')) : 0;
-$maxViewport = $viewports ? max(array_column($viewports, 'c')) : 0;
+$maxPage = max_count($topPages);
+$maxRef  = max_count($topRefs);
+$maxCty  = max_count($countries);
+$maxDev  = max_count($devices);
+$maxBro  = max_count($browsers);
+$maxSys  = max_count($systems);
+$maxLang = max_count($langs);
+$maxBot  = max_count($topBots);
+$maxEntry = max_count($entryPages);
+$maxExit  = max_count($exitPages);
+$maxUtm   = max_count($utmRows);
+$maxBroLang = max_count($browserLangs);
+$maxViewport = max_count($viewports);
 
 $deviceLabels  = ['desktop' => 'Escritorio', 'mobile' => 'Movil', 'tablet' => 'Tablet', 'desconocido' => 'Desconocido'];
 $langLabels    = ['es' => 'Espanol', 'en' => 'Ingles', 'ca' => 'Catalan', '?' => 'Desconocido'];

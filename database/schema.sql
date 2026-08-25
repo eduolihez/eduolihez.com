@@ -9,12 +9,23 @@
 --  ES IDEMPOTENTE: puedes importarlo tantas veces como quieras.
 --    - Crea lo que falta (tablas, columnas, indices).
 --    - NO toca lo que ya existe: tus proyectos, certificaciones, mensajes,
---      visitas y usuarios se quedan como estan.
+--      visitas y usuarios se quedan como estan -- salvo las correcciones
+--      puntuales descritas en la regla de mas abajo, que solo tocan un
+--      campo concreto y solo si todavia tiene el valor antiguo conocido.
 --    - Los datos de ejemplo solo se insertan si la tabla esta VACIA.
 --
 --  Sirve por igual para:
 --    a) una instalacion NUEVA (crea todo desde cero, con datos de ejemplo);
 --    b) actualizar una base de datos YA EN PRODUCCION (actua de migracion).
+--
+--  REGLA PARA CORREGIR DATOS YA SEMBRADOS: si anades un UPDATE que corrige un
+--  valor que el seed ya inserto (ver ejemplos en las secciones "projects" y
+--  "certifications" mas abajo), guarda el WHERE por el valor ANTERIOR del
+--  campo, no solo por un identificador inmutable como el nombre/titulo. Un
+--  WHERE solo-por-nombre reimportaria el valor viejo por encima de cualquier
+--  edicion manual hecha despues desde /admin -- este archivo no lleva
+--  tracking de "esto ya se aplico", asi que cada reimportacion vuelve a
+--  ejecutar el UPDATE entero.
 --
 --  COMO IMPORTARLO EN CDMON:
 --    1. Crea una base de datos MySQL desde el panel de CDMON.

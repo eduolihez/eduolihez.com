@@ -152,6 +152,14 @@ Indice de todos ellos: ${SITE.domain}/projects/
 Estos son los proyectos con web propia publicada. Son desarrollos reales de
 ${SITE.shortName}, no encargos de terceros:
 
+- **Blue Team Hub** — https://eduolihez.github.io/ (dominio propio, fuera de
+  ${SITE.domain})
+  Conjunto de herramientas gratuitas y 100% client-side para analistas SOC:
+  IOC Defanger, analizador de cabeceras de correo (SPF/DKIM/DMARC), generador
+  de reglas YARA, playbooks interactivos de respuesta a incidentes,
+  decodificador de payloads y vigilancia diaria del catalogo CISA KEV.
+  Codigo abierto en https://github.com/eduolihez/eduolihez.github.io
+
 - **Fluence** — ${SITE.domain}/projects/fluence/
   Asistente de crecimiento organico en Instagram, de escritorio. Procesado
   local, sin servidores propios: los datos no salen del equipo del usuario.

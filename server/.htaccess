@@ -169,6 +169,13 @@ Options -Indexes
   Header always set Permissions-Policy "geolocation=(), microphone=(), camera=(), interest-cohort=()"
   Header always set Cross-Origin-Opener-Policy "same-origin"
 
+  # X-XSS-Protection: cabecera obsoleta (Chrome/Edge la ignoran desde 2019,
+  # Firefox nunca la soporto) que OWASP recomienda omitir o poner a "0" -- la
+  # proteccion real la da la CSP de arriba. La ponemos a "0" explicitamente
+  # en vez de dejarla ausente: mismo efecto, pero algunos escaneres
+  # automaticos solo comprueban si la cabecera esta presente.
+  Header always set X-XSS-Protection "0"
+
   # HSTS: fuerza HTTPS durante 1 ano.
   # ACTIVO: el sitio ya esta en produccion con SSL y Cloudflare delante.
   # Si algun dia necesitas servir algo por HTTP puro, comenta esta linea Y
@@ -201,8 +208,19 @@ Options -Indexes
   #    con hashes calculados en cada build (script-src 'self' + sha256, SIN
   #    'unsafe-inline'). Ver astro.config.mjs -> experimental.csp.
   #  - El PANEL (PHP) fija su CSP por cabecera desde server/admin/auth.php.
-  #  Por eso NO ponemos aqui una CSP global: duplicarla bloquearia los scripts.
+  #  Por eso NO ponemos aqui una CSP global: duplicarla con directivas como
+  #  script-src bloquearia los scripts (gana la interseccion mas restrictiva
+  #  entre la cabecera y el <meta>, y la cabecera no conoce los hashes).
   #  X-Frame-Options: DENY (arriba) cubre el clickjacking en todas las paginas.
+  #
+  #  frame-ancestors SI se puede anadir por cabecera sin ese riesgo: el <meta>
+  #  la ignora por spec (igual que report-uri y sandbox, ver
+  #  https://www.w3.org/TR/CSP3/#meta-element), asi que no hay nada con lo que
+  #  intersecar. Solo a .html para no tocar /admin/ ni /api/, que ya mandan su
+  #  propia CSP completa por PHP -- "always set" la REEMPLAZARIA entera.
+  <FilesMatch "\.html$">
+    Header always set Content-Security-Policy "frame-ancestors 'none'"
+  </FilesMatch>
   # -------------------------------------------------------------------------
 </IfModule>
 

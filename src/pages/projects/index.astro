@@ -2,11 +2,12 @@
 /**
  * /projects/ — indice de los proyectos con web propia.
  *
- * POR QUE EXISTE: todas las webs de proyecto cuelgan de /projects/, pero esa
- * ruta no tenia ningun archivo. Con "Options -Indexes" en el .htaccess, pedir
- * https://eduolihez.com/projects/ devolvia un 403: justo el directorio padre
- * de cada URL del sitemap. Ahora es una pagina real que ademas hace de
- * concentrador de enlaces internos hacia los seis proyectos.
+ * POR QUE EXISTE: la mayoria de las webs de proyecto cuelgan de /projects/,
+ * pero esa ruta no tenia ningun archivo. Con "Options -Indexes" en el
+ * .htaccess, pedir https://eduolihez.com/projects/ devolvia un 403: justo el
+ * directorio padre de cada URL del sitemap. Ahora es una pagina real que
+ * ademas hace de concentrador de enlaces internos hacia los seis proyectos
+ * (Blue Team Hub es la excepcion: vive en su propio dominio, GitHub Pages).
  *
  * Se genera con Astro (no es HTML suelto en /public) para heredar el layout,
  * la CSP con hashes y todo el SEO del resto del sitio.
@@ -17,9 +18,19 @@ import { SITE } from '../../config';
 const lang = 'es';
 const title = 'Proyectos publicados | Eduardo Olivares';
 const description =
-  'Herramientas de seguridad, extensiones de navegador y desarrollos web de Eduardo Olivares: Password Sentinel, PromptMaster, FollowGuard, Fluence y Zéora.';
+  'Herramientas de seguridad, extensiones de navegador y desarrollos web de Eduardo Olivares: Blue Team Hub, Password Sentinel, PromptMaster, FollowGuard, Fluence y Zéora.';
 
 const projects = [
+  {
+    name: 'Blue Team Hub',
+    href: 'https://eduolihez.github.io/',
+    tagline: 'Herramientas gratuitas para analistas SOC',
+    summary:
+      'IOC Defanger, analizador de cabeceras de correo, generador de reglas YARA, playbooks interactivos y más. 100% cliente: ningún dato sale del navegador.',
+    stack: ['Astro', 'JavaScript', 'GitHub Pages'],
+    badges: ['open-source'],
+    lang: 'Español',
+  },
   {
     name: 'Password Sentinel',
     href: '/projects/passwdcentinel/',
@@ -37,7 +48,7 @@ const projects = [
     summary:
       'Convierte instrucciones vagas en prompts estructurados con rol, contexto y formato, sin salir de ChatGPT, Claude o Gemini.',
     stack: ['JavaScript', 'Chrome API', 'Tailwind'],
-    badges: ['open-source'],
+    badges: ['private-code'],
     lang: 'Español',
   },
   {
@@ -110,9 +121,9 @@ const itemList = {
           Proyectos publicados
         </h1>
         <p class="max-w-2xl text-base leading-relaxed text-text-muted sm:text-lg">
-          Cada uno de estos proyectos tiene su propia web en este dominio. Son desarrollos
-          propios: herramientas de seguridad, extensiones de navegador y plataformas
-          ciudadanas, construidas de principio a fin.
+          Desarrollos propios de principio a fin: herramientas de seguridad, extensiones de
+          navegador y plataformas ciudadanas. La mayoría tiene su propia web en este dominio;
+          Blue Team Hub vive en su propio sitio (GitHub Pages) y se enlaza desde aquí.
         </p>
       </div>
 
@@ -160,8 +171,13 @@ const itemList = {
             >
               <div class="mb-3 flex items-baseline justify-between gap-3">
                 <h2 class="text-lg font-semibold text-text">
-                  <a href={p.href} class="transition hover:text-accent hover:no-underline">
+                  <a
+                    href={p.href}
+                    class="transition hover:text-accent hover:no-underline"
+                    {...p.href.startsWith('http') && { target: '_blank', rel: 'noopener noreferrer' }}
+                  >
                     {p.name}
+                    {p.href.startsWith('http') && <span aria-hidden="true"> &#8599;</span>}
                   </a>
                 </h2>
                 <span class="shrink-0 font-mono text-[11px] text-text-faint">{p.lang}</span>

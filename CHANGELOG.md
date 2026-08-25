@@ -5,6 +5,36 @@ Todos los cambios notables de este proyecto se documentan en este archivo.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/),
 y el versionado usa cuatro números (`MAJOR.MINOR.PATCH.MICRO`).
 
+## [1.4.0.0] - 2026-08-25
+
+### Added
+
+- Blue Team Hub (el conjunto de herramientas gratuitas para analistas SOC en
+  `eduolihez.github.io`) aparece ahora como proyecto en el portfolio
+  (`/projects/`) y en el resumen para IAs (`llms.txt`), con enlace externo
+  claramente señalizado.
+- Cabecera `Content-Security-Policy: frame-ancestors 'none'` en todas las
+  páginas HTML, y `X-XSS-Protection: 0` explícito — refuerzo de las cabeceras
+  de seguridad del sitio.
+- 9 certificaciones de Fortinet nuevas (Credly), cada una con su enlace de
+  verificación.
+
+### Fixed
+
+- El badge de PromptMaster estaba marcado como "Open Source" en todo el
+  sitio (portfolio, pie de página, base de datos) cuando en realidad es de
+  código privado — corregido en todas partes.
+- Certificación de Python: emisor correcto (Certiport, no OpenBootcamp) y
+  nombre oficial ("IT Specialist - Python").
+- Reordenada la categoría de varias certificaciones (los dos cursos de
+  Google/Santander y la de la Federació Catalana de Vela pasan a "Otros";
+  la de LinkedIn/Microsoft se unifica bajo "LinkedIn").
+- Restaurados 5 proyectos (Dewi App, BinCat, NorthGate Browser, Password
+  Sentinel, PromptMaster) que habían desaparecido de la portada tras un
+  vaciado accidental de la base de datos durante una actualización de
+  esquema; el propio archivo de esquema (`database/schema.sql`) queda
+  además más seguro frente a reimportaciones futuras.
+
 ## [1.3.0.0] - 2026-08-24
 
 ### Added

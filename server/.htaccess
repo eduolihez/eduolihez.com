@@ -141,9 +141,16 @@ ErrorDocument 500 /500.html
 <FilesMatch "\.(sql|md|log|sh|bak|inc|ini|yml|yaml|lock|ts|mjs|env)$">
   Require all denied
 </FilesMatch>
-<FilesMatch "^(package(-lock)?\.json|composer\.(json|lock)|tsconfig\.json|astro\.config\..*|tailwind\.config\..*)$">
+<FilesMatch "^(package(-lock)?\.json|composer\.(json|lock)|phpunit\.xml|tsconfig\.json|astro\.config\..*|tailwind\.config\..*)$">
   Require all denied
 </FilesMatch>
+
+# Si alguna vez subes la carpeta entera y "composer install" ya corrio ahi,
+# /vendor/ tendria PHP ejecutable de terceros (PHPUnit incluido) alcanzable
+# por URL -- clase de RCE conocida (ver CVE-2017-9841). Igual que badaveu/
+# mesbadalona mas abajo, pero devolviendo 403 en vez de 410 porque esto no
+# es contenido retirado, es una carpeta que nunca deberia estar aqui.
+RedirectMatch 403 ^/vendor(/.*)?$
 
 # Ocultar el propio .htaccess y archivos ocultos
 <FilesMatch "^\.">

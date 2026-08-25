@@ -6,6 +6,7 @@
 require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/partials/layout.php';
 require_once __DIR__ . '/../lib/upload.php';
+require_once __DIR__ . '/../lib/validate.php';
 require_login();
 
 $id = (int) ($_GET['id'] ?? 0);
@@ -87,6 +88,25 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
         }
     } catch (Throwable $ex) {
         $errors[] = $ex->getMessage();
+    }
+
+    // Mismo esquema que announcement_url en settings.php (server/lib/validate.php):
+    // solo https:// o ruta interna. Sin esto, un campo de texto libre
+    // admitiria un javascript:... (auditoria VibeSec del 2026-08-25; hoy no
+    // era explotable porque e() escapa el valor, pero esto lo cierra en
+    // origen en vez de depender solo del escape en cada sitio donde se
+    // imprime). Los cuatro campos de URL del formulario pasan por aqui, no
+    // solo image_url -- si alguno se te olvida, deja de ser cierto que esto
+    // "se cierra en origen".
+    foreach ([
+        'image_url' => 'La URL de la imagen',
+        'repo_url'  => 'La URL del repositorio',
+        'demo_url'  => 'La URL de la pagina del proyecto',
+        'store_url' => 'La URL de la tienda',
+    ] as $field => $label) {
+        if ($err = validate_public_url($p[$field], $label)) {
+            $errors[] = $err;
+        }
     }
 
     if (!$errors) {
@@ -194,7 +214,7 @@ if (!empty($errors)) {
 
   <label for="image_url" style="margin-top:1rem;">...o URL de imagen (opcional)</label>
   <input type="text" id="image_url" name="image_url" maxlength="255" value="<?= e($p['image_url']) ?>" placeholder="/uploads/projects/mi-imagen.jpg">
-  <div class="hint">Si subes un archivo arriba, este campo se rellena solo. Tambien puedes pegar una URL externa (https://...).</div>
+  <div class="hint">Si subes un archivo arriba, este campo se rellena solo. Tambien puedes pegar una URL externa: debe empezar por <code>https://</code> o por <code>/</code> (ruta interna).</div>
 
   <label for="stack">Stack tecnologico</label>
   <input type="text" id="stack" name="stack" value="<?= e($p['stack']) ?>" placeholder="Next.js, TypeScript, Tailwind">

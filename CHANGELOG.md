@@ -13,6 +13,8 @@ y el versionado usa cuatro números (`MAJOR.MINOR.PATCH.MICRO`).
   `eduolihez.github.io`) aparece ahora como proyecto en el portfolio
   (`/projects/`) y en el resumen para IAs (`llms.txt`), con enlace externo
   claramente señalizado.
+- Zéora se une a los proyectos destacados de la portada (el carrusel que se
+  sirve desde la base de datos), donde antes no aparecía.
 - Cabecera `Content-Security-Policy: frame-ancestors 'none'` en todas las
   páginas HTML, y `X-XSS-Protection: 0` explícito — refuerzo de las cabeceras
   de seguridad del sitio.

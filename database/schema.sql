@@ -9,12 +9,23 @@
 --  ES IDEMPOTENTE: puedes importarlo tantas veces como quieras.
 --    - Crea lo que falta (tablas, columnas, indices).
 --    - NO toca lo que ya existe: tus proyectos, certificaciones, mensajes,
---      visitas y usuarios se quedan como estan.
+--      visitas y usuarios se quedan como estan -- salvo las correcciones
+--      puntuales descritas en la regla de mas abajo, que solo tocan un
+--      campo concreto y solo si todavia tiene el valor antiguo conocido.
 --    - Los datos de ejemplo solo se insertan si la tabla esta VACIA.
 --
 --  Sirve por igual para:
 --    a) una instalacion NUEVA (crea todo desde cero, con datos de ejemplo);
 --    b) actualizar una base de datos YA EN PRODUCCION (actua de migracion).
+--
+--  REGLA PARA CORREGIR DATOS YA SEMBRADOS: si anades un UPDATE que corrige un
+--  valor que el seed ya inserto (ver ejemplos en las secciones "projects" y
+--  "certifications" mas abajo), guarda el WHERE por el valor ANTERIOR del
+--  campo, no solo por un identificador inmutable como el nombre/titulo. Un
+--  WHERE solo-por-nombre reimportaria el valor viejo por encima de cualquier
+--  edicion manual hecha despues desde /admin -- este archivo no lleva
+--  tracking de "esto ya se aplico", asi que cada reimportacion vuelve a
+--  ejecutar el UPDATE entero.
 --
 --  COMO IMPORTARLO EN CDMON:
 --    1. Crea una base de datos MySQL desde el panel de CDMON.
@@ -333,6 +344,187 @@ CALL add_column_if_missing('projects', 'store_url', 'VARCHAR(255) NULL');
 -- Proyectos: badges (etiquetas).
 CALL add_column_if_missing('projects', 'badges', 'VARCHAR(255) NULL AFTER `stack`');
 
+-- Proyectos: anadir Zeora si el sitio ya tenia proyectos.
+--
+-- INCIDENTE (2026-08-25): la primera version de este bloque solo comprobaba
+-- "NOT EXISTS (title_es = Zeora)", sin mirar si la tabla estaba vacia. Cuando
+-- se reimporto este archivo contra una `projects` que se habia quedado vacia,
+-- ESTE insert se ejecuto primero (esta seccion va antes que la 6 en el
+-- archivo) y dejo la tabla con 1 fila. El seed de la seccion 6 comprueba
+-- `COUNT(*) = 0` para decidir si siembra los 6 proyectos de fabrica, y con
+-- esa fila ya puesta la condicion era falsa: no sembro nada mas, y los otros
+-- 5 proyectos (Dewi App, BinCat, NorthGate Browser, Password Sentinel,
+-- PromptMaster) desaparecieron de produccion hasta que se restauraron a mano.
+--
+-- `EXISTS (SELECT 1 FROM projects)` evita que esto se repita: este bloque
+-- SOLO actua sobre una tabla que YA tiene datos (una instalacion nueva, con
+-- la tabla vacia, la deja intacta para que la siembre entera la seccion 6,
+-- Zeora incluida).
+INSERT INTO `projects`
+  (`title_es`, `title_en`, `summary_es`, `summary_en`, `stack`, `badges`,
+   `repo_url`, `demo_url`, `store_url`, `featured`, `sort_order`, `status`)
+SELECT 'Zéora', 'Zéora',
+       'Webs profesionales listas en 72 horas para fontaneros, electricistas y reformistas, con SEO local y mantenimiento mensual.',
+       'Professional websites ready in 72 hours for plumbers, electricians and renovators, with local SEO and monthly maintenance.',
+       '["HTML","SEO local"]',
+       '["private-code"]',
+       NULL, '/projects/zeora/', NULL, 0, 6, 'published'
+WHERE EXISTS (SELECT 1 FROM `projects`)
+  AND NOT EXISTS (SELECT 1 FROM `projects` WHERE `title_es` = 'Zéora');
+
+-- Proyectos: restaura los 5 que se perdieron en el incidente de arriba
+-- (Dewi App, BinCat, NorthGate Browser, Password Sentinel, PromptMaster).
+-- Mismo patron: solo actua si la tabla ya tiene datos, y cada fila solo
+-- entra si ese titulo todavia no existe -- reimportar esto no duplica nada.
+INSERT INTO `projects`
+  (`title_es`, `title_en`, `summary_es`, `summary_en`, `stack`, `badges`,
+   `repo_url`, `demo_url`, `store_url`, `featured`, `sort_order`, `status`)
+SELECT 'Dewi App', 'Dewi App',
+       'Prototipo web ganador de la 8a Hackathon TecnoCampus para monitorizar el consumo de agua en tiempo real.',
+       'Award-winning web prototype (8th TecnoCampus Hackathon) to monitor water consumption in real time.',
+       '["Next.js","TypeScript","Tailwind CSS"]', '["open-source"]',
+       'https://github.com/eduolihez/hackathon-Dewi', NULL, NULL, 1, 1, 'published'
+WHERE EXISTS (SELECT 1 FROM `projects`)
+  AND NOT EXISTS (SELECT 1 FROM `projects` WHERE `title_es` = 'Dewi App');
+
+INSERT INTO `projects`
+  (`title_es`, `title_en`, `summary_es`, `summary_en`, `stack`, `badges`,
+   `repo_url`, `demo_url`, `store_url`, `featured`, `sort_order`, `status`)
+SELECT 'BinCat', 'BinCat',
+       'Sistema de gestion segura de tokens en Python con cifrado Fernet y almacenamiento en SQLite.',
+       'Secure token management system in Python using Fernet encryption and SQLite storage.',
+       '["Python","Cryptography (Fernet)","SQLite"]', '["open-source"]',
+       'https://github.com/eduolihez/BinCat', NULL, NULL, 1, 2, 'published'
+WHERE EXISTS (SELECT 1 FROM `projects`)
+  AND NOT EXISTS (SELECT 1 FROM `projects` WHERE `title_es` = 'BinCat');
+
+INSERT INTO `projects`
+  (`title_es`, `title_en`, `summary_es`, `summary_en`, `stack`, `badges`,
+   `repo_url`, `demo_url`, `store_url`, `featured`, `sort_order`, `status`)
+SELECT 'NorthGate Browser', 'NorthGate Browser',
+       'Navegador (fork de Mullvad/Firefox) con clasificador de phishing on-device en ONNX/Rust. En desarrollo temprano.',
+       'Browser (Mullvad/Firefox fork) with an on-device phishing classifier in ONNX/Rust. Early stage.',
+       '["Rust","ONNX","Firefox","Machine Learning"]', '["open-source","in-development"]',
+       'https://github.com/eduolihez/northgate-browser', NULL, NULL, 1, 3, 'published'
+WHERE EXISTS (SELECT 1 FROM `projects`)
+  AND NOT EXISTS (SELECT 1 FROM `projects` WHERE `title_es` = 'NorthGate Browser');
+
+INSERT INTO `projects`
+  (`title_es`, `title_en`, `summary_es`, `summary_en`, `stack`, `badges`,
+   `repo_url`, `demo_url`, `store_url`, `featured`, `sort_order`, `status`)
+SELECT 'Password Sentinel', 'Password Sentinel',
+       'Extension de Chrome que comprueba la seguridad de tus contrasenas con Have I Been Pwned, sin enviar datos a ningun servidor.',
+       'Chrome extension that checks password safety against Have I Been Pwned, without sending data to any server.',
+       '["JavaScript","Chrome Extension","Have I Been Pwned API"]', '["open-source"]',
+       NULL, '/projects/passwdcentinel/', NULL, 0, 4, 'published'
+WHERE EXISTS (SELECT 1 FROM `projects`)
+  AND NOT EXISTS (SELECT 1 FROM `projects` WHERE `title_es` = 'Password Sentinel');
+
+INSERT INTO `projects`
+  (`title_es`, `title_en`, `summary_es`, `summary_en`, `stack`, `badges`,
+   `repo_url`, `demo_url`, `store_url`, `featured`, `sort_order`, `status`)
+SELECT 'PromptMaster Universal AI', 'PromptMaster Universal AI',
+       'Extension de Chrome que optimiza tus prompts para ChatGPT, Claude y Gemini.',
+       'Chrome extension that optimizes your prompts for ChatGPT, Claude and Gemini.',
+       '["JavaScript","Chrome Extension","Prompt Engineering"]', '["private-code"]',
+       NULL, '/projects/promptmaster/', 'https://addons.mozilla.org/es-ES/firefox/addon/promptmaster/', 0, 5, 'published'
+WHERE EXISTS (SELECT 1 FROM `projects`)
+  AND NOT EXISTS (SELECT 1 FROM `projects` WHERE `title_es` = 'PromptMaster Universal AI');
+
+-- PromptMaster es de codigo privado, no open-source (correccion 2026-08-25).
+-- Cubre la fila que ya estuviera insertada con el badge antiguo (el INSERT de
+-- arriba solo aplica el valor nuevo si la fila no existe todavia).
+--
+-- Guardado por el VALOR anterior conocido, no solo por title_es: title_es no
+-- cambia nunca, asi que un WHERE solo-por-nombre pisaria en silencio
+-- cualquier badge que se edite despues a mano desde /admin cada vez que se
+-- reimporte este archivo (schema.sql se reimporta entero, sin tracking de
+-- "esto ya se aplico"). Con el valor antiguo en el WHERE, esto se aplica una
+-- sola vez: en cuanto el badge deja de ser open-source, deja de coincidir.
+UPDATE `projects` SET `badges` = '["private-code"]'
+WHERE `title_es` = 'PromptMaster Universal AI' AND `badges` = '["open-source"]';
+
+-- ---------------------------------------------------------------------------
+-- Certificaciones: correcciones y ampliacion con las insignias de Credly
+-- (https://www.credly.com/users/eduolihez), revisadas 2026-08-25.
+-- ---------------------------------------------------------------------------
+
+-- La de Python la emite Certiport (via Credly), no OpenBootcamp, y el nombre
+-- oficial de la insignia es "IT Specialist - Python".
+UPDATE `certifications` SET `name` = 'IT Specialist - Python', `issuer` = 'Certiport'
+WHERE `name` = 'Python' AND `issuer` = 'OpenBootcamp';
+
+-- "Fundamentos profesionales en ciberseguridad" figuraba con el emisor
+-- combinado "Microsoft / LinkedIn", que en la vista por emisor creaba una
+-- tarjeta propia de un solo curso en vez de sumarse al grupo "LinkedIn".
+UPDATE `certifications` SET `issuer` = 'LinkedIn'
+WHERE `issuer` = 'Microsoft / LinkedIn';
+
+-- Los dos cursos de Google/Santander pasan de categoria "AI / Cloud" a
+-- "Otros" para no mezclarse con las certificaciones tecnicas de IA/Cloud
+-- reales. La de la Federacio Catalana de Vela YA estaba en "Otros" antes de
+-- este cambio -- no forma parte de esta migracion, no hace falta tocarla.
+--
+-- Guardado por el VALOR anterior conocido (`category` = 'AI / Cloud'), no
+-- solo por nombre: igual que el UPDATE de PromptMaster de mas arriba, un
+-- WHERE solo-por-nombre pisaria en silencio una recategorizacion manual
+-- hecha despues desde /admin cada vez que se reimporte este archivo.
+UPDATE `certifications` SET `category` = 'Otros'
+WHERE `name` IN ('Iniciación al Desarrollo con IA', 'Domina la IA con Gemini')
+  AND `category` = 'AI / Cloud';
+
+-- Insignias de Fortinet en Credly que no estaban en la tabla. Solo actua si
+-- `certifications` ya tiene datos (mismo motivo que en `projects` mas arriba:
+-- en una instalacion nueva, con la tabla vacia, esto se dejaria para el seed
+-- completo de la seccion 6 en vez de anticiparse y vaciar el COUNT(*) = 0).
+INSERT INTO `certifications` (`name`, `issuer`, `issue_date`, `credential_url`, `category`, `visible`, `sort_order`)
+SELECT v.name, 'Fortinet', v.issue_date, v.url, 'Network Security', 1, 32 + v.n
+FROM (
+  SELECT 1 AS n, 'Fortinet Certified Associate Cybersecurity' AS name, '2026' AS issue_date, 'https://www.credly.com/badges/d211824c-9076-4d47-a3e4-df212f541969' AS url
+  UNION ALL SELECT 2, 'Fortinet FortiGate 7.6 Operator', '2026', 'https://www.credly.com/badges/cd693891-405c-4fe2-81c9-16b42816fa0e'
+  UNION ALL SELECT 3, 'Fortinet NSE 3 Certified in Cybersecurity', '2026', 'https://www.credly.com/badges/9a8e25b3-ca1d-4010-ba2e-59378b3eb668'
+  UNION ALL SELECT 4, 'Technical Introduction to Cybersecurity 3.0', '2026', 'https://www.credly.com/badges/24f091e5-8613-4e39-97b4-df961ee0d4a6'
+  UNION ALL SELECT 5, 'Fortinet Certified Fundamentals Cybersecurity', '2026', 'https://www.credly.com/badges/67a908ff-25ff-4595-be0f-341082223ddb'
+  UNION ALL SELECT 6, 'Fortinet NSE 1 Certified in Cybersecurity', '2026', 'https://www.credly.com/badges/378cb1cc-36ff-4873-8bf3-343155f79a14'
+  UNION ALL SELECT 7, 'Fortinet NSE 2 Certified in Cybersecurity', '2026', 'https://www.credly.com/badges/ac473901-06f2-4919-92e4-485d3233a4e0'
+  UNION ALL SELECT 8, 'Getting Started in Cybersecurity 3.0', '2026', 'https://www.credly.com/badges/1d0b424a-bcdd-48bd-b40f-a6af00fc0f05'
+  UNION ALL SELECT 9, 'Introduction to the Threat Landscape 3.0', '2026', 'https://www.credly.com/badges/c9f14aef-cfe0-4f45-927f-8442f0e03b05'
+) v
+WHERE EXISTS (SELECT 1 FROM `certifications`)
+  AND NOT EXISTS (SELECT 1 FROM `certifications` WHERE `certifications`.`name` = v.name);
+
+-- Enlaces a Credly para las filas que aun no tenian ninguno. Cubre tanto una
+-- instalacion nueva (el INSERT de arriba ya no aplica) como produccion (donde
+-- las 9 de Fortinet ya se insertaron sin link antes de conocer estas URLs).
+UPDATE `certifications` SET `credential_url` = 'https://www.credly.com/badges/3010ded8-d149-438c-b041-0da42fc58d09'
+WHERE `name` = 'Microsoft Certified: Azure AI Fundamentals' AND `credential_url` IS NULL;
+
+UPDATE `certifications` SET `credential_url` = CASE `name`
+  WHEN 'Fortinet Certified Associate Cybersecurity'   THEN 'https://www.credly.com/badges/d211824c-9076-4d47-a3e4-df212f541969'
+  WHEN 'Fortinet FortiGate 7.6 Operator'              THEN 'https://www.credly.com/badges/cd693891-405c-4fe2-81c9-16b42816fa0e'
+  WHEN 'Fortinet NSE 3 Certified in Cybersecurity'    THEN 'https://www.credly.com/badges/9a8e25b3-ca1d-4010-ba2e-59378b3eb668'
+  WHEN 'Technical Introduction to Cybersecurity 3.0'  THEN 'https://www.credly.com/badges/24f091e5-8613-4e39-97b4-df961ee0d4a6'
+  WHEN 'Fortinet Certified Fundamentals Cybersecurity' THEN 'https://www.credly.com/badges/67a908ff-25ff-4595-be0f-341082223ddb'
+  WHEN 'Fortinet NSE 1 Certified in Cybersecurity'    THEN 'https://www.credly.com/badges/378cb1cc-36ff-4873-8bf3-343155f79a14'
+  WHEN 'Fortinet NSE 2 Certified in Cybersecurity'    THEN 'https://www.credly.com/badges/ac473901-06f2-4919-92e4-485d3233a4e0'
+  WHEN 'Getting Started in Cybersecurity 3.0'         THEN 'https://www.credly.com/badges/1d0b424a-bcdd-48bd-b40f-a6af00fc0f05'
+  WHEN 'Introduction to the Threat Landscape 3.0'     THEN 'https://www.credly.com/badges/c9f14aef-cfe0-4f45-927f-8442f0e03b05'
+END
+WHERE `name` IN (
+  'Fortinet Certified Associate Cybersecurity', 'Fortinet FortiGate 7.6 Operator',
+  'Fortinet NSE 3 Certified in Cybersecurity', 'Technical Introduction to Cybersecurity 3.0',
+  'Fortinet Certified Fundamentals Cybersecurity', 'Fortinet NSE 1 Certified in Cybersecurity',
+  'Fortinet NSE 2 Certified in Cybersecurity', 'Getting Started in Cybersecurity 3.0',
+  'Introduction to the Threat Landscape 3.0'
+) AND `credential_url` IS NULL;
+
+-- "Fortinet NSE" (id 1) es la entrada resumen de toda la trayectoria
+-- Fortinet, no una insignia individual de Credly -- no tiene pagina de
+-- verificacion propia. Enlaza al perfil de Credly completo en vez de dejarla
+-- sin link.
+UPDATE `certifications` SET `credential_url` = 'https://www.credly.com/users/eduolihez'
+WHERE `name` = 'Fortinet NSE' AND `credential_url` IS NULL;
+
 -- Blog: etiquetas y fecha de publicacion propia.
 CALL add_column_if_missing('posts', 'tags',         "VARCHAR(255) NULL AFTER `cover_url`");
 CALL add_column_if_missing('posts', 'published_at', "DATETIME NULL AFTER `visible`");
@@ -396,8 +588,16 @@ BEGIN
        'Extension de Chrome que optimiza tus prompts para ChatGPT, Claude y Gemini.',
        'Chrome extension that optimizes your prompts for ChatGPT, Claude and Gemini.',
        '["JavaScript","Chrome Extension","Prompt Engineering"]',
-       '["open-source"]',
-       NULL, '/projects/promptmaster/', 'https://addons.mozilla.org/es-ES/firefox/addon/promptmaster/', 0, 5, 'published');
+       '["private-code"]',
+       NULL, '/projects/promptmaster/', 'https://addons.mozilla.org/es-ES/firefox/addon/promptmaster/', 0, 5, 'published'),
+
+      ('Zéora',
+       'Zéora',
+       'Webs profesionales listas en 72 horas para fontaneros, electricistas y reformistas, con SEO local y mantenimiento mensual.',
+       'Professional websites ready in 72 hours for plumbers, electricians and renovators, with local SEO and monthly maintenance.',
+       '["HTML","SEO local"]',
+       '["private-code"]',
+       NULL, '/projects/zeora/', NULL, 0, 6, 'published');
   END IF;
 
   -- --- Certificaciones -----------------------------------------------------
@@ -408,19 +608,19 @@ BEGIN
     INSERT INTO `certifications`
       (`name`, `issuer`, `issue_date`, `credential_url`, `logo_url`, `category`, `visible`, `sort_order`)
     VALUES
-      ('Fortinet NSE', 'Fortinet', '2026', NULL, NULL, 'Network Security', 1, 1),
-      ('Microsoft Certified: Azure AI Fundamentals', 'Microsoft', '2026', NULL, NULL, 'AI / Cloud', 1, 2),
+      ('Fortinet NSE', 'Fortinet', '2026', 'https://www.credly.com/users/eduolihez', NULL, 'Network Security', 1, 1),
+      ('Microsoft Certified: Azure AI Fundamentals', 'Microsoft', '2026', 'https://www.credly.com/badges/3010ded8-d149-438c-b041-0da42fc58d09', NULL, 'AI / Cloud', 1, 2),
       ('Trend Micro Vision One Platform - Advanced', 'Trend Micro', '2024', '/certificaciones/TrendAI/TrendAI%20Vision%20One%20Platform%20Advanced.pdf', NULL, 'XDR / SecOps', 1, 3),
       ('TryHackMe Pre-Security', 'TryHackMe', '2023', '/certificaciones/THM-R3JSJHVXSI.pdf', NULL, 'Cybersecurity', 1, 4),
       ('Introducción a la Ciberseguridad', 'Cisco Networking Academy', '2023', '/certificaciones/Cisco/Introduccion%20a%20la%20Ciberseguridad.pdf', NULL, 'Cybersecurity', 1, 5),
       ('Introduction to Modern AI', 'Cisco Networking Academy', '2024', '/certificaciones/Cisco/Introduction%20to%20Modern%20AI.pdf', NULL, 'AI / Cloud', 1, 6),
-      ('Fundamentos profesionales en ciberseguridad', 'Microsoft / LinkedIn', '2023', '/certificaciones/LinkedIn/CertificadoDeFinalizacion_Fundamentos%20profesionales%20en%20ciberseguridad%20por%20Microsoft%20y%20LinkedIn.pdf', NULL, 'Cybersecurity', 1, 7),
+      ('Fundamentos profesionales en ciberseguridad', 'LinkedIn', '2023', '/certificaciones/LinkedIn/CertificadoDeFinalizacion_Fundamentos%20profesionales%20en%20ciberseguridad%20por%20Microsoft%20y%20LinkedIn.pdf', NULL, 'Cybersecurity', 1, 7),
       ('Microsoft Copilot para Seguridad', 'LinkedIn', '2024', '/certificaciones/LinkedIn/CertificadoDeFinalizacion_Microsoft%20Copilot%20para%20Seguridad.pdf', NULL, 'AI / Cloud', 1, 8),
-      ('Iniciación al Desarrollo con IA', 'Google / Santander', '2024', '/certificaciones/Certificado_Iniciación_Al_Desarrollo_Con_IA.pdf', NULL, 'AI / Cloud', 1, 9),
-      ('Domina la IA con Gemini', 'Google / Santander', '2024', '/certificaciones/Domina%20la%20IA%20con%20Gemini.pdf', NULL, 'AI / Cloud', 1, 10),
+      ('Iniciación al Desarrollo con IA', 'Google / Santander', '2024', '/certificaciones/Certificado_Iniciación_Al_Desarrollo_Con_IA.pdf', NULL, 'Otros', 1, 9),
+      ('Domina la IA con Gemini', 'Google / Santander', '2024', '/certificaciones/Domina%20la%20IA%20con%20Gemini.pdf', NULL, 'Otros', 1, 10),
       ('First Certificate in English (B2)', 'Cambridge English', '2021', '/certificaciones/First%20Certificate.jpg', NULL, 'Idiomas', 1, 11),
       ('IC3 Digital Literacy GS6 Level 1', 'Certiport', '2023', '/certificaciones/IC3%20GS6%20Level%201.pdf', NULL, 'Sistemas', 1, 12),
-      ('Python', 'OpenBootcamp', '2023', '/certificaciones/Python.pdf', NULL, 'Desarrollo', 1, 13),
+      ('IT Specialist - Python', 'Certiport', '2023', '/certificaciones/Python.pdf', NULL, 'Desarrollo', 1, 13),
       ('Reglas de la IA: cómo usarla sin correr riesgos legales', 'LinkedIn', '2024', '/certificaciones/Reglas%20de%20la%20IA%20c%C3%B3mo%20usarla%20sin%20correr%20riesgos%20legales.pdf', NULL, 'AI / Cloud', 1, 14),
       ('Concienciación en Ciberseguridad: Terminología', 'LinkedIn', '2023', '/certificaciones/LinkedIn/CertificadoDeFinalizacion_Concienciacion%20en%20ciberseguridad%20Terminologia%20de%20ciberseguridad.pdf', NULL, 'Cybersecurity', 1, 15),
       ('Fundamentos de Ciberseguridad', 'LinkedIn', '2023', '/certificaciones/LinkedIn/CertificadoDeFinalizacion_Fundamentos%20de%20ciberseguridad%20(1).pdf', NULL, 'Cybersecurity', 1, 16),
@@ -439,7 +639,16 @@ BEGIN
       ('Trend Micro Vision One™ for Service Providers (xSP) Foundation', 'Trend Micro', '2024', '/certificaciones/TrendAI/TrendAI%20Vision%20One%E2%84%A2%20for%20Service%20Providers%20(xSP)%20Foundation.pdf', NULL, 'Sistemas', 1, 29),
       ('Trend Micro Flex Foundation', 'Trend Micro', '2024', '/certificaciones/TrendAI/TrendAI%E2%84%A2%20Flex%20Foundation.pdf', NULL, 'AI Security', 1, 30),
       ('Trend Micro Research Foundation', 'Trend Micro', '2024', '/certificaciones/TrendAI/TrendAI%E2%84%A2%20Research%20Foundation.pdf', NULL, 'Threat Intel', 1, 31),
-      ('Certificado de Vela - Acceso', 'Federació Catalana de Vela', '2022', '/certificaciones/Certificat%20vela_prova%20acces.pdf', NULL, 'Otros', 1, 32);
+      ('Certificado de Vela - Acceso', 'Federació Catalana de Vela', '2022', '/certificaciones/Certificat%20vela_prova%20acces.pdf', NULL, 'Otros', 1, 32),
+      ('Fortinet Certified Associate Cybersecurity', 'Fortinet', '2026', 'https://www.credly.com/badges/d211824c-9076-4d47-a3e4-df212f541969', NULL, 'Network Security', 1, 33),
+      ('Fortinet FortiGate 7.6 Operator', 'Fortinet', '2026', 'https://www.credly.com/badges/cd693891-405c-4fe2-81c9-16b42816fa0e', NULL, 'Network Security', 1, 34),
+      ('Fortinet NSE 3 Certified in Cybersecurity', 'Fortinet', '2026', 'https://www.credly.com/badges/9a8e25b3-ca1d-4010-ba2e-59378b3eb668', NULL, 'Network Security', 1, 35),
+      ('Technical Introduction to Cybersecurity 3.0', 'Fortinet', '2026', 'https://www.credly.com/badges/24f091e5-8613-4e39-97b4-df961ee0d4a6', NULL, 'Network Security', 1, 36),
+      ('Fortinet Certified Fundamentals Cybersecurity', 'Fortinet', '2026', 'https://www.credly.com/badges/67a908ff-25ff-4595-be0f-341082223ddb', NULL, 'Network Security', 1, 37),
+      ('Fortinet NSE 1 Certified in Cybersecurity', 'Fortinet', '2026', 'https://www.credly.com/badges/378cb1cc-36ff-4873-8bf3-343155f79a14', NULL, 'Network Security', 1, 38),
+      ('Fortinet NSE 2 Certified in Cybersecurity', 'Fortinet', '2026', 'https://www.credly.com/badges/ac473901-06f2-4919-92e4-485d3233a4e0', NULL, 'Network Security', 1, 39),
+      ('Getting Started in Cybersecurity 3.0', 'Fortinet', '2026', 'https://www.credly.com/badges/1d0b424a-bcdd-48bd-b40f-a6af00fc0f05', NULL, 'Network Security', 1, 40),
+      ('Introduction to the Threat Landscape 3.0', 'Fortinet', '2026', 'https://www.credly.com/badges/c9f14aef-cfe0-4f45-927f-8442f0e03b05', NULL, 'Network Security', 1, 41);
   END IF;
 
   -- --- Articulos del blog ---------------------------------------------------

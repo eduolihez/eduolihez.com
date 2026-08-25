@@ -63,4 +63,16 @@ describe('GET /llms.txt', () => {
     expect(body).toContain(`${SITE.domain}/llms-blog.txt`);
     expect(body).toContain(`${SITE.domain}/sitemap-posts.xml`);
   });
+
+  it('incluye Blue Team Hub con su dominio externo, no bajo /projects/', async () => {
+    // Regresion: a diferencia de los otros 5 proyectos con web propia en
+    // este dominio, Blue Team Hub vive en eduolihez.github.io. Si alguien
+    // "simplifica" la entrada a SITE.domain + /projects/blue-team-hub/ por
+    // consistencia con las demas, la IA citaria una URL que no existe.
+    const response = GET({} as APIContext);
+    const body = await response.text();
+
+    expect(body).toContain('https://eduolihez.github.io/');
+    expect(body).not.toContain(`${SITE.domain}/projects/blue-team-hub`);
+  });
 });

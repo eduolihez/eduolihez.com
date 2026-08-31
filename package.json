@@ -17,7 +17,7 @@
   "dependencies": {
     "@fontsource-variable/inter": "^5.1.0",
     "@fontsource-variable/jetbrains-mono": "^5.1.0",
-    "astro": "^7.2.4"
+    "astro": "^7.2.9"
   },
   "devDependencies": {
     "@tailwindcss/cli": "^4.3.3",

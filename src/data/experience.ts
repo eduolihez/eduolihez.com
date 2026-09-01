@@ -17,6 +17,9 @@ export interface Experience {
   current?: boolean;
   description: Localized;
   tech: string[];
+  /** Enlace opcional a un proyecto/repo que respalda esta entrada (ej. el
+   * generador de informes mencionado en la descripcion). */
+  link?: { url: string; label: Localized };
 }
 
 export const experiences: Experience[] = [
@@ -42,6 +45,14 @@ export const experiences: Experience[] = [
       'IA / TrendAI',
       'Phishing',
     ],
+    link: {
+      url: 'https://github.com/eduolihez/vision-one-crem-report-generator',
+      label: {
+        es: 'Ver el generador de informes en GitHub',
+        en: 'View the report generator on GitHub',
+        ca: 'Veure el generador d’informes a GitHub',
+      },
+    },
   },
   {
     company: 'Dagram',

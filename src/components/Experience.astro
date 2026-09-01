@@ -168,6 +168,19 @@ const getTotalPeriod = (roles: typeof experiences, lang: Lang) => {
                               <li class="badge text-[10px]/4 py-0.5 px-1.5">{tech}</li>
                             ))}
                           </ul>
+
+                          {role.link && (
+                            <a
+                              href={role.link.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              class="group/link mt-3 inline-flex items-center gap-1.5 font-mono text-xs text-accent transition hover:underline"
+                            >
+                              <Icon name="github" class="h-3.5 w-3.5" />
+                              {pick(role.link.label, lang)}
+                              <span class="transition-transform group-hover/link:translate-x-0.5">&rarr;</span>
+                            </a>
+                          )}
                         </div>
                       </div>
                     ))}

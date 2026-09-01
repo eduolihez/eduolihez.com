@@ -5,6 +5,27 @@ Todos los cambios notables de este proyecto se documentan en este archivo.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/),
 y el versionado usa cuatro números (`MAJOR.MINOR.PATCH.MICRO`).
 
+## [1.6.0.0] - 2026-09-01
+
+### Added
+
+- Nueva entrada en Experiencia: el rol actual (SOC / Cybersecurity Analyst en
+  Dagram) ya describía "automatización de informes en Python" sin enlazarlo a
+  nada. Se añade un campo `link` opcional en `Experience`
+  (`src/data/experience.ts` + `src/components/Experience.astro`) y se usa
+  para apuntar al repositorio público recién publicado del generador de
+  informes ([vision-one-crem-report-generator](https://github.com/eduolihez/vision-one-crem-report-generator)).
+- `database/schema.sql`: migración idempotente (mismo patrón que las
+  ampliaciones ya existentes de `projects`/`certifications`) que añade el
+  proyecto **CREM Report Generator**, enlaza el post ya publicado
+  *"Automatizar el informe semanal del SOC con Python"* al repositorio, y
+  suma 4 artículos nuevos al blog: priorización de CVEs (NVD/KEV/EPSS),
+  checklist de hardening de FortiGate, un post de carrera (soporte → SOC) y
+  checklist de hardening de Active Directory. Como el blog y los proyectos
+  viven en MySQL y no en el build, este archivo no se aplica solo: hay que
+  reimportarlo por phpMyAdmin contra la base de datos de producción para que
+  el contenido nuevo aparezca en la web.
+
 ## [1.5.0.0] - 2026-08-25
 
 ### Security

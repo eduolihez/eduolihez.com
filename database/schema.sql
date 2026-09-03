@@ -431,6 +431,23 @@ SELECT 'PromptMaster Universal AI', 'PromptMaster Universal AI',
 WHERE EXISTS (SELECT 1 FROM `projects`)
   AND NOT EXISTS (SELECT 1 FROM `projects` WHERE `title_es` = 'PromptMaster Universal AI');
 
+-- Proyectos: Blue Team Hub (2026-09-04). Portal de herramientas de
+-- ciberseguridad para analistas SOC, con vigilancia automatizada del
+-- catalogo CISA KEV via GitHub Actions. demo_url es un dominio propio
+-- (eduolihez.github.io), no una subpagina /projects/ de este sitio -- por
+-- eso, a diferencia de Password Sentinel/PromptMaster/Zeora, lleva ambos:
+-- repo_url (codigo) y demo_url (sitio en produccion).
+INSERT INTO `projects`
+  (`title_es`, `title_en`, `summary_es`, `summary_en`, `stack`, `badges`,
+   `repo_url`, `demo_url`, `store_url`, `featured`, `sort_order`, `status`)
+SELECT 'Blue Team Hub', 'Blue Team Hub',
+       'Portal de herramientas de ciberseguridad para analistas SOC: desarmador de IOCs, generador de reglas YARA, playbooks interactivos de respuesta a incidentes y vigilancia automatizada del catalogo CISA KEV.',
+       'Cybersecurity toolkit for SOC analysts: IOC defanger, YARA rule generator, interactive incident-response playbooks, and automated CISA KEV catalog monitoring.',
+       '["Astro","Tailwind CSS","TypeScript","GitHub Actions"]', '["open-source"]',
+       'https://github.com/eduolihez/eduolihez.github.io', 'https://eduolihez.github.io/', NULL, 1, 7, 'published'
+WHERE EXISTS (SELECT 1 FROM `projects`)
+  AND NOT EXISTS (SELECT 1 FROM `projects` WHERE `title_es` = 'Blue Team Hub');
+
 -- PromptMaster es de codigo privado, no open-source (correccion 2026-08-25).
 -- Cubre la fila que ya estuviera insertada con el badge antiguo (el INSERT de
 -- arriba solo aplica el valor nuevo si la fila no existe todavia).
@@ -597,7 +614,15 @@ BEGIN
        'Professional websites ready in 72 hours for plumbers, electricians and renovators, with local SEO and monthly maintenance.',
        '["HTML","SEO local"]',
        '["private-code"]',
-       NULL, '/projects/zeora/', NULL, 0, 6, 'published');
+       NULL, '/projects/zeora/', NULL, 0, 6, 'published'),
+
+      ('Blue Team Hub',
+       'Blue Team Hub',
+       'Portal de herramientas de ciberseguridad para analistas SOC: desarmador de IOCs, generador de reglas YARA, playbooks interactivos de respuesta a incidentes y vigilancia automatizada del catalogo CISA KEV.',
+       'Cybersecurity toolkit for SOC analysts: IOC defanger, YARA rule generator, interactive incident-response playbooks, and automated CISA KEV catalog monitoring.',
+       '["Astro","Tailwind CSS","TypeScript","GitHub Actions"]',
+       '["open-source"]',
+       'https://github.com/eduolihez/eduolihez.github.io', 'https://eduolihez.github.io/', NULL, 1, 7, 'published');
   END IF;
 
   -- --- Certificaciones -----------------------------------------------------

@@ -2,7 +2,7 @@
 
 # eduolihez.com
 
-**Wiki i Portfolio Professional de Eduardo Olivares Hernández** — Analista SOC / Blue Team
+**Wiki i portfolio professional d'Eduardo Olivares Hernández**, analista SOC / Blue Team
 
 [![Web](https://img.shields.io/badge/web-eduolihez.com-4ade80?style=flat-square)](https://eduolihez.com)
 [![Astro](https://img.shields.io/badge/Astro-7-BC52EE?style=flat-square&logo=astro&logoColor=white)](https://astro.build)
@@ -14,33 +14,38 @@
 
 ---
 
-### [🌐 English version](README.en.md) · **[🌐 Versió en Català](README.ca.md)** · [🌐 Versión en Español](README.md)
+### [English version](README.en.md) · **[Versió en Català](README.ca.md)** · [Versión en Español](README.md)
 
 </div>
 
 ---
 
-Benvingut al repositori i wiki tècnica de **eduolihez.com**. Aquest és el codi font del lloc web personal i portfolio professional de Eduardo Olivares, disponible completament en **català, espanyol i anglès**.
+Aquest és el codi font d'**eduolihez.com**, el lloc web personal i portfolio d'Eduardo
+Olivares, disponible en català, espanyol i anglès.
 
-El lloc s'ha dissenyat seguint el principi de **defensa en profunditat** i serveix com a demostració de competències tècniques en seguretat ofensiva, enduriment de servidors (hardening) i desenvolupament web segur. Tots els detalls tècnics sobre el seu disseny es descriuen a [eduolihez.com/ca/sobre-aquesta-web](https://eduolihez.com/ca/sobre-aquesta-web/).
-
----
-
-## 📖 Índex
-1. [Arquitectura i Flux de Treball](#-arquitectura-i-flux-de-treball)
-2. [Estructura del Projecte](#-estructura-del-projecte)
-3. [Seguretat Avançada (Hardening)](#-seguretat-avançada-hardening)
-4. [Administració i Base de Dades](#-administració-i-base-de-dades)
-5. [SEO Tècnic i IA-Friendliness](#-seo-tècnic-i-ia-friendliness)
-6. [Instal·lació i Desplegament](#-instal·lació-i-desplegament)
-7. [Més Documentació](#-més-documentació)
-8. [Llicència](#-llicència)
+El lloc està dissenyat seguint el principi de defensa en profunditat, i serveix també
+com a demostració de seguretat ofensiva, hardening de servidors i desenvolupament web
+segur. Els detalls tècnics del disseny es descriuen a
+[eduolihez.com/ca/sobre-aquesta-web](https://eduolihez.com/ca/sobre-aquesta-web/).
 
 ---
 
-## 🏗️ Arquitectura i Flux de Treball
+## Índex
+1. [Arquitectura i flux de treball](#arquitectura-i-flux-de-treball)
+2. [Estructura del projecte](#estructura-del-projecte)
+3. [Hardening](#hardening)
+4. [Administració i base de dades](#administració-i-base-de-dades)
+5. [SEO tècnic i rastreig per IA](#seo-tècnic-i-rastreig-per-ia)
+6. [Instal·lació i desplegament](#installació-i-desplegament)
+7. [Més documentació](#més-documentació)
+8. [Llicència](#llicència)
 
-El projecte combina un generador de llocs estàtics (SSG) modern amb una infraestructura backend robusta per a la gestió del contingut dinàmic:
+---
+
+## Arquitectura i flux de treball
+
+El projecte combina un generador de llocs estàtics amb un backend propi per al
+contingut dinàmic:
 
 ```
 ┌─ src/          Astro (Frontend) · Compila a HTML estàtic ─► dist/ ──► Servidor Apache ─┐
@@ -55,13 +60,16 @@ El projecte combina un generador de llocs estàtics (SSG) modern amb una infraes
                                                                                 └──────────────────┘
 ```
 
-* **Frontend**: Astro compila les pàgines estàtiques. En producció, la càrrega de Node és inexistent; només se serveixen fitxers plans des de la carpeta `dist/`.
-* **Backend**: Una API REST pròpia i independent en PHP 8 interactua amb la base de dades MySQL/MariaDB per gestionar la bústia de contacte, visites, articles de blog, certificacions i projectes.
-* **Integració**: Ambdós resideixen en el mateix allotjament sota el mateix domini. Això elimina la necessitat de configurar regles de CORS creuades.
+* Frontend: Astro compila les pàgines estàtiques. En producció no hi ha càrrega de Node;
+  només se serveixen fitxers plans des de `dist/`.
+* Backend: una API REST pròpia en PHP 8 parla amb MySQL/MariaDB per gestionar la bústia
+  de contacte, les visites, els articles del blog, les certificacions i els projectes.
+* Integració: tots dos viuen al mateix allotjament i sota el mateix domini, així que no
+  cal configurar regles de CORS creuades.
 
 ---
 
-## 📂 Estructura del Projecte
+## Estructura del projecte
 
 El repositori està organitzat de forma modular per aïllar responsabilitats:
 
@@ -82,48 +90,75 @@ El repositori està organitzat de forma modular per aïllar responsabilitats:
 
 ---
 
-## 🛡️ Seguretat Avançada (Hardening)
+## Hardening
 
-Com a portfolio d'un professional de ciberseguretat, s'han implementat rigurosos controls per tancar vectors d'atac comuns:
+Els controls implementats per tancar els vectors d'atac habituals:
 
 ### Frontend
-* **Content Security Policy (CSP)**: `script-src` configurat únicament amb hashos SHA-256 calculats automàticament a cada compilació (evita `'unsafe-inline'`). Si un atacant injecta una etiqueta `<script>`, el navegador es negarà a executar-la.
-* **Capçaleres d'Aïllament**: HSTS actiu (1 any amb subdominis), `X-Frame-Options: DENY` contra clickjacking, i directives COOP/CORP restrictives.
-* **Privadesa per Disseny (Do Not Track)**: Respecte estricte a les peticions `DNT` (si el navegador l'envia, l'analítica local s'inhabilita per complet). Les adreces IP de les estadístiques s'hashegen immediatament amb `SHA-256` i una sal d'un sol ús; mai s'emmagatzemen en text pla.
+* Content Security Policy: `script-src` es configura únicament amb hashos SHA-256
+  calculats a cada compilació, sense `'unsafe-inline'`. Si un atacant injecta una
+  etiqueta `<script>`, el navegador es nega a executar-la.
+* Capçaleres d'aïllament: HSTS actiu (1 any, amb subdominis),
+  `X-Frame-Options: DENY` contra clickjacking i directives COOP/CORP restrictives.
+* Do Not Track: si el navegador envia la capçalera `DNT`, l'analítica local s'inhabilita
+  per complet. Les IP de les estadístiques s'hashegen a l'instant amb SHA-256 i una sal
+  d'un sol ús; mai s'emmagatzemen en text pla.
 
-### Backend i Injeccions
-* **Consultes Preparades Reals**: Deshabilitada l'emulació de PDO (`ATTR_EMULATE_PREPARES = false`) per evitar desbordaments o fallades de codificació de caràcters.
-* **Seguretat en Formularis**: CSRF implementat amb tokens de sessió verificats en temps constant (`hash_equals`).
-* **Protecció del Bàner superior amb Markdown**: El camp del bàner d'administració admet Markdown i es renderitza al client de forma segura. L'HTML s'escapa per complet *abans* del parseig per evitar injeccions XSS persistents (Stored XSS).
-* **Sanejament de Pujades**: Les imatges s'analitzen amb `finfo` (MIME real) i `getimagesize()` (estructura interna). La carpeta de pujades inhabilita l'execució de scripts (handlers PHP apagats via `.htaccess`) i assigna noms aleatoris als fitxers desats.
-
----
-
-## 🗄️ Administració i Base de Dades
-
-* **Manteniment Preventiu**: El sistema inclou un validador a [bootstrap.php](file:///c:/Users/eduol/Documents/GitHub/eduolihez.com/server/lib/bootstrap.php) que comprova les taules i columnes necessàries en iniciar la consola d'administració. Si detecta la manca de camps (ex. després del desplegament d'una columna com `badges`), redirigeu a una pantalla d'avís amb instruccions guiades en comptes de llançar un error crític al client.
-* **Esquema Idempotent**: El fitxer [schema.sql](file:///c:/Users/eduol/Documents/GitHub/eduolihez.com/database/schema.sql) es pot importar repetidament a phpMyAdmin sobre bases de dades existents sense esborrar la informació prèvia de l'usuari.
-
----
-
-## 🔍 SEO Tècnic i IA-Friendliness
-
-* **Graf Únic JSON-LD**: Dades estructurades (`Person`, `WebSite`, `FAQPage`, `BreadcrumbList`) unificades mitjançant identificadors `@id` creuats en comptes de blocs dispersos.
-* **hreflang Recíproc**: La distribució multilingüe inclou referències creuades i `x-default` únicament en pàgines amb traducció activa.
-* **IA Rastreabilitat**: Compleix amb l'especificació de [llmstxt.org](https://llmstxt.org/) generant un fitxer pla [`/llms.txt`](https://eduolihez.com/llms.txt) a cada build, ideal perquè els models de llenguatge (LLM) indexin el portfolio sense HTML residual.
-* **Control de Bots**: Filtre selectiu a `robots.txt` que permet indexar a més de 20 rastrejadors legítims d'IA i cercadors (GPTBot, ClaudeBot, PerplexityBot, Google-Extended, Amazonbot, entre altres), bloqueja `/admin/` i `/api/` a tots ells, i bloqueja del tot els rastrejadors agressius de SEO de pagament (Semrush, Ahrefs, MJ12 i altres).
-* **Blog citable sense JavaScript**: Els articles viuen a MySQL i es publiquen sense recompilar, així que un rastrejador que no executa JS els veuria buits. [`/llms-blog.txt`](https://eduolihez.com/llms-blog.txt) en serveix el text íntegre i `/sitemap-posts.xml` els enumera, tots dos generats a cada petició.
+### Backend i injeccions
+* Consultes preparades de debò: l'emulació de PDO està desactivada
+  (`ATTR_EMULATE_PREPARES = false`) per evitar desbordaments i fallades de codificació
+  de caràcters.
+* CSRF amb tokens de sessió verificats en temps constant (`hash_equals`).
+* El bàner superior admet Markdown i es renderitza al client. L'HTML s'escapa per
+  complet *abans* del parseig, per evitar XSS persistent.
+* Sanejament de pujades: les imatges passen per `finfo` (MIME real) i `getimagesize()`
+  (estructura interna). La carpeta de pujades té els handlers PHP apagats via
+  `.htaccess`, així que no executa scripts, i els fitxers desats reben noms aleatoris.
 
 ---
 
-## 🚀 Instal·lació i Desplegament
+## Administració i base de dades
+
+* Manteniment preventiu: [bootstrap.php](server/lib/bootstrap.php)
+  comprova les taules i columnes necessàries en iniciar la consola d'administració. Si
+  falta algun camp, per exemple després de desplegar una columna com `badges`,
+  redirigeix a una pantalla d'avís amb instruccions en comptes de petar amb un error al
+  client.
+* Esquema idempotent: [schema.sql](database/schema.sql)
+  es pot importar repetidament a phpMyAdmin sobre bases de dades existents sense
+  esborrar la informació prèvia.
+
+---
+
+## SEO tècnic i rastreig per IA
+
+* Graf únic JSON-LD: les dades estructurades (`Person`, `WebSite`, `FAQPage`,
+  `BreadcrumbList`) s'unifiquen amb identificadors `@id` creuats en comptes de quedar en
+  blocs dispersos.
+* hreflang recíproc: la distribució multilingüe inclou referències creuades i
+  `x-default` només a les pàgines amb traducció activa.
+* Rastreig per IA: compleix l'especificació de [llmstxt.org](https://llmstxt.org/)
+  generant un fitxer pla [`/llms.txt`](https://eduolihez.com/llms.txt) a cada build,
+  perquè els models de llenguatge indexin el portfolio sense HTML residual.
+* Control de bots: `robots.txt` permet indexar a més de 20 rastrejadors legítims d'IA i
+  cercadors (GPTBot, ClaudeBot, PerplexityBot, Google-Extended, Amazonbot i altres), els
+  bloqueja `/admin/` i `/api/` a tots, i bloqueja del tot els rastrejadors agressius de
+  SEO de pagament (Semrush, Ahrefs, MJ12 i companyia).
+* Blog citable sense JavaScript: els articles viuen a MySQL i es publiquen sense
+  recompilar, així que un rastrejador que no executa JS els veuria buits.
+  [`/llms-blog.txt`](https://eduolihez.com/llms-blog.txt) en serveix el text íntegre i
+  `/sitemap-posts.xml` els enumera, tots dos generats a cada petició.
+
+---
+
+## Instal·lació i desplegament
 
 ### Requisits
 * Node.js v20+
 * PHP 8.0+ amb PDO habilitat
 * Base de dades MySQL / MariaDB
 
-### Instal·lació Local (Entorn Frontend)
+### Instal·lació local (frontend)
 ```bash
 # Instal·lar dependències
 npm install
@@ -133,44 +168,54 @@ npm run dev
 ```
 
 > [!NOTE]
-> Com que la base de dades dinàmica i PHP no corren directament sota el servidor de desenvolupament d'Astro (`localhost:4321`), és normal veure missatges d'error a les seccions dinàmiques locals. Per provar la integració completa, utilitza una pila local tipus XAMPP, Laragon o Docker.
+> La base de dades i PHP no corren sota el servidor de desenvolupament d'Astro
+> (`localhost:4321`), així que és normal veure errors a les seccions dinàmiques quan
+> treballes en local. Per provar la integració completa, fes servir una pila local tipus
+> XAMPP, Laragon o Docker.
 
-### Comandes Útils
-* `npm run build`: Compila el frontend estàtic a la carpeta `dist/`.
-* `npm run preview`: Llança una vista prèvia local del directori compilat.
-* `npm run icons`: Regenera la pila de favicons i gràfics del web.
-* `npm test`: Executa la suite de tests (Vitest) sobre el frontend a `src/`.
+### Comandes útils
+* `npm run build`: compila el frontend estàtic a `dist/`.
+* `npm run preview`: llança una vista prèvia local del directori compilat.
+* `npm run icons`: regenera la pila de favicons i gràfics del web.
+* `npm test`: executa la suite de tests (Vitest) sobre el frontend a `src/`.
 
-### Instruccions de Desplegament en Servidor (CDMON / CPanel)
+### Desplegament al servidor (CDMON / cPanel)
 1. Compila el lloc localment amb `npm run build`.
-2. Puja per FTP el contingut de `dist/` a la arrel del teu servidor (ex. `public_html/`).
-3. Puja la carpeta `server/` al mateix nivell del teu servidor per mapejar `/api/` i `/admin/`.
-4. Còpia `server/config.example.php` a `server/config.php` i configura les teves variables de connexió. **Important**: No pugis aquest fitxer al control de versions.
-5. Accedeix a phpMyAdmin i importa [schema.sql](file:///c:/Users/eduol/Documents/GitHub/eduolihez.com/database/schema.sql).
-6. Entra a `tudomini.com/admin/setup.php` per crear el teu primer compte d'administració. **Un cop creat l'usuari, esborra el fitxer `setup.php` del servidor.**
+2. Puja per FTP el contingut de `dist/` a l'arrel del teu servidor, per exemple
+   `public_html/`.
+3. Puja la carpeta `server/` al mateix nivell, per mapejar `/api/` i `/admin/`.
+4. Copia `server/config.example.php` a `server/config.php` i configura les teves
+   variables de connexió. No pugis aquest fitxer al control de versions.
+5. Entra a phpMyAdmin i importa [schema.sql](database/schema.sql).
+6. Obre `tudomini.com/admin/setup.php` per crear el teu primer compte d'administració.
+   **Un cop creat l'usuari, esborra `setup.php` del servidor.**
 
 ---
 
-## 📚 Més Documentació
+## Més documentació
 
-Aquest repositori té més documentació de la que cap en aquest README. La major
-part està en castellà (és el web personal de l'autor, no una llibreria pensada
-per a col·laboradors internacionals) — `SECURITY.md` és l'excepció, en anglès:
+Aquest repositori té més documentació de la que cap en aquest README. La major part està
+en castellà, perquè és el web personal de l'autor i no una llibreria pensada per a
+col·laboradors internacionals. `SECURITY.md` és l'excepció, en anglès:
 
-* [Wiki](https://github.com/eduolihez/eduolihez.com/wiki) — punt d'entrada
-  a tota la documentació, incloent el pla de visibilitat IA/SEO.
-* [TESTING.md](TESTING.md) — framework de tests, cobertura i convencions.
-* [CONTRIBUTING.md](CONTRIBUTING.md) — com reportar un error o proposar un canvi.
-* [SECURITY.md](SECURITY.md) — política de divulgació de vulnerabilitats.
-* [CHANGELOG.md](CHANGELOG.md) — historial de versions.
-* [PRODUCT.md](PRODUCT.md) — per a qui és aquest web i quin problema resol.
-* [DESIGN.md](DESIGN.md) — sistema de disseny (tipografia, color, espaiat, motion).
-* [TODOS.md](TODOS.md) — treball pendent conegut, amb context de per què no s'ha fet encara.
+* [Wiki](https://github.com/eduolihez/eduolihez.com/wiki), punt d'entrada a tota la
+  documentació, incloent el pla de visibilitat IA/SEO.
+* [TESTING.md](TESTING.md), framework de tests, cobertura i convencions.
+* [CONTRIBUTING.md](CONTRIBUTING.md), com reportar un error o proposar un canvi.
+* [SECURITY.md](SECURITY.md), política de divulgació de vulnerabilitats.
+* [CHANGELOG.md](CHANGELOG.md), historial de versions.
+* [PRODUCT.md](PRODUCT.md), per a qui és aquest web i quin problema resol.
+* [DESIGN.md](DESIGN.md), sistema de disseny (tipografia, color, espaiat, motion).
+* [TODOS.md](TODOS.md), treball pendent conegut, amb context de per què no s'ha fet
+  encara.
 
 ---
 
-## 📄 Llicència
+## Llicència
 
-Aquest projecte està sota la [Llicència MIT](LICENSE). 
+Aquest projecte està sota la [Llicència MIT](LICENSE).
 
-* Queden exclosos de la llicència MIT i reservats tots els drets sobre el contingut personal (imatges de marca, fotografies, fitxers PDF de certificacions i textos biogràfics de l'autor). Pots emprar la lògica i arquitectura del projecte per al teu propi desenvolupament; es prohibeix el clonatge directe de la identitat visual i informació de l'autor.
+El contingut personal queda exclòs de la llicència MIT i amb tots els drets reservats:
+imatges de marca, fotografies, PDF de certificacions i textos biogràfics de l'autor. Pots
+fer servir la lògica i l'arquitectura del projecte per al teu propi desenvolupament; el
+que no es permet és clonar directament la identitat visual i la informació de l'autor.

@@ -24,7 +24,14 @@ name: "Auto-version"
 #
 # COMO EVITA EL BUCLE: el push del propio commit de subida de version
 # (hecho con el PAT) volveria a disparar este workflow. Se corta mirando si
-# el mensaje del ultimo commit lleva "[skip-tag]".
+# el mensaje del ultimo commit EMPIEZA por el prefijo fijo que usan esos
+# commits. OJO: la primera vez que se escribio este workflow, el propio
+# comentario de este archivo mencionaba la palabra clave anterior ("[skip-
+# tag]") dentro de la prosa explicativa -- y como el commit de ESTE archivo
+# la contenia, `contains()` hizo match con su propio mensaje y se salto a si
+# mismo en el primer push. Por eso el chequeo usa startsWith() sobre el
+# prefijo exacto de los commits generados, no un texto libre que cualquier
+# commit futuro podria mencionar sin querer.
 
 on:
   push:
@@ -39,7 +46,7 @@ concurrency:
 
 jobs:
   auto-version:
-    if: "!contains(github.event.head_commit.message, '[skip-tag]')"
+    if: "!startsWith(github.event.head_commit.message, 'chore: auto-bump build to v')"
     runs-on: ubuntu-latest
     steps:
       - name: Comprobar que el secret AUTO_TAG_PAT esta configurado
@@ -72,7 +79,7 @@ jobs:
           echo "$NEW_VERSION" > VERSION
 
           git add VERSION
-          git commit -m "chore: auto-bump build to v$NEW_VERSION [skip-tag]"
+          git commit -m "chore: auto-bump build to v$NEW_VERSION"
           git tag "v$NEW_VERSION"
 
           echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"

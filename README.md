@@ -120,11 +120,11 @@ Los controles implementados para cerrar los vectores de ataque habituales:
 
 ## Administración y base de datos
 
-* Mantenimiento preventivo: [bootstrap.php](file:///c:/Users/eduol/Documents/GitHub/eduolihez.com/server/lib/bootstrap.php)
+* Mantenimiento preventivo: [bootstrap.php](server/lib/bootstrap.php)
   comprueba las tablas y columnas necesarias al iniciar el panel de administración. Si
   falta algún campo, por ejemplo tras desplegar una columna como `badges`, redirige a
   una pantalla de aviso con instrucciones en vez de reventar con un error en el cliente.
-* Esquema idempotente: [schema.sql](file:///c:/Users/eduol/Documents/GitHub/eduolihez.com/database/schema.sql)
+* Esquema idempotente: [schema.sql](database/schema.sql)
   se puede importar repetidamente en phpMyAdmin sobre bases de datos existentes sin
   borrar la información previa.
 
@@ -186,7 +186,7 @@ npm run dev
 3. Sube la carpeta `server/` al mismo nivel, para mapear `/api/` y `/admin/`.
 4. Copia `server/config.example.php` a `server/config.php` y configura tus variables de
    conexión. No subas este archivo al control de versiones.
-5. Entra en phpMyAdmin e importa [schema.sql](file:///c:/Users/eduol/Documents/GitHub/eduolihez.com/database/schema.sql).
+5. Entra en phpMyAdmin e importa [schema.sql](database/schema.sql).
 6. Abre `tudominio.com/admin/setup.php` para crear tu primera cuenta de administración.
    **Una vez creado el usuario, borra `setup.php` del servidor.**
 

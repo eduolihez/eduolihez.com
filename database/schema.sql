@@ -444,7 +444,7 @@ SELECT 'Blue Team Hub', 'Blue Team Hub',
        'Portal de herramientas de ciberseguridad para analistas SOC: desarmador de IOCs, generador de reglas YARA, playbooks interactivos de respuesta a incidentes y vigilancia automatizada del catalogo CISA KEV.',
        'Cybersecurity toolkit for SOC analysts: IOC defanger, YARA rule generator, interactive incident-response playbooks, and automated CISA KEV catalog monitoring.',
        '["Astro","Tailwind CSS","TypeScript","GitHub Actions"]', '["open-source"]',
-       'https://github.com/eduolihez/eduolihez.github.io', 'https://eduolihez.github.io/', NULL, 1, 7, 'published'
+       'https://github.com/eduolihez/eduolihez.github.io', 'https://eduolihez.github.io/', NULL, 1, 8, 'published'
 WHERE EXISTS (SELECT 1 FROM `projects`)
   AND NOT EXISTS (SELECT 1 FROM `projects` WHERE `title_es` = 'Blue Team Hub');
 
@@ -637,7 +637,7 @@ BEGIN
        'Cybersecurity toolkit for SOC analysts: IOC defanger, YARA rule generator, interactive incident-response playbooks, and automated CISA KEV catalog monitoring.',
        '["Astro","Tailwind CSS","TypeScript","GitHub Actions"]',
        '["open-source"]',
-       'https://github.com/eduolihez/eduolihez.github.io', 'https://eduolihez.github.io/', NULL, 1, 7, 'published');
+       'https://github.com/eduolihez/eduolihez.github.io', 'https://eduolihez.github.io/', NULL, 1, 8, 'published');
   END IF;
 
   -- --- Certificaciones -----------------------------------------------------

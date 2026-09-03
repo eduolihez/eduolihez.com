@@ -1,0 +1,22 @@
+# .htaccess de dist/ (Astro lo copia tal cual desde public/ a la raiz del build).
+#
+# POR QUE EXISTE: el detalle de un articulo de blog era una sola pagina
+# /blog/post/ que leia ?slug= y rellenaba el contenido por JavaScript (ver
+# src/lib/posts.ts para el porque completo). Ahora cada slug es una pagina
+# estatica real en /blog/post/<slug>/, generada en build-time. La regla de
+# abajo hace que las URLs viejas -- enlaces ya compartidos, marcadores,
+# capturas del historial de Search Console -- sigan funcionando exactamente
+# igual, sirviendo por dentro el archivo nuevo sin que la URL visible cambie.
+#
+# Es una reescritura interna (sin R=301 ni redirect visible): la barra de
+# direcciones y cualquier "vista previa" de enlace conservan la URL original.
+RewriteEngine On
+
+RewriteCond %{QUERY_STRING} (?:^|&)slug=([^&]+)
+RewriteRule ^blog/post/?$ /blog/post/%1/ [L]
+
+RewriteCond %{QUERY_STRING} (?:^|&)slug=([^&]+)
+RewriteRule ^en/blog/post/?$ /en/blog/post/%1/ [L]
+
+RewriteCond %{QUERY_STRING} (?:^|&)slug=([^&]+)
+RewriteRule ^ca/blog/post/?$ /ca/blog/post/%1/ [L]

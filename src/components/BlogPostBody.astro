@@ -1,0 +1,97 @@
+---
+/**
+ * <BlogPostBody /> - Maquetacion del detalle de un articulo, compartida por
+ * los 3 idiomas (/blog/post/[slug], /en/blog/post/[slug], /ca/blog/post/[slug]).
+ *
+ * Antes cada idioma tenia su propio molde HTML casi identico (ver el
+ * historial de src/scripts/blog.ts: exactamente ese problema, "seis copias
+ * del mismo JavaScript", es lo que motivo centralizar blog.ts). Un solo
+ * componente evita repetir el mismo error en la version server-rendered.
+ *
+ * El cuerpo del articulo SI se inyecta como HTML a proposito: se redacta
+ * desde /admin, una zona autenticada, igual que en el render de cliente que
+ * sustituye. La CSP del sitio (script-src 'self' con hashes, sin
+ * 'unsafe-inline') impide que un <script> o un onclick= colado ahi llegue a
+ * ejecutarse.
+ */
+import { formatDate } from '../scripts/blog';
+import { safeUrl } from '../scripts/shared';
+import type { PostDetail } from '../lib/posts';
+
+interface Props {
+  post: PostDetail;
+  lang: string;
+  backHref: string;
+  backLabel: string;
+}
+
+const { post, lang, backHref, backLabel } = Astro.props;
+const cover = safeUrl(post.cover_url);
+---
+
+<article class="border-b border-bg-border bg-bg-soft py-20 sm:py-28">
+  <div class="container-page max-w-3xl">
+    <a
+      href={backHref}
+      class="group mb-8 inline-flex items-center gap-2 font-mono text-xs text-text-muted transition hover:text-accent"
+    >
+      <span class="transition-transform group-hover:-translate-x-1">&larr;</span> {backLabel}
+    </a>
+
+    <header class="mb-8">
+      <div class="mb-3 flex items-center gap-3">
+        <time
+          class="font-mono text-xs text-text-muted"
+          datetime={post.published_at.replace(' ', 'T').slice(0, 10)}
+        >
+          {formatDate(post.published_at, lang, true)}
+        </time>
+        {
+          post.read_minutes ? (
+            <>
+              <span aria-hidden="true" class="text-text-faint">·</span>
+              <span class="font-mono text-xs text-text-faint">{post.read_minutes} min</span>
+            </>
+          ) : null
+        }
+        <span
+          class="rounded-sm border border-bg-border px-1.5 py-0.5 font-mono text-[10px] uppercase text-text-faint"
+        >
+          {lang}
+        </span>
+      </div>
+      <h1 class="mb-4 text-3xl font-bold leading-tight text-text-title sm:text-4xl">
+        {post.title}
+      </h1>
+      <p class="border-l-2 border-accent pl-4 text-base italic text-text-muted">
+        {post.summary}
+      </p>
+      {
+        post.tags?.length > 0 && (
+          <ul class="mt-4 flex flex-wrap gap-1.5">
+            {post.tags.map((tag) => (
+              <li class="rounded-sm border border-bg-border px-1.5 py-0.5 font-mono text-[10px] text-text-faint">
+                {tag}
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </header>
+
+    {
+      cover && (
+        <div class="mb-10">
+          <img
+            src={cover}
+            alt={post.title}
+            class="max-h-[400px] w-full rounded-xl border border-bg-border object-cover"
+            loading="eager"
+          />
+        </div>
+      )
+    }
+
+    <div class="prose max-w-none leading-relaxed text-text" set:html={post.content} />
+  </div>
+</article>

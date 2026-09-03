@@ -1,0 +1,53 @@
+---
+/**
+ * /ca/blog/post/<slug>/ — Detall d'un article, generat en build-time.
+ * Mateix patró que src/pages/blog/post/[slug].astro (vegeu aquell fitxer pel
+ * "perquè" complet); aquesta és la variant en català. Avui no genera cap
+ * ruta perquè encara no hi ha cap article publicat en català -- és l'estat
+ * esperat, no un error.
+ */
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import BlogPostBody from '../../../../components/BlogPostBody.astro';
+import { useTranslations } from '../../../../i18n/utils';
+import { SITE } from '../../../../config';
+import { fetchAllPostDetails, isoDate, type PostDetail } from '../../../../lib/posts';
+
+export async function getStaticPaths() {
+  const posts = await fetchAllPostDetails('ca');
+  return posts.map((post) => ({ params: { slug: post.slug }, props: { post } }));
+}
+
+interface Props {
+  post: PostDetail;
+}
+
+const { post } = Astro.props;
+const lang = 'ca';
+const t = useTranslations(lang);
+
+const title = `${post.title} | Blog | ${SITE.shortName}`;
+const path = `/ca/blog/post/${post.slug}/`;
+const image = post.cover_url ? new URL(post.cover_url, SITE.domain).href : undefined;
+---
+
+<BaseLayout
+  title={title}
+  description={post.summary}
+  lang={lang}
+  path={path}
+  withFaq={false}
+  breadcrumbs={[{ name: 'Blog', path: '/ca/blog/' }]}
+  breadcrumbName={post.title}
+  ogType="article"
+  article={{
+    headline: post.title,
+    description: post.summary,
+    datePublished: isoDate(post.published_at),
+    dateModified: isoDate(post.updated_at || post.published_at),
+    tags: post.tags,
+    readMinutes: post.read_minutes,
+    image,
+  }}
+>
+  <BlogPostBody post={post} lang={lang} backHref="/ca/blog/" backLabel={t('blog.back')} />
+</BaseLayout>

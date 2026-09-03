@@ -140,7 +140,13 @@ function card(
   post: Post,
   opts: { lang: string; readMore: string; detailBase: string },
 ): HTMLElement {
-  const href = `${opts.detailBase}?slug=${encodeURIComponent(post.slug || '')}`;
+  // Antes: `${detailBase}?slug=${slug}`. La query string solo servia una
+  // unica plantilla vacia para los N articulos (ver src/lib/posts.ts); ahora
+  // cada slug tiene su propia pagina real generada en build-time, asi que el
+  // propio listado debe enlazar ahi directamente. El formato ?slug= sigue
+  // funcionando para enlaces externos ya existentes via el rewrite del
+  // .htaccess, pero un enlace nuevo no debe depender de esa redireccion.
+  const href = `${opts.detailBase}${encodeURIComponent(post.slug || '')}/`;
 
   const article = document.createElement('article');
   article.className =

@@ -2,7 +2,7 @@
 
 # eduolihez.com
 
-**Wiki y Portfolio Profesional de Eduardo Olivares Hernández** — Analista SOC / Blue Team
+**Wiki y portfolio profesional de Eduardo Olivares Hernández**, analista SOC / Blue Team
 
 [![Web](https://img.shields.io/badge/web-eduolihez.com-4ade80?style=flat-square)](https://eduolihez.com)
 [![Astro](https://img.shields.io/badge/Astro-7-BC52EE?style=flat-square&logo=astro&logoColor=white)](https://astro.build)
@@ -14,33 +14,38 @@
 
 ---
 
-### [🌐 English version](README.en.md) · [🌐 Versió en Català](README.ca.md) · **[🌐 Versión en Español](README.md)**
+### [English version](README.en.md) · [Versió en Català](README.ca.md) · **[Versión en Español](README.md)**
 
 </div>
 
 ---
 
-Bienvenido al repositorio y wiki técnica de **eduolihez.com**. Este es el código fuente del sitio web personal y portfolio profesional de Eduardo Olivares, disponible completamente en **español, inglés y catalán**.
+Este es el código fuente de **eduolihez.com**, el sitio web personal y portfolio de
+Eduardo Olivares, disponible en español, inglés y catalán.
 
-El sitio se ha diseñado siguiendo el principio de **defensa en profundidad** y sirve como demostración de competencias técnicas en seguridad ofensiva, endurecimiento de servidores (hardening) y desarrollo web seguro. Todos los detalles técnicos sobre su diseño se describen en [eduolihez.com/sobre-esta-web](https://eduolihez.com/sobre-esta-web/).
-
----
-
-## 📖 Índice
-1. [Arquitectura y Flujo de Trabajo](#-arquitectura-y-flujo-de-trabajo)
-2. [Estructura del Proyecto](#-estructura-del-proyecto)
-3. [Seguridad Avanzada (Hardening)](#-seguridad-avanzada-hardening)
-4. [Administración y Base de Datos](#-administración-y-base-de-datos)
-5. [SEO Técnico e IA-Friendliness](#-seo-técnico-e-ia-friendliness)
-6. [Instalación y Despliegue](#-instalación-y-despliegue)
-7. [Más Documentación](#-más-documentación)
-8. [Licencia](#-licencia)
+El sitio está diseñado siguiendo el principio de defensa en profundidad, y sirve
+también como demostración de seguridad ofensiva, hardening de servidores y desarrollo
+web seguro. Los detalles técnicos del diseño están en
+[eduolihez.com/sobre-esta-web](https://eduolihez.com/sobre-esta-web/).
 
 ---
 
-## 🏗️ Arquitectura y Flujo de Trabajo
+## Índice
+1. [Arquitectura y flujo de trabajo](#arquitectura-y-flujo-de-trabajo)
+2. [Estructura del proyecto](#estructura-del-proyecto)
+3. [Hardening](#hardening)
+4. [Administración y base de datos](#administración-y-base-de-datos)
+5. [SEO técnico y rastreo por IA](#seo-técnico-y-rastreo-por-ia)
+6. [Instalación y despliegue](#instalación-y-despliegue)
+7. [Más documentación](#más-documentación)
+8. [Licencia](#licencia)
 
-El proyecto combina un generador de sitios estáticos (SSG) moderno con una infraestructura backend robusta para la gestión del contenido dinámico:
+---
+
+## Arquitectura y flujo de trabajo
+
+El proyecto combina un generador de sitios estáticos con un backend propio para el
+contenido dinámico:
 
 ```
 ┌─ src/          Astro (Frontend) · Compila a HTML estático ─► dist/ ──► Servidor Apache ─┐
@@ -55,13 +60,16 @@ El proyecto combina un generador de sitios estáticos (SSG) moderno con una infr
                                                                                 └──────────────────┘
 ```
 
-* **Frontend**: Astro compila las páginas estáticas. En producción, la carga de Node es inexistente; solo se sirven archivos planos desde la carpeta `dist/`.
-* **Backend**: Una API REST propia e independiente en PHP 8 interactúa con la base de datos MySQL/MariaDB para gestionar el buzón de contacto, visitas, artículos de blog, certificaciones y proyectos.
-* **Integración**: Ambos residen en el mismo hosting bajo el mismo dominio. Esto elimina la necesidad de configurar reglas de CORS cruzadas.
+* Frontend: Astro compila las páginas estáticas. En producción no hay carga de Node;
+  solo se sirven archivos planos desde `dist/`.
+* Backend: una API REST propia en PHP 8 habla con MySQL/MariaDB para gestionar el buzón
+  de contacto, las visitas, los artículos del blog, las certificaciones y los proyectos.
+* Integración: ambos viven en el mismo hosting y bajo el mismo dominio, así que no hay
+  que configurar reglas de CORS cruzadas.
 
 ---
 
-## 📂 Estructura del Proyecto
+## Estructura del proyecto
 
 El repositorio está organizado de forma modular para aislar responsabilidades:
 
@@ -82,48 +90,75 @@ El repositorio está organizado de forma modular para aislar responsabilidades:
 
 ---
 
-## 🛡️ Seguridad Avanzada (Hardening)
+## Hardening
 
-Como portfolio de un profesional de ciberseguridad, se han implementado rigurosos controles para cerrar vectores de ataque comunes:
+Los controles implementados para cerrar los vectores de ataque habituales:
 
 ### Frontend
-* **Content Security Policy (CSP)**: `script-src` configurado únicamente con hashes SHA-256 calculados automáticamente en cada compilación (evita `'unsafe-inline'`). Si un atacante inyecta una etiqueta `<script>`, el navegador se negará a ejecutarla.
-* **Cabeceras de Aislamiento**: HSTS activo (1 año con subdominios), `X-Frame-Options: DENY` contra clickjacking, y directivas COOP/CORP restrictivas.
-* **Privacidad por Diseño (Do Not Track)**: Respeto estricto a las peticiones `DNT` (si el navegador la envía, la analítica local se inhabilita por completo). Las direcciones IP de las estadísticas se hashean inmediatamente con `SHA-256` y una sal de un solo uso; nunca se almacenan en texto plano.
+* Content Security Policy: `script-src` se configura únicamente con hashes SHA-256
+  calculados en cada compilación, sin `'unsafe-inline'`. Si un atacante inyecta una
+  etiqueta `<script>`, el navegador se niega a ejecutarla.
+* Cabeceras de aislamiento: HSTS activo (1 año, con subdominios),
+  `X-Frame-Options: DENY` contra clickjacking y directivas COOP/CORP restrictivas.
+* Do Not Track: si el navegador envía la cabecera `DNT`, la analítica local se
+  inhabilita por completo. Las IP de las estadísticas se hashean al momento con SHA-256
+  y una sal de un solo uso; nunca se almacenan en texto plano.
 
-### Backend e Inyecciones
-* **Consultas Preparadas Reales**: Deshabilitada la emulación de PDO (`ATTR_EMULATE_PREPARES = false`) para evitar desbordes o fallos de codificación de caracteres.
-* **Seguridad en Formularios**: CSRF implementado con tokens de sesión verificados en tiempo constante (`hash_equals`).
-* **Protección del Banner superior con Markdown**: El campo del banner de administración admite Markdown y se renderiza en el cliente de forma segura. El HTML se escapa por completo *antes* del parseo para evitar inyecciones XSS persistentes (Stored XSS).
-* **Sanitización de Subidas**: Las imágenes se analizan con `finfo` (MIME real) y `getimagesize()` (estructura interna). La carpeta de subidas deshabilita la ejecución de scripts (handlers PHP apagados vía `.htaccess`) y asigna nombres aleatorios aleatorios a los archivos guardados.
-
----
-
-## 🗄️ Administración y Base de Datos
-
-* **Mantenimiento Preventivo**: El sistema incluye un validador en [bootstrap.php](file:///c:/Users/eduol/Documents/GitHub/eduolihez.com/server/lib/bootstrap.php) que comprueba las tablas y columnas necesarias al iniciar el panel de administración. Si detecta la falta de campos (ej. tras el despliegue de una columna como `badges`), redirige a una pantalla de aviso con instrucciones guiadas en vez de lanzar un error crítico en el cliente.
-* **Esquema Idempotente**: El archivo [schema.sql](file:///c:/Users/eduol/Documents/GitHub/eduolihez.com/database/schema.sql) se puede importar repetidamente en phpMyAdmin sobre bases de datos existentes sin borrar la información previa del usuario.
-
----
-
-## 🔍 SEO Técnico e IA-Friendliness
-
-* **Grafo Único JSON-LD**: Datos estructurados (`Person`, `WebSite`, `FAQPage`, `BreadcrumbList`) unificados mediante identificadores `@id` cruzados en vez de bloques dispersos.
-* **hreflang Recíproco**: La distribución multilingüe incluye referencias cruzadas y `x-default` únicamente en páginas con traducción activa.
-* **IA Rastreabilidad**: Cumple con la especificación de [llmstxt.org](https://llmstxt.org/) generando un archivo plano [`/llms.txt`](https://eduolihez.com/llms.txt) en cada build, ideal para que los modelos de lenguaje (LLM) indexen el portfolio sin HTML residual.
-* **Control de Bots**: Filtro selectivo en `robots.txt` que permite indexar a más de 20 rastreadores legítimos de IA y buscadores (GPTBot, ClaudeBot, PerplexityBot, Google-Extended, Amazonbot, entre otros), bloquea `/admin/` y `/api/` a todos ellos, y bloquea por completo a los rastreadores agresivos de SEO de pago (Semrush, Ahrefs, MJ12 y otros).
-* **Blog citable sin JavaScript**: Los artículos viven en MySQL y se publican sin recompilar, así que un rastreador que no ejecuta JS los vería vacíos. [`/llms-blog.txt`](https://eduolihez.com/llms-blog.txt) sirve su texto íntegro y `/sitemap-posts.xml` los enumera, ambos generados en cada petición.
+### Backend e inyecciones
+* Consultas preparadas de verdad: la emulación de PDO está desactivada
+  (`ATTR_EMULATE_PREPARES = false`) para evitar desbordes y fallos de codificación de
+  caracteres.
+* CSRF con tokens de sesión verificados en tiempo constante (`hash_equals`).
+* El banner superior admite Markdown y se renderiza en el cliente. El HTML se escapa por
+  completo *antes* del parseo, para evitar XSS persistente.
+* Sanitización de subidas: las imágenes pasan por `finfo` (MIME real) y `getimagesize()`
+  (estructura interna). La carpeta de subidas tiene los handlers PHP apagados vía
+  `.htaccess`, así que no ejecuta scripts, y los archivos guardados reciben nombres
+  aleatorios.
 
 ---
 
-## 🚀 Instalación y Despliegue
+## Administración y base de datos
+
+* Mantenimiento preventivo: [bootstrap.php](server/lib/bootstrap.php)
+  comprueba las tablas y columnas necesarias al iniciar el panel de administración. Si
+  falta algún campo, por ejemplo tras desplegar una columna como `badges`, redirige a
+  una pantalla de aviso con instrucciones en vez de reventar con un error en el cliente.
+* Esquema idempotente: [schema.sql](database/schema.sql)
+  se puede importar repetidamente en phpMyAdmin sobre bases de datos existentes sin
+  borrar la información previa.
+
+---
+
+## SEO técnico y rastreo por IA
+
+* Grafo único JSON-LD: los datos estructurados (`Person`, `WebSite`, `FAQPage`,
+  `BreadcrumbList`) se unifican con identificadores `@id` cruzados en vez de quedar en
+  bloques dispersos.
+* hreflang recíproco: la distribución multilingüe incluye referencias cruzadas y
+  `x-default` solo en las páginas que tienen traducción activa.
+* Rastreo por IA: cumple la especificación de [llmstxt.org](https://llmstxt.org/)
+  generando un archivo plano [`/llms.txt`](https://eduolihez.com/llms.txt) en cada
+  build, para que los modelos de lenguaje indexen el portfolio sin HTML residual.
+* Control de bots: `robots.txt` permite indexar a más de 20 rastreadores legítimos de IA
+  y buscadores (GPTBot, ClaudeBot, PerplexityBot, Google-Extended, Amazonbot y otros),
+  les bloquea `/admin/` y `/api/` a todos, y bloquea por completo a los rastreadores
+  agresivos de SEO de pago (Semrush, Ahrefs, MJ12 y compañía).
+* Blog citable sin JavaScript: los artículos viven en MySQL y se publican sin
+  recompilar, así que un rastreador que no ejecuta JS los vería vacíos.
+  [`/llms-blog.txt`](https://eduolihez.com/llms-blog.txt) sirve su texto íntegro y
+  `/sitemap-posts.xml` los enumera, ambos generados en cada petición.
+
+---
+
+## Instalación y despliegue
 
 ### Requisitos
 * Node.js v20+
 * PHP 8.0+ con PDO habilitado
 * Base de datos MySQL / MariaDB
 
-### Instalación Local (Entorno Frontend)
+### Instalación local (frontend)
 ```bash
 # Instalar dependencias
 npm install
@@ -133,42 +168,53 @@ npm run dev
 ```
 
 > [!NOTE]
-> Dado que la base de datos dinámica y PHP no corren directamente bajo el servidor de desarrollo de Astro (`localhost:4321`), es normal ver mensajes de error en las secciones dinámicas locales. Para probar la integración completa, utiliza una pila local tipo XAMPP, Laragon o Docker.
+> La base de datos y PHP no corren bajo el servidor de desarrollo de Astro
+> (`localhost:4321`), así que es normal ver errores en las secciones dinámicas cuando
+> trabajas en local. Para probar la integración completa, usa una pila local tipo XAMPP,
+> Laragon o Docker.
 
-### Comandos Útiles
-* `npm run build`: Compila el frontend estático a la carpeta `dist/`.
-* `npm run preview`: Lanza una vista previa local del directorio compilado.
-* `npm run icons`: Regenera la pila de favicons y gráficos de la web.
-* `npm test`: Ejecuta la suite de tests (Vitest) sobre el frontend en `src/`.
+### Comandos útiles
+* `npm run build`: compila el frontend estático a `dist/`.
+* `npm run preview`: lanza una vista previa local del directorio compilado.
+* `npm run icons`: regenera la pila de favicons y gráficos de la web.
+* `npm test`: ejecuta la suite de tests (Vitest) sobre el frontend en `src/`.
 
-### Instrucciones de Despliegue en Servidor (CDMON / CPanel)
+### Despliegue en servidor (CDMON / cPanel)
 1. Compila el sitio localmente con `npm run build`.
-2. Sube por FTP el contenido de `dist/` a la raíz de tu servidor (ej. `public_html/`).
-3. Sube la carpeta `server/` al mismo nivel de tu servidor para mapear `/api/` y `/admin/`.
-4. Copia `server/config.example.php` a `server/config.php` y configura tus variables de conexión. **Importante**: No subas este archivo al control de versiones.
-5. Accede a phpMyAdmin e importa [schema.sql](file:///c:/Users/eduol/Documents/GitHub/eduolihez.com/database/schema.sql).
-6. Entra en `tudominio.com/admin/setup.php` para crear tu primera cuenta de administración. **Una vez creado el usuario, borra el archivo `setup.php` del servidor.**
+2. Sube por FTP el contenido de `dist/` a la raíz de tu servidor, por ejemplo
+   `public_html/`.
+3. Sube la carpeta `server/` al mismo nivel, para mapear `/api/` y `/admin/`.
+4. Copia `server/config.example.php` a `server/config.php` y configura tus variables de
+   conexión. No subas este archivo al control de versiones.
+5. Entra en phpMyAdmin e importa [schema.sql](database/schema.sql).
+6. Abre `tudominio.com/admin/setup.php` para crear tu primera cuenta de administración.
+   **Una vez creado el usuario, borra `setup.php` del servidor.**
 
 ---
 
-## 📚 Más Documentación
+## Más documentación
 
 Este repositorio tiene más documentación de la que cabe en este README:
 
-* [Wiki](https://github.com/eduolihez/eduolihez.com/wiki) — punto de entrada
-  a toda la documentación, incluido el plan de visibilidad IA/SEO.
-* [TESTING.md](TESTING.md) — framework de tests, cobertura y convenciones.
-* [CONTRIBUTING.md](CONTRIBUTING.md) — cómo reportar un fallo o proponer un cambio.
-* [SECURITY.md](SECURITY.md) — política de divulgación de vulnerabilidades.
-* [CHANGELOG.md](CHANGELOG.md) — historial de versiones.
-* [PRODUCT.md](PRODUCT.md) — para quién es esta web y qué problema resuelve.
-* [DESIGN.md](DESIGN.md) — sistema de diseño (tipografía, color, espaciado, motion).
-* [TODOS.md](TODOS.md) — trabajo pendiente conocido, con contexto de por qué no se hizo ya.
+* [Wiki](https://github.com/eduolihez/eduolihez.com/wiki), punto de entrada a toda la
+  documentación, incluido el plan de visibilidad IA/SEO.
+* [TESTING.md](TESTING.md), framework de tests, cobertura y convenciones.
+* [CONTRIBUTING.md](CONTRIBUTING.md), cómo reportar un fallo o proponer un cambio.
+* [SECURITY.md](SECURITY.md), política de divulgación de vulnerabilidades.
+* [CHANGELOG.md](CHANGELOG.md), historial de versiones.
+* [PRODUCT.md](PRODUCT.md), para quién es esta web y qué problema resuelve.
+* [DESIGN.md](DESIGN.md), sistema de diseño (tipografía, color, espaciado, motion).
+* [TODOS.md](TODOS.md), trabajo pendiente conocido, con contexto de por qué no se hizo
+  ya.
 
 ---
 
-## 📄 Licencia
+## Licencia
 
-Este proyecto está bajo la [Licencia MIT](LICENSE). 
+Este proyecto está bajo la [Licencia MIT](LICENSE).
 
-* Quedan excluidos de la licencia MIT y reservados todos los derechos sobre el contenido personal (imágenes de marca, fotografías, archivos PDF de certificaciones y textos biográficos del autor). Puedes emplear la lógica y arquitectura del proyecto para tu propio desarrollo; se prohíbe el clonado directo de la identidad visual e información del autor.
+El contenido personal queda excluido de la licencia MIT y con todos los derechos
+reservados: imágenes de marca, fotografías, PDF de certificaciones y textos biográficos
+del autor. Puedes usar la lógica y la arquitectura del proyecto para tu propio
+desarrollo; lo que no se permite es clonar directamente la identidad visual y la
+información del autor.

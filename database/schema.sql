@@ -461,6 +461,21 @@ WHERE EXISTS (SELECT 1 FROM `projects`)
 UPDATE `projects` SET `badges` = '["private-code"]'
 WHERE `title_es` = 'PromptMaster Universal AI' AND `badges` = '["open-source"]';
 
+-- Proyectos: anadir CREM Report Generator (2026-09-01). Mismo patron que los
+-- bloques de arriba: solo actua sobre una tabla que YA tiene datos, y solo si
+-- el titulo todavia no existe -- reimportar esto no duplica nada.
+INSERT INTO `projects`
+  (`title_es`, `title_en`, `summary_es`, `summary_en`, `stack`, `badges`,
+   `repo_url`, `demo_url`, `store_url`, `featured`, `sort_order`, `status`)
+SELECT 'CREM Report Generator', 'CREM Report Generator',
+       'Motor en Python que automatiza informes mensuales de seguridad sobre Trend Micro Vision One, con enriquecimiento de CVEs (NVD, CISA KEV, EPSS) y dashboard de escritorio.',
+       'Python engine that automates monthly security reports over Trend Micro Vision One, with CVE enrichment (NVD, CISA KEV, EPSS) and a desktop dashboard.',
+       '["Python","Flask","PyQt6"]',
+       '["open-source"]',
+       'https://github.com/eduolihez/vision-one-crem-report-generator', NULL, NULL, 1, 7, 'published'
+WHERE EXISTS (SELECT 1 FROM `projects`)
+  AND NOT EXISTS (SELECT 1 FROM `projects` WHERE `title_es` = 'CREM Report Generator');
+
 -- ---------------------------------------------------------------------------
 -- Certificaciones: correcciones y ampliacion con las insignias de Credly
 -- (https://www.credly.com/users/eduolihez), revisadas 2026-08-25.
@@ -850,6 +865,62 @@ END$$
 DELIMITER ;
 
 CALL seed_if_empty();
+
+-- ---------------------------------------------------------------------------
+-- Blog: enlazar "Automatizar el informe semanal del SOC con Python" al
+-- repositorio publico del generador completo (2026-09-01).
+--
+-- Guardado por el VALOR anterior conocido del contenido (que NO contenga ya
+-- el enlace), no solo por slug: mismo motivo que las correcciones de arriba
+-- en `projects` y `certifications` -- evita que reimportar este archivo
+-- vuelva a anadir el parrafo si alguien ya lo edito o lo quito a mano desde
+-- /admin.
+UPDATE `posts` SET `content` = CONCAT(`content`,
+  '\r\n<p>Ese generador semanal crecio con el tiempo hasta convertirse en algo mas completo: un sistema que tambien enriquece cada CVE contra NVD, CISA KEV y EPSS antes de meterlo en el informe. Lo publique en abierto: <a href="https://github.com/eduolihez/vision-one-crem-report-generator">el codigo esta en GitHub</a>.</p>')
+WHERE `slug` = 'automatizar-el-informe-semanal-del-soc-con-python'
+  AND `content` NOT LIKE '%vision-one-crem-report-generator%';
+
+-- ---------------------------------------------------------------------------
+-- Blog: cuatro articulos nuevos (2026-09-01). Mismo patron que las
+-- ampliaciones de `projects`: solo entran si su slug todavia no existe, asi
+-- que reimportar este archivo nunca los duplica.
+-- ---------------------------------------------------------------------------
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'Priorizar CVEs sin fiarse solo del CVSS',
+  'priorizar-cves-sin-fiarse-solo-del-cvss',
+  'Un CVSS de 9.8 puede ser irrelevante y uno de 6.5 una emergencia. Como cruzo NVD, el catalogo KEV de CISA y la probabilidad de EPSS para decidir que vulnerabilidad se parchea primero, y como lo automatice para que no dependa de que yo me acuerde de mirarlo.',
+  '<p>El error que mas veces he visto -- y que cometi yo tambien al principio -- es ordenar una lista de CVEs por CVSS y llamar a eso priorizacion. El CVSS mide gravedad tecnica en abstracto. No dice si alguien esta explotando ese fallo ahora mismo. Son preguntas distintas, y tratarlas como si fueran la misma hace que se gasten semanas en un CVE de 9.8 que nadie usa mientras uno de 6.5 se explota activamente.</p>\r\n<h2>Tres fuentes, tres preguntas distintas</h2>\r\n<p>Cada una de las siguientes responde algo que las otras dos no saben:</p>\r\n<ul>\r\n  <li><strong>NVD</strong> responde que es el fallo: CVSS, CWE, y la version que lo corrige.</li>\r\n  <li><strong>CISA KEV</strong> responde si se esta explotando de verdad, ahora mismo, confirmado.</li>\r\n  <li><strong>EPSS</strong> responde la probabilidad de que se explote en los proximos 30 dias, aunque todavia no este en KEV.</li>\r\n</ul>\r\n<p>Ninguna sustituye a las otras dos. NVD sin las otras da listas larguisimas sin orden real. KEV solo es binario: dentro o fuera. EPSS solo es un numero sin contexto de que corrige.</p>\r\n<h2>El criterio que aplico</h2>\r\n<p>Con las tres cruzadas, el orden queda asi, sin excepciones:</p>\r\n<ol>\r\n  <li>Si esta en <strong>KEV</strong>, va primero. Da igual el CVSS.</li>\r\n  <li>Si no esta en KEV pero el <strong>EPSS es alto</strong>, va despues. Es la senal de que empieza a explotarse.</li>\r\n  <li>CVSS alto con EPSS bajo y fuera de KEV puede esperar al ciclo normal de parcheo.</li>\r\n</ol>\r\n<p>La sorpresa la primera vez que aplico esto sobre un tenant real siempre es la misma: la lista final no se parece nada a la que sale de ordenar solo por CVSS.</p>\r\n<h2>Por que lo automatice</h2>\r\n<p>Cruzar tres fuentes a mano cada mes no escala, y es justo el tipo de tarea que se salta cuando hay prisa, que es precisamente cuando mas falta hace. Lo integre en el generador de informes que uso para los clientes: cada CVE que aparece se enriquece automaticamente contra las tres fuentes antes de entrar en el documento, con cache en disco para no volver a preguntar por un CVE que ya se consulto. <a href="https://github.com/eduolihez/vision-one-crem-report-generator">El codigo esta publicado</a> si a alguien le sirve de referencia.</p>\r\n<h2>Lo que ninguna de las tres sabe</h2>\r\n<p>Ni NVD, ni KEV, ni EPSS saben si el activo afectado es un portatil de pruebas o un controlador de dominio. Eso solo lo sabe quien conoce la red. La automatizacion ordena por senal tecnica; el contexto de negocio lo sigue poniendo una persona, y ahi es donde de verdad se decide que se parchea esta semana y que espera al mes que viene.</p>',
+  'cve,vulnerabilidades,nvd,epss,gestion-de-riesgo', 'es', 1, '2026-07-14 10:00:00', '2026-07-14 10:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'priorizar-cves-sin-fiarse-solo-del-cvss');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'Hardening de FortiGate: lo que reviso antes de dar un despliegue por bueno',
+  'hardening-fortigate-antes-de-dar-un-despliegue-por-bueno',
+  'La configuracion de fabrica de un FortiGate no esta lista para produccion solo porque bloquea trafico por defecto. Esta es la lista que reviso siempre, y por que la inspeccion SSL es la que mas se pospone sin motivo.',
+  '<p>La configuracion de fabrica de un FortiGate es un punto de partida razonable, no un estado final. He heredado mas de un firewall ya en produccion donde nadie habia tocado nada de esta lista desde el dia de la instalacion. No es exhaustiva: es lo que reviso siempre, en este orden, antes de dar un despliegue por bueno.</p>\r\n<h2>Administracion</h2>\r\n<ul>\r\n  <li>Solo <strong>HTTPS</strong> en la interfaz de gestion, nunca HTTP, y nunca expuesta a la WAN.</li>\r\n  <li>Acceso restringido por <em>trusted host</em>: IPs concretas, no cualquiera con la contrasena.</li>\r\n  <li>Cuentas nominales por administrador. Compartir el usuario admin por defecto hace imposible saber despues quien cambio que.</li>\r\n  <li>MFA en todas las cuentas de administracion, sin excepcion.</li>\r\n</ul>\r\n<h2>Politicas</h2>\r\n<p>Lo mas comun que encuentro en una auditoria no es un fallo tecnico sofisticado: es una politica <code>ALL a ALL</code> que quedo ahi "temporalmente" hace meses. Reviso siempre:</p>\r\n<ul>\r\n  <li>Que no exista ninguna regla asi de amplia sin fecha de caducidad.</li>\r\n  <li>Que todas las politicas tengan <strong>logging activado</strong>. Sin logs, el resto del stack (SIEM, XDR) no tiene nada que correlacionar.</li>\r\n  <li>Que los servicios que no se usan esten deshabilitados, no solo sin politica que los permita.</li>\r\n</ul>\r\n<h2>La inspeccion SSL, que casi siempre se pospone</h2>\r\n<p>Es el punto que mas se retrasa porque "puede romper algo", y sin el el firewall es efectivamente ciego a casi todo el trafico moderno, que va cifrado. Lo que hago para que no rompa nada al activarlo:</p>\r\n<ul>\r\n  <li>Empezar en modo de inspeccion de certificado si la inspeccion completa no es viable de inmediato -- ver al menos el SNI y el certificado ya aporta algo.</li>\r\n  <li>Desplegar el certificado de la CA del FortiGate por GPO en los equipos del dominio, para no generar avisos de certificado no confiable en cada sesion.</li>\r\n  <li>Excepciones explicitas y documentadas para lo que de verdad no se debe inspeccionar -- nunca una excepcion porque si.</li>\r\n</ul>\r\n<h2>La regla que mas aplico</h2>\r\n<p>Si una politica, una excepcion o una cuenta de administracion no tiene una razon documentada de por que existe, no deberia existir. La mayoria de las exposiciones que encuentro en auditorias no son fallos tecnicos complejos: son configuraciones "temporales" que nadie volvio a mirar.</p>',
+  'fortinet,fortigate,hardening,firewall,blue-team', 'es', 1, '2026-08-02 09:00:00', '2026-08-02 09:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'hardening-fortigate-antes-de-dar-un-despliegue-por-bueno');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'De soporte tecnico a SOC: lo que cambio no fue el puesto',
+  'de-soporte-tecnico-a-soc-lo-que-cambio-no-fue-el-puesto',
+  'El salto de dar soporte a mas de 100 usuarios a triar alertas en un SOC no fue un cambio de titulo de un dia para otro. Fue un cambio en la pregunta que me hacia delante de cada tarea repetitiva.',
+  '<p>Empece dando soporte tecnico a mas de cien usuarios: contrasenas bloqueadas, administracion de Active Directory, el dia a dia habitual de cualquiera que empieza en IT. No hay nada malo en ese trabajo -- de hecho es donde aprendi mas de lo que esperaba. Pero hay un momento en el que empiezas a ver patrones, y ese momento es el que nadie te explica de antemano.</p>\r\n<h2>El ticket numero cuarenta y tantos</h2>\r\n<p>La primera vez que reseteas una contrasena es un tramite. La vez cuarenta y tantos, empiezas a preguntarte por que el proceso sigue siendo manual. Ese fue mi patron: no fue una vocacion repentina, fue la irritacion acumulada de repetir lo mismo sin que nadie se planteara automatizarlo. Ahi empece a escribir los primeros scripts en Python, no en un curso, sino para resolver tareas concretas del dia a dia.</p>\r\n<h2>El paso intermedio que nadie menciona</h2>\r\n<p>De soporte no pase directo a SOC. Pase antes por administrar FortiGate y FortiAnalyzer, y por responder incidentes de nivel 1 y 2. Ese paso intermedio importa mas de lo que parece: entender la red desde dentro, tocando firewalls y viendo trafico real, es lo que despues hace que triar una alerta XDR tenga sentido en vez de ser una etiqueta de severidad sin contexto.</p>\r\n<h2>El cambio real no fue de titulo</h2>\r\n<p>Pasar a analista de SOC no fue un cambio de un dia para otro. Fue un cambio en la pregunta que me hacia frente a cada tarea repetitiva: de <em>como lo resuelvo</em> a <em>como hago que esto no vuelva a pasar</em>. Ese giro es el que, con el tiempo, lleva de gestionar tickets a gestionar riesgo.</p>\r\n<h2>Lo que me hubiera gustado saber antes</h2>\r\n<ul>\r\n  <li><strong>El soporte de nivel 1 no es un peaje, es formacion.</strong> Ver por que un usuario hace algo "mal" ensena a disenar sistemas que fallan menos.</li>\r\n  <li><strong>Nadie va a pedirte que automatices nada.</strong> El primer script que escribi para ahorrarme trabajo no me lo pidio nadie.</li>\r\n  <li><strong>El SOC no es un destino, es seguir haciendo la misma pregunta.</strong> Sigo automatizando cosas que antes hacia a mano, el mismo impulso que el primer script de reseteo de contrasenas.</li>\r\n</ul>\r\n<p>Si estas en soporte tecnico y sientes que todavia no estas listo para dar el salto: probablemente ya tienes la parte mas dificil, que es entender la infraestructura real, con usuarios reales rompiendola de formas que ningun curso ensena. Lo que falta no es mas teoria: es empezar a preguntarte, delante de cada tarea repetitiva, como evitar que vuelva a pasar.</p>',
+  'carrera,soc,blue-team,automatizacion', 'es', 1, '2026-08-19 08:30:00', '2026-08-19 08:30:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'de-soporte-tecnico-a-soc-lo-que-cambio-no-fue-el-puesto');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'Active Directory: los primeros diez cambios en cualquier dominio nuevo',
+  'active-directory-los-primeros-diez-cambios-en-cualquier-dominio-nuevo',
+  'Antes de tocar GPOs avanzadas, hay una lista corta que reviso siempre en un dominio de Active Directory nuevo. La mayoria llevan mal configuradas desde la instalacion y nadie las vuelve a mirar.',
+  '<p>Cuando heredo un dominio de Active Directory que no monte yo, hay una lista rapida que reviso antes que nada, antes de meterme en GPOs complejas. Son los fallos mas comunes, los mas baratos de arreglar, y con mas impacto real si se explotan.</p>\r\n<h2>Cuentas y privilegios</h2>\r\n<ol>\r\n  <li><strong>Contrasenas de cuentas privilegiadas que no caducan.</strong> Sorprendentemente comun, incluso en administradores de dominio. Se revisa en un minuto con PowerShell.</li>\r\n  <li><strong>Demasiada gente en Domain Admins.</strong> El grupo deberia tener el minimo posible, y ninguna de esas cuentas deberia usarse para el dia a dia.</li>\r\n  <li><strong>Cuentas de servicio con privilegios de mas.</strong> Se crean "temporalmente" con permisos de administrador de dominio para instalar algo, y ahi se quedan.</li>\r\n</ol>\r\n<h2>Configuracion que se hereda mal</h2>\r\n<ol start="4">\r\n  <li><strong>Delegacion de Kerberos sin restricciones.</strong> Es una de las rutas de escalada de privilegios mas explotadas en AD real. Migrar a delegacion restringida siempre que se pueda.</li>\r\n  <li><strong>Politica de contrasenas por defecto.</strong> Sigue sin exigir una longitud minima competitiva. Subir a 14 caracteres o mas.</li>\r\n  <li><strong>LAPS sin desplegar.</strong> Si el administrador local comparte contrasena en todos los equipos, un solo equipo comprometido da acceso lateral a todos los demas. Es gratuito y lleva anos siendo casi un estandar.</li>\r\n  <li><strong>SMBv1 todavia activo</strong> "por si acaso". Anos despues de que dejara de ser defendible, sigue apareciendo.</li>\r\n</ol>\r\n<h2>Visibilidad y recuperacion</h2>\r\n<ol start="8">\r\n  <li><strong>Auditoria avanzada sin activar.</strong> Sin registro de cambios de grupo y autenticaciones fallidas, cualquier investigacion empieza a ciegas.</li>\r\n  <li><strong>Grupos anidados sin documentar.</strong> Varios niveles de anidamiento acaban dando accesos que nadie recuerda haber concedido.</li>\r\n  <li><strong>Sin plan de recuperacion del propio AD probado de verdad.</strong> Si el dominio cae, todo lo demas cae con el. Es la pieza que menos se puede permitir fallar en silencio.</li>\r\n</ol>\r\n<p>Ninguno de estos diez puntos necesita presupuesto ni herramientas de terceros: es configuracion nativa de Windows Server. Es exactamente el tipo de deuda que se acumula porque "funciona asi desde siempre", hasta que aparece en una auditoria o, peor, en un incidente real.</p>',
+  'active-directory,hardening,windows-server,sysadmin', 'es', 1, '2026-08-28 09:00:00', '2026-08-28 09:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'active-directory-los-primeros-diez-cambios-en-cualquier-dominio-nuevo');
 
 -- Ajustes del sitio. INSERT IGNORE: si ya existen, NO se tocan tus valores.
 INSERT IGNORE INTO `settings` (`key`, `value`) VALUES

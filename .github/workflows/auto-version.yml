@@ -1,0 +1,83 @@
+name: "Auto-version"
+
+# POR QUE EXISTE: antes, solo se generaba un dist/+server/ descargable
+# (release.yml) cuando alguien creaba un tag de version a mano. Este
+# workflow sube en 1 el ultimo numero de VERSION (el MICRO, pensado
+# exactamente para esto -- ver README: MAJOR.MINOR.PATCH.MICRO) en CADA push
+# a master, y empuja el tag correspondiente, lo que dispara release.yml solo.
+# Asi cada push deja un zip listo para desplegar, sin esperar a un release
+# "de verdad" con su entrada en CHANGELOG.md (esos se siguen etiquetando a
+# mano, subiendo MAJOR/MINOR/PATCH, como hasta ahora).
+#
+# POR QUE USA UN PAT Y NO EL GITHUB_TOKEN por defecto: master tiene
+# proteccion de rama (PR obligatorio, check "Vitest" requerido, historial
+# lineal). El GITHUB_TOKEN normal de un workflow no tiene privilegios de
+# admin para saltarsela, y un PR abierto con ese token tampoco dispara el
+# check que el mismo necesita para poder fusionarse (GitHub bloquea que un
+# GITHUB_TOKEN dispare otros workflows, para evitar bucles) -- se quedaria
+# esperando para siempre. Probado en vivo: tampoco existe en cuentas
+# personales (no-organizacion) la alternativa de dar bypass de la
+# proteccion a la app de GitHub Actions via Ruleset. Un PAT del propio
+# dueno del repo (secret AUTO_TAG_PAT) empuja con la misma identidad que
+# cuando el bypasea la proteccion a mano, y SI dispara los demas workflows
+# con normalidad.
+#
+# COMO EVITA EL BUCLE: el push del propio commit de subida de version
+# (hecho con el PAT) volveria a disparar este workflow. Se corta mirando si
+# el mensaje del ultimo commit lleva "[skip-tag]".
+
+on:
+  push:
+    branches: [ "master" ]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: auto-version-master
+  cancel-in-progress: false
+
+jobs:
+  auto-version:
+    if: "!contains(github.event.head_commit.message, '[skip-tag]')"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Comprobar que el secret AUTO_TAG_PAT esta configurado
+        env:
+          PAT_SET: ${{ secrets.AUTO_TAG_PAT != '' }}
+        run: |
+          if [ "$PAT_SET" != "true" ]; then
+            echo "::error::Falta el secret AUTO_TAG_PAT (Settings > Secrets and variables > Actions). Sin el, este workflow no puede pushear a master (protegida) ni crear el tag."
+            exit 1
+          fi
+
+      - name: Descargar el repositorio
+        uses: actions/checkout@v7
+        with:
+          token: ${{ secrets.AUTO_TAG_PAT }}
+          fetch-depth: 0
+
+      - name: Configurar Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Subir el numero MICRO de VERSION y etiquetar
+        id: bump
+        run: |
+          set -euo pipefail
+          CURRENT="$(cat VERSION)"
+          IFS='.' read -r MAJOR MINOR PATCH MICRO <<< "$CURRENT"
+          NEW_VERSION="$MAJOR.$MINOR.$PATCH.$((MICRO + 1))"
+          echo "$NEW_VERSION" > VERSION
+
+          git add VERSION
+          git commit -m "chore: auto-bump build to v$NEW_VERSION [skip-tag]"
+          git tag "v$NEW_VERSION"
+
+          echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Pushear el commit y el tag
+        run: |
+          git push origin HEAD:master
+          git push origin "v${{ steps.bump.outputs.new_version }}"

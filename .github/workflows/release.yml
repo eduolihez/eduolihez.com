@@ -1,11 +1,14 @@
 name: "Release"
 
 # POR QUE EXISTE: cada version real (VERSION + entrada en CHANGELOG.md) queda
-# como una Release en GitHub con el /dist ya compilado adjunto. Asi quien
-# necesite desplegar a mano (o un futuro job de FTP) descarga el zip listo
-# para subir, sin tener que clonar el repo ni correr "npm run build" el
-# mismo. Se dispara con un tag de version, no con cada commit a master, para
-# no llenar la pestana Releases con un release por cada arreglo pequeno.
+# como una Release en GitHub con dist/ + server/ ya listos, en un solo zip.
+# Asi quien necesite desplegar a mano descarga el zip, lo descomprime y sube
+# ambas carpetas por FTP de una vez (ver "Despliegue en servidor" en el
+# README: dist/ -> public_html/, server/ al mismo nivel), sin tener que
+# clonar el repo ni compilar nada localmente. Se dispara con un tag de
+# version (a mano, o automaticamente en cada push a master via
+# auto-version.yml), no con cada commit suelto, para no llenar la pestana
+# Releases con un release por cada arreglo pequeno.
 #
 # COMO SE ETIQUETA: el tag debe coincidir EXACTO con el contenido de
 # VERSION, con "v" delante (VERSION="1.1.0.0" -> tag "v1.1.0.0").
@@ -54,10 +57,14 @@ jobs:
             exit 1
           fi
 
-      - name: Empaquetar dist/
+      - name: Empaquetar dist/ + server/
         run: |
-          cd dist
-          zip -r "../eduolihez.com-${{ github.ref_name }}.zip" .
+          # dist/ y server/ quedan como carpetas de nivel superior dentro del
+          # zip (no fusionadas), para que al descomprimir se puedan arrastrar
+          # las dos directamente al hosting, igual que describe el README.
+          # server/config.php nunca esta aqui (esta en .gitignore), asi que
+          # no hay credenciales en el zip.
+          zip -r "eduolihez.com-${{ github.ref_name }}.zip" dist server
 
       - name: Extraer la seccion del CHANGELOG para este tag
         id: changelog

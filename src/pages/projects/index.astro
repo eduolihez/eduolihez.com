@@ -83,7 +83,14 @@ const projects = [
   },
 ];
 
-/** Lista ordenada de los proyectos, para que las IAs los lean de una vez. */
+/**
+ * Lista ordenada de los proyectos, para que las IAs los lean de una vez.
+ *
+ * Cada entrada anida un `item` con su propio @type (SoftwareApplication) en
+ * vez de poner name/description/url sueltos en el ListItem: asi un
+ * parser de Google/IA sabe que esto es una app funcional citable y
+ * enlazable, no un enlace de navegacion generico dentro de una lista.
+ */
 const itemList = {
   '@context': 'https://schema.org',
   '@type': 'ItemList',
@@ -91,9 +98,13 @@ const itemList = {
   itemListElement: projects.map((p, i) => ({
     '@type': 'ListItem',
     position: i + 1,
-    name: p.name,
-    description: p.summary,
-    url: new URL(p.href, SITE.domain).href,
+    item: {
+      '@type': 'SoftwareApplication',
+      name: p.name,
+      description: p.summary,
+      url: new URL(p.href, SITE.domain).href,
+      applicationCategory: 'SecurityApplication',
+    },
   })),
 };
 ---

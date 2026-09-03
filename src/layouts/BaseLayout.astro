@@ -39,6 +39,18 @@ interface Props {
   breadcrumbs?: { name: string; path: string }[];
   /** Nombre corto de esta pagina para la ultima miga. Ver <Seo />. */
   breadcrumbName?: string;
+  /** og:type. Ver <Seo />. */
+  ogType?: 'profile' | 'article';
+  /** Nodo BlogPosting del detalle de un articulo. Ver <Seo />. */
+  article?: {
+    headline: string;
+    description: string;
+    datePublished: string;
+    dateModified: string;
+    tags?: string[];
+    readMinutes?: number;
+    image?: string;
+  };
 }
 const {
   title,
@@ -50,6 +62,8 @@ const {
   alternates,
   breadcrumbs,
   breadcrumbName,
+  ogType,
+  article,
 } = Astro.props;
 
 // El enlace de salto estaba escrito a mano en castellano, asi que en /en/ y
@@ -82,6 +96,8 @@ const t = useTranslations(lang);
       alternates={alternates}
       breadcrumbs={breadcrumbs}
       breadcrumbName={breadcrumbName}
+      ogType={ogType}
+      article={article}
     />
   </head>
 

@@ -1,0 +1,61 @@
+---
+/**
+ * /blog/post/<slug>/ — Detalle de un articulo, generado en build-time.
+ *
+ * Sustituye al patron antiguo /blog/post/?slug=X (una sola pagina, rellenada
+ * por JavaScript en el navegador): esa version servia el mismo <title>,
+ * descripcion y canonical -- SIN slug -- para los 8 articulos, asi que
+ * cualquier rastreador que no ejecute JS los veia como una unica pagina
+ * duplicada. Ver src/lib/posts.ts para el porque completo.
+ *
+ * El .htaccess de /public reescribe /blog/post/?slug=X a esta misma ruta
+ * (/blog/post/X/) por dentro, asi que ningun enlace externo ni el sitemap
+ * existente se rompen: la URL publica sigue aceptando ?slug=, solo que ahora
+ * el servidor devuelve el HTML real de ese articulo en vez de la plantilla
+ * vacia.
+ */
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import BlogPostBody from '../../../components/BlogPostBody.astro';
+import { useTranslations } from '../../../i18n/utils';
+import { SITE } from '../../../config';
+import { fetchAllPostDetails, isoDate, type PostDetail } from '../../../lib/posts';
+
+export async function getStaticPaths() {
+  const posts = await fetchAllPostDetails('es');
+  return posts.map((post) => ({ params: { slug: post.slug }, props: { post } }));
+}
+
+interface Props {
+  post: PostDetail;
+}
+
+const { post } = Astro.props;
+const lang = 'es';
+const t = useTranslations(lang);
+
+const title = `${post.title} | Blog | ${SITE.shortName}`;
+const path = `/blog/post/${post.slug}/`;
+const image = post.cover_url ? new URL(post.cover_url, SITE.domain).href : undefined;
+---
+
+<BaseLayout
+  title={title}
+  description={post.summary}
+  lang={lang}
+  path={path}
+  withFaq={false}
+  breadcrumbs={[{ name: 'Blog', path: '/blog/' }]}
+  breadcrumbName={post.title}
+  ogType="article"
+  article={{
+    headline: post.title,
+    description: post.summary,
+    datePublished: isoDate(post.published_at),
+    dateModified: isoDate(post.updated_at || post.published_at),
+    tags: post.tags,
+    readMinutes: post.read_minutes,
+    image,
+  }}
+>
+  <BlogPostBody post={post} lang={lang} backHref="/blog/" backLabel={t('blog.back')} />
+</BaseLayout>

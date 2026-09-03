@@ -57,9 +57,13 @@ foreach ($rows as $row) {
     $lang = (string) $row['lang'];
     $base = POST_PATHS[$lang] ?? POST_PATHS['es'];
 
-    // El slug viaja en la query, asi que se codifica para URL y despues se
-    // escapa para XML. Sin lo segundo, un slug con & romperia el documento.
-    $loc = SITE_ORIGIN . $base . '?slug=' . rawurlencode((string) $row['slug']);
+    // Antes: $base . '?slug=' . rawurlencode(...) -- la URL con query string
+    // que Astro solo sabia servir como una unica plantilla vacia para los N
+    // articulos. Ahora cada slug es una pagina propia generada en build-time
+    // (ver src/lib/posts.ts), asi que el sitemap debe apuntar directamente ahi
+    // -- la version con ?slug= sigue funcionando via el rewrite del
+    // .htaccess, pero el sitemap no debe anunciar la URL vieja como canonica.
+    $loc = SITE_ORIGIN . $base . rawurlencode((string) $row['slug']) . '/';
     $loc = htmlspecialchars($loc, ENT_XML1 | ENT_QUOTES, 'UTF-8');
 
     $lastmod = substr((string) $row['lastmod'], 0, 10);

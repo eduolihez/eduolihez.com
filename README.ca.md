@@ -119,12 +119,12 @@ Els controls implementats per tancar els vectors d'atac habituals:
 
 ## Administració i base de dades
 
-* Manteniment preventiu: [bootstrap.php](file:///c:/Users/eduol/Documents/GitHub/eduolihez.com/server/lib/bootstrap.php)
+* Manteniment preventiu: [bootstrap.php](server/lib/bootstrap.php)
   comprova les taules i columnes necessàries en iniciar la consola d'administració. Si
   falta algun camp, per exemple després de desplegar una columna com `badges`,
   redirigeix a una pantalla d'avís amb instruccions en comptes de petar amb un error al
   client.
-* Esquema idempotent: [schema.sql](file:///c:/Users/eduol/Documents/GitHub/eduolihez.com/database/schema.sql)
+* Esquema idempotent: [schema.sql](database/schema.sql)
   es pot importar repetidament a phpMyAdmin sobre bases de dades existents sense
   esborrar la informació prèvia.
 
@@ -186,7 +186,7 @@ npm run dev
 3. Puja la carpeta `server/` al mateix nivell, per mapejar `/api/` i `/admin/`.
 4. Copia `server/config.example.php` a `server/config.php` i configura les teves
    variables de connexió. No pugis aquest fitxer al control de versions.
-5. Entra a phpMyAdmin i importa [schema.sql](file:///c:/Users/eduol/Documents/GitHub/eduolihez.com/database/schema.sql).
+5. Entra a phpMyAdmin i importa [schema.sql](database/schema.sql).
 6. Obre `tudomini.com/admin/setup.php` per crear el teu primer compte d'administració.
    **Un cop creat l'usuari, esborra `setup.php` del servidor.**
 

@@ -119,11 +119,11 @@ The controls in place to close common attack vectors:
 
 ## Admin console and database
 
-* Preventative maintenance: the schema validator in [bootstrap.php](file:///c:/Users/eduol/Documents/GitHub/eduolihez.com/server/lib/bootstrap.php)
+* Preventative maintenance: the schema validator in [bootstrap.php](server/lib/bootstrap.php)
   checks tables and columns when the admin dashboard starts. If a column is missing, for
   example after deploying a new database property like `badges`, it shows a warning page
   with guided migration steps instead of failing cryptically.
-* Idempotent schema: [schema.sql](file:///c:/Users/eduol/Documents/GitHub/eduolihez.com/database/schema.sql)
+* Idempotent schema: [schema.sql](database/schema.sql)
   can be imported repeatedly on top of active tables without wiping existing records.
 
 ---
@@ -185,7 +185,7 @@ npm run dev
    correctly.
 4. Copy `server/config.example.php` to `server/config.php` and configure your
    credentials. Keep this file out of Git.
-5. Import [schema.sql](file:///c:/Users/eduol/Documents/GitHub/eduolihez.com/database/schema.sql)
+5. Import [schema.sql](database/schema.sql)
    into your database using phpMyAdmin.
 6. Open `yourdomain.com/admin/setup.php` to register the primary admin account.
    **Delete `setup.php` from your server immediately after.**

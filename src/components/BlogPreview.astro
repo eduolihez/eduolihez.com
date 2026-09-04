@@ -1,0 +1,80 @@
+---
+/**
+ * <BlogPreview /> - "Ultimas entradas" en la portada, con las 3 mas
+ * recientes del blog.
+ *
+ * POR QUE EXISTE: la portada enlazaba al blog solo desde la cabecera. Con
+ * mas de una docena de articulos ya publicados, un visitante que entra por
+ * "/" no se entera de que existen salvo que mire el menu. Esta seccion se
+ * resuelve en BUILD TIME (no client-side como el indice /blog/) para que
+ * los enlaces y los titulos esten en el HTML servido desde el primer
+ * momento: mejor para el primer impacto visual y para cualquier rastreador
+ * que no ejecute JavaScript.
+ *
+ * Si la API falla en el momento del build, fetchLatestPostSummaries()
+ * devuelve un array vacio y la seccion entera no se pinta -- no tiene
+ * sentido fallar el build entero (como si hace posts.ts para las paginas de
+ * detalle) por una vista previa que no es el contenido principal de la
+ * pagina.
+ */
+import { fetchLatestPostSummaries } from '../lib/posts';
+import { formatDate } from '../scripts/blog';
+import { useTranslations } from '../i18n/utils';
+import type { Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const basePath = lang === 'es' ? '/blog/post/' : `/${lang}/blog/post/`;
+const blogIndexPath = lang === 'es' ? '/blog/' : `/${lang}/blog/`;
+
+const posts = await fetchLatestPostSummaries(lang, 3);
+---
+
+{
+  posts.length > 0 && (
+    <section id="blog-preview" class="border-b border-bg-border py-20 sm:py-28">
+      <div class="container-page">
+        <div class="reveal mb-12 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p class="section-kicker">{t('kicker.blog')}</p>
+            <h2 class="section-title">{t('blog.homeTitle')}</h2>
+            <p class="section-subtitle">{t('blog.homeSubtitle')}</p>
+          </div>
+          <a
+            href={blogIndexPath}
+            class="inline-flex shrink-0 items-center gap-1.5 text-sm font-semibold text-accent transition hover:text-accent-hover"
+          >
+            {t('blog.viewAll')} →
+          </a>
+        </div>
+
+        <div class="grid gap-6 sm:grid-cols-3">
+          {posts.map((post) => {
+            const href = `${basePath}${encodeURIComponent(post.slug)}/`;
+            return (
+              <a
+                href={href}
+                class="reveal group flex flex-col rounded-xl border border-bg-border bg-bg-card p-5 shadow-xs transition hover:-translate-y-1 hover:border-bg-border-hover hover:shadow-md"
+              >
+                <time
+                  class="mb-2 font-mono text-xs text-text-muted"
+                  datetime={post.published_at.replace(' ', 'T').slice(0, 10)}
+                >
+                  {formatDate(post.published_at, lang)}
+                </time>
+                <h3 class="mb-2 text-base font-bold leading-snug text-text-title transition group-hover:text-accent">
+                  {post.title}
+                </h3>
+                <p class="line-clamp-3 text-sm text-text-muted">{post.summary}</p>
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  )
+}

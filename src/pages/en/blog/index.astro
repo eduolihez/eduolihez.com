@@ -56,6 +56,9 @@ const alternates = { es: '/blog/', en: '/en/blog/', ca: '/ca/blog/' };
         retryText={t('status.retry')}
       />
 
+      <!-- Tag filters (filled in by blog.ts from the loaded articles) -->
+      <div id="blog-filters" class="mb-8 hidden flex-wrap gap-2" data-all="All"></div>
+
       <!-- Blog grid (filled in by blog.ts) -->
       <div
         id="blog-grid"

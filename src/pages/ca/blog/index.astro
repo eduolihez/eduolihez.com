@@ -55,6 +55,9 @@ const alternates = { es: '/blog/', en: '/en/blog/', ca: '/ca/blog/' };
         retryText={t('status.retry')}
       />
 
+      <!-- Filtres per etiqueta (els omple blog.ts a partir dels articles) -->
+      <div id="blog-filters" class="mb-8 hidden flex-wrap gap-2" data-all="Tots"></div>
+
       <!-- Llistat d'articles (l'omple blog.ts) -->
       <div
         id="blog-grid"

@@ -101,8 +101,9 @@ export const ui = {
     'kicker.skills': '02 / Stack técnico',
     'kicker.projects': '03 / Portfolio',
     'kicker.certs': '04 / Credenciales',
-    'kicker.faq': '05 / Preguntas frecuentes',
-    'kicker.contact': '06 / Hablemos',
+    'kicker.blog': '05 / Blog',
+    'kicker.faq': '06 / Preguntas frecuentes',
+    'kicker.contact': '07 / Hablemos',
 
     'faq.title': 'Preguntas frecuentes',
     'faq.subtitle': 'Lo que suelen preguntarme antes de escribirme',
@@ -135,6 +136,9 @@ export const ui = {
     'blog.publishedAt': 'Publicado el',
     'blog.notFound': 'El artículo solicitado no existe o aún no se ha publicado.',
     'blog.noSlug': 'Falta indicar qué artículo quieres leer.',
+    'blog.homeTitle': 'Últimas entradas',
+    'blog.homeSubtitle': 'Lo último que he escrito sobre SOC, Blue Team y automatización',
+    'blog.viewAll': 'Ver todas las entradas',
   },
 
   en: {
@@ -216,8 +220,9 @@ export const ui = {
     'kicker.skills': '02 / Tech stack',
     'kicker.projects': '03 / Portfolio',
     'kicker.certs': '04 / Credentials',
-    'kicker.faq': '05 / Frequently asked',
-    'kicker.contact': '06 / Get in touch',
+    'kicker.blog': '05 / Blog',
+    'kicker.faq': '06 / Frequently asked',
+    'kicker.contact': '07 / Get in touch',
 
     'faq.title': 'Frequently asked questions',
     'faq.subtitle': 'What people usually ask before reaching out',
@@ -250,6 +255,9 @@ export const ui = {
     'blog.publishedAt': 'Published on',
     'blog.notFound': 'The requested article does not exist or has not been published yet.',
     'blog.noSlug': 'No article was specified.',
+    'blog.homeTitle': 'Latest posts',
+    'blog.homeSubtitle': 'What I have been writing about SOC, Blue Team and automation',
+    'blog.viewAll': 'View all posts',
   },
 
   ca: {
@@ -331,8 +339,9 @@ export const ui = {
     'kicker.skills': '02 / Stack tècnic',
     'kicker.projects': '03 / Portfolio',
     'kicker.certs': '04 / Credencials',
-    'kicker.faq': '05 / Preguntes freqüents',
-    'kicker.contact': '06 / Parlem-ne',
+    'kicker.blog': '05 / Blog',
+    'kicker.faq': '06 / Preguntes freqüents',
+    'kicker.contact': '07 / Parlem-ne',
 
     'faq.title': 'Preguntes freqüents',
     'faq.subtitle': "El que solen preguntar-me abans d'escriure'm",
@@ -365,6 +374,9 @@ export const ui = {
     'blog.publishedAt': 'Publicat el',
     'blog.notFound': 'L’article sol·licitat no existeix o encara no s’ha publicat.',
     'blog.noSlug': 'Falta indicar quin article vols llegir.',
+    'blog.homeTitle': 'Últimes entrades',
+    'blog.homeSubtitle': 'El que he escrit darrerament sobre SOC, Blue Team i automatització',
+    'blog.viewAll': 'Veure totes les entrades',
   },
 } as const;
 

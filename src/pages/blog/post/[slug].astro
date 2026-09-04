@@ -35,7 +35,12 @@ const t = useTranslations(lang);
 
 const title = `${post.title} | Blog | ${SITE.shortName}`;
 const path = `/blog/post/${post.slug}/`;
-const image = post.cover_url ? new URL(post.cover_url, SITE.domain).href : undefined;
+// Fallback a la portada generada (ver src/lib/cover.ts) cuando el articulo
+// no tiene cover_url propio en la base de datos -- hoy, los 13.
+const image = new URL(
+  post.cover_url || `/blog/covers/${post.slug}.png`,
+  SITE.domain,
+).href;
 ---
 
 <BaseLayout

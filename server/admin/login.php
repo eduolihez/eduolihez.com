@@ -66,7 +66,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
   button:hover { background:#22c55e; }
   .err { background:rgba(248,113,113,.12); color:#f87171; border:1px solid rgba(248,113,113,.3);
     padding:.6rem .8rem; border-radius:.5rem; font-size:.88rem; margin-bottom:1rem; }
-  .back { display:block; text-align:center; margin-top:1.2rem; color:#6b7688; font-size:.85rem; text-decoration:none; }
+  .back { display:block; text-align:center; margin-top:1.2rem; color:#78849a; font-size:.85rem; text-decoration:none; }
 </style>
 </head>
 <body>

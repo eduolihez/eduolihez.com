@@ -138,7 +138,7 @@ no existen en tu base de datos. Es un paso de un minuto y no se pierde nada.</p>
 </ol>
 <p>Falta por crear:</p>
 <ul class="miss">{$items}</ul>
-<p style="font-size:.88rem;color:#6b7688;margin-bottom:0;">
+<p style="font-size:.88rem;color:#78849a;margin-bottom:0;">
   La migracion se puede ejecutar varias veces sin riesgo: comprueba lo que ya existe
   antes de crear nada. Tus proyectos, certificaciones y mensajes no se tocan.
 </p>

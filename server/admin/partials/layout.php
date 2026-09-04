@@ -100,7 +100,7 @@ function admin_header(string $title, string $active = ''): void
 <style>
   :root {
     --bg: #0a0e14; --soft: #0f141c; --card: rgba(20, 26, 36, 0.72); --border: #1f2733;
-    --text: #e6edf3; --muted: #9aa7b8; --faint: #6b7688;
+    --text: #e6edf3; --muted: #9aa7b8; --faint: #78849a;
     --accent: #4ade80; --accent-hover: #22c55e; --danger: #f87171;
     --cyan: #22d3ee; --warn: #f59e0b; --violet: #a78bfa;
     --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.05);

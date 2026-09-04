@@ -90,6 +90,7 @@ export function initBlogList(): void {
 
   const status = document.getElementById('blog-status');
   const statusText = document.getElementById('blog-status-text');
+  const filters = document.getElementById('blog-filters');
 
   const apiUrl = grid.dataset.api || '';
   const loadingMsg = grid.dataset.loading || '';
@@ -98,6 +99,7 @@ export function initBlogList(): void {
   const readMore = grid.dataset.readmore || '';
   const lang = grid.dataset.lang || 'es';
   const detailBase = grid.dataset.detail || '/blog/post/';
+  const allLabel = filters?.dataset.all || 'All';
 
   const setState = (state: 'loading' | 'empty' | 'error', msg: string) => {
     setStatusPanel(status, statusText, state, msg);
@@ -107,6 +109,8 @@ export function initBlogList(): void {
     if (!grid) return;
     setState('loading', loadingMsg);
     grid.innerHTML = '';
+    filters?.replaceChildren();
+    filters?.classList.add('hidden');
     fetch(apiUrl)
       .then((res) => {
         if (!res.ok) throw new Error('http');
@@ -127,12 +131,60 @@ export function initBlogList(): void {
         // Las tarjetas nacen despues de que initReveal() haya observado el DOM,
         // asi que se marcan visibles a mano en lugar de quedarse en opacidad 0.
         grid.querySelectorAll('.reveal').forEach((el) => el.classList.add('is-visible'));
+
+        if (filters) initTagFilters(filters, grid, posts, allLabel);
       })
       .catch(() => setState('error', errorMsg));
   }
 
   status?.querySelector('.status-retry')?.addEventListener('click', loadPosts);
   loadPosts();
+}
+
+/**
+ * Construye los chips de filtro por etiqueta y engancha el click que
+ * muestra/oculta tarjetas. Mismo patron que el filtro de /projects/: un
+ * "Todos" activo por defecto mas un boton por etiqueta unica, ordenadas
+ * alfabeticamente para que la posicion no salte entre cargas.
+ */
+function initTagFilters(filters: HTMLElement, grid: HTMLElement, posts: Post[], allLabel: string): void {
+  const tags = [...new Set(posts.flatMap((p) => p.tags || []))].sort((a, b) => a.localeCompare(b));
+  if (tags.length === 0) return;
+
+  const baseClass =
+    'blog-filter-btn px-4 py-1.5 text-xs font-semibold rounded-lg border transition duration-200 cursor-pointer';
+  const activeClass = 'bg-accent text-bg border-accent';
+  const inactiveClass = 'bg-bg-soft/40 text-text-muted border-bg-border/60 hover:bg-bg-card hover:text-text';
+
+  const makeButton = (label: string, filterValue: string, active: boolean): HTMLButtonElement => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = `${baseClass} ${active ? activeClass : inactiveClass}`;
+    btn.dataset.filter = filterValue;
+    btn.textContent = label;
+    return btn;
+  };
+
+  filters.appendChild(makeButton(allLabel, 'all', true));
+  tags.forEach((tag) => filters.appendChild(makeButton(tag, tag, false)));
+  filters.classList.remove('hidden');
+  filters.classList.add('flex');
+
+  filters.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest('.blog-filter-btn') as HTMLButtonElement | null;
+    if (!btn) return;
+
+    filters.querySelectorAll('.blog-filter-btn').forEach((b) => {
+      b.className = `${baseClass} ${inactiveClass}`;
+    });
+    btn.className = `${baseClass} ${activeClass}`;
+
+    const value = btn.dataset.filter || 'all';
+    grid.querySelectorAll<HTMLElement>('article[data-tags]').forEach((cardEl) => {
+      const cardTags = (cardEl.dataset.tags || '').split(',');
+      cardEl.classList.toggle('hidden', value !== 'all' && !cardTags.includes(value));
+    });
+  });
 }
 
 /** Tarjeta de UN articulo. Construida con nodos, nunca con innerHTML. */
@@ -151,31 +203,28 @@ function card(
   const article = document.createElement('article');
   article.className =
     'group reveal flex flex-col overflow-hidden rounded-xl border border-bg-border bg-bg-card shadow-xs transition hover:-translate-y-1 hover:border-bg-border-hover hover:shadow-md';
+  if (post.tags?.length) article.dataset.tags = post.tags.join(',');
 
   // --- Portada ---
-  const cover = safeUrl(post.cover_url);
+  // Fallback a la portada generada (ver src/lib/cover.ts) cuando el
+  // articulo no tiene cover_url propio: antes las 13 tarjetas mostraban el
+  // mismo icono "</>", ahora cada una lleva su propio titulo y etiquetas.
+  const coversBase = opts.detailBase.replace('/blog/post/', '/blog/covers/');
+  const cover = safeUrl(post.cover_url) || `${coversBase}${encodeURIComponent(post.slug || '')}.png`;
   const coverLink = document.createElement('a');
   coverLink.href = href;
   coverLink.className = 'block overflow-hidden';
   coverLink.setAttribute('aria-hidden', 'true');
   coverLink.tabIndex = -1;
 
-  if (cover) {
-    const img = document.createElement('img');
-    img.src = cover;
-    img.alt = '';
-    img.loading = 'lazy';
-    img.decoding = 'async';
-    img.className =
-      'h-48 w-full object-cover transition-transform duration-500 group-hover:scale-105';
-    coverLink.appendChild(img);
-  } else {
-    const ph = document.createElement('div');
-    ph.className =
-      'flex h-48 w-full items-center justify-center border-b border-bg-border bg-bg-soft font-mono text-xs text-text-faint';
-    ph.textContent = '</>';
-    coverLink.appendChild(ph);
-  }
+  const img = document.createElement('img');
+  img.src = cover;
+  img.alt = '';
+  img.loading = 'lazy';
+  img.decoding = 'async';
+  img.className =
+    'h-48 w-full object-cover transition-transform duration-500 group-hover:scale-105';
+  coverLink.appendChild(img);
   article.appendChild(coverLink);
 
   // --- Cuerpo ---

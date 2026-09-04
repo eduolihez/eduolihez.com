@@ -78,6 +78,40 @@ export async function fetchAllPostDetails(lang: Lang): Promise<PostDetail[]> {
   return details;
 }
 
+/**
+ * Los N articulos mas recientes de un idioma, SOLO con los campos del
+ * resumen (sin contenido). Para vistas previas (la seccion "Ultimas
+ * entradas" de la portada) donde traer el HTML completo de cada post via
+ * fetchAllPostDetails() seria una peticion por articulo desperdiciada: aqui
+ * basta una sola llamada a /api/posts.php.
+ *
+ * A diferencia de fetchAllPostDetails(), un fallo aqui NO tumba el build: es
+ * una seccion de "tambien te puede interesar", no la pagina del propio
+ * articulo. Un error de red no debe impedir publicar el resto del sitio; el
+ * llamador decide que hacer con un array vacio (normalmente, no pintar la
+ * seccion).
+ */
+export async function fetchLatestPostSummaries(lang: Lang, limit: number): Promise<PostSummary[]> {
+  const all = await fetchAllPostSummaries(lang);
+  return all.slice(0, limit);
+}
+
+/**
+ * Todos los resumenes de un idioma, mas recientes primero. Igual que
+ * fetchLatestPostSummaries(), un fallo de red devuelve un array vacio en vez
+ * de tumbar el build: lo usan las portadas generadas (ver
+ * src/pages/blog/covers/[slug].png.ts), donde faltar una imagen es mucho
+ * menos grave que impedir publicar el resto del sitio.
+ */
+export async function fetchAllPostSummaries(lang: Lang): Promise<PostSummary[]> {
+  try {
+    const list = await fetchJson<PostSummary[]>(`${SITE.domain}/api/posts.php?lang=${lang}`);
+    return [...list].sort((a, b) => (a.published_at < b.published_at ? 1 : -1));
+  } catch {
+    return [];
+  }
+}
+
 /** Fecha en ISO 8601 para datePublished/dateModified. */
 export function isoDate(raw: string): string {
   if (!raw) return '';

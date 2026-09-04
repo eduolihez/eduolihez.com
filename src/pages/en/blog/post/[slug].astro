@@ -27,7 +27,12 @@ const t = useTranslations(lang);
 
 const title = `${post.title} | Blog | ${SITE.shortName}`;
 const path = `/en/blog/post/${post.slug}/`;
-const image = post.cover_url ? new URL(post.cover_url, SITE.domain).href : undefined;
+// Fallback to the generated cover (see src/lib/cover.ts) when the post has
+// no cover_url of its own in the database.
+const image = new URL(
+  post.cover_url || `/en/blog/covers/${post.slug}.png`,
+  SITE.domain,
+).href;
 ---
 
 <BaseLayout

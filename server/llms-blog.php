@@ -72,7 +72,11 @@ echo str_repeat('=', 74) . "\n\n";
 foreach ($rows as $row) {
     $lang = (string) $row['lang'];
     $base = POST_PATHS[$lang] ?? POST_PATHS['es'];
-    $url  = SITE_ORIGIN . $base . '?slug=' . rawurlencode((string) $row['slug']);
+    // Cada slug tiene su propia pagina real generada en build-time (ver
+    // src/lib/posts.ts); el formato ?slug= antiguo sigue funcionando via el
+    // rewrite del .htaccess, pero un archivo pensado para que una IA CITE la
+    // fuente correcta no debe anunciar la URL vieja como canonica.
+    $url  = SITE_ORIGIN . $base . rawurlencode((string) $row['slug']) . '/';
     $langName = LANG_NAMES[$lang] ?? $lang;
     $date = substr((string) $row['published_at'], 0, 10);
 

@@ -26,7 +26,10 @@ interface Props {
 }
 
 const { post, lang, backHref, backLabel } = Astro.props;
-const cover = safeUrl(post.cover_url);
+// Fallback a la portada generada (ver src/lib/cover.ts) cuando el articulo
+// no tiene cover_url propio en la base de datos.
+const coversBase = lang === 'es' ? '/blog/covers/' : `/${lang}/blog/covers/`;
+const cover = safeUrl(post.cover_url) || `${coversBase}${post.slug}.png`;
 ---
 
 <article class="border-b border-bg-border bg-bg-soft py-20 sm:py-28">

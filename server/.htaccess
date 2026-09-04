@@ -103,6 +103,10 @@
   # HTML crudo y no ejecutan JavaScript, asi que el cuerpo del articulo -- que
   # se pinta en cliente -- les resulta invisible. Aqui lo tienen en plano.
   RewriteRule ^llms-blog\.txt$ /llms-blog.php [L]
+
+  # /blog/rss.xml: feed RSS del blog, mismo patron (lee la tabla en cada
+  # peticion, un articulo nuevo entra sin recompilar). Ver server/rss.php.
+  RewriteRule ^blog/rss\.xml$ /rss.php [L]
 </IfModule>
 
 # ---------------------------------------------------------------------------

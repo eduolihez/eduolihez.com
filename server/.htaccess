@@ -79,6 +79,32 @@
 
   # Cualquier otro resto de la carpeta antigua.
   RewriteRule ^src(/.*)?$ / [L,R=301]
+
+  # -------------------------------------------------------------------------
+  # /blog/post/?slug=X (y en/ca) -> /blog/post/X/  (reescritura interna)
+  #
+  # Hasta la conversion a paginas estaticas por slug, el detalle de un
+  # articulo era una unica pagina que leia ?slug= y rellenaba el contenido
+  # por JavaScript (ver src/lib/posts.ts). Ahora cada slug es una pagina real
+  # generada en build-time, pero enlaces ya compartidos, marcadores y el
+  # historial de Search Console siguen usando la URL vieja con query string.
+  #
+  # Esta regla vivia antes en public/.htaccess (Astro la copiaba tal cual a
+  # dist/.htaccess), un archivo DISTINTO de este que tambien aspira a ocupar
+  # la raiz del sitio -- dist/ y server/ se suben a la MISMA carpeta, asi que
+  # el segundo .htaccess que subas por FTP borra en silencio el primero.
+  # Vive aqui, en el unico .htaccess que de verdad llega a la raiz.
+  #
+  # Sin R=301 a proposito: es interna, la barra de direcciones y cualquier
+  # vista previa de enlace conservan la URL original con ?slug=.
+  RewriteCond %{QUERY_STRING} (?:^|&)slug=([^&]+)
+  RewriteRule ^blog/post/?$ /blog/post/%1/ [L]
+
+  RewriteCond %{QUERY_STRING} (?:^|&)slug=([^&]+)
+  RewriteRule ^en/blog/post/?$ /en/blog/post/%1/ [L]
+
+  RewriteCond %{QUERY_STRING} (?:^|&)slug=([^&]+)
+  RewriteRule ^ca/blog/post/?$ /ca/blog/post/%1/ [L]
 </IfModule>
 
 # ---------------------------------------------------------------------------

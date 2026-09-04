@@ -14,6 +14,13 @@ export interface Experience {
   company: string;
   role: Localized;
   period: Localized;
+  /** Fecha de inicio en ISO 8601 (YYYY-MM-DD), para OrganizationRole.startDate
+   * en el schema JSON-LD (ver Seo.astro). `period` es el texto que se
+   * muestra; esto es lo que exige Schema.org y valida Rich Results Test. */
+  startDateISO: string;
+  /** Igual que startDateISO pero de fin. Se omite (no `current: true`) para
+   * el puesto en curso: Schema.org no lleva endDate cuando no ha terminado. */
+  endDateISO?: string;
   current?: boolean;
   description: Localized;
   tech: string[];
@@ -31,6 +38,7 @@ export const experiences: Experience[] = [
       ca: 'SOC / Cybersecurity Analyst',
     },
     period: { es: 'Abr 2026 - Presente', en: 'Apr 2026 - Present', ca: 'Abr 2026 - Actualitat' },
+    startDateISO: '2026-04-01',
     current: true,
     description: {
       es: 'Triage de alertas con Trend Micro Vision One (TrendAI), investigación de amenazas asistida por IA, automatización de informes en Python y diseño de campañas de phishing y concienciación.',
@@ -62,6 +70,8 @@ export const experiences: Experience[] = [
       ca: 'Cybersecurity Technician L1/L2',
     },
     period: { es: 'Ene 2026 - Abr 2026', en: 'Jan 2026 - Apr 2026', ca: 'Gen 2026 - Abr 2026' },
+    startDateISO: '2026-01-01',
+    endDateISO: '2026-04-01',
     description: {
       es: 'Administración y monitorización de FortiGate y FortiAnalyzer, respuesta a incidentes de nivel 1 y 2, y desarrollo de scripts de seguridad en Python.',
       en: 'Administration and monitoring of FortiGate and FortiAnalyzer, L1/L2 incident response, and development of Python security scripts.',
@@ -73,6 +83,8 @@ export const experiences: Experience[] = [
     company: 'Institucio Cultural Laietania',
     role: { es: 'Tecnico IT', en: 'IT Technician', ca: 'Tècnic IT' },
     period: { es: 'Oct 2024 - Abr 2025', en: 'Oct 2024 - Apr 2025', ca: 'Oct 2024 - Abr 2025' },
+    startDateISO: '2024-10-01',
+    endDateISO: '2025-04-01',
     description: {
       es: 'Soporte técnico a más de 100 usuarios, administración de Active Directory y automatización de tareas con scripts en Python.',
       en: 'Technical support for 100+ users, Active Directory administration, and task automation with Python scripts.',
@@ -84,6 +96,8 @@ export const experiences: Experience[] = [
     company: 'Escola del Vent',
     role: { es: 'Instructor de Fitness', en: 'Fitness Instructor', ca: 'Instructor de Fitness' },
     period: { es: 'May 2024 - Sep 2024', en: 'May 2024 - Sep 2024', ca: 'Maig 2024 - Set 2024' },
+    startDateISO: '2024-05-01',
+    endDateISO: '2024-09-01',
     description: {
       es: 'Liderazgo de grupos, comunicación y gestión de personas: habilidades transferibles clave para el trabajo en equipo y la comunicación de un SOC.',
       en: 'Group leadership, communication and people management: key transferable skills for teamwork and communication within a SOC.',

@@ -5,6 +5,71 @@ Todos los cambios notables de este proyecto se documentan en este archivo.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/),
 y el versionado usa cuatro números (`MAJOR.MINOR.PATCH.MICRO`).
 
+## [1.6.0.7] - 2026-09-04
+
+Auditoría SEO completa (10 agentes en paralelo: técnico, contenido, schema,
+sitemap, rendimiento, visual, GEO, Google APIs, backlinks, SXO) y arreglo de
+todos los hallazgos accionables desde el propio repositorio.
+
+### Fixed
+
+- **Blog (`/blog/`) renderizado en build-time en vez de client-side.** Causaba
+  CLS crítico (0.374 móvil / 0.762 escritorio) y era invisible para
+  rastreadores sin JavaScript (GPTBot, ClaudeBot, PerplexityBot). Ahora usa el
+  mismo patrón que `BlogPreview.astro`: `fetchAllPostSummaries()` en build-time
+  (`src/pages/blog/index.astro`), con el filtro por etiqueta ya no reconstruye
+  las tarjetas, solo muestra/oculta las que ya están en el HTML
+  (`initStaticBlogFilters()` en `src/scripts/blog.ts`).
+- **Imágenes de portada del blog sin `width`/`height`.** Añadido
+  `width="1200" height="630"` + `aspect-ratio` explícito (misma proporción que
+  genera `src/lib/cover.ts`), eliminando el resto del CLS y el recorte de
+  texto en las miniaturas.
+- **Proyectos y certificaciones invisibles sin JavaScript.** `<Projects />` y
+  `<Certifications />` ahora traen un primer pintado real en build-time
+  (`src/lib/projects.ts`, `src/lib/certifications.ts`, con reintento y fallo
+  suave vía `src/lib/buildFetch.ts`) que el script cliente sustituye al
+  cargar, igual que ya hacía el blog.
+- **Blog EN/CA oculto hasta que haya contenido real.** El enlace "Blog" ya no
+  aparece en cabecera/pie para EN/CA (`Header.astro`, `Footer.astro`), y
+  `/en/blog/` + `/ca/blog/` redirigen a la home de su idioma
+  (`server/.htaccess`) en vez de mostrar un listado vacío.
+- **Dos subdominios de proyectos retirados devolvían 521** desde julio
+  (`mesbadalona.eduolihez.com`, `passwdcentinel.eduolihez.com`) — uno de ellos
+  la página más clicada del dominio, ya desindexada por Google. Arreglado con
+  dos Redirect Rules 301 en Cloudflare (ver `CLOUDFLARE.md`).
+- **Fechas de experiencia laboral no eran ISO 8601** en el JSON-LD
+  (`OrganizationRole.startDate`/`endDate`). Añadidos `startDateISO`/
+  `endDateISO` reales en `src/data/experience.ts`, usados en `Seo.astro`.
+- **CV**: el modal de "en actualización" ahora también ofrece contacto directo
+  por email, no solo LinkedIn (`Hero.astro`, `src/i18n/ui.ts`).
+- **Cabecera se rompía en tablet (768px)**: el selector de idioma podía
+  desaparecer por falta de margen. El punto de corte a navegación móvil sube
+  de `md` (768px) a `lg` (1024px) (`Header.astro`).
+- **Contraste de color insuficiente** en texto terciario (footer, fechas):
+  `--color-text-faint` de `#78849a` a `#8e99ad` (`src/styles/global.css`).
+- **Selector de idioma sin nombre accesible claro** para lectores de
+  pantalla: el `aria-label` ("Idioma") no incluía el texto visible ("ES") —
+  ahora sí (`Header.astro`).
+
+### Changed
+
+- `sitemap.xml` ya no emite `priority`/`changefreq` (Google los ignora desde
+  hace años) y calcula `lastmod` desde el último commit real que tocó los
+  archivos de cada página (`gitLastMod()` en `src/pages/sitemap.xml.ts`), en
+  vez de la fecha del build en cada URL.
+- `/blog/` ya no comparte grupo de hreflang con `/en/blog/`/`/ca/blog/` en el
+  sitemap (esas rutas ahora redirigen, no sirven contenido equivalente).
+- CSS del sitio (~12KB) ahora se inserta inline en el HTML
+  (`inlineStylesheets: 'always'` en `astro.config.mjs`) en vez de servirse
+  como `<link>` externo que bloqueaba el primer render.
+- El HTML estático envía `charset=utf-8` en la cabecera HTTP, no solo en el
+  `<meta>` (`server/.htaccess`).
+
+### Removed
+
+- Sitemap HTTP obsoleto (`http://eduolihez.com/sitemap.xml`, sin enviar desde
+  noviembre de 2025) eliminado de Search Console.
+
 ## [1.6.0.0] - 2026-09-01
 
 ### Added

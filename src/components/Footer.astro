@@ -144,7 +144,7 @@ const projects = [
         <li><a href={`${base}#certificaciones`} class="text-text-muted hover:text-accent transition hover:no-underline flex items-center gap-1 group"><span class="opacity-0 group-hover:opacity-100 transition-opacity text-accent text-[10px]">&rarr;</span>{t('nav.certifications')}</a></li>
         <li><a href={`${base}#faq`} class="text-text-muted hover:text-accent transition hover:no-underline flex items-center gap-1 group"><span class="opacity-0 group-hover:opacity-100 transition-opacity text-accent text-[10px]">&rarr;</span>{t('nav.faq')}</a></li>
         <li><a href={`${base}#contacto`} class="text-text-muted hover:text-accent transition hover:no-underline flex items-center gap-1 group"><span class="opacity-0 group-hover:opacity-100 transition-opacity text-accent text-[10px]">&rarr;</span>{t('nav.contact')}</a></li>
-        <li><a href={`${base}blog/`} class="text-text-muted hover:text-accent transition hover:no-underline flex items-center gap-1 group"><span class="opacity-0 group-hover:opacity-100 transition-opacity text-accent text-[10px]">&rarr;</span>{t('nav.blog')}</a></li>
+        {lang === 'es' && <li><a href={`${base}blog/`} class="text-text-muted hover:text-accent transition hover:no-underline flex items-center gap-1 group"><span class="opacity-0 group-hover:opacity-100 transition-opacity text-accent text-[10px]">&rarr;</span>{t('nav.blog')}</a></li>}
       </ul>
     </nav>
 

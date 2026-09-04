@@ -13,6 +13,8 @@
 import { useTranslations } from '../i18n/utils';
 import type { Lang } from '../i18n/ui';
 import { api } from '../config';
+import { fetchCertificationSummaries } from '../lib/certifications';
+import { safeUrl } from '../scripts/shared';
 import StatusPanel from './StatusPanel.astro';
 import Icon from './Icon.astro';
 
@@ -23,6 +25,12 @@ const { lang } = Astro.props;
 const t = useTranslations(lang);
 
 const apiUrl = api(`/api/certifications.php?lang=${lang}`);
+
+// Primer pintado en build-time (ver src/lib/certifications.ts). Lista plana,
+// sin agrupar por emisor: initCerts() la sustituye por la vista agrupada en
+// cuanto carga (ver #certs-grid mas abajo) -- esto solo evita que un
+// rastreador sin JS vea el contenedor vacio.
+const ssrCerts = await fetchCertificationSummaries(lang);
 
 const pick = <T,>(es: T, ca: T, en: T): T => (lang === 'es' ? es : lang === 'ca' ? ca : en);
 
@@ -141,6 +149,17 @@ const labels = {
       data-api={apiUrl}
       data-labels={JSON.stringify(labels)}
     >
+      {ssrCerts.map((c) => (
+        <a
+          href={safeUrl(c.credential_url) || undefined}
+          target={safeUrl(c.credential_url) ? '_blank' : undefined}
+          rel={safeUrl(c.credential_url) ? 'noopener noreferrer' : undefined}
+          class="flex flex-col rounded-lg border border-bg-border bg-bg-card p-4"
+        >
+          <span class="text-sm font-semibold text-text-title">{c.name}</span>
+          <span class="mt-1 text-xs text-text-muted">{[c.issuer, c.issue_date].filter(Boolean).join(' · ')}</span>
+        </a>
+      ))}
     </div>
 
     <div id="certs-load-more-container" class="reveal mt-6 hidden justify-center">

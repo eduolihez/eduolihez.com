@@ -1,16 +1,35 @@
 ---
 /**
- * /blog/ — Indice de articulos en espanol.
+ * /blog/ — Indice de articulos, ahora renderizado EN BUILD TIME (no client-side).
+ * ---------------------------------------------------------------------------
+ * Antes este listado se pintaba en el navegador via fetch() a /api/posts.php
+ * (ver src/scripts/blog.ts), igual que el detalle de un articulo hacia antes
+ * de la migracion documentada en src/lib/posts.ts. Eso tenia dos costes reales:
  *
- * El listado se carga desde el API de PHP al abrir la pagina, asi que lo que
- * publiques en /admin sale al momento sin recompilar la web.
+ *  1. CLS critico (medido: 0.374 movil / 0.762 escritorio -- el umbral "malo"
+ *     es 0.25). La cuadricula entera aparecia de golpe tras el fetch,
+ *     empujando todo lo que hay debajo justo cuando la pagina ya parecia
+ *     cargada.
+ *  2. Invisible para rastreadores que no ejecutan JavaScript (GPTBot,
+ *     ClaudeBot, PerplexityBot no lo hacen): un fetch a /blog/ crudo no
+ *     mostraba ni un titulo, ni un enlace, ni un articulo -- justo la pagina
+ *     que deberia ser la puerta de entrada a los 13 posts.
  *
- * La logica vive en src/scripts/blog.ts, compartida con ingles y catalan.
+ * El detalle de cada articulo (src/pages/blog/post/[slug].astro) ya se genera
+ * en build-time desde fetchAllPostDetails() y esta pagina usaba el mismo
+ * patron en BlogPreview.astro para las 3 ultimas entradas de la portada:
+ * este archivo simplemente lo aplica al listado completo. El unico coste
+ * real es el ya asumido en src/lib/posts.ts -- `npm run build` depende de
+ * que la API este viva -- que no cambia con este archivo.
+ *
+ * El filtro por etiqueta sigue siendo interactivo, pero ahora solo
+ * muestra/oculta tarjetas ya presentes en el HTML (ver <script> al final):
+ * no vuelve a pedir nada a la API.
  */
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { useTranslations } from '../../i18n/utils';
-import { api } from '../../config';
-import StatusPanel from '../../components/StatusPanel.astro';
+import { fetchAllPostSummaries, isoDate } from '../../lib/posts';
+import { formatDate, safeUrl } from '../../scripts/blog';
 
 const lang = 'es';
 const t = useTranslations(lang);
@@ -19,19 +38,11 @@ const title = 'Blog de Ciberseguridad | Eduardo Olivares';
 const description =
   'Artículos, tutoriales y análisis de ciberseguridad, respuesta a incidentes, malware, Blue Team y automatización con Python.';
 
-const apiUrl = api(`/api/posts.php?lang=${lang}`);
-const alternates = { es: '/blog/', en: '/en/blog/', ca: '/ca/blog/' };
+const posts = await fetchAllPostSummaries(lang);
+const tags = [...new Set(posts.flatMap((p) => p.tags || []))].sort((a, b) => a.localeCompare(b));
 ---
 
-<BaseLayout
-  title={title}
-  description={description}
-  lang={lang}
-  path="/blog/"
-  withFaq={false}
-  alternates={alternates}
-  breadcrumbName="Blog"
->
+<BaseLayout title={title} description={description} lang={lang} path="/blog/" withFaq={false} breadcrumbName="Blog">
   <section class="border-b border-bg-border bg-bg-soft py-20 sm:py-28">
     <div class="container-page">
       <a
@@ -55,35 +66,80 @@ const alternates = { es: '/blog/', en: '/en/blog/', ca: '/ca/blog/' };
         </a>
       </div>
 
-      <!-- Estado de carga / vacio / error -->
-      <StatusPanel
-        id="blog-status"
-        class="mb-8"
-        loadingText={t('blog.loading')}
-        retryText={t('status.retry')}
-      />
+      {posts.length === 0 && <p class="text-sm text-text-muted">{t('blog.empty')}</p>}
 
-      <!-- Filtros por etiqueta (los rellena blog.ts a partir de los articulos) -->
-      <div id="blog-filters" class="mb-8 hidden flex-wrap gap-2" data-all="Todos"></div>
+      {tags.length > 0 && (
+        <div id="blog-filters" class="mb-8 flex flex-wrap gap-2" data-all="Todos">
+          <button
+            type="button"
+            class="blog-filter-btn cursor-pointer rounded-lg border px-4 py-1.5 text-xs font-semibold transition duration-200 border-accent bg-accent text-bg"
+            data-filter="all"
+          >
+            Todos
+          </button>
+          {tags.map((tag) => (
+            <button
+              type="button"
+              class="blog-filter-btn cursor-pointer rounded-lg border border-bg-border/60 bg-bg-soft/40 px-4 py-1.5 text-xs font-semibold text-text-muted transition duration-200 hover:bg-bg-card hover:text-text"
+              data-filter={tag}
+            >
+              {tag}
+            </button>
+          ))}
+        </div>
+      )}
 
-      <!-- Cuadricula de articulos (la rellena blog.ts) -->
-      <div
-        id="blog-grid"
-        class="hidden grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
-        data-api={apiUrl}
-        data-loading={t('blog.loading')}
-        data-empty={t('blog.empty')}
-        data-error={t('blog.error')}
-        data-readmore={t('blog.readMore')}
-        data-lang={lang}
-        data-detail="/blog/post/"
-      >
+      <div id="blog-grid" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {posts.map((post) => {
+          const href = `/blog/post/${encodeURIComponent(post.slug || '')}/`;
+          const cover = safeUrl(post.cover_url) || `/blog/covers/${encodeURIComponent(post.slug || '')}.png`;
+          return (
+            <article
+              class="group reveal flex flex-col overflow-hidden rounded-xl border border-bg-border bg-bg-card shadow-xs transition hover:-translate-y-1 hover:border-bg-border-hover hover:shadow-md"
+              data-tags={post.tags?.length ? post.tags.join(',') : undefined}
+            >
+              <a href={href} class="block overflow-hidden" aria-hidden="true" tabindex="-1">
+                {/* width/height + aspect-ratio: el navegador reserva el hueco antes
+                    de que la imagen cargue, así que la cuadrícula ya no da el salto
+                    de layout (CLS) que se medía al pintarla por JS tras el fetch.
+                    1200x630 es la relación real de la portada generada en
+                    src/lib/cover.ts -- con el contenedor a la misma proporción,
+                    object-cover ya no tiene que recortar nada en horizontal. */}
+                <img
+                  src={cover}
+                  alt=""
+                  width="1200"
+                  height="630"
+                  style="aspect-ratio: 1200 / 630"
+                  loading="lazy"
+                  decoding="async"
+                  class="w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+              </a>
+              <div class="flex flex-1 flex-col p-5">
+                <p class="mb-2 flex items-center gap-2 font-mono text-xs text-text-muted">
+                  <time datetime={isoDate(post.published_at).slice(0, 10)}>{formatDate(post.published_at, lang)}</time>
+                </p>
+                <h2 class="mb-2 text-lg font-bold leading-snug text-text-title transition group-hover:text-accent">
+                  <a href={href}>{post.title}</a>
+                </h2>
+                <p class="mb-4 line-clamp-3 flex-1 text-sm text-text-muted">{post.summary}</p>
+                <a
+                  href={href}
+                  class="mt-auto inline-flex items-center gap-1.5 text-sm font-semibold text-accent transition group-hover:gap-2.5"
+                >
+                  {t('blog.readMore')} →
+                </a>
+              </div>
+            </article>
+          );
+        })}
       </div>
     </div>
   </section>
 </BaseLayout>
 
 <script>
-  import { initBlogList } from '../../scripts/blog';
-  initBlogList();
+  import { initStaticBlogFilters } from '../../scripts/blog';
+  initStaticBlogFilters();
 </script>

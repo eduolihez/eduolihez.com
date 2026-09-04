@@ -9,6 +9,8 @@
 import { useTranslations } from '../i18n/utils';
 import type { Lang } from '../i18n/ui';
 import { api } from '../config';
+import { fetchProjectSummaries } from '../lib/projects';
+import { safeUrl } from '../scripts/shared';
 import StatusPanel from './StatusPanel.astro';
 
 interface Props {
@@ -18,6 +20,12 @@ const { lang } = Astro.props;
 const t = useTranslations(lang);
 
 const apiUrl = api(`/api/projects.php?lang=${lang}`);
+
+// Primer pintado en build-time (ver src/lib/projects.ts): initProjects()
+// vacia y reconstruye #projects-grid en cuanto carga, esto solo evita que un
+// rastreador sin JS -- o el primer frame para todos los demas -- vea el
+// contenedor vacio.
+const ssrProjects = await fetchProjectSummaries(lang);
 const labels = {
   loading: t('projects.loading'),
   error: t('projects.error'),
@@ -89,6 +97,31 @@ const labels = {
       data-api={apiUrl}
       data-labels={JSON.stringify(labels)}
     >
+      {ssrProjects.map((p) => (
+        <div class="flex flex-col rounded-xl border border-bg-border bg-bg-card p-5 shadow-xs">
+          <h3 class="mb-2 text-base font-bold text-text-title">{p.title}</h3>
+          <p class="mb-4 flex-1 text-sm text-text-muted">{p.description || p.summary}</p>
+          {p.stack?.length ? (
+            <ul class="mb-4 flex flex-wrap gap-1.5">
+              {p.stack.map((s) => (
+                <li class="rounded-md border border-bg-border px-2 py-0.5 text-xs text-text-muted">{s}</li>
+              ))}
+            </ul>
+          ) : null}
+          <div class="mt-auto flex gap-3 text-sm font-semibold">
+            {safeUrl(p.repo_url) && (
+              <a href={safeUrl(p.repo_url)} class="text-accent" target="_blank" rel="noopener noreferrer">
+                {labels.repo}
+              </a>
+            )}
+            {safeUrl(p.demo_url) && (
+              <a href={safeUrl(p.demo_url)} class="text-accent" target="_blank" rel="noopener noreferrer">
+                {labels.demo}
+              </a>
+            )}
+          </div>
+        </div>
+      ))}
     </div>
   </div>
 

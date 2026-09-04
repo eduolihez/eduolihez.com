@@ -26,7 +26,10 @@ const nav = [
   // que la pagina real es /blog/. Sin la barra, Apache responde un 301 a
   // /blog/ en cada clic (un salto de mas) y el enlace interno deja de
   // coincidir con la canonica que declara la propia pagina.
-  { href: `${base}blog/`, label: t('nav.blog') },
+  // Solo en espanol: el blog no tiene contenido en EN/CA todavia (ver
+  // BlogPreview.astro), asi que un enlace a un listado vacio en esos idiomas
+  // solo genera contenido fino y confunde al visitante.
+  ...(lang === 'es' ? [{ href: `${base}blog/`, label: t('nav.blog') }] : []),
   { href: `${base}#faq`, label: t('nav.faq') },
   { href: `${base}#contacto`, label: t('nav.contact') },
 ];
@@ -64,7 +67,11 @@ const flagSvgs = {
       <span class="text-accent">&gt;_</span> eduolihez
     </a>
 
-    <ul class="hidden items-center gap-1 md:flex">
+    {/* lg (1024px), no md (768px): a 768px el logo + 7 enlaces + icono de
+        GitHub + selector de idioma no caben con margen -- se midio el
+        selector de idioma desaparecer del todo en esa franja (ver auditoria
+        visual). lg da holgura real en vez de quedar al filo. */}
+    <ul class="hidden items-center gap-1 lg:flex">
       {
         nav.map((item) => (
           <li>
@@ -102,7 +109,7 @@ const flagSvgs = {
           aria-haspopup="true"
           aria-expanded="false"
           aria-controls="lang-menu"
-          aria-label={t('nav.language')}
+          aria-label={`${t('nav.language')}: ${lang.toUpperCase()}`}
         >
           <span class="flex items-center shrink-0 select-none" set:html={flagSvgs[lang]} />
           <span>{lang.toUpperCase()}</span>
@@ -139,7 +146,7 @@ const flagSvgs = {
       <button
         id="menu-toggle"
         type="button"
-        class="inline-flex items-center justify-center rounded-md p-2 text-text-muted transition hover:text-text md:hidden"
+        class="inline-flex items-center justify-center rounded-md p-2 text-text-muted transition hover:text-text lg:hidden"
         aria-label={t('nav.menu')}
         aria-expanded="false"
         aria-controls="mobile-menu"
@@ -152,7 +159,7 @@ const flagSvgs = {
   </nav>
 
   <!-- Menu movil -->
-  <div id="mobile-menu" class="hidden border-t border-bg-border bg-bg md:hidden">
+  <div id="mobile-menu" class="hidden border-t border-bg-border bg-bg lg:hidden">
     <ul class="container-page space-y-1 py-4">
       {
         nav.map((item) => (

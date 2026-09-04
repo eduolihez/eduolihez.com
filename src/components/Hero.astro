@@ -137,10 +137,14 @@ const settingsUrl = api('/api/settings.php');
             <Icon name="linkedin" class="h-4 w-4" />
             {t('cv.modal.linkedin')}
           </a>
-          <button type="button" id="cv-modal-btn-close" class="btn-ghost flex-1 font-sans text-xs">
-            {t('cv.modal.close')}
-          </button>
+          <a href={`mailto:${SITE.social.email}`} class="btn-ghost flex-1 font-sans text-xs flex items-center justify-center gap-2">
+            <Icon name="mail" class="h-4 w-4" />
+            {t('cv.modal.email')}
+          </a>
         </div>
+        <button type="button" id="cv-modal-btn-close" class="btn-ghost mt-3 w-full font-sans text-xs">
+          {t('cv.modal.close')}
+        </button>
       </div>
     </div>
   </div>

@@ -187,6 +187,41 @@ function initTagFilters(filters: HTMLElement, grid: HTMLElement, posts: Post[], 
   });
 }
 
+/**
+ * Filtro por etiqueta para /blog/ (indice ES, renderizado en build-time --
+ * ver src/pages/blog/index.astro). A diferencia de initTagFilters() de
+ * arriba -- que construye los botones Y las tarjetas a partir de un fetch --
+ * aqui ambos ya estan en el HTML servido; esta funcion solo engancha el click
+ * que muestra/oculta tarjetas ya presentes. Nunca vuelve a pedir nada a la
+ * API.
+ */
+export function initStaticBlogFilters(): void {
+  const filters = document.getElementById('blog-filters');
+  const grid = document.getElementById('blog-grid');
+  if (!filters || !grid) return;
+
+  const baseClass =
+    'blog-filter-btn cursor-pointer rounded-lg border px-4 py-1.5 text-xs font-semibold transition duration-200';
+  const activeClass = 'border-accent bg-accent text-bg';
+  const inactiveClass = 'border-bg-border/60 bg-bg-soft/40 text-text-muted hover:bg-bg-card hover:text-text';
+
+  filters.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest('.blog-filter-btn') as HTMLButtonElement | null;
+    if (!btn) return;
+
+    filters.querySelectorAll('.blog-filter-btn').forEach((b) => {
+      b.className = `${baseClass} ${inactiveClass}`;
+    });
+    btn.className = `${baseClass} ${activeClass}`;
+
+    const value = btn.dataset.filter || 'all';
+    grid.querySelectorAll<HTMLElement>('article[data-tags]').forEach((cardEl) => {
+      const cardTags = (cardEl.dataset.tags || '').split(',');
+      cardEl.classList.toggle('hidden', value !== 'all' && !cardTags.includes(value));
+    });
+  });
+}
+
 /** Tarjeta de UN articulo. Construida con nodos, nunca con innerHTML. */
 function card(
   post: Post,

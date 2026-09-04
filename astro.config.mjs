@@ -56,6 +56,14 @@ export default defineConfig({
     // Genera /experiencia/index.html en vez de /experiencia.html.
     // Mas compatible con Apache/cPanel.
     format: 'directory',
+    // El CSS del sitio son ~12KB (todo Tailwind incluido) -- por encima del
+    // umbral que el modo 'auto' de Astro inlinea, asi que se serviria como
+    // <link> externo que bloquea el primer render (100-300ms medidos en
+    // PageSpeed Insights). 'always' lo mete directo en un <style> del HTML:
+    // sin peticion extra, sin bloqueo. El sitio es pequeno (una decena de
+    // paginas), asi que perder el cacheo entre paginas de un CSS compartido
+    // pesa menos que el round-trip que se ahorra en cada una.
+    inlineStylesheets: 'always',
   },
 
   // Optimizaciones para hosting compartido.

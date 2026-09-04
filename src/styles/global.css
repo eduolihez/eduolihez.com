@@ -64,13 +64,16 @@
   --color-text-title: #f0f3f6; /* titulares (un punto por encima del cuerpo) */
   --color-text-muted: #9aa7b8; /* texto secundario */
   /* Texto terciario / metadatos.
-     Era #6b7688 y no llegaba al minimo de WCAG AA: 4.21 sobre el fondo
-     principal, 4.14 sobre el pie, 4.02 sobre las secciones alternas y 3.80
-     sobre las tarjetas, para un minimo de 4.5. Afectaba a fechas, empresas
-     del timeline, encabezados de columna del pie y el copyright.
-     #78849a es el escalon minimo que pasa en el PEOR fondo (4.63 sobre
-     bg-card) y sigue claramente por debajo de --color-text-muted. */
-  --color-text-faint: #78849a;
+     Era #6b7688 y no llegaba al minimo de WCAG AA (4.21 sobre el fondo
+     principal, 3.80 sobre las tarjetas). Se subio a #78849a, calculado para
+     pasar por poco sobre bg-card en teoria -- pero Lighthouse midio 3.34:1
+     de verdad sobre el texto del pie (probablemente por el fondo
+     semitransparente de algunos bloques, bg-card/40 entre otros, que rebaja
+     el contraste real por debajo del calculo contra un fondo solido).
+     #8e99ad da margen de sobra incluso si el fondo efectivo es mas claro de
+     lo esperado (6.1 sobre bg-card solido, ~6.7 sobre el fondo principal) y
+     sigue claramente por debajo de --color-text-muted. */
+  --color-text-faint: #8e99ad;
 
   /* --- Tipografia ----------------------------------------------------- */
   --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;

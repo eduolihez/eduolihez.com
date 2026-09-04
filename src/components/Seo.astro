@@ -160,11 +160,15 @@ const personId = `${SITE.domain}/#person`;
 const siteId = `${SITE.domain}/#website`;
 
 // Puestos de trabajo -> Schema.org (da contexto de trayectoria a Google y a las IAs).
+// startDate/endDate en ISO 8601 real (startDateISO/endDateISO de experience.ts),
+// no el texto libre de `period` -- Schema.org exige Date ahi y cualquier
+// validador (Rich Results Test incluido) lo marca en rojo si no lo es.
 const jobRoles = experiences.map((exp) => ({
   '@type': 'OrganizationRole',
   roleName: pick(exp.role, lang),
   description: pick(exp.description, lang),
-  startDate: pick(exp.period, lang),
+  startDate: exp.startDateISO,
+  ...(exp.endDateISO ? { endDate: exp.endDateISO } : {}),
   worksFor: { '@type': 'Organization', name: exp.company },
 }));
 

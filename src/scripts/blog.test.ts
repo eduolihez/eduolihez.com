@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { initBlogList, escapeHtml, safeUrl, formatDate } from './blog';
+import { initBlogList, initStaticBlogFilters, escapeHtml, safeUrl, formatDate } from './blog';
 
 function setupGrid(overrides: Partial<Record<string, string>> = {}) {
   document.body.innerHTML = `
@@ -159,6 +159,69 @@ describe('initBlogList()', () => {
 
     await vi.waitFor(() => expect(grid.children.length).toBeGreaterThan(0));
     expect(status.classList.contains('hidden')).toBe(true);
+  });
+});
+
+describe('initStaticBlogFilters()', () => {
+  function setupStaticGrid() {
+    document.body.innerHTML = `
+      <div id="blog-filters">
+        <button type="button" class="blog-filter-btn border-accent bg-accent text-bg" data-filter="all">Todos</button>
+        <button type="button" class="blog-filter-btn border-bg-border/60" data-filter="python">python</button>
+        <button type="button" class="blog-filter-btn border-bg-border/60" data-filter="soc">soc</button>
+      </div>
+      <div id="blog-grid">
+        <article data-tags="python,soc"><h2>A</h2></article>
+        <article data-tags="python"><h2>B</h2></article>
+        <article data-tags="soc"><h2>C</h2></article>
+      </div>
+    `;
+  }
+
+  it('no lanza si faltan los contenedores', () => {
+    document.body.innerHTML = '';
+    expect(() => initStaticBlogFilters()).not.toThrow();
+  });
+
+  it('oculta las tarjetas que no tienen la etiqueta seleccionada', () => {
+    setupStaticGrid();
+    initStaticBlogFilters();
+
+    document.querySelector<HTMLButtonElement>('[data-filter="python"]')?.click();
+
+    const articles = [...document.querySelectorAll<HTMLElement>('#blog-grid article')];
+    expect(articles.map((a) => a.classList.contains('hidden'))).toEqual([false, false, true]);
+  });
+
+  it('vuelve a mostrar todas las tarjetas al elegir "Todos"', () => {
+    setupStaticGrid();
+    initStaticBlogFilters();
+
+    document.querySelector<HTMLButtonElement>('[data-filter="soc"]')?.click();
+    document.querySelector<HTMLButtonElement>('[data-filter="all"]')?.click();
+
+    const articles = [...document.querySelectorAll<HTMLElement>('#blog-grid article')];
+    expect(articles.every((a) => !a.classList.contains('hidden'))).toBe(true);
+  });
+
+  it('marca como activo solo el boton pulsado', () => {
+    setupStaticGrid();
+    initStaticBlogFilters();
+
+    const pythonBtn = document.querySelector<HTMLButtonElement>('[data-filter="python"]')!;
+    pythonBtn.click();
+
+    expect(pythonBtn.className).toContain('bg-accent');
+    const allBtn = document.querySelector<HTMLButtonElement>('[data-filter="all"]')!;
+    expect(allBtn.className).not.toContain('bg-accent');
+  });
+
+  it('ignora clicks fuera de un boton de filtro', () => {
+    setupStaticGrid();
+    initStaticBlogFilters();
+    const filters = document.getElementById('blog-filters')!;
+
+    expect(() => filters.click()).not.toThrow();
   });
 });
 

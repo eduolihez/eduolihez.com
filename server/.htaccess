@@ -150,6 +150,16 @@
 RedirectMatch 410 ^/(projects/)?badaveu(/.*)?$
 RedirectMatch 410 ^/(projects/)?mesbadalona(/.*)?$
 
+# ---------------------------------------------------------------------------
+# Blog EN/CA: sin articulos todavia (ver BlogPreview.astro y Header.astro).
+# El listado en esos idiomas no tiene nada que mostrar, asi que en vez de
+# servir un indice vacio se redirige a la home del idioma. Reversible: en
+# cuanto haya contenido real en EN/CA basta con borrar estas dos lineas.
+# Va FUERA del bloque mod_rewrite: Redirect no necesita ese modulo.
+# ---------------------------------------------------------------------------
+RedirectMatch 301 ^/en/blog/?$ /en/
+RedirectMatch 301 ^/ca/blog/?$ /ca/
+
 # Pagina propia para el 410, para que el visitante no vea la de Apache.
 # Con build.format 'directory', Astro la compila a /410/index.html.
 ErrorDocument 410 /410/index.html
@@ -295,4 +305,16 @@ Options -Indexes
   AddType image/svg+xml .svg
   AddType font/woff2 .woff2
   AddType text/vcard .vcf
+</IfModule>
+
+# El HTML estatico de Astro solo declara el charset en <meta charset="UTF-8">
+# del <head>, nunca en la cabecera HTTP Content-Type. Los navegadores lo
+# resuelven bien porque leen el <meta>, pero un consumidor no-navegador
+# (algunos scrapers, validadores, y potencialmente algun rastreador de IA)
+# puede asumir Latin-1 por defecto sin el charset en la cabecera -- justo en
+# un sitio en espanol/catalan con tildes y enes en cada pagina. AddCharset
+# fuerza el charset en la cabecera HTTP para lo que Apache ya sirve como
+# texto, sin tocar los tipos MIME de arriba.
+<IfModule mod_mime.c>
+  AddCharset UTF-8 .html .htm .css .js .xml .svg .txt .webmanifest .vcf
 </IfModule>

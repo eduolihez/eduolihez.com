@@ -36,6 +36,13 @@ name: "Auto-version"
 on:
   push:
     branches: [ "master" ]
+  # Disparo manual: el blog/proyectos viven en MySQL, no en el repo, asi que
+  # publicar contenido nuevo desde /admin (o reimportar schema.sql) no toca
+  # ningun archivo -- no hay push que dispare un rebuild solo. Sin esto, la
+  # unica forma de forzar un dist/ nuevo despues de publicar contenido era
+  # un commit vacio o esperar al siguiente cambio de codigo real. Desde
+  # Actions > Auto-version > Run workflow.
+  workflow_dispatch: {}
 
 permissions:
   contents: read
@@ -46,7 +53,10 @@ concurrency:
 
 jobs:
   auto-version:
-    if: "!startsWith(github.event.head_commit.message, 'chore: auto-bump build to v')"
+    # En un disparo manual (workflow_dispatch) no hay head_commit -- por eso
+    # el guardia anti-bucle solo se evalua para el evento push, donde si
+    # existe.
+    if: "github.event_name != 'push' || !startsWith(github.event.head_commit.message, 'chore: auto-bump build to v')"
     runs-on: ubuntu-latest
     steps:
       - name: Comprobar que el secret AUTO_TAG_PAT esta configurado

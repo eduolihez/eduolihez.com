@@ -92,7 +92,6 @@ $visible  = (int) db()->query('SELECT COUNT(*) FROM posts WHERE visible=1')->fet
 admin_header('Blog - Entradas', 'posts.php');
 show_flash();
 ?>
-<div class="subdash">
 <div class="toolbar">
   <h1 style="margin:0;">Artículos del Blog <span class="faint" style="font-size:1rem;">(<?= $visible ?> visibles de <?= $totalAll ?>)</span></h1>
   <a class="btn" href="post-edit.php">+ Nuevo artículo</a>
@@ -200,7 +199,6 @@ show_flash();
     </table>
   </div>
 </div>
-</div><!-- /.subdash -->
 <?php
 admin_footer();
 ?>

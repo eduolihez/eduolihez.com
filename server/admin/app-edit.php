@@ -77,7 +77,6 @@ if ($errors) {
     echo '<div class="flash err">' . e(implode(' ', $errors)) . '</div>';
 }
 ?>
-<div class="subdash">
 <div class="toolbar">
   <h1 style="margin:0;"><?= $isEdit ? 'Editar app' : 'Nueva app' ?></h1>
   <a class="btn ghost" href="apps.php">&larr; Volver</a>
@@ -111,5 +110,4 @@ if ($errors) {
   </div>
 </form>
 
-</div><!-- /.subdash -->
 <?php admin_footer(); ?>

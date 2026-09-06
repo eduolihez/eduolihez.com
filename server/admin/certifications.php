@@ -108,7 +108,6 @@ $last = count($rows) - 1;
 admin_header('Certificaciones', 'certifications.php');
 show_flash();
 ?>
-<div class="subdash">
 <div class="toolbar">
   <h1 style="margin:0;">Certificaciones <span class="faint" style="font-size:1rem;">(<?= $visible ?> visibles de <?= $totalAll ?>)</span></h1>
   <a class="btn" href="cert-edit.php">+ Nueva certificacion</a>
@@ -212,5 +211,4 @@ show_flash();
   </div>
 </div>
 
-</div><!-- /.subdash -->
 <?php admin_footer(); ?>

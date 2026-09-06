@@ -146,7 +146,6 @@ $checks = [
 admin_header('Seguridad', 'security.php');
 show_flash();
 ?>
-<div class="subdash">
 <h1>Seguridad</h1>
 
 <div class="grid4">
@@ -303,5 +302,4 @@ show_flash();
 <p class="hint">Los registros de auditoria se conservan 365 dias y los intentos de
   acceso 90; despues se purgan solos.</p>
 
-</div><!-- /.subdash -->
 <?php admin_footer(); ?>

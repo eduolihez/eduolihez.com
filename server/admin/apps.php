@@ -68,7 +68,6 @@ $rows = db()->query(
 admin_header('Apps', 'apps.php');
 show_flash();
 ?>
-<div class="subdash">
 <div class="toolbar">
   <h1 style="margin:0;">Apps <span class="faint" style="font-size:1rem;">(<?= count($rows) ?>)</span></h1>
   <a class="btn" href="app-edit.php">+ Nueva app</a>
@@ -140,5 +139,4 @@ show_flash();
   </div>
 </div>
 
-</div><!-- /.subdash -->
 <?php admin_footer(); ?>

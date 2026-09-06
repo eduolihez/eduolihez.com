@@ -105,7 +105,6 @@ if (!empty($errors)) {
     echo '<div class="flash err">' . e(implode(' ', $errors)) . '</div>';
 }
 ?>
-<div class="subdash">
 <div class="toolbar">
   <h1 style="margin:0;"><?= $isEdit ? 'Editar certificacion' : 'Nueva certificacion' ?></h1>
   <a class="btn ghost" href="certifications.php">&larr; Volver</a>
@@ -168,5 +167,4 @@ if (!empty($errors)) {
   </div>
 </form>
 
-</div><!-- /.subdash -->
 <?php admin_footer(); ?>

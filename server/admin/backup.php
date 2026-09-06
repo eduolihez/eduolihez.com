@@ -203,7 +203,6 @@ $nMessages = (int) db()->query('SELECT COUNT(*) FROM messages')->fetchColumn();
 admin_header('Backup', 'backup.php');
 show_flash();
 ?>
-<div class="subdash">
 <h1>Copia de seguridad</h1>
 
 <?php if ($errors): ?>
@@ -289,5 +288,4 @@ show_flash();
   </table>
 </div>
 
-</div><!-- /.subdash -->
 <?php admin_footer(); ?>

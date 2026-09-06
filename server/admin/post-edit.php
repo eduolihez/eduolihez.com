@@ -157,7 +157,6 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
 
 admin_header($isEdit ? 'Editar Artículo' : 'Nuevo Artículo', 'posts.php');
 ?>
-<div class="subdash">
 <div class="toolbar">
   <h1 style="margin:0;"><?= $isEdit ? 'Editar Artículo' : 'Nuevo Artículo del Blog' ?></h1>
   <a class="btn ghost" href="posts.php">Volver al listado</a>
@@ -268,7 +267,6 @@ admin_header($isEdit ? 'Editar Artículo' : 'Nuevo Artículo', 'posts.php');
   </div>
 </form>
 
-</div><!-- /.subdash -->
 <script>
   // Autogeneración del slug a partir del título en tiempo real (solo al crear)
   document.addEventListener('DOMContentLoaded', () => {

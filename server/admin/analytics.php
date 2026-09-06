@@ -352,7 +352,6 @@ admin_header('Analitica', 'analytics.php');
 // partials/layout.php (bloque ".subdash"), reutilizados por todas las
 // paginas re-skinadas de la Entrega 2 -- no se duplican aqui.
 ?>
-<div class="subdash">
 <div class="toolbar">
   <h1 style="margin:0;">
     Analitica
@@ -666,5 +665,4 @@ admin_header('Analitica', 'analytics.php');
   visita". Compatible con RGPD sin banner de cookies.
 </p>
 
-</div><!-- /.subdash -->
 <?php admin_footer(); ?>

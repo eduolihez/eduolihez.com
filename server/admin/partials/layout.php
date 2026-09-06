@@ -120,13 +120,24 @@ function admin_header(string $title, string $active = ''): void
   }
 </style>
 <style>
+  /* Tema claro, minimal, tipo Linear/Vercel (2026-09-06): unificado para
+     TODO el panel, barra lateral incluida -- antes solo el contenido de
+     cada pagina llevaba este tema via un bloque ".subdash" aparte, y la
+     barra lateral se quedaba con el tema oscuro original "como chrome fijo
+     de navegacion". Union pedida expresamente: la barra oscura se leia como
+     un descuido, no como una decision. Con los tokens aqui y los componentes
+     de abajo ya usando var(...) en vez de colores sueltos, cambiar estos
+     valores re-pinta el panel entero sin tocar cada pagina. */
   :root {
-    --bg: #0a0e14; --soft: #0f141c; --card: rgba(20, 26, 36, 0.72); --border: #1f2733;
-    --text: #e6edf3; --muted: #9aa7b8; --faint: #78849a;
-    --accent: #4ade80; --accent-hover: #22c55e; --danger: #f87171;
-    --cyan: #22d3ee; --warn: #f59e0b; --violet: #a78bfa;
-    --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --bg: #fbfbfa; --soft: #f2f1ee; --card: #ffffff; --border: #e5e4e0;
+    --text: #16151a; --muted: #6b6b74; --faint: #9c9ba3;
+    --accent: #5b5bd6; --accent-hover: #4747c2; --accent-soft: #eeeefc;
+    --danger: #b3261e; --danger-soft: #fbe9e8;
+    --warn: #a15c00; --warn-soft: #fdf1de;
+    --green: #17794f; --green-soft: #e6f6ee;
+    --cyan: #0c8599; --violet: #7048e8;
+    --shadow: 0 1px 2px rgba(20, 20, 30, 0.04), 0 12px 32px -16px rgba(20, 20, 30, 0.14);
+    --shadow-sm: 0 1px 2px rgba(20, 20, 30, 0.05);
   }
   * { box-sizing: border-box; }
   body {
@@ -310,14 +321,14 @@ function admin_header(string $title, string $active = ''): void
   }
 
   .menu-item:hover {
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--soft);
     color: var(--text);
   }
 
   .menu-item.active {
-    background: rgba(74, 222, 128, 0.08);
+    background: var(--accent-soft);
     color: var(--accent);
-    border-color: rgba(74, 222, 128, 0.18);
+    border-color: transparent;
   }
   .menu-item.active::before {
     opacity: 1;
@@ -354,7 +365,7 @@ function admin_header(string $title, string $active = ''): void
   /* Contador informativo (cuantos hay), distinto del aviso de "hay algo que
      mirar" (badge-count, verde): mismo hueco, tono neutro. */
   .badge-muted {
-    background: rgba(255, 255, 255, 0.06);
+    background: var(--border);
     color: var(--faint);
     font-size: 0.7rem;
     font-weight: 700;
@@ -366,7 +377,7 @@ function admin_header(string $title, string $active = ''): void
   }
   .menu-item.active .badge-muted {
     color: var(--accent);
-    background: rgba(74, 222, 128, 0.14);
+    background: var(--accent-soft);
   }
 
   .sidebar-footer {
@@ -438,7 +449,7 @@ function admin_header(string $title, string $active = ''): void
   }
 
   .action-btn:hover {
-    background: rgba(255, 255, 255, 0.02);
+    background: var(--soft);
     color: var(--text);
   }
 
@@ -449,7 +460,7 @@ function admin_header(string $title, string $active = ''): void
 
   .action-btn.danger-text:hover {
     color: var(--danger);
-    background: rgba(248, 113, 113, 0.05);
+    background: var(--danger-soft);
   }
 
   /* Main Content Wrapper */
@@ -468,7 +479,7 @@ function admin_header(string $title, string $active = ''): void
     align-items: center;
     justify-content: space-between;
     padding: 1rem 2rem;
-    background: rgba(10, 14, 20, 0.8);
+    background: rgba(251, 251, 250, 0.82);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border);
   }
@@ -526,7 +537,6 @@ function admin_header(string $title, string $active = ''): void
     padding: 1.5rem;
     margin-bottom: 1.5rem;
     box-shadow: var(--shadow);
-    backdrop-filter: blur(8px);
   }
 
   /* Card "hundida": para contenido citado/preformateado (p.ej. el cuerpo de
@@ -535,9 +545,7 @@ function admin_header(string $title, string $active = ''): void
   .card.inset { background: var(--bg); box-shadow: none; backdrop-filter: none; }
 
   /* Caja de fondo neutro para miniaturas/paneles sueltos que no son una
-     .card completa (marcador de imagen sin logo, vista previa de un
-     campo...). Clase en vez de "style=background:var(--soft)" repetido
-     para que el re-skin por pagina (.subdash) tambien la alcance. */
+     .card completa (marcador de imagen sin logo, vista previa de un campo...). */
   .soft-box { background: var(--soft); }
 
   h1 { font-size: 1.75rem; font-weight: 700; margin: 0 0 1.5rem; letter-spacing: -0.03em; }
@@ -557,7 +565,7 @@ function admin_header(string $title, string $active = ''): void
     background: var(--accent); opacity: 0; transition: opacity 0.25s;
   }
   .stat:hover::before { opacity: 1; }
-  .stat:hover { border-color: rgba(255,255,255,0.15); transform: translateY(-4px); }
+  .stat:hover { border-color: rgba(20, 20, 30, 0.16); transform: translateY(-4px); }
   .stat .num { 
     font-family: 'JetBrains Mono', monospace; 
     font-size: 2.25rem; 
@@ -579,9 +587,9 @@ function admin_header(string $title, string $active = ''): void
     font-size: 0.72rem; font-weight: 700; margin-left: 0.5rem; padding: 0.15rem 0.4rem; 
     border-radius: 0.375rem; vertical-align: middle;
   }
-  .delta.up { color: var(--accent); background: rgba(74, 222, 128, 0.12); }
-  .delta.down { color: var(--danger); background: rgba(248, 113, 113, 0.12); }
-  .delta.flat { color: var(--faint); background: rgba(255, 255, 255, 0.04); }
+  .delta.up { color: var(--green); background: var(--green-soft); }
+  .delta.down { color: var(--danger); background: var(--danger-soft); }
+  .delta.flat { color: var(--faint); background: var(--border); }
 
   /* Tablas */
   table { width: 100%; border-collapse: collapse; }
@@ -589,20 +597,20 @@ function admin_header(string $title, string $active = ''): void
   th { color: var(--faint); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; }
   tr:last-child td { border-bottom: none; }
   tr { transition: background-color 0.15s ease; }
-  tr:hover td { background: rgba(255, 255, 255, 0.02); }
+  tr:hover td { background: rgba(20, 20, 30, 0.025); }
 
   /* Form Controls */
   label { display: block; margin: 1rem 0 0.4rem; font-weight: 600; font-size: 0.85rem; color: var(--text); }
   input[type=text], input[type=email], input[type=password], input[type=url],
   input[type=number], input[type=date], input[type=search], textarea, select {
-    width: 100%; padding: 0.7rem 0.9rem; background: rgba(10, 14, 20, 0.7);
+    width: 100%; padding: 0.7rem 0.9rem; background: var(--card);
     border: 1px solid var(--border); border-radius: 0.5rem; color: var(--text);
     font-size: 0.92rem; font-family: inherit; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  input:focus, textarea:focus, select:focus { 
-    outline: none; border-color: var(--accent); 
-    box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.18); 
-    background: rgba(10, 14, 20, 0.9);
+  input:focus, textarea:focus, select:focus {
+    outline: none; border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+    background: var(--card);
   }
   textarea { resize: vertical; min-height: 120px; }
   
@@ -618,9 +626,9 @@ function admin_header(string $title, string $active = ''): void
   }
   .btn:hover { background: var(--accent-hover); box-shadow: var(--shadow); }
   .btn.ghost { background: transparent; color: var(--text); border-color: var(--border); }
-  .btn.ghost:hover { border-color: var(--accent); color: var(--accent); background: rgba(74, 222, 128, 0.05); }
-  .btn.danger { background: transparent; color: var(--danger); border-color: rgba(248, 113, 113, 0.35); }
-  .btn.danger:hover { background: rgba(248, 113, 113, 0.08); }
+  .btn.ghost:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+  .btn.danger { background: transparent; color: var(--danger); border-color: rgba(179, 38, 30, 0.35); }
+  .btn.danger:hover { background: var(--danger-soft); }
   .btn.sm { padding: 0.4rem 0.85rem; font-size: 0.8rem; border-radius: 0.375rem; }
   .btn.icon { padding: 0.4rem 0.55rem; font-size: 0.85rem; border-radius: 0.375rem; }
   .btn[disabled] { opacity: 0.35; pointer-events: none; }
@@ -632,23 +640,23 @@ function admin_header(string $title, string $active = ''): void
     font-size: 0.72rem; font-weight: 600; border: 1px solid var(--border); 
     background: var(--soft); color: var(--muted); 
   }
-  .pill.on { color: var(--accent); border-color: rgba(74, 222, 128, 0.28); background: rgba(74, 222, 128, 0.06); }
-  .pill.off { color: var(--faint); background: rgba(255, 255, 255, 0.02); }
-  .pill.warn { color: var(--warn); border-color: rgba(245, 158, 11, 0.25); background: rgba(245, 158, 11, 0.06); }
-  .pill.danger { color: var(--danger); border-color: rgba(248, 113, 113, 0.25); background: rgba(248, 113, 113, 0.06); }
+  .pill.on { color: var(--green); border-color: transparent; background: var(--green-soft); }
+  .pill.off { color: var(--faint); background: var(--border); }
+  .pill.warn { color: var(--warn); border-color: transparent; background: var(--warn-soft); }
+  .pill.danger { color: var(--danger); border-color: transparent; background: var(--danger-soft); }
 
   .actions { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
   .flash { padding: 0.85rem 1.25rem; border-radius: 0.5rem; margin-bottom: 1.5rem; font-size: 0.88rem; font-weight: 500; }
-  .flash.ok { background: rgba(74, 222, 128, 0.08); color: var(--accent); border: 1px solid rgba(74, 222, 128, 0.18); }
-  .flash.err { background: rgba(248, 113, 113, 0.08); color: var(--danger); border: 1px solid rgba(248, 113, 113, 0.15); }
-  .flash.warn { background: rgba(245, 158, 11, 0.06); color: var(--warn); border: 1px solid rgba(245, 158, 11, 0.15); }
+  .flash.ok { background: var(--green-soft); color: var(--green); border: 1px solid transparent; }
+  .flash.err { background: var(--danger-soft); color: var(--danger); border: 1px solid transparent; }
+  .flash.warn { background: var(--warn-soft); color: var(--warn); border: 1px solid transparent; }
   .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 1.25rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
   .hint { color: var(--faint); font-size: 0.78rem; margin-top: 0.3rem; line-height: 1.5; }
   
   /* Horizontal bar graphs */
-  .bar-wrap { height: 6px; background: rgba(255, 255, 255, 0.04); border-radius: 99px; overflow: hidden; margin-top: 0.4rem; }
+  .bar-wrap { height: 6px; background: var(--border); border-radius: 99px; overflow: hidden; margin-top: 0.4rem; }
   .bar { height: 100%; background: var(--cyan); border-radius: 99px; }
-  .bar.green { background: var(--accent); }
+  .bar.green { background: var(--green); }
   .bar.violet { background: var(--violet); }
   .barline { margin-bottom: 0.85rem; }
   .barline .lab { display: flex; justify-content: space-between; font-size: 0.82rem; gap: 1rem; }
@@ -665,7 +673,7 @@ function admin_header(string $title, string $active = ''): void
   
   .tabs { display: flex; gap: 0.35rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
   .tabs a { padding: 0.45rem 1rem; border-radius: 0.5rem; font-size: 0.82rem; font-weight: 500; color: var(--muted); border: 1px solid var(--border); transition: all 0.2s; }
-  .tabs a.active { background: rgba(74, 222, 128, 0.08); color: var(--accent); border-color: rgba(74, 222, 128, 0.18); }
+  .tabs a.active { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
   .tabs a:hover { text-decoration: none; color: var(--text); border-color: var(--muted); }
   .tabs a:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
   
@@ -693,11 +701,11 @@ function admin_header(string $title, string $active = ''): void
   /* Rejilla de "casillas" de estado (salud del sistema, seguridad): se lee de
      un vistazo mucho mas rapido que una tabla de filas clave/valor. */
   .health-grid { display: grid; gap: 0.75rem; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); }
-  .health-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.85rem 1rem; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); border-radius: 0.6rem; }
-  .health-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; background: var(--faint); box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.03); }
-  .health-dot.ok { background: var(--accent); box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.15); }
-  .health-dot.warn { background: var(--warn); box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15); }
-  .health-dot.danger { background: var(--danger); box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.15); }
+  .health-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.85rem 1rem; background: var(--soft); border: 1px solid var(--border); border-radius: 0.6rem; }
+  .health-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; background: var(--faint); box-shadow: 0 0 0 3px var(--border); }
+  .health-dot.ok { background: var(--green); box-shadow: 0 0 0 3px var(--green-soft); }
+  .health-dot.warn { background: var(--warn); box-shadow: 0 0 0 3px var(--warn-soft); }
+  .health-dot.danger { background: var(--danger); box-shadow: 0 0 0 3px var(--danger-soft); }
   .health-body { min-width: 0; }
   .health-val { font-size: 0.86rem; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .health-lbl { font-size: 0.72rem; color: var(--faint); margin-top: 0.1rem; }
@@ -708,7 +716,7 @@ function admin_header(string $title, string $active = ''): void
   .timeline-item:last-child { border-bottom: none; padding-bottom: 0; }
   .timeline-item:first-child { padding-top: 0; }
   .timeline-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); flex-shrink: 0; margin-top: 0.4rem; }
-  .timeline-dot.green { background: var(--accent); }
+  .timeline-dot.green { background: var(--green); }
   .timeline-dot.cyan { background: var(--cyan); }
   .timeline-dot.violet { background: var(--violet); }
   .timeline-dot.danger { background: var(--danger); }
@@ -727,7 +735,7 @@ function admin_header(string $title, string $active = ''): void
       width: 270px;
       transform: translateX(-100%);
       transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 10px 0 25px rgba(0, 0, 0, 0.5);
+      box-shadow: 10px 0 25px rgba(20, 20, 30, 0.18);
     }
     .sidebar.open {
       transform: translateX(0);
@@ -738,7 +746,7 @@ function admin_header(string $title, string $active = ''): void
     .sidebar-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.6);
+      background: rgba(20, 20, 30, 0.4);
       backdrop-filter: blur(4px);
       z-index: 99;
       display: none;
@@ -753,138 +761,8 @@ function admin_header(string $title, string $active = ''): void
     main {
       padding: 1.5rem;
     }
-    .subdash {
-      margin: -1.5rem -1.5rem 0;
-      padding: 1.5rem;
-    }
   }
 
-  /* ===========================================================================
-     SUB-DASHBOARD (docs/designs/admin-dashboard.md, Entrega 1 + Entrega 2):
-     tema claro, minimal, tipo Linear/Vercel -- deliberadamente distinto del
-     panel oscuro de siempre. La barra lateral y la topbar SIGUEN oscuras a
-     proposito: dan continuidad de navegacion mientras cada pagina de
-     contenido va pasando a este tema (Entrega 2 se aplica pagina por
-     pagina, no de golpe). Vive bajo <div class="subdash">...</div> -- MISMO
-     HTML que el resto del panel (.card, .btn, .table, inputs...), apariencia
-     nueva solo por cascada, sin tocar la logica de ninguna pagina.
-     =========================================================================== */
-  .subdash {
-    --sd-bg: #fbfbfa; --sd-surface: #ffffff;
-    --sd-border: #ececea; --sd-border-strong: #dbdad6;
-    --sd-text: #16151a; --sd-muted: #6b6b74; --sd-faint: #9c9ba3;
-    --sd-accent: #5b5bd6; --sd-accent-soft: #eeeefc;
-    --sd-green: #17794f; --sd-green-soft: #e6f6ee;
-    --sd-warn: #a15c00; --sd-warn-soft: #fdf1de;
-    --sd-danger: #b3261e; --sd-danger-soft: #fbe9e8;
-    background: var(--sd-bg);
-    color: var(--sd-text);
-    margin: -2rem -2rem 0;
-    padding: 2rem;
-    font-feature-settings: "tnum" 1;
-  }
-  .subdash h1 { color: var(--sd-text); font-weight: 650; letter-spacing: -0.03em; }
-  .subdash h1 .faint { color: var(--sd-faint); font-weight: 500; }
-  .subdash h2 {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
-    letter-spacing: 0.09em; color: var(--sd-faint);
-    border: 0; padding: 0; margin: 2.25rem 0 0.75rem;
-  }
-  .subdash h3 { color: var(--sd-faint); }
-  .subdash .card {
-    background: var(--sd-surface); border: 1px solid var(--sd-border);
-    border-radius: 10px; box-shadow: none; backdrop-filter: none;
-  }
-  .subdash .stat:hover { border-color: var(--sd-border-strong); transform: none; }
-  .subdash .stat::before { background: var(--sd-accent); }
-  .subdash .stat .num {
-    font-family: 'Inter', sans-serif; font-weight: 650; font-size: 2rem;
-    letter-spacing: -0.03em; color: var(--sd-text);
-  }
-  .subdash .stat .num.cyan,
-  .subdash .stat .num.violet { color: var(--sd-accent); }
-  .subdash .stat .num.warn { color: var(--sd-warn); }
-  .subdash .stat .num.danger { color: var(--sd-danger); }
-  .subdash .stat .lbl { color: var(--sd-muted); }
-  .subdash .delta.up { color: var(--sd-green); background: var(--sd-green-soft); }
-  .subdash .delta.down { color: var(--sd-danger); background: var(--sd-danger-soft); }
-  .subdash .delta.flat { color: var(--sd-faint); background: var(--sd-border); }
-  .subdash table th, .subdash table td { border-bottom: 1px solid var(--sd-border); }
-  .subdash table th { color: var(--sd-faint); font-family: 'JetBrains Mono', monospace; letter-spacing: 0.07em; }
-  .subdash table td { color: var(--sd-text); }
-  .subdash tr:hover td { background: var(--sd-bg); }
-  .subdash .btn { border-radius: 7px; font-weight: 600; background: var(--sd-text); color: var(--sd-surface); }
-  .subdash .btn:hover { background: #000; box-shadow: none; }
-  /* .ghost y .danger PISAN el fondo solido de .btn de arriba a proposito:
-     sin este "background: transparent" se quedaban con el fondo negro de
-     .btn pero el texto oscuro (o rojo) de su propia variante -- texto
-     invisible o casi, la caja parecia un boton roto en vez de uno "outline". */
-  .subdash .btn.ghost { background: transparent; color: var(--sd-text); border-color: var(--sd-border-strong); }
-  .subdash .btn.ghost:hover { border-color: var(--sd-accent); color: var(--sd-accent); background: var(--sd-accent-soft); }
-  .subdash .btn.danger { background: transparent; color: var(--sd-danger); border-color: var(--sd-danger-soft); }
-  .subdash .btn.danger:hover { background: var(--sd-danger-soft); }
-  .subdash .btn[disabled] { opacity: 0.4; }
-  /* Enlaces sueltos (no .btn): sin esto heredaban el verde del tema oscuro
-     de layout.php (regla global "a { color: var(--accent) }"), que desentona
-     dentro de una pagina ya re-skinada en claro con acento indigo. */
-  .subdash a { color: var(--sd-accent); }
-  .subdash a:hover { color: #4747c2; }
-  .subdash .pill { background: var(--sd-accent-soft); color: var(--sd-accent); border-color: transparent; }
-  .subdash .pill.on { background: var(--sd-green-soft); color: var(--sd-green); }
-  .subdash .pill.off { background: var(--sd-border); color: var(--sd-faint); }
-  .subdash .pill.warn { background: var(--sd-warn-soft); color: var(--sd-warn); }
-  .subdash .pill.danger { background: var(--sd-danger-soft); color: var(--sd-danger); }
-  .subdash .hint, .subdash .muted, .subdash .empty { color: var(--sd-muted); }
-  .subdash .faint { color: var(--sd-faint); }
-  .subdash .chart { border-bottom: 1px solid var(--sd-border); }
-  .subdash .chart .bar-v { background: var(--sd-accent); border-radius: 3px 3px 0 0; }
-  .subdash .chart .bar-v:hover { background: #4747c2; filter: none; }
-  .subdash .chart .tick, .subdash .chart .val { color: var(--sd-faint); }
-  .subdash .bar-wrap { background: var(--sd-border); }
-  .subdash .bar { background: var(--sd-accent); }
-  .subdash .bar.green { background: var(--sd-green); }
-  .subdash .bar.violet { background: var(--sd-accent); }
-  .subdash .barline .lab span:first-child { color: var(--sd-text); }
-  .subdash .barline .lab span:last-child { color: var(--sd-faint); }
-  .subdash .scroll-x { background: var(--sd-surface); border-color: var(--sd-border); }
-  .subdash .flash.ok { background: var(--sd-green-soft); color: var(--sd-green); border-color: transparent; }
-  .subdash .flash.err { background: var(--sd-danger-soft); color: var(--sd-danger); border-color: transparent; }
-  .subdash .flash.warn { background: var(--sd-warn-soft); color: var(--sd-warn); border-color: transparent; }
-  .subdash .tabs a { color: var(--sd-muted); border-color: var(--sd-border-strong); }
-  .subdash .tabs a.active { background: var(--sd-accent-soft); color: var(--sd-accent); border-color: transparent; }
-  .subdash .tabs a:hover { color: var(--sd-text); border-color: var(--sd-faint); }
-  .subdash .checkline strong { color: var(--sd-text); }
-  .subdash label { color: var(--sd-text); }
-  .subdash input[type=text], .subdash input[type=email], .subdash input[type=password],
-  .subdash input[type=url], .subdash input[type=number], .subdash input[type=date],
-  .subdash input[type=search], .subdash textarea, .subdash select {
-    background: var(--sd-surface); border: 1px solid var(--sd-border-strong); color: var(--sd-text);
-  }
-  .subdash input:focus, .subdash textarea:focus, .subdash select:focus {
-    border-color: var(--sd-accent); background: var(--sd-surface);
-    box-shadow: 0 0 0 3px var(--sd-accent-soft);
-  }
-  .subdash .health-item { background: var(--sd-surface); border-color: var(--sd-border); }
-  .subdash .health-dot { background: var(--sd-faint); box-shadow: 0 0 0 3px var(--sd-border); }
-  .subdash .health-dot.ok { background: var(--sd-green); box-shadow: 0 0 0 3px var(--sd-green-soft); }
-  .subdash .health-dot.warn { background: var(--sd-warn); box-shadow: 0 0 0 3px var(--sd-warn-soft); }
-  .subdash .health-dot.danger { background: var(--sd-danger); box-shadow: 0 0 0 3px var(--sd-danger-soft); }
-  .subdash .health-val { color: var(--sd-text); }
-  .subdash .health-lbl { color: var(--sd-faint); }
-  .subdash .timeline-item { border-color: var(--sd-border); }
-  .subdash .timeline-dot { background: var(--sd-faint); }
-  .subdash .timeline-dot.green { background: var(--sd-green); }
-  .subdash .timeline-dot.cyan,
-  .subdash .timeline-dot.violet { background: var(--sd-accent); }
-  .subdash .timeline-dot.danger { background: var(--sd-danger); }
-  .subdash .spark i { background: var(--sd-accent); }
-  .subdash .spark.cyan i,
-  .subdash .spark.violet i { background: var(--sd-accent); }
-  .subdash .spark.warn i { background: var(--sd-warn); }
-  .subdash .h2-icon svg { color: var(--sd-accent); opacity: 1; }
-  .subdash .card.inset { background: var(--sd-bg); }
-  .subdash .soft-box { background: var(--sd-bg); }
 </style>
 </head>
 <body>

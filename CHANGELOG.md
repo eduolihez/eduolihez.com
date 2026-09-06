@@ -5,6 +5,30 @@ Todos los cambios notables de este proyecto se documentan en este archivo.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/),
 y el versionado usa cuatro números (`MAJOR.MINOR.PATCH.MICRO`).
 
+## [1.7.2.0] - 2026-09-06
+
+### Changed
+
+- **Panel unificado en un solo tema claro, barra lateral incluida.** Desde
+  la Entrega 2 (1.7.0.0), solo el contenido de cada página llevaba el tema
+  claro tipo Linear/Vercel — la barra lateral y la topbar se quedaban
+  oscuras a propósito, como "chrome" fijo de navegación. Pedido expreso:
+  esa mezcla se leía como un descuido, no como una decisión. Los tokens de
+  `:root` en `server/admin/partials/layout.php` pasan a ser los del tema
+  claro directamente (antes solo los redefinía el bloque `.subdash` para
+  el contenido), y cada componente que tenía un color de dark-theme escrito
+  a mano (`rgba(255,255,255,…)` para hover, `rgba(74,222,128,…)` atado al
+  verde antiguo, fondos de formulario en `rgba(10,14,20,…)`…) pasa a usar
+  variables — incluida una separación real entre el acento de marca
+  (índigo) y los colores semánticos (verde para "activo"/éxito, ámbar para
+  aviso, rojo para peligro), que antes coincidían por casualidad con el
+  verde de acento del tema oscuro.
+- El bloque `.subdash` (creado en la Entrega 2 para acotar el tema nuevo
+  solo al contenido) queda retirado por completo — ya redundante una vez
+  que el tema base es el mismo en todo el panel — y los `<div
+  class="subdash">` que envolvían el contenido de cada página se quitan
+  del HTML (14 archivos) al quedarse sin ningún estilo asociado.
+
 ## [1.7.1.0] - 2026-09-06
 
 ### Fixed

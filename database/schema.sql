@@ -154,6 +154,32 @@ CREATE TABLE IF NOT EXISTS `activity_log` (
   KEY `idx_entity` (`entity`, `entity_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Registro de "apps" para admin.eduolihez.com (docs/designs/admin-dashboard.md):
+-- un sub-dashboard por proyecto (eduolihez.com, y los que vengan despues,
+-- p.ej. BloomGram), cada uno con su propia clave de ingesta.
+--
+-- NO se llama `projects`: esa tabla ya existe mas abajo (seccion 2) y es
+-- otra cosa -- las tarjetas de portfolio (Blue Team Hub, PromptMaster...).
+-- Confundir los dos nombres fue el primer hallazgo de la revision de
+-- arquitectura de este diseno.
+--
+-- `api_key_hash` guarda SHA-256 de la clave, nunca la clave en claro (mismo
+-- tratamiento que `visits.ip_hash`): la clave real solo se ensena una vez,
+-- al crearla o rotarla, desde el panel. `key_rotated_at` es el mecanismo de
+-- revocacion -- rotar invalida la clave anterior al instante, no hace falta
+-- una lista de claves revocadas a esta escala.
+CREATE TABLE IF NOT EXISTS `apps` (
+  `id`               INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `slug`             VARCHAR(60)  NOT NULL,
+  `display_name`     VARCHAR(100) NOT NULL,
+  `api_key_hash`     CHAR(64)     NULL,      -- SHA-256 hex; NULL hasta generar la clave
+  `allowed_origins`  TEXT         NULL,      -- JSON: ["https://...", "chrome-extension://..."]
+  `key_rotated_at`   DATETIME     NULL,
+  `created_at`       DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_slug` (`slug`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 -- ===========================================================================
 --  2. CONTENIDO DEL PORTFOLIO
@@ -283,6 +309,50 @@ CREATE TABLE IF NOT EXISTS `visits` (
   KEY `idx_country` (`country`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Telemetria generica de las apps registradas en `apps` (arriba, seccion 1):
+-- instalaciones, errores, clics... lo que cada app quiera reportar. A
+-- diferencia de `visits` (forma fija, pagina vista de ESTE sitio), aqui el
+-- `payload` es JSON de forma libre porque una app futura puede reportar
+-- tipos de evento que hoy no existen.
+--
+-- `UNIQUE KEY (app_id, event_id)` deduplica reintentos: si el cliente (una
+-- extension, un programa, no del todo bajo control en el momento de la
+-- peticion) repite el mismo POST por un fallo de red, la segunda llegada no
+-- duplica la fila.
+-- `event_id` lo genera el cliente (p.ej. un UUID por evento), no el servidor.
+--
+-- Se purga sola igual que `visits` (400 dias) por consistencia -- decision
+-- revisada en plan-eng-review 2026-09-04, mantenida a proposito: sin datos
+-- reales de cuanto hace falta retener eventos de una app que aun no existe,
+-- fijar otro numero seria adivinar.
+CREATE TABLE IF NOT EXISTS `app_events` (
+  `id`         BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `app_id`     INT UNSIGNED NOT NULL,
+  `event_id`   VARCHAR(64)  NOT NULL,
+  `type`       VARCHAR(60)  NOT NULL,
+  `payload`    TEXT         NULL,           -- JSON, forma libre por app
+  `created_at` DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_dedup` (`app_id`, `event_id`),
+  KEY `idx_app_type_time` (`app_id`, `type`, `created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Rate-limit por IP de server/api/events.php, ANTES de identificar la app
+-- (una clave invalida nunca llega al contador por app_id de arriba, asi que
+-- sin esto el limite por clave no frena intentos de fuerza bruta). Misma
+-- IP hasheada que `visits.ip_hash` -- nunca la IP en claro. Vida muy corta
+-- a proposito: la unica consulta que hace este endpoint sobre esta tabla es
+-- "cuantas peticiones en el ultimo minuto", asi que un dia de margen ya es
+-- generoso; se purga sola con el mismo patron probabilistico que `visits`
+-- (ver server/api/events.php).
+CREATE TABLE IF NOT EXISTS `app_events_ip_log` (
+  `id`         BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `ip_hash`    CHAR(64)  NOT NULL,
+  `created_at` DATETIME  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_hash_time` (`ip_hash`, `created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 -- ===========================================================================
 --  4. AJUSTES DEL SITIO (clave/valor)
@@ -313,6 +383,13 @@ CALL add_column_if_missing('visits', 'is_bot',  "TINYINT(1) NOT NULL DEFAULT 0 A
 CALL add_index_if_missing('visits', 'idx_hash_time', '`ip_hash`, `visited_at`');
 CALL add_index_if_missing('visits', 'idx_bot_time',  '`is_bot`, `visited_at`');
 CALL add_index_if_missing('visits', 'idx_country',   '`country`');
+
+-- admin.eduolihez.com (docs/designs/admin-dashboard.md): cada visita queda
+-- ligada a la app que la genero. El backfill de abajo asigna las visitas ya
+-- existentes (todas de antes de que existiera el concepto de "apps") a
+-- eduolihez.com -- son suyas, no deben quedar en NULL.
+CALL add_column_if_missing('visits', 'app_id', 'INT UNSIGNED NULL AFTER `id`');
+CALL add_index_if_missing('visits', 'idx_app_time', '`app_id`, `visited_at`');
 
 -- Analitica de comportamiento y atribucion. Nada de esto es persistente ni
 -- identifica a nadie: session_id vive solo en sessionStorage (muere al
@@ -886,11 +963,31 @@ Se compara:  en el navegador, contra la lista recibida</code></pre>
      'python,automatizacion,soc,reporting,buenas-practicas',
      'es', 1, '2026-06-18 12:00:00', '2026-06-18 12:00:00');
   END IF;
+
+  -- --- Apps (admin.eduolihez.com) -------------------------------------------
+  -- Solo la app "eduolihez" en la siembra inicial: BloomGram y las que
+  -- vengan despues se registran desde el panel cuando existan de verdad, no
+  -- se inventan aqui. Sin api_key_hash todavia -- la clave real se genera y
+  -- se ensena una vez desde /admin (docs/designs/admin-dashboard.md), nunca
+  -- se guarda en claro ni se versiona en este archivo.
+  IF (SELECT COUNT(*) FROM `apps`) = 0 THEN
+    INSERT INTO `apps` (`slug`, `display_name`)
+    VALUES ('eduolihez', 'eduolihez.com');
+  END IF;
 END$$
 
 DELIMITER ;
 
 CALL seed_if_empty();
+
+-- Backfill: las visitas ya existentes son todas de eduolihez.com (el
+-- concepto de "apps" no existia cuando se registraron). Guardado por
+-- `app_id IS NULL`, no por rango de fechas ni otro criterio -- asi es
+-- naturalmente idempotente: una vez rellenado, reimportar este archivo no
+-- vuelve a tocar esas filas ni pisa una asignacion manual futura.
+UPDATE `visits`
+SET `app_id` = (SELECT `id` FROM `apps` WHERE `slug` = 'eduolihez')
+WHERE `app_id` IS NULL;
 
 -- ---------------------------------------------------------------------------
 -- Blog: enlazar "Automatizar el informe semanal del SOC con Python" al

@@ -171,6 +171,7 @@ if ($viewId > 0) {
     admin_header('Mensaje', 'messages.php');
     show_flash();
     ?>
+    <div class="subdash">
     <div class="toolbar">
       <h1 style="margin:0;">Mensaje #<?= (int) $m['id'] ?></h1>
       <div class="actions">
@@ -197,7 +198,7 @@ if ($viewId > 0) {
       </table>
 
       <h2>Contenido</h2>
-      <div class="card" style="background:var(--bg); white-space:pre-wrap;"><?= e($m['message']) ?></div>
+      <div class="card inset" style="white-space:pre-wrap;"><?= e($m['message']) ?></div>
 
       <div class="actions" style="margin-top:1rem;">
         <a class="btn" href="mailto:<?= e($m['email']) ?>?subject=<?= rawurlencode('RE: ' . $m['subject']) ?>">Responder por email</a>
@@ -247,6 +248,7 @@ if ($viewId > 0) {
         </table>
       </div>
     <?php endif; ?>
+    </div><!-- /.subdash -->
     <?php
     admin_footer();
     exit;
@@ -327,6 +329,7 @@ $tabs = [
 admin_header('Mensajes', 'messages.php');
 show_flash();
 ?>
+<div class="subdash">
 <div class="toolbar">
   <h1 style="margin:0;">Buzon de contacto</h1>
   <div class="actions">
@@ -436,4 +439,5 @@ show_flash();
   </div>
 <?php endif; ?>
 
+</div><!-- /.subdash -->
 <?php admin_footer(); ?>

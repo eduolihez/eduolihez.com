@@ -71,6 +71,7 @@ $b = static fn(string $k, bool $d = true): bool => setting_on($k, $d);
 admin_header('Ajustes', 'settings.php');
 show_flash();
 ?>
+<div class="subdash">
 <h1>Ajustes del sitio</h1>
 <?php if ($errors): ?>
   <div class="flash err"><?= e(implode(' ', $errors)) ?></div>
@@ -193,4 +194,5 @@ show_flash();
   </table>
 </div>
 
+</div><!-- /.subdash -->
 <?php admin_footer(); ?>

@@ -24,7 +24,7 @@ if (!in_array($lang, ['es', 'en', 'ca'], true)) {
 
 try {
     $stmt = db()->prepare(
-        'SELECT id, title, slug, summary, cover_url, tags, lang,
+        'SELECT id, title, slug, summary, cover_url, tags, category, lang,
                 COALESCE(published_at, created_at) AS published_at,
                 CHAR_LENGTH(content) AS content_length
          FROM posts
@@ -44,6 +44,7 @@ json(array_map(static fn(array $r): array => [
     'summary'       => $r['summary'],
     'cover_url'     => $r['cover_url'],
     'tags'          => post_tags($r['tags']),
+    'category'      => post_category_label($r['category']),
     'lang'          => $r['lang'],
     'published_at'  => $r['published_at'],
     'read_minutes'  => post_read_minutes((int) $r['content_length']),

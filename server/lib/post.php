@@ -8,6 +8,35 @@
  */
 
 /**
+ * Categorias del blog: clave => etiqueta legible.
+ *
+ * Distintas de `tags` a proposito (2026-09-06): las tags son libres y por
+ * articulo salian ~5, asi que con 13 articulos el filtro del listado llegaba
+ * a mostrar mas de 40 botones -- inutilizable como navegacion. `category` es
+ * SIEMPRE una de estas 5 claves (o null), pensada solo para filtrar; las
+ * tags de cada articulo se conservan tal cual para SEO (keywords de
+ * Schema.org) y como metadato fino en la propia tarjeta/articulo.
+ *
+ * Anadir una categoria aqui: tambien hace falta backfillear `category` en
+ * database/schema.sql para los articulos existentes que deban usarla, y
+ * anadir la opcion equivalente en el <select> de server/admin/post-edit.php.
+ */
+const POST_CATEGORIES = [
+    'blue-team-soc'    => 'Blue Team & SOC',
+    'vulnerabilidades' => 'Vulnerabilidades',
+    'automatizacion'   => 'Automatización',
+    'ia-aplicada'      => 'IA aplicada a seguridad',
+    'herramientas'     => 'Herramientas y proyectos',
+    'carrera-personal' => 'Carrera y trayectoria',
+];
+
+/** Etiqueta legible de una categoria, o null si no es una clave conocida (incluye NULL/''). */
+function post_category_label(?string $category): ?string
+{
+    return POST_CATEGORIES[$category ?? ''] ?? null;
+}
+
+/**
  * Convierte la cadena CSV de la columna `tags` en una lista limpia.
  *
  * Se guarda como texto separado por comas porque son un punado por articulo y

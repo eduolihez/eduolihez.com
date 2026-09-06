@@ -30,6 +30,7 @@ export interface PostSummary {
   summary: string;
   cover_url: string | null;
   tags: string[];
+  category: string | null;
   lang: string;
   published_at: string;
 }

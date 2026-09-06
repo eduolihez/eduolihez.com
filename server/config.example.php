@@ -50,6 +50,18 @@ return [
         //   la IP del visitante desde CF-Connecting-IP. Ver CLOUDFLARE.md.
         'trust_proxy' => false,
 
+        // Dominio de la cookie de sesion del panel. Vacio (por defecto) la
+        // escopa al host exacto. admin.eduolihez.com (docs/designs/
+        // admin-dashboard.md) ya sirve este mismo panel, pero via un Worker
+        // de Cloudflare que reescribe la peticion en el borde (ver
+        // CLOUDFLARE.md, seccion 5) -- el navegador solo ve
+        // admin.eduolihez.com de principio a fin, asi que la sesion ya
+        // funciona SIN tocar esto. Solo hace falta '.eduolihez.com' aqui si
+        // algun dia quieres compartir sesion iniciada en un host con el
+        // otro (p.ej. entrar en eduolihez.com/admin y que ya valga tambien
+        // en admin.eduolihez.com).
+        'session_domain' => '',
+
         // Login del panel: bloqueo por fuerza bruta.
         'login_max_attempts'   => 5,   // intentos fallidos permitidos...
         'login_lockout_minutes' => 15, // ...antes de bloquear esta ventana (min)

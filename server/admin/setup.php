@@ -53,23 +53,43 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
 <meta name="robots" content="noindex, nofollow">
 <title>Configuracion inicial · Admin</title>
 <style>
+  @font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+    src: url('assets/fonts/inter-latin-wght-normal.woff2') format('woff2-variations');
+  }
+  :root {
+    --bg: #fbfbfa; --surface: #ffffff; --border: #ececea; --border-strong: #dbdad6;
+    --text: #16151a; --muted: #6b6b74;
+    --accent: #5b5bd6; --accent-soft: #eeeefc;
+    --danger: #b3261e; --danger-soft: #fbe9e8;
+    --green: #17794f; --green-soft: #e6f6ee;
+  }
+  * { box-sizing: border-box; }
   body { margin:0; min-height:100vh; display:grid; place-items:center;
-    background:#0a0e14; color:#e6edf3; font-family:Inter,system-ui,sans-serif; }
-  .box { width:100%; max-width:400px; padding:2rem; margin:1rem;
-    background:#141a24; border:1px solid #1f2733; border-radius:.9rem; }
-  h1 { font-size:1.2rem; margin:0 0 .5rem; }
-  p.sub { color:#9aa7b8; font-size:.9rem; margin:0 0 1.2rem; }
-  label { display:block; margin:.9rem 0 .3rem; font-weight:600; font-size:.9rem; }
-  input { width:100%; padding:.65rem .75rem; background:#0a0e14; color:#e6edf3;
-    border:1px solid #1f2733; border-radius:.5rem; box-sizing:border-box; }
-  input:focus { outline:none; border-color:#4ade80; }
+    background:var(--bg); color:var(--text); font-family:'Inter',system-ui,sans-serif; }
+  .box { width:100%; max-width:400px; padding:2.25rem 2rem 2rem; margin:1rem;
+    background:var(--surface); border:1px solid var(--border); border-radius:.9rem;
+    box-shadow: 0 1px 2px rgba(20,20,30,.04), 0 12px 32px -16px rgba(20,20,30,.12);
+    position: relative; overflow: hidden; }
+  .box::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--accent); }
+  h1 { font-size:1.2rem; margin:0 0 .5rem; letter-spacing: -0.02em; }
+  p.sub { color:var(--muted); font-size:.9rem; margin:0 0 1.2rem; }
+  label { display:block; margin:.9rem 0 .3rem; font-weight:600; font-size:.85rem; color: var(--muted); }
+  input { width:100%; padding:.65rem .75rem; background:var(--surface); color:var(--text);
+    border:1px solid var(--border-strong); border-radius:.5rem; box-sizing:border-box; font-family: inherit;
+    transition: border-color .15s, box-shadow .15s; }
+  input:focus { outline:none; border-color:var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
   button { width:100%; margin-top:1.4rem; padding:.7rem; border:none; border-radius:.5rem;
-    background:#4ade80; color:#0a0e14; font-weight:700; cursor:pointer; }
-  .err { background:rgba(248,113,113,.12); color:#f87171; border:1px solid rgba(248,113,113,.3);
+    background:var(--text); color:var(--surface); font-weight:700; cursor:pointer; font-family: inherit; }
+  button:hover { background:#000; }
+  .err { background:var(--danger-soft); color:var(--danger); border:1px solid transparent;
     padding:.6rem .8rem; border-radius:.5rem; font-size:.88rem; margin-bottom:1rem; }
-  .ok { background:rgba(74,222,128,.12); color:#4ade80; border:1px solid rgba(74,222,128,.3);
+  .ok { background:var(--green-soft); color:var(--green); border:1px solid transparent;
     padding:.9rem 1rem; border-radius:.5rem; font-size:.9rem; }
-  a { color:#4ade80; }
+  a { color:var(--accent); }
 </style>
 </head>
 <body>

@@ -108,6 +108,7 @@ $last = count($rows) - 1;
 admin_header('Certificaciones', 'certifications.php');
 show_flash();
 ?>
+<div class="subdash">
 <div class="toolbar">
   <h1 style="margin:0;">Certificaciones <span class="faint" style="font-size:1rem;">(<?= $visible ?> visibles de <?= $totalAll ?>)</span></h1>
   <a class="btn" href="cert-edit.php">+ Nueva certificacion</a>
@@ -143,8 +144,8 @@ show_flash();
           <tr>
             <td>
               <?php if (!empty($c['logo_url'])): ?>
-                <img src="<?= e($c['logo_url']) ?>" alt="" width="32" height="32"
-                     style="width:32px; height:32px; object-fit:contain; border-radius:.3rem; border:1px solid var(--border); background:var(--soft);">
+                <img src="<?= e($c['logo_url']) ?>" alt="" width="32" height="32" class="soft-box"
+                     style="width:32px; height:32px; object-fit:contain; border-radius:.3rem; border:1px solid var(--border);">
               <?php else: ?>
                 <span class="faint">—</span>
               <?php endif; ?>
@@ -211,4 +212,5 @@ show_flash();
   </div>
 </div>
 
+</div><!-- /.subdash -->
 <?php admin_footer(); ?>

@@ -23,7 +23,28 @@ if (!in_array($days, $allowedDays, true)) {
 
 // ¿Incluir bots en las cifras? Por defecto NO (falsean todo).
 $withBots = ($_GET['bots'] ?? '') === '1';
-$botFilter = $withBots ? '1=1' : 'is_bot = 0';
+
+// --- App (docs/designs/admin-dashboard.md): filtra por app_id si se pide -----
+// Sin ?app=, se ve todo (compatibilidad con el /admin de un solo sitio de
+// hoy). El futuro selector de apps enlazara aqui con ?app=<slug>. $appId sale
+// siempre de una consulta parametrizada -> se puede interpolar como INT en el
+// resto de SQL de este archivo sin riesgo de inyeccion.
+$appSlug = (string) ($_GET['app'] ?? '');
+$appId   = null;
+$appName = null;
+if ($appSlug !== '') {
+    $appRow = db()->prepare('SELECT id, display_name FROM apps WHERE slug = ?');
+    $appRow->execute([$appSlug]);
+    $appRow = $appRow->fetch();
+    if ($appRow) {
+        $appId   = (int) $appRow['id'];
+        $appName = (string) $appRow['display_name'];
+    }
+}
+$appFilterSql = $appId !== null ? " AND app_id = $appId" : '';
+$appQs        = $appSlug !== '' ? '&app=' . rawurlencode($appSlug) : '';
+
+$botFilter = ($withBots ? '1=1' : 'is_bot = 0') . $appFilterSql;
 
 /** Ejecuta una consulta parametrizada y devuelve las filas (tolerante a fallos). */
 function q_rows(string $sql, array $params = []): array
@@ -83,7 +104,7 @@ if (($_GET['export'] ?? '') === 'csv') {
         "SELECT visited_at, path, lang, referrer, country, device, browser, os, is_bot,
                 duration_s, scroll_pct, utm_source, utm_medium, utm_campaign, viewport, browser_lang
          FROM visits
-         WHERE visited_at > (NOW() - INTERVAL ? DAY)
+         WHERE visited_at > (NOW() - INTERVAL ? DAY)$appFilterSql
          ORDER BY visited_at DESC
          LIMIT 20000",
         [$days]
@@ -116,7 +137,7 @@ $prevUniques = q_int(
      AND visited_at <= (NOW() - INTERVAL ? DAY) AND visited_at > (NOW() - INTERVAL ? DAY)",
     [$days, $days * 2]
 );
-$botCount = q_int('SELECT COUNT(*) FROM visits WHERE is_bot = 1 AND visited_at > (NOW() - INTERVAL ? DAY)', [$days]);
+$botCount = q_int("SELECT COUNT(*) FROM visits WHERE is_bot = 1$appFilterSql AND visited_at > (NOW() - INTERVAL ? DAY)", [$days]);
 $today   = q_int("SELECT COUNT(*) FROM visits WHERE $botFilter AND DATE(visited_at)=CURDATE()");
 
 // Paginas por visitante (profundidad media de la visita).
@@ -234,7 +255,7 @@ $maxChannel = $channels ? max($channels) : 0;
 // Bots mas activos (util para saber si te esta indexando una IA).
 $topBots = q_rows(
     "SELECT user_agent, COUNT(*) AS c FROM visits
-     WHERE is_bot = 1 AND visited_at > (NOW() - INTERVAL ? DAY)
+     WHERE is_bot = 1$appFilterSql AND visited_at > (NOW() - INTERVAL ? DAY)
      GROUP BY user_agent ORDER BY c DESC LIMIT 8",
     [$days]
 );
@@ -327,20 +348,32 @@ $viewportLabels = ['xs' => '< 480 px', 'sm' => '480–767 px', 'md' => '768–10
                     'lg' => '1024–1439 px', 'xl' => '≥ 1440 px', '?' => 'Desconocido'];
 
 admin_header('Analitica', 'analytics.php');
+// Sub-dashboard (docs/designs/admin-dashboard.md): estilos compartidos en
+// partials/layout.php (bloque ".subdash"), reutilizados por todas las
+// paginas re-skinadas de la Entrega 2 -- no se duplican aqui.
 ?>
+<div class="subdash">
 <div class="toolbar">
-  <h1 style="margin:0;">Analitica</h1>
+  <h1 style="margin:0;">
+    Analitica
+    <?php if ($appName !== null): ?><span class="faint" style="font-size:1rem;">— <?= e($appName) ?></span><?php endif; ?>
+  </h1>
   <div class="actions">
     <?php foreach ($allowedDays as $d): ?>
       <a class="btn <?= $d === $days ? '' : 'ghost' ?> sm"
-         href="?days=<?= $d ?><?= $withBots ? '&bots=1' : '' ?>"><?= $d === 1 ? '24 h' : $d . 'd' ?></a>
+         href="?days=<?= $d ?><?= $withBots ? '&bots=1' : '' ?><?= e($appQs) ?>"><?= $d === 1 ? '24 h' : $d . 'd' ?></a>
     <?php endforeach; ?>
-    <a class="btn ghost sm" href="?days=<?= $days ?><?= $withBots ? '' : '&bots=1' ?>">
+    <a class="btn ghost sm" href="?days=<?= $days ?><?= $withBots ? '' : '&bots=1' ?><?= e($appQs) ?>">
       <?= $withBots ? '✓ Bots incluidos' : 'Incluir bots' ?>
     </a>
-    <a class="btn ghost sm" href="?days=<?= $days ?>&amp;export=csv">Exportar CSV</a>
+    <a class="btn ghost sm" href="?days=<?= $days ?>&amp;export=csv<?= e($appQs) ?>">Exportar CSV</a>
   </div>
 </div>
+<?php if ($appSlug !== '' && $appId === null): ?>
+  <p class="hint" style="color:var(--warn, #c77);">
+    No se encontro ninguna app con slug "<?= e($appSlug) ?>" — mostrando datos de todas las apps.
+  </p>
+<?php endif; ?>
 
 <div class="grid4">
   <div class="card stat">
@@ -633,4 +666,5 @@ admin_header('Analitica', 'analytics.php');
   visita". Compatible con RGPD sin banner de cookies.
 </p>
 
+</div><!-- /.subdash -->
 <?php admin_footer(); ?>

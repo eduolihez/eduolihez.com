@@ -37,6 +37,23 @@ function admin_header(string $title, string $active = ''): void
     $visibleCerts       = $countSafe('SELECT COUNT(*) FROM certifications WHERE visible = 1');
     $visiblePosts       = $countSafe('SELECT COUNT(*) FROM posts WHERE visible = 1');
 
+    // Selector de apps (docs/designs/admin-dashboard.md): que sub-dashboard
+    // se esta viendo. Mismo patron try/catch que $countSafe -- la tabla
+    // puede no existir todavia si la migracion no se ha corrido.
+    try {
+        $appsList = db()->query('SELECT slug, display_name FROM apps ORDER BY created_at ASC')->fetchAll();
+    } catch (Throwable $e) {
+        $appsList = [];
+    }
+    $currentAppSlug = (string) ($_GET['app'] ?? '');
+    $currentAppName = null;
+    foreach ($appsList as $ap) {
+        if ($ap['slug'] === $currentAppSlug) {
+            $currentAppName = $ap['display_name'];
+            break;
+        }
+    }
+
     // [etiqueta_grupo, url, [titulo, badge, icono, tipo_badge]]. tipo_badge:
     // 'alert' (verde/llamada a la accion, como Mensajes) o 'count' (gris,
     // solo informativo). Grupo '' no imprime cabecera (Panel va suelto).
@@ -52,6 +69,11 @@ function admin_header(string $title, string $active = ''): void
         'Actividad' => [
             'messages.php'  => ['Mensajes', $unread > 0 ? (string) $unread : '', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>', 'alert'],
             'analytics.php' => ['Analítica', '', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>', 'count'],
+        ],
+        'Multi-proyecto' => [
+            // admin.eduolihez.com (docs/designs/admin-dashboard.md): registro
+            // de apps con su propio sub-dashboard y clave de ingesta.
+            'apps.php' => ['Apps', (string) $countSafe('SELECT COUNT(*) FROM apps'), '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>', 'count'],
         ],
         'Sistema' => [
             'security.php' => ['Seguridad', '', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>', 'count'],
@@ -158,14 +180,82 @@ function admin_header(string $title, string $active = ''): void
     margin-bottom: 2rem;
   }
 
+  .brand-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
   .brand {
     font-family: 'JetBrains Mono', monospace;
     font-weight: 700;
     font-size: 1.15rem;
     letter-spacing: -0.04em;
     color: var(--text);
+    text-decoration: none;
   }
   .brand span { color: var(--accent); }
+
+  /* Selector de apps (docs/designs/admin-dashboard.md): a que sub-dashboard
+     apuntan las paginas de datos (hoy solo Analitica lee ?app=). <details>
+     nativo -- sin JS, se cierra solo al navegar a otra pagina. */
+  .app-switcher { position: relative; }
+  .app-switcher summary {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    list-style: none;
+    cursor: pointer;
+    user-select: none;
+    font-size: 0.75rem;
+    color: var(--muted);
+    padding: 0.2rem 0.4rem;
+    margin-left: -0.4rem;
+    border-radius: 6px;
+    width: fit-content;
+  }
+  .app-switcher summary::-webkit-details-marker { display: none; }
+  .app-switcher summary:hover { background: var(--soft); color: var(--text); }
+  .app-switcher[open] summary { color: var(--text); }
+  .app-switcher-current { font-weight: 600; }
+  .app-switcher summary svg {
+    width: 12px; height: 12px; flex-shrink: 0;
+    transition: transform 0.15s;
+  }
+  .app-switcher[open] summary svg { transform: rotate(180deg); }
+  .app-switcher-menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: -0.4rem;
+    z-index: 200;
+    min-width: 190px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    padding: 0.35rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    backdrop-filter: blur(8px);
+  }
+  .app-switcher-menu a {
+    display: block;
+    padding: 0.4rem 0.55rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    color: var(--text);
+    text-decoration: none;
+  }
+  .app-switcher-menu a:hover { background: var(--soft); }
+  .app-switcher-menu a.active { color: var(--accent); font-weight: 600; }
+  .app-switcher-manage {
+    margin-top: 0.25rem;
+    padding-top: 0.45rem !important;
+    border-top: 1px solid var(--border);
+    color: var(--faint) !important;
+    font-size: 0.72rem !important;
+  }
 
   .sidebar-menu {
     display: flex;
@@ -439,6 +529,17 @@ function admin_header(string $title, string $active = ''): void
     backdrop-filter: blur(8px);
   }
 
+  /* Card "hundida": para contenido citado/preformateado (p.ej. el cuerpo de
+     un mensaje) dentro de otra card, un tono de fondo distinto en vez de
+     borde extra. */
+  .card.inset { background: var(--bg); box-shadow: none; backdrop-filter: none; }
+
+  /* Caja de fondo neutro para miniaturas/paneles sueltos que no son una
+     .card completa (marcador de imagen sin logo, vista previa de un
+     campo...). Clase en vez de "style=background:var(--soft)" repetido
+     para que el re-skin por pagina (.subdash) tambien la alcance. */
+  .soft-box { background: var(--soft); }
+
   h1 { font-size: 1.75rem; font-weight: 700; margin: 0 0 1.5rem; letter-spacing: -0.03em; }
   h2 { font-size: 1.25rem; font-weight: 700; margin: 1.5rem 0 1rem; letter-spacing: -0.02em; color: var(--text); }
   h3 { font-size: 0.85rem; font-weight: 600; margin: 0 0 1rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
@@ -652,7 +753,129 @@ function admin_header(string $title, string $active = ''): void
     main {
       padding: 1.5rem;
     }
+    .subdash {
+      margin: -1.5rem -1.5rem 0;
+      padding: 1.5rem;
+    }
   }
+
+  /* ===========================================================================
+     SUB-DASHBOARD (docs/designs/admin-dashboard.md, Entrega 1 + Entrega 2):
+     tema claro, minimal, tipo Linear/Vercel -- deliberadamente distinto del
+     panel oscuro de siempre. La barra lateral y la topbar SIGUEN oscuras a
+     proposito: dan continuidad de navegacion mientras cada pagina de
+     contenido va pasando a este tema (Entrega 2 se aplica pagina por
+     pagina, no de golpe). Vive bajo <div class="subdash">...</div> -- MISMO
+     HTML que el resto del panel (.card, .btn, .table, inputs...), apariencia
+     nueva solo por cascada, sin tocar la logica de ninguna pagina.
+     =========================================================================== */
+  .subdash {
+    --sd-bg: #fbfbfa; --sd-surface: #ffffff;
+    --sd-border: #ececea; --sd-border-strong: #dbdad6;
+    --sd-text: #16151a; --sd-muted: #6b6b74; --sd-faint: #9c9ba3;
+    --sd-accent: #5b5bd6; --sd-accent-soft: #eeeefc;
+    --sd-green: #17794f; --sd-green-soft: #e6f6ee;
+    --sd-warn: #a15c00; --sd-warn-soft: #fdf1de;
+    --sd-danger: #b3261e; --sd-danger-soft: #fbe9e8;
+    background: var(--sd-bg);
+    color: var(--sd-text);
+    margin: -2rem -2rem 0;
+    padding: 2rem;
+    font-feature-settings: "tnum" 1;
+  }
+  .subdash h1 { color: var(--sd-text); font-weight: 650; letter-spacing: -0.03em; }
+  .subdash h1 .faint { color: var(--sd-faint); font-weight: 500; }
+  .subdash h2 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.09em; color: var(--sd-faint);
+    border: 0; padding: 0; margin: 2.25rem 0 0.75rem;
+  }
+  .subdash h3 { color: var(--sd-faint); }
+  .subdash .card {
+    background: var(--sd-surface); border: 1px solid var(--sd-border);
+    border-radius: 10px; box-shadow: none; backdrop-filter: none;
+  }
+  .subdash .stat:hover { border-color: var(--sd-border-strong); transform: none; }
+  .subdash .stat::before { background: var(--sd-accent); }
+  .subdash .stat .num {
+    font-family: 'Inter', sans-serif; font-weight: 650; font-size: 2rem;
+    letter-spacing: -0.03em; color: var(--sd-text);
+  }
+  .subdash .stat .num.cyan,
+  .subdash .stat .num.violet { color: var(--sd-accent); }
+  .subdash .stat .num.warn { color: var(--sd-warn); }
+  .subdash .stat .num.danger { color: var(--sd-danger); }
+  .subdash .stat .lbl { color: var(--sd-muted); }
+  .subdash .delta.up { color: var(--sd-green); background: var(--sd-green-soft); }
+  .subdash .delta.down { color: var(--sd-danger); background: var(--sd-danger-soft); }
+  .subdash .delta.flat { color: var(--sd-faint); background: var(--sd-border); }
+  .subdash table th, .subdash table td { border-bottom: 1px solid var(--sd-border); }
+  .subdash table th { color: var(--sd-faint); font-family: 'JetBrains Mono', monospace; letter-spacing: 0.07em; }
+  .subdash table td { color: var(--sd-text); }
+  .subdash tr:hover td { background: var(--sd-bg); }
+  .subdash .btn { border-radius: 7px; font-weight: 600; background: var(--sd-text); color: var(--sd-surface); }
+  .subdash .btn:hover { background: #000; box-shadow: none; }
+  .subdash .btn.ghost { color: var(--sd-text); border-color: var(--sd-border-strong); }
+  .subdash .btn.ghost:hover { border-color: var(--sd-accent); color: var(--sd-accent); background: var(--sd-accent-soft); }
+  .subdash .btn.danger { color: var(--sd-danger); border-color: var(--sd-danger-soft); }
+  .subdash .btn.danger:hover { background: var(--sd-danger-soft); }
+  .subdash .btn[disabled] { opacity: 0.4; }
+  .subdash .pill { background: var(--sd-accent-soft); color: var(--sd-accent); border-color: transparent; }
+  .subdash .pill.on { background: var(--sd-green-soft); color: var(--sd-green); }
+  .subdash .pill.off { background: var(--sd-border); color: var(--sd-faint); }
+  .subdash .pill.warn { background: var(--sd-warn-soft); color: var(--sd-warn); }
+  .subdash .pill.danger { background: var(--sd-danger-soft); color: var(--sd-danger); }
+  .subdash .hint, .subdash .muted, .subdash .empty { color: var(--sd-muted); }
+  .subdash .faint { color: var(--sd-faint); }
+  .subdash .chart { border-bottom: 1px solid var(--sd-border); }
+  .subdash .chart .bar-v { background: var(--sd-accent); border-radius: 3px 3px 0 0; }
+  .subdash .chart .bar-v:hover { background: #4747c2; filter: none; }
+  .subdash .chart .tick, .subdash .chart .val { color: var(--sd-faint); }
+  .subdash .bar-wrap { background: var(--sd-border); }
+  .subdash .bar { background: var(--sd-accent); }
+  .subdash .bar.green { background: var(--sd-green); }
+  .subdash .bar.violet { background: var(--sd-accent); }
+  .subdash .barline .lab span:first-child { color: var(--sd-text); }
+  .subdash .barline .lab span:last-child { color: var(--sd-faint); }
+  .subdash .scroll-x { background: var(--sd-surface); border-color: var(--sd-border); }
+  .subdash .flash.ok { background: var(--sd-green-soft); color: var(--sd-green); border-color: transparent; }
+  .subdash .flash.err { background: var(--sd-danger-soft); color: var(--sd-danger); border-color: transparent; }
+  .subdash .flash.warn { background: var(--sd-warn-soft); color: var(--sd-warn); border-color: transparent; }
+  .subdash .tabs a { color: var(--sd-muted); border-color: var(--sd-border-strong); }
+  .subdash .tabs a.active { background: var(--sd-accent-soft); color: var(--sd-accent); border-color: transparent; }
+  .subdash .tabs a:hover { color: var(--sd-text); border-color: var(--sd-faint); }
+  .subdash .checkline strong { color: var(--sd-text); }
+  .subdash label { color: var(--sd-text); }
+  .subdash input[type=text], .subdash input[type=email], .subdash input[type=password],
+  .subdash input[type=url], .subdash input[type=number], .subdash input[type=date],
+  .subdash input[type=search], .subdash textarea, .subdash select {
+    background: var(--sd-surface); border: 1px solid var(--sd-border-strong); color: var(--sd-text);
+  }
+  .subdash input:focus, .subdash textarea:focus, .subdash select:focus {
+    border-color: var(--sd-accent); background: var(--sd-surface);
+    box-shadow: 0 0 0 3px var(--sd-accent-soft);
+  }
+  .subdash .health-item { background: var(--sd-surface); border-color: var(--sd-border); }
+  .subdash .health-dot { background: var(--sd-faint); box-shadow: 0 0 0 3px var(--sd-border); }
+  .subdash .health-dot.ok { background: var(--sd-green); box-shadow: 0 0 0 3px var(--sd-green-soft); }
+  .subdash .health-dot.warn { background: var(--sd-warn); box-shadow: 0 0 0 3px var(--sd-warn-soft); }
+  .subdash .health-dot.danger { background: var(--sd-danger); box-shadow: 0 0 0 3px var(--sd-danger-soft); }
+  .subdash .health-val { color: var(--sd-text); }
+  .subdash .health-lbl { color: var(--sd-faint); }
+  .subdash .timeline-item { border-color: var(--sd-border); }
+  .subdash .timeline-dot { background: var(--sd-faint); }
+  .subdash .timeline-dot.green { background: var(--sd-green); }
+  .subdash .timeline-dot.cyan,
+  .subdash .timeline-dot.violet { background: var(--sd-accent); }
+  .subdash .timeline-dot.danger { background: var(--sd-danger); }
+  .subdash .spark i { background: var(--sd-accent); }
+  .subdash .spark.cyan i,
+  .subdash .spark.violet i { background: var(--sd-accent); }
+  .subdash .spark.warn i { background: var(--sd-warn); }
+  .subdash .h2-icon svg { color: var(--sd-accent); opacity: 1; }
+  .subdash .card.inset { background: var(--sd-bg); }
+  .subdash .soft-box { background: var(--sd-bg); }
 </style>
 </head>
 <body>
@@ -661,7 +884,25 @@ function admin_header(string $title, string $active = ''): void
   
   <aside id="admin-sidebar" class="sidebar">
     <div class="sidebar-header">
-      <span class="brand">&gt;_ <span>admin</span></span>
+      <div class="brand-block">
+        <a href="index.php" class="brand">&gt;_ <span>admin</span></a>
+        <?php if ($appsList): ?>
+          <details class="app-switcher">
+            <summary>
+              <span class="app-switcher-current"><?= e($currentAppName ?? 'Todas las apps') ?></span>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6" /></svg>
+            </summary>
+            <div class="app-switcher-menu">
+              <a href="analytics.php" class="<?= $currentAppSlug === '' ? 'active' : '' ?>">Todas las apps</a>
+              <?php foreach ($appsList as $ap): ?>
+                <a href="analytics.php?app=<?= e(rawurlencode($ap['slug'])) ?>"
+                   class="<?= $currentAppSlug === $ap['slug'] ? 'active' : '' ?>"><?= e($ap['display_name']) ?></a>
+              <?php endforeach; ?>
+              <a href="apps.php" class="app-switcher-manage">Gestionar apps &rarr;</a>
+            </div>
+          </details>
+        <?php endif; ?>
+      </div>
       <button id="sidebar-close-btn" class="sidebar-toggle-btn mobile-only" aria-label="Cerrar menu">
         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
       </button>
@@ -693,7 +934,11 @@ function admin_header(string $title, string $active = ''): void
         </div>
       </div>
       <div class="sidebar-actions">
-        <a href="/" target="_blank" rel="noopener" class="action-btn">
+        <?php /* Absoluta a proposito (docs/designs/admin-dashboard.md): en
+                admin.eduolihez.com, un href="/" relativo llevaria al propio
+                panel (el Worker de enrutado lo reescribe hacia /admin/),
+                no al portfolio publico. */ ?>
+        <a href="https://eduolihez.com/" target="_blank" rel="noopener" class="action-btn">
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
           Ver web
         </a>

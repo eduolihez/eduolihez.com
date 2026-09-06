@@ -236,6 +236,7 @@ $icoShield  = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fi
 admin_header('Panel', 'index.php');
 show_flash();
 ?>
+<div class="subdash">
 <h1>Hola, <?= e(current_admin()) ?> 👋</h1>
 
 <?php foreach ($warnings as [$type, $html]): ?>
@@ -520,4 +521,5 @@ show_flash();
   </div>
 </div>
 
+</div><!-- /.subdash -->
 <?php admin_footer(); ?>

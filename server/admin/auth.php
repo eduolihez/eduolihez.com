@@ -33,9 +33,22 @@ if (session_status() === PHP_SESSION_NONE) {
     if (!$https && !empty(config()['security']['trust_proxy'])) {
         $https = strtolower((string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '')) === 'https';
     }
+    // 'domain' vacio (comportamiento por defecto) escopa la cookie al host
+    // exacto. admin.eduolihez.com (docs/designs/admin-dashboard.md) ya
+    // sirve este mismo panel via un Worker de Cloudflare que reescribe la
+    // peticion en el borde (CLOUDFLARE.md, seccion 5): el navegador solo ve
+    // ese host, nunca el principal, asi que la sesion ya funciona sin tocar
+    // esto. config()['security']['session_domain'] queda para el caso
+    // aparte de querer compartir sesion ENTRE eduolihez.com/admin y
+    // admin.eduolihez.com a la vez (p.ej. '.eduolihez.com'; decision de
+    // plan-eng-review 2026-09-04: el radio real de esto son subdominios
+    // propios, ninguno de terceros ni generado por usuarios, así que
+    // ensanchar es un riesgo aceptado, no una debilidad nueva).
+    $sessionDomain = (string) (config()['security']['session_domain'] ?? '');
     session_set_cookie_params([
         'lifetime' => 0,
         'path'     => '/',
+        'domain'   => $sessionDomain,
         'httponly' => true,        // la cookie no es accesible por JS
         'secure'   => $https,      // solo por HTTPS en produccion
         'samesite' => 'Lax',

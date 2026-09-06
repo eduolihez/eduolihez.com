@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NoWait — Skip Link Shortener Wait Times</title>
+    <meta name="description" content="NoWait is a browser extension that automatically bypasses link-shortener wait screens and countdowns, and blocks IP loggers. 90+ site-specific bypasses, debloated by design.">
+    <link rel="canonical" href="https://eduolihez.com/projects/nowait/">
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://eduolihez.com/projects/nowait/">
+    <meta property="og:title" content="NoWait — Skip Link Shortener Wait Times">
+    <meta property="og:description" content="Automatically bypasses link-shortener wait screens and blocks IP loggers. 90+ site-specific bypasses, injected only where they're actually needed.">
+    <meta property="og:image" content="https://eduolihez.com/img/og-cover.png">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="Eduardo Olivares Hernández">
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="NoWait — Skip Link Shortener Wait Times">
+    <meta name="twitter:description" content="Automatically bypasses link-shortener wait screens and blocks IP loggers. 90+ site-specific bypasses, injected only where they're actually needed.">
+    <meta name="twitter:image" content="https://eduolihez.com/img/og-cover.png">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%235b5bd6'/><text y='.72em' font-size='55' x='18' fill='white'>»</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Inicio", "item": "https://eduolihez.com/" },
+    { "@type": "ListItem", "position": 2, "name": "Proyectos", "item": "https://eduolihez.com/projects/" },
+    { "@type": "ListItem", "position": 3, "name": "NoWait", "item": "https://eduolihez.com/projects/nowait/" }
+  ]
+}
+</script>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <span class="logo-icon">»</span>
+                <span class="logo-text">NoWait</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#demo" class="nav-link">Demo</a></li>
+                <li><a href="#features" class="nav-link">Features</a></li>
+                <li><a href="privacy.html" class="nav-link">Privacy</a></li>
+            </ul>
+            <a href="https://github.com/eduolihez/nowait" class="nav-btn-download" target="_blank" rel="noopener">View on GitHub</a>
+            <div class="hamburger" role="button" tabindex="0" aria-label="Abrir menú" aria-expanded="false">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <span class="badge-new">Manifest V3</span>
+                <h1 class="hero-title">
+                    Stop waiting.<br>
+                    <span class="gradient-text">Get to the link.</span>
+                </h1>
+                <p class="hero-subtitle">
+                    NoWait skips the countdown screens, fake ads, and "click here 3 times"
+                    steps that link shorteners put between you and your download —
+                    automatically, on 90+ sites it actually knows how to bypass.
+                </p>
+                <div class="hero-actions">
+                    <a href="https://github.com/eduolihez/nowait" class="btn btn-primary" target="_blank" rel="noopener">Get NoWait on GitHub</a>
+                    <a href="#demo" class="btn btn-secondary">See it work</a>
+                </div>
+                <p class="store-note">Not yet on the Chrome Web Store — install unpacked from source for now.</p>
+            </div>
+
+            <div class="hero-visual">
+                <div class="glass-card">
+                    <div class="demo-mock">
+                        <div class="demo-mock-bar">
+                            <span></span><span></span><span></span>
+                        </div>
+                        <div class="demo-mock-body" id="heroDemoBody">
+                            <p class="demo-mock-wait">Please wait <span id="heroCountdown">5</span> seconds…</p>
+                            <div class="demo-mock-progress"><i id="heroProgress"></i></div>
+                        </div>
+                    </div>
+                    <div class="card-info">
+                        <h4>Debloated by design</h4>
+                        <p>The script only runs on the ~90 domains it has a real bypass for — never on every page you visit.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="demo" class="tools-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>What waiting looks like — and what NoWait does instead</h2>
+                <p>The same countdown page, with and without the extension.</p>
+            </div>
+
+            <div class="control-center">
+                <div class="tool-tabs">
+                    <button class="tab-btn active" data-tool="without">Without NoWait</button>
+                    <button class="tab-btn" data-tool="with">With NoWait</button>
+                </div>
+
+                <div id="without-content" class="tool-panel active">
+                    <div class="input-group">
+                        <p class="main-input" style="cursor:default;">shortener.example/go/a1b2c3</p>
+                    </div>
+                    <div class="strength-meter-container">
+                        <div class="meter-bar"><div id="withoutFill" class="meter-fill"></div></div>
+                        <div class="meter-label" id="withoutLabel">Waiting… 5s</div>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-item"><span class="stat-title">Countdown</span><span class="stat-value">5s</span></div>
+                        <div class="stat-item"><span class="stat-title">Extra clicks</span><span class="stat-value">2–3</span></div>
+                        <div class="stat-item"><span class="stat-title">Ads shown</span><span class="stat-value">1–4</span></div>
+                        <div class="stat-item"><span class="stat-title">IP logged?</span><span class="stat-value">Sometimes</span></div>
+                    </div>
+                </div>
+
+                <div id="with-content" class="tool-panel">
+                    <div class="generated-display" id="withDisplay">Redirecting instantly…</div>
+                    <div class="controls-grid">
+                        <div class="control-toggles">
+                            <label class="toggle-row"><span>Countdown skipped</span><input type="checkbox" checked disabled></label>
+                            <label class="toggle-row"><span>IP logger blocked</span><input type="checkbox" checked disabled></label>
+                            <label class="toggle-row"><span>Tracker bypassed</span><input type="checkbox" checked disabled></label>
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-primary full-width" id="replayDemo">Replay</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="features" class="features-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Everything it does. Nothing it hides.</h2>
+                <p>Fork of FastForward, rebuilt to inject less and disclose more.</p>
+            </div>
+
+            <div class="bento-grid">
+                <div class="bento-card large dark">
+                    <div class="card-content">
+                        <div class="icon">»</div>
+                        <h3>90+ site-specific bypasses</h3>
+                        <p>Each shortener gets its own bypass module — no generic guesswork, no false positives.</p>
+                    </div>
+                </div>
+                <div class="bento-card">
+                    <div class="card-content">
+                        <div class="icon">🧩</div>
+                        <h3>Debloated injection</h3>
+                        <p>The content script only loads on domains that actually have a bypass — computed at build time, never <code>&lt;all_urls&gt;</code>.</p>
+                    </div>
+                </div>
+                <div class="bento-card">
+                    <div class="card-content">
+                        <div class="icon">🚫</div>
+                        <h3>IP logger blocking</h3>
+                        <p>Links known to log your IP get blocked outright instead of letting you walk into them.</p>
+                    </div>
+                </div>
+                <div class="bento-card wide">
+                    <div class="card-content">
+                        <div class="icon">🔁</div>
+                        <h3>Tracker &amp; crowd bypass</h3>
+                        <p>Automatic tracker bypass (bit.ly, t.co) plus an optional, off-by-default crowd bypass for links nobody's cracked yet.</p>
+                    </div>
+                </div>
+                <div class="bento-card">
+                    <div class="card-content">
+                        <div class="icon">📊</div>
+                        <h3>Disclosed, minimal telemetry</h3>
+                        <p>Only the shortener's <em>domain</em> and which bypass ran — never the destination URL, path, or query string. <a href="privacy.html">Read the policy</a>.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="download" class="cta-section">
+        <div class="container">
+            <div class="cta-box">
+                <h2>Your browsing. Your time back.</h2>
+                <p>Open source, Manifest V3, and honest about the one thing it reports.</p>
+                <a href="https://github.com/eduolihez/nowait" class="btn btn-primary big-btn" target="_blank" rel="noopener">Get NoWait on GitHub</a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2026 NoWait. Unlicense (public domain).</p>
+                <div class="footer-links">
+                    <a href="privacy.html">Privacy Policy</a>
+                    <a href="https://github.com/eduolihez/nowait" target="_blank" rel="noopener">GitHub</a>
+                    <a href="mailto:privacy@eduolihez.com">Support</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <footer style="text-align:center; padding:1.5rem; font-size:0.8rem; color:#888; border-top:1px solid rgba(255,255,255,0.08);">
+        <p>A project by <a href="https://eduolihez.com" style="color:inherit; text-decoration:underline;">Eduardo Olivares — SOC Analyst · Blue Team</a></p>
+    </footer>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "NoWait",
+      "applicationCategory": "BrowserApplication",
+      "description": "NoWait automatically bypasses link-shortener wait screens and blocks IP loggers, with 90+ site-specific bypasses injected only where they're needed.",
+      "operatingSystem": "Chrome, Firefox",
+      "url": "https://eduolihez.com/projects/nowait/",
+      "downloadUrl": "https://github.com/eduolihez/nowait",
+      "author": {
+        "@type": "Person", "@id": "https://eduolihez.com/#person",
+        "name": "Eduardo Olivares",
+        "url": "https://eduolihez.com"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "EUR"
+      }
+    }
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>

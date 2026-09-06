@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy — NoWait</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { background: var(--bg-body); }
+        .privacy-header { text-align: center; padding: 60px 0 40px; }
+        .privacy-header h1 { font-size: 36px; margin-bottom: 10px; }
+
+        .content-card {
+            background: white;
+            border-radius: var(--radius-xl);
+            padding: 60px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 60px;
+            border: 1px solid var(--border-light);
+        }
+
+        .policy-section { margin-bottom: 40px; }
+        .policy-section h2 { color: var(--primary); font-size: 20px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .policy-section p { color: var(--text-secondary); margin-bottom: 12px; }
+
+        .badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 4px 10px; border-radius: var(--radius-pill);
+            font-size: 13px; font-weight: 500; margin-right: 8px; margin-bottom: 8px;
+        }
+        .badge.safe { background: rgba(52, 199, 89, 0.1); color: var(--success); }
+        .badge.danger { background: rgba(255, 59, 48, 0.1); color: var(--danger); }
+        .badge.neutral { background: #F5F5F7; color: var(--text-secondary); }
+
+        ul { margin-left: 20px; margin-bottom: 16px; }
+        li { margin-bottom: 8px; color: var(--text-main); font-size: 15px; }
+
+        @media (max-width: 768px) {
+            .content-card { padding: 30px; }
+        }
+    </style>
+  <meta name="description" content="NoWait's exact telemetry scope: the domain of the shortener bypassed and which bypass ran, never the destination URL, path, query string, or your browsing history.">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <link rel="canonical" href="https://eduolihez.com/projects/nowait/privacy.html">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://eduolihez.com/projects/nowait/privacy.html">
+  <meta property="og:title" content="Privacy Policy — NoWait">
+  <meta property="og:description" content="NoWait reports only the bypassed domain and which bypass ran. Never your destination URL, path, query string, or browsing history.">
+  <meta property="og:image" content="https://eduolihez.com/img/og-cover.png">
+  <meta name="twitter:card" content="summary_large_image">
+</head>
+<body>
+
+    <nav class="navbar" style="margin-bottom: 0;">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <span class="logo-icon">»</span>
+                <span class="logo-text">NoWait</span>
+            </a>
+            <a href="index.html" class="nav-link">← Back to Home</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="privacy-header">
+            <h1>Privacy Policy</h1>
+            <p style="color: var(--text-secondary);">Exactly what NoWait sends, and exactly what it never does.</p>
+        </div>
+
+        <div class="content-card">
+            <div class="policy-section">
+                <h2>🔗 Link bypassing</h2>
+                <p>Every shortener page NoWait bypasses is processed <strong>locally, in your browser</strong>. The destination URL never leaves your device through this mechanism.</p>
+            </div>
+
+            <div class="policy-section">
+                <h2>📊 What NoWait reports</h2>
+                <p>NoWait sends anonymous usage events to its own API (<code>api.eduolihez.com</code>) so its developer can see which bypasses actually get used:</p>
+                <ul>
+                    <li><span class="badge neutral">Domain only</span> The bare domain of the shortener/tracker being bypassed, e.g. <code>linkvertise.com</code>.</li>
+                    <li><span class="badge neutral">Module</span> Which bypass module was triggered for it.</li>
+                    <li><span class="badge neutral">Install-only</span> Your browser and the NoWait version, once, when you install or update.</li>
+                </ul>
+            </div>
+
+            <div class="policy-section">
+                <h2>🚫 What NoWait never sends</h2>
+                <ul>
+                    <li><span class="badge danger">Never</span> The destination URL, its path, or its query string.</li>
+                    <li><span class="badge danger">Never</span> Anything that could reconstruct your browsing history.</li>
+                    <li><span class="badge danger">Never</span> A success/failure verdict — NoWait doesn't verify whether a bypass ultimately worked, only that it ran.</li>
+                    <li><span class="badge danger">Never</span> Any identity attached to the events above.</li>
+                </ul>
+            </div>
+
+            <div class="policy-section">
+                <h2>🌐 Crowd Bypass (optional, off by default)</h2>
+                <p>If you enable "Crowd Bypass", for shorteners NoWait can't resolve on its own, its URL and discovered destination are sent to the community FastForward crowd-bypass server (NoWait doesn't run its own) so other users don't have to wait either. A hashed IP is kept there to prevent abuse; only its maintainers have access.</p>
+            </div>
+
+            <div class="policy-section">
+                <h2>💾 Local storage</h2>
+                <p>Your options (whitelist, delay settings, toggles) are stored with <code>chrome.storage.local</code> and never leave your browser.</p>
+            </div>
+
+            <div class="policy-section">
+                <h2>📧 Contact</h2>
+                <p>Questions about this policy: <strong>privacy@eduolihez.com</strong>, or open an issue on <a href="https://github.com/eduolihez/nowait" target="_blank" rel="noopener">GitHub</a>.</p>
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid var(--border-light); margin: 40px 0;">
+
+            <p style="font-size: 13px; color: var(--text-secondary); text-align: center;">
+                NoWait is an open source project (Unlicense / public domain).
+            </p>
+        </div>
+    </div>
+
+</body>
+</html>

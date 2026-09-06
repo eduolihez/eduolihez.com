@@ -20,7 +20,7 @@ if ($slug === '') {
 
 try {
     $stmt = db()->prepare(
-        'SELECT id, title, slug, summary, content, cover_url, tags, lang,
+        'SELECT id, title, slug, summary, content, cover_url, tags, category, lang,
                 COALESCE(published_at, created_at) AS published_at,
                 updated_at
          FROM posts
@@ -45,6 +45,7 @@ json([
     'content'      => $row['content'],
     'cover_url'    => $row['cover_url'],
     'tags'         => post_tags($row['tags']),
+    'category'     => post_category_label($row['category']),
     'lang'         => $row['lang'],
     'published_at' => $row['published_at'],
     'updated_at'   => $row['updated_at'],

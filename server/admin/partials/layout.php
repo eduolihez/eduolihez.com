@@ -816,11 +816,20 @@ function admin_header(string $title, string $active = ''): void
   .subdash tr:hover td { background: var(--sd-bg); }
   .subdash .btn { border-radius: 7px; font-weight: 600; background: var(--sd-text); color: var(--sd-surface); }
   .subdash .btn:hover { background: #000; box-shadow: none; }
-  .subdash .btn.ghost { color: var(--sd-text); border-color: var(--sd-border-strong); }
+  /* .ghost y .danger PISAN el fondo solido de .btn de arriba a proposito:
+     sin este "background: transparent" se quedaban con el fondo negro de
+     .btn pero el texto oscuro (o rojo) de su propia variante -- texto
+     invisible o casi, la caja parecia un boton roto en vez de uno "outline". */
+  .subdash .btn.ghost { background: transparent; color: var(--sd-text); border-color: var(--sd-border-strong); }
   .subdash .btn.ghost:hover { border-color: var(--sd-accent); color: var(--sd-accent); background: var(--sd-accent-soft); }
-  .subdash .btn.danger { color: var(--sd-danger); border-color: var(--sd-danger-soft); }
+  .subdash .btn.danger { background: transparent; color: var(--sd-danger); border-color: var(--sd-danger-soft); }
   .subdash .btn.danger:hover { background: var(--sd-danger-soft); }
   .subdash .btn[disabled] { opacity: 0.4; }
+  /* Enlaces sueltos (no .btn): sin esto heredaban el verde del tema oscuro
+     de layout.php (regla global "a { color: var(--accent) }"), que desentona
+     dentro de una pagina ya re-skinada en claro con acento indigo. */
+  .subdash a { color: var(--sd-accent); }
+  .subdash a:hover { color: #4747c2; }
   .subdash .pill { background: var(--sd-accent-soft); color: var(--sd-accent); border-color: transparent; }
   .subdash .pill.on { background: var(--sd-green-soft); color: var(--sd-green); }
   .subdash .pill.off { background: var(--sd-border); color: var(--sd-faint); }

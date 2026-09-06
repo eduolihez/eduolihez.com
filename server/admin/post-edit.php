@@ -8,6 +8,7 @@
 require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/partials/layout.php';
 require_once __DIR__ . '/../lib/upload.php';
+require_once __DIR__ . '/../lib/post.php';
 require_login();
 
 $id = (int) ($_GET['id'] ?? 0);
@@ -20,6 +21,7 @@ $p = [
     'content'      => '',
     'cover_url'    => '',
     'tags'         => '',
+    'category'     => '',
     'lang'         => 'es',
     'visible'      => 1,
     // Al crear se propone ahora; se puede cambiar para fechar hacia atras.
@@ -63,6 +65,12 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
         explode(',', (string) ($_POST['tags'] ?? ''))
     ), static fn(string $t): bool => $t !== '')));
     $p['tags'] = mb_substr(implode(',', $tagList), 0, 255);
+
+    // Categoria: lista blanca estricta contra POST_CATEGORIES (server/lib/post.php).
+    // Vacio es valido -- un articulo sin categoria simplemente no aparece bajo
+    // ningun filtro del listado (pero si en "Todos").
+    $categoryIn = trim((string) ($_POST['category'] ?? ''));
+    $p['category'] = $categoryIn !== '' && isset(POST_CATEGORIES[$categoryIn]) ? $categoryIn : null;
 
     // El idioma se interpola en las URLs del sitio: lista blanca estricta.
     if (!in_array($p['lang'], ['es', 'en', 'ca'], true)) {
@@ -120,24 +128,24 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
         if ($isEdit) {
             db()->prepare(
                 'UPDATE posts
-                    SET title=?, slug=?, summary=?, content=?, cover_url=?, tags=?,
+                    SET title=?, slug=?, summary=?, content=?, cover_url=?, tags=?, category=?,
                         lang=?, visible=?, published_at=?, updated_at=NOW()
                   WHERE id=?'
             )->execute([
                 $p['title'], $p['slug'], $p['summary'], $p['content'], $p['cover_url'],
-                $p['tags'], $p['lang'], $p['visible'], $publishedAt, $id,
+                $p['tags'], $p['category'], $p['lang'], $p['visible'], $publishedAt, $id,
             ]);
             log_activity('update', 'post', $id, 'Artículo: ' . $p['title']);
             set_flash('ok', 'Artículo actualizado con éxito.');
         } else {
             db()->prepare(
                 'INSERT INTO posts
-                    (title, slug, summary, content, cover_url, tags, lang, visible,
+                    (title, slug, summary, content, cover_url, tags, category, lang, visible,
                      published_at, created_at, updated_at)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())'
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())'
             )->execute([
                 $p['title'], $p['slug'], $p['summary'], $p['content'], $p['cover_url'],
-                $p['tags'], $p['lang'], $p['visible'], $publishedAt,
+                $p['tags'], $p['category'], $p['lang'], $p['visible'], $publishedAt,
             ]);
             $id = (int) db()->lastInsertId();
             log_activity('create', 'post', $id, 'Artículo: ' . $p['title']);
@@ -200,20 +208,32 @@ admin_header($isEdit ? 'Editar Artículo' : 'Nuevo Artículo', 'posts.php');
 
   <div class="row2">
     <div>
+      <label for="category">Categoría <span class="faint">(para el filtro del listado)</span></label>
+      <select id="category" name="category">
+        <option value="">Sin categoría</option>
+        <?php foreach (POST_CATEGORIES as $key => $label): ?>
+          <option value="<?= e($key) ?>" <?= $p['category'] === $key ? 'selected' : '' ?>><?= e($label) ?></option>
+        <?php endforeach; ?>
+      </select>
+      <p class="hint">Una sola, a diferencia de las etiquetas: es lo que ve el visitante
+         para filtrar <a href="/blog/" target="_blank">/blog/</a>. Con muchas etiquetas
+         libres el filtro se llenaba de botones; la categoría se queda en un puñado fijo.</p>
+    </div>
+    <div>
       <label for="tags">Etiquetas <span class="faint">(separadas por comas)</span></label>
       <input type="text" id="tags" name="tags" value="<?= e($p['tags']) ?>"
              placeholder="python, soc, automatizacion" maxlength="255">
       <p class="hint">Se guardan en minúsculas y sin repetir. Salen en la tarjeta del
-         artículo y como <code>keywords</code> en los datos estructurados.</p>
-    </div>
-    <div>
-      <label for="published_at">Fecha de publicación</label>
-      <input type="datetime-local" id="published_at" name="published_at"
-             value="<?= e($p['published_at']) ?>">
-      <p class="hint">Es la fecha que se muestra y la que ve Google. Puedes fecharla
-         hacia atrás; no tiene por qué coincidir con cuándo creaste el borrador.</p>
+         artículo y como <code>keywords</code> en los datos estructurados. No se usan
+         para filtrar el listado.</p>
     </div>
   </div>
+
+  <label for="published_at">Fecha de publicación</label>
+  <input type="datetime-local" id="published_at" name="published_at"
+         value="<?= e($p['published_at']) ?>" style="max-width:300px;">
+  <p class="hint">Es la fecha que se muestra y la que ve Google. Puedes fecharla
+     hacia atrás; no tiene por qué coincidir con cuándo creaste el borrador.</p>
 
   <label for="summary">Resumen / Extracto <span class="faint">(Meta Descripción SEO - máx. 250 caracteres)</span></label>
   <textarea id="summary" name="summary" maxlength="250" placeholder="Escribe un breve resumen atractivo para Google y las listas de artículos..." required style="min-height:70px;"><?= e($p['summary']) ?></textarea>

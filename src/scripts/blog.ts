@@ -74,6 +74,7 @@ interface Post {
   content?: string;
   cover_url?: string | null;
   tags?: string[];
+  category?: string | null;
   lang: string;
   published_at: string;
   updated_at?: string;
@@ -142,14 +143,21 @@ export function initBlogList(): void {
 }
 
 /**
- * Construye los chips de filtro por etiqueta y engancha el click que
+ * Construye los chips de filtro por categoria y engancha el click que
  * muestra/oculta tarjetas. Mismo patron que el filtro de /projects/: un
- * "Todos" activo por defecto mas un boton por etiqueta unica, ordenadas
+ * "Todos" activo por defecto mas un boton por categoria unica, ordenadas
  * alfabeticamente para que la posicion no salte entre cargas.
+ *
+ * Por categoria, no por etiqueta (2026-09-06): las etiquetas son libres y
+ * salian ~5 por articulo, asi que con 13 articulos el filtro llegaba a mas
+ * de 40 botones. La categoria es un valor unico de una lista corta (ver
+ * POST_CATEGORIES en server/lib/post.php) pensado solo para esto.
  */
 function initTagFilters(filters: HTMLElement, grid: HTMLElement, posts: Post[], allLabel: string): void {
-  const tags = [...new Set(posts.flatMap((p) => p.tags || []))].sort((a, b) => a.localeCompare(b));
-  if (tags.length === 0) return;
+  const categories = [...new Set(posts.map((p) => p.category).filter((c): c is string => Boolean(c)))].sort((a, b) =>
+    a.localeCompare(b)
+  );
+  if (categories.length === 0) return;
 
   const baseClass =
     'blog-filter-btn px-4 py-1.5 text-xs font-semibold rounded-lg border transition duration-200 cursor-pointer';
@@ -166,7 +174,7 @@ function initTagFilters(filters: HTMLElement, grid: HTMLElement, posts: Post[], 
   };
 
   filters.appendChild(makeButton(allLabel, 'all', true));
-  tags.forEach((tag) => filters.appendChild(makeButton(tag, tag, false)));
+  categories.forEach((category) => filters.appendChild(makeButton(category, category, false)));
   filters.classList.remove('hidden');
   filters.classList.add('flex');
 
@@ -180,15 +188,14 @@ function initTagFilters(filters: HTMLElement, grid: HTMLElement, posts: Post[], 
     btn.className = `${baseClass} ${activeClass}`;
 
     const value = btn.dataset.filter || 'all';
-    grid.querySelectorAll<HTMLElement>('article[data-tags]').forEach((cardEl) => {
-      const cardTags = (cardEl.dataset.tags || '').split(',');
-      cardEl.classList.toggle('hidden', value !== 'all' && !cardTags.includes(value));
+    grid.querySelectorAll<HTMLElement>('article[data-category]').forEach((cardEl) => {
+      cardEl.classList.toggle('hidden', value !== 'all' && cardEl.dataset.category !== value);
     });
   });
 }
 
 /**
- * Filtro por etiqueta para /blog/ (indice ES, renderizado en build-time --
+ * Filtro por categoria para /blog/ (indice ES, renderizado en build-time --
  * ver src/pages/blog/index.astro). A diferencia de initTagFilters() de
  * arriba -- que construye los botones Y las tarjetas a partir de un fetch --
  * aqui ambos ya estan en el HTML servido; esta funcion solo engancha el click
@@ -215,9 +222,8 @@ export function initStaticBlogFilters(): void {
     btn.className = `${baseClass} ${activeClass}`;
 
     const value = btn.dataset.filter || 'all';
-    grid.querySelectorAll<HTMLElement>('article[data-tags]').forEach((cardEl) => {
-      const cardTags = (cardEl.dataset.tags || '').split(',');
-      cardEl.classList.toggle('hidden', value !== 'all' && !cardTags.includes(value));
+    grid.querySelectorAll<HTMLElement>('article[data-category]').forEach((cardEl) => {
+      cardEl.classList.toggle('hidden', value !== 'all' && cardEl.dataset.category !== value);
     });
   });
 }
@@ -238,7 +244,7 @@ function card(
   const article = document.createElement('article');
   article.className =
     'group reveal flex flex-col overflow-hidden rounded-xl border border-bg-border bg-bg-card shadow-xs transition hover:-translate-y-1 hover:border-bg-border-hover hover:shadow-md';
-  if (post.tags?.length) article.dataset.tags = post.tags.join(',');
+  if (post.category) article.dataset.category = post.category;
 
   // --- Portada ---
   // Fallback a la portada generada (ver src/lib/cover.ts) cuando el

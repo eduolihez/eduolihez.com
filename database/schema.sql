@@ -243,6 +243,14 @@ CREATE TABLE IF NOT EXISTS `posts` (
   `content`      MEDIUMTEXT   NOT NULL,               -- HTML redactado desde el panel
   `cover_url`    VARCHAR(255) NULL,
   `tags`         VARCHAR(255) NULL,                   -- CSV: "python,soc,automatizacion"
+  -- Categoria UNICA para el filtro del listado (2026-09-06): las tags de
+  -- arriba son libres y por articulo salian ~5, asi que con 13 articulos el
+  -- filtro llegaba a mostrar mas de 40 botones -- inutilizable. `category`
+  -- es un valor fijo de una lista corta (ver POST_CATEGORIES en
+  -- server/lib/post.php), pensado solo para filtrar/navegar; `tags` sigue
+  -- existiendo tal cual para SEO (keywords de Schema.org) y como metadato
+  -- fino visible en la propia tarjeta/articulo.
+  `category`     VARCHAR(40)  NULL,
   `lang`         CHAR(2)      NOT NULL DEFAULT 'es',  -- es | en | ca
   `visible`      TINYINT(1)   NOT NULL DEFAULT 1,     -- 0 = borrador
   -- Fecha que se muestra y que va al datePublished de Schema.org.
@@ -664,6 +672,10 @@ WHERE `name` = 'Fortinet NSE' AND `credential_url` IS NULL;
 CALL add_column_if_missing('posts', 'tags',         "VARCHAR(255) NULL AFTER `cover_url`");
 CALL add_column_if_missing('posts', 'published_at', "DATETIME NULL AFTER `visible`");
 CALL add_index_if_missing('posts', 'idx_visible_lang', '`visible`, `lang`, `published_at`');
+
+-- Blog: categoria unica para el filtro (ver comentario en la definicion de
+-- `posts` mas arriba). `tags` no se toca -- sigue siendo libre y para SEO.
+CALL add_column_if_missing('posts', 'category', "VARCHAR(40) NULL AFTER `tags`");
 
 -- Los articulos que ya existieran antes de tener published_at se fechan con su
 -- created_at, que es lo que se venia mostrando como fecha de publicacion.
@@ -1149,6 +1161,31 @@ UPDATE `posts`
 SET `content` = CONCAT(`content`, '\r\n<p><strong>Relacionado:</strong> <a href="/blog/post/el-desacuerdo-entre-clasificadores-pierde-contra-algo-mas-simple/">medí después si el desacuerdo entre varios clasificadores ayuda a priorizar qué correo revisar</a> — la respuesta no fue la esperada.</p>')
 WHERE `slug` = 'clasificar-phishing-en-el-navegador-sin-mandar-la-url'
   AND `content` NOT LIKE '%el-desacuerdo-entre-clasificadores-pierde-contra-algo-mas-simple%';
+
+-- ---------------------------------------------------------------------------
+-- Blog: categoria de cada articulo existente (2026-09-06).
+--
+-- Las 5 categorias son las mismas que POST_CATEGORIES en
+-- server/lib/post.php -- si se anade una aqui, hay que anadirla alli tambien
+-- (y viceversa) o el filtro del listado la mostraria con la clave en bruto
+-- en vez de la etiqueta legible.
+--
+-- Un UPDATE por slug, no una unica sentencia con CASE: son solo 13 filas y
+-- asi cada linea se lee y se corrige sola sin tener que tocar las demas.
+-- ---------------------------------------------------------------------------
+UPDATE `posts` SET `category` = 'herramientas'     WHERE `slug` = 'comprobar-si-una-contrasena-esta-filtrada-sin-enviarsela-a-nadie';
+UPDATE `posts` SET `category` = 'blue-team-soc'    WHERE `slug` = 'triaje-de-alertas-en-un-soc-en-que-orden-mirar';
+UPDATE `posts` SET `category` = 'ia-aplicada'      WHERE `slug` = 'clasificar-phishing-en-el-navegador-sin-mandar-la-url';
+UPDATE `posts` SET `category` = 'automatizacion'   WHERE `slug` = 'automatizar-el-informe-semanal-del-soc-con-python';
+UPDATE `posts` SET `category` = 'blue-team-soc'    WHERE `slug` = 'priorizar-cves-sin-fiarse-solo-del-cvss';
+UPDATE `posts` SET `category` = 'blue-team-soc'    WHERE `slug` = 'hardening-fortigate-antes-de-dar-un-despliegue-por-bueno';
+UPDATE `posts` SET `category` = 'carrera-personal' WHERE `slug` = 'de-soporte-tecnico-a-soc-lo-que-cambio-no-fue-el-puesto';
+UPDATE `posts` SET `category` = 'blue-team-soc'    WHERE `slug` = 'active-directory-los-primeros-diez-cambios-en-cualquier-dominio-nuevo';
+UPDATE `posts` SET `category` = 'automatizacion'   WHERE `slug` = 'vigilar-el-catalogo-kev-de-cisa-sin-servidor';
+UPDATE `posts` SET `category` = 'herramientas'     WHERE `slug` = 'blue-team-hub-por-que-quite-el-cristal-esmerilado';
+UPDATE `posts` SET `category` = 'herramientas'     WHERE `slug` = 'revocar-un-token-sin-derribar-la-sesion-entera';
+UPDATE `posts` SET `category` = 'carrera-personal' WHERE `slug` = 'lo-que-da-tiempo-a-aprender-en-24-horas-de-hackathon';
+UPDATE `posts` SET `category` = 'ia-aplicada'      WHERE `slug` = 'el-desacuerdo-entre-clasificadores-pierde-contra-algo-mas-simple';
 
 -- Ajustes del sitio. INSERT IGNORE: si ya existen, NO se tocan tus valores.
 INSERT IGNORE INTO `settings` (`key`, `value`) VALUES

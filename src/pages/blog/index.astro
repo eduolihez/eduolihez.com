@@ -39,7 +39,13 @@ const description =
   'Artículos, tutoriales y análisis de ciberseguridad, respuesta a incidentes, malware, Blue Team y automatización con Python.';
 
 const posts = await fetchAllPostSummaries(lang);
-const tags = [...new Set(posts.flatMap((p) => p.tags || []))].sort((a, b) => a.localeCompare(b));
+// Categoria, no etiqueta: son ~5 valores fijos pensados para navegar el
+// listado (ver POST_CATEGORIES en server/lib/post.php). Las tags siguen
+// existiendo por articulo (SEO, tarjeta) pero con 13 articulos y ~5 tags
+// libres cada uno, un filtro por tag llegaba a mas de 40 botones.
+const categories = [...new Set(posts.map((p) => p.category).filter((c): c is string => Boolean(c)))].sort((a, b) =>
+  a.localeCompare(b)
+);
 ---
 
 <BaseLayout title={title} description={description} lang={lang} path="/blog/" withFaq={false} breadcrumbName="Blog">
@@ -68,7 +74,7 @@ const tags = [...new Set(posts.flatMap((p) => p.tags || []))].sort((a, b) => a.l
 
       {posts.length === 0 && <p class="text-sm text-text-muted">{t('blog.empty')}</p>}
 
-      {tags.length > 0 && (
+      {categories.length > 0 && (
         <div id="blog-filters" class="mb-8 flex flex-wrap gap-2" data-all="Todos">
           <button
             type="button"
@@ -77,13 +83,13 @@ const tags = [...new Set(posts.flatMap((p) => p.tags || []))].sort((a, b) => a.l
           >
             Todos
           </button>
-          {tags.map((tag) => (
+          {categories.map((category) => (
             <button
               type="button"
               class="blog-filter-btn cursor-pointer rounded-lg border border-bg-border/60 bg-bg-soft/40 px-4 py-1.5 text-xs font-semibold text-text-muted transition duration-200 hover:bg-bg-card hover:text-text"
-              data-filter={tag}
+              data-filter={category}
             >
-              {tag}
+              {category}
             </button>
           ))}
         </div>
@@ -96,7 +102,7 @@ const tags = [...new Set(posts.flatMap((p) => p.tags || []))].sort((a, b) => a.l
           return (
             <article
               class="group reveal flex flex-col overflow-hidden rounded-xl border border-bg-border bg-bg-card shadow-xs transition hover:-translate-y-1 hover:border-bg-border-hover hover:shadow-md"
-              data-tags={post.tags?.length ? post.tags.join(',') : undefined}
+              data-category={post.category || undefined}
             >
               <a href={href} class="block overflow-hidden" aria-hidden="true" tabindex="-1">
                 {/* width/height + aspect-ratio: el navegador reserva el hueco antes

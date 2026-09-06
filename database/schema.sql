@@ -587,6 +587,24 @@ SELECT 'CREM Report Generator', 'CREM Report Generator',
 WHERE EXISTS (SELECT 1 FROM `projects`)
   AND NOT EXISTS (SELECT 1 FROM `projects` WHERE `title_es` = 'CREM Report Generator');
 
+-- Proyectos: anadir NoWait (2026-09-06). Extension de navegador (fork de
+-- FastForward, Unlicense) que evade acortadores de enlaces; el content
+-- script solo se inyecta en los dominios con bypass real, no en <all_urls>.
+-- Tiene landing propia en public/projects/nowait/ (demo_url), igual que
+-- Blue Team Hub lleva repo_url y demo_url a la vez -- el repo de GitHub es
+-- privado por ahora, asi que status queda en 'draft' hasta que se publique
+-- (en la Chrome Web Store o al hacer publico el repo).
+INSERT INTO `projects`
+  (`title_es`, `title_en`, `summary_es`, `summary_en`, `stack`, `badges`,
+   `repo_url`, `demo_url`, `store_url`, `featured`, `sort_order`, `status`)
+SELECT 'NoWait', 'NoWait',
+       'Extension de navegador que evade automaticamente las pantallas de espera de los acortadores de enlaces y bloquea registradores de IP. Mas de 90 bypasses especificos por sitio, inyectados solo donde realmente hacen falta.',
+       'Browser extension that automatically bypasses link-shortener wait screens and blocks IP loggers. 90+ site-specific bypasses, injected only where they''re actually needed.',
+       '["JavaScript","Chrome Extension","Manifest V3"]', '["open-source"]',
+       'https://github.com/eduolihez/nowait', '/projects/nowait/', NULL, 0, 11, 'draft'
+WHERE EXISTS (SELECT 1 FROM `projects`)
+  AND NOT EXISTS (SELECT 1 FROM `projects` WHERE `title_es` = 'NoWait');
+
 -- ---------------------------------------------------------------------------
 -- Certificaciones: correcciones y ampliacion con las insignias de Credly
 -- (https://www.credly.com/users/eduolihez), revisadas 2026-08-25.

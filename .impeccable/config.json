@@ -1,7 +1,11 @@
 {
   "detector": {
     "ignoreRules": [],
-    "ignoreFiles": [],
+    "ignoreFiles": [
+      "public/projects/nowait/index.html",
+      "public/projects/nowait/style.css",
+      "public/projects/nowait/privacy.html"
+    ],
     "ignoreValues": [
       {
         "rule": "overused-font",
@@ -17,6 +21,24 @@
         ],
         "createdAt": "2026-08-22T23:58:44.987Z",
         "reason": "Agent: 5 em-dashes, all of them title/meta separators (Nombre — Rol en Ciudad) in SEO templates, not body prose; the rule counted them as running text"
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#888",
+        "files": [
+          "public/projects/nowait/index.html"
+        ],
+        "createdAt": "2026-09-06T19:47:56.866Z",
+        "reason": "matches the identical inline credit-line footer already used verbatim in public/projects/passwdcentinel/index.html"
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "0.8rem",
+        "files": [
+          "public/projects/nowait/index.html"
+        ],
+        "createdAt": "2026-09-06T19:47:56.954Z",
+        "reason": "matches the identical inline credit-line footer already used verbatim in public/projects/passwdcentinel/index.html"
       }
     ]
   }

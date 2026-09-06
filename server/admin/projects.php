@@ -125,7 +125,6 @@ $last = count($rows) - 1;
 admin_header('Proyectos', 'projects.php');
 show_flash();
 ?>
-<div class="subdash">
 <div class="toolbar">
   <h1 style="margin:0;">Proyectos <span class="faint" style="font-size:1rem;">(<?= $published ?> publicados de <?= $totalAll ?>)</span></h1>
   <a class="btn" href="project-edit.php">+ Nuevo proyecto</a>
@@ -240,5 +239,4 @@ show_flash();
   ese numero con el proyecto vecino.
 </p>
 
-</div><!-- /.subdash -->
 <?php admin_footer(); ?>

@@ -5,6 +5,37 @@ Todos los cambios notables de este proyecto se documentan en este archivo.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/),
 y el versionado usa cuatro números (`MAJOR.MINOR.PATCH.MICRO`).
 
+## [1.7.1.0] - 2026-09-06
+
+### Fixed
+
+- **Botones "ghost"/"danger" del panel invisibles bajo el tema claro
+  (`.subdash`, ver 1.7.0.0).** `.subdash .btn` fija un fondo solido para el
+  boton primario, y las variantes `.ghost`/`.danger` no lo reseteaban a
+  transparente — se veian como cajas negras solidas, con el texto (oscuro o
+  rojo sobre negro) practicamente ilegible en unas y perfectamente ilegible
+  en otras. Afectaba a botones "Editar", "Duplicar", acciones en bloque de
+  `messages.php`, exportar CSV, etc. en **todas** las paginas re-skinadas.
+- **Enlaces sueltos dentro de `.subdash` heredaban el verde del tema oscuro**
+  (regla global `a { color: var(--accent) }`) en vez del indigo del re-skin
+  — desentonaba en enlaces como "Seguridad" (`settings.php`) o los titulos
+  de "Frescura de contenido" (`index.php`).
+- **Titulos de `posts.php` casi invisibles**: un `style="color:var(--text)"`
+  a mano usaba el texto casi blanco del tema oscuro sobre el fondo ahora
+  claro. Quitado — hereda el color correcto del enlace.
+
+### Added
+
+- **Categoria del blog** (`posts.category`, columna nueva): las etiquetas
+  libres (`tags`) daban ~40 botones de filtro con solo 13 articulos —
+  inservible como navegacion. `category` es un valor unico de una lista fija
+  de 5 (`POST_CATEGORIES` en `server/lib/post.php`): Blue Team & SOC,
+  Automatización, IA aplicada a seguridad, Herramientas y proyectos, Carrera
+  y trayectoria. `tags` no se toca — sigue existiendo para SEO (`keywords`
+  de Schema.org) y como metadato visible en la tarjeta/articulo. Selector
+  nuevo en `server/admin/post-edit.php`; los 13 articulos existentes ya
+  vienen categorizados en `database/schema.sql`.
+
 ## [1.7.0.0] - 2026-09-06
 
 Multi-project dashboard (`admin.eduolihez.com`) e ingesta de telemetría

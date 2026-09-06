@@ -171,9 +171,9 @@ describe('initStaticBlogFilters()', () => {
         <button type="button" class="blog-filter-btn border-bg-border/60" data-filter="soc">soc</button>
       </div>
       <div id="blog-grid">
-        <article data-tags="python,soc"><h2>A</h2></article>
-        <article data-tags="python"><h2>B</h2></article>
-        <article data-tags="soc"><h2>C</h2></article>
+        <article data-category="python"><h2>A</h2></article>
+        <article data-category="python"><h2>B</h2></article>
+        <article data-category="soc"><h2>C</h2></article>
       </div>
     `;
   }
@@ -183,7 +183,7 @@ describe('initStaticBlogFilters()', () => {
     expect(() => initStaticBlogFilters()).not.toThrow();
   });
 
-  it('oculta las tarjetas que no tienen la etiqueta seleccionada', () => {
+  it('oculta las tarjetas que no tienen la categoria seleccionada', () => {
     setupStaticGrid();
     initStaticBlogFilters();
 

@@ -8,6 +8,7 @@
 require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/partials/layout.php';
 require_once __DIR__ . '/../lib/upload.php';
+require_once __DIR__ . '/../lib/post.php';
 require_login();
 
 $search = mb_substr(trim((string) ($_GET['q'] ?? '')), 0, 80);
@@ -46,8 +47,8 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
                     // heredar la del original la colocaria entre los articulos
                     // ya publicados en cuanto se marcara visible.
                     db()->prepare(
-                        'INSERT INTO posts (title, slug, summary, content, cover_url, tags, lang, visible, published_at, created_at, updated_at)
-                         VALUES (?, ?, ?, ?, ?, ?, ?, 0, NULL, NOW(), NOW())'
+                        'INSERT INTO posts (title, slug, summary, content, cover_url, tags, category, lang, visible, published_at, created_at, updated_at)
+                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, NULL, NOW(), NOW())'
                     )->execute([
                         $row['title'] . ' (copia)',
                         $uniqueSlug,
@@ -55,6 +56,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
                         $row['content'],
                         $row['cover_url'],
                         $row['tags'] ?? null,
+                        $row['category'] ?? null,
                         $row['lang']
                     ]);
                     $newId = (int) db()->lastInsertId();
@@ -77,7 +79,7 @@ if ($search !== '') {
 }
 
 $st = db()->prepare(
-    "SELECT id, title, slug, summary, cover_url, tags, lang, visible,
+    "SELECT id, title, slug, summary, cover_url, tags, category, lang, visible,
             COALESCE(published_at, created_at) AS created_at
      FROM posts $where ORDER BY COALESCE(published_at, created_at) DESC, id DESC"
 );
@@ -109,6 +111,7 @@ show_flash();
         <tr>
           <th style="width:60px;">Portada</th>
           <th>Título</th>
+          <th>Categoría</th>
           <th>Idioma</th>
           <th>Slug / Enlace</th>
           <th>Estado</th>
@@ -119,7 +122,7 @@ show_flash();
       <tbody>
         <?php if (!$rows): ?>
           <tr>
-            <td colspan="7" class="empty">
+            <td colspan="8" class="empty">
               <?= $search !== '' ? 'Ningún artículo coincide con la búsqueda.' : 'Aún no hay artículos publicados.' ?>
             </td>
           </tr>
@@ -135,11 +138,15 @@ show_flash();
               <?php endif; ?>
             </td>
             <td>
-              <a href="post-edit.php?id=<?= $c['id'] ?>" style="font-weight:600; color:var(--text); hover:color:var(--accent);">
+              <a href="post-edit.php?id=<?= $c['id'] ?>" style="font-weight:600;">
                 <?= e($c['title']) ?>
               </a>
               <br>
               <span class="faint" style="font-size:0.75rem; display:block; max-width: 400px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-top:2px;"><?= e($c['summary']) ?></span>
+            </td>
+            <td>
+              <?php $categoryLabel = post_category_label($c['category']); ?>
+              <?= $categoryLabel !== null ? '<span class="pill">' . e($categoryLabel) . '</span>' : '<span class="faint">—</span>' ?>
             </td>
             <td>
               <span class="pill" style="text-transform: uppercase; font-family: 'JetBrains Mono', monospace; font-size:10px;">

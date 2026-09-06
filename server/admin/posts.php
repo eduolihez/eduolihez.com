@@ -90,6 +90,7 @@ $visible  = (int) db()->query('SELECT COUNT(*) FROM posts WHERE visible=1')->fet
 admin_header('Blog - Entradas', 'posts.php');
 show_flash();
 ?>
+<div class="subdash">
 <div class="toolbar">
   <h1 style="margin:0;">Artículos del Blog <span class="faint" style="font-size:1rem;">(<?= $visible ?> visibles de <?= $totalAll ?>)</span></h1>
   <a class="btn" href="post-edit.php">+ Nuevo artículo</a>
@@ -127,10 +128,10 @@ show_flash();
           <tr>
             <td>
               <?php if (!empty($c['cover_url'])): ?>
-                <img src="<?= e($c['cover_url']) ?>" alt="" width="48" height="32"
-                     style="width:48px; height:32px; object-fit:cover; border-radius:.3rem; border:1px solid var(--border); background:var(--soft);">
+                <img src="<?= e($c['cover_url']) ?>" alt="" width="48" height="32" class="soft-box"
+                     style="width:48px; height:32px; object-fit:cover; border-radius:.3rem; border:1px solid var(--border);">
               <?php else: ?>
-                <div style="width:48px; height:32px; border-radius:.3rem; border:1px solid var(--border); background:var(--soft); display:flex; align-items:center; justify-content:center; color:var(--faint); font-size:10px; font-weight:700;">NO IMG</div>
+                <div class="soft-box" style="width:48px; height:32px; border-radius:.3rem; border:1px solid var(--border); display:flex; align-items:center; justify-content:center; color:var(--faint); font-size:10px; font-weight:700;">NO IMG</div>
               <?php endif; ?>
             </td>
             <td>
@@ -192,6 +193,7 @@ show_flash();
     </table>
   </div>
 </div>
+</div><!-- /.subdash -->
 <?php
 admin_footer();
 ?>

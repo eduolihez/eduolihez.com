@@ -64,3 +64,65 @@ function validate_public_url(string $value, string $label): ?string
     }
     return null;
 }
+
+/**
+ * Compara un Origin de peticion contra la lista de origenes permitidos de
+ * una app (server/api/events.php). SIEMPRE comparacion exacta de string,
+ * nunca prefijo/substring/regex -- un check laxo es bypasseable, mismo
+ * motivo que la regla de barra invertida de validate_public_url() de arriba.
+ * Soporta esquemas de extension de navegador (chrome-extension://,
+ * moz-extension://) ademas de https://, que es el caso de uso real.
+ *
+ * Extraida como funcion pura (sin tocar la BD) para poder testearla: la
+ * decodificacion del JSON guardado en apps.allowed_origins vive en
+ * events.php, que si toca la BD y por eso no tiene test unitario, igual que
+ * el resto de endpoints de server/api/ (ver server/tests/bootstrap.php).
+ */
+function origin_is_allowed(string $origin, array $allowedOrigins): bool
+{
+    foreach ($allowedOrigins as $candidate) {
+        if (is_string($candidate) && hash_equals($candidate, $origin)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * Valida la forma del body de POST /api/events.php (server/api/events.php):
+ * event_id y type son strings no vacios, payload es opcional pero si esta
+ * presente debe ser un objeto JSON (array asociativo en PHP). Devuelve el
+ * mensaje de error, o null si el body es valido.
+ *
+ * $body es lo que devuelve json_decode($raw, true) -- puede ser cualquier
+ * cosa (null si el JSON no parseaba, un escalar, una lista...), de ahi el
+ * mixed en la firma en vez de exigir array desde fuera.
+ */
+function validate_event_body(mixed $body): ?string
+{
+    if (!is_array($body)) {
+        return 'Cuerpo invalido.';
+    }
+    $eventId = $body['event_id'] ?? '';
+    $type    = $body['type'] ?? '';
+    $payload = $body['payload'] ?? null;
+
+    // is_string() explicito, no solo "no vacio": un event_id/type que llega
+    // como numero, bool, array u objeto JSON debe rechazarse, no coaccionarse
+    // en silencio a texto -- (string) sobre un array dispara un warning de
+    // PHP y guardaria literalmente el texto "Array" como si fuera valido.
+    if (!is_string($eventId) || $eventId === '' || !is_string($type) || $type === '') {
+        return 'Cuerpo invalido.';
+    }
+    if ($payload !== null) {
+        // json_decode(..., true) no distingue un objeto JSON ({...}) de una
+        // lista JSON ([...]): ambos son array en PHP. array_is_list()
+        // detecta el caso lista (indices 0..n-1 consecutivos) para
+        // rechazarlo -- el payload debe ser un objeto, no un array suelto.
+        // Un array vacio es ambiguo ({} y [] decodifican igual) y se acepta.
+        if (!is_array($payload) || ($payload !== [] && array_is_list($payload))) {
+            return 'Cuerpo invalido.';
+        }
+    }
+    return null;
+}

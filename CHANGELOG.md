@@ -5,6 +5,47 @@ Todos los cambios notables de este proyecto se documentan en este archivo.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/),
 y el versionado usa cuatro números (`MAJOR.MINOR.PATCH.MICRO`).
 
+## [1.7.0.0] - 2026-09-06
+
+Multi-project dashboard (`admin.eduolihez.com`) e ingesta de telemetría
+(`api.eduolihez.com`), diseñado con `/office-hours` + `/plan-eng-review`
+(ver `docs/designs/admin-dashboard.md`). Entrega 1 (funcional) + Entrega 2
+(re-skin visual del resto de `/admin`).
+
+### Added
+
+- **Registro de apps** (`apps` + `app_events` en `database/schema.sql`,
+  `server/admin/apps.php` + `app-edit.php`): cada proyecto (eduolihez.com,
+  y los que vengan después) tiene su propia fila, clave de API (hasheada
+  con SHA-256, solo se enseña una vez al generarla/rotarla) y lista de
+  orígenes permitidos.
+- **`server/api/events.php`**: endpoint de ingesta (`POST /events.php`) para
+  que otros proyectos manden telemetría — auth por clave de API, validación
+  de Origin como defensa en profundidad, deduplicación por `event_id`,
+  rate-limit por IP y por clave, purga probabilística a 400 días.
+- **`admin.eduolihez.com`**: selector de apps en la barra lateral del panel
+  y `server/admin/analytics.php` filtrable por `?app=<slug>`, para que cada
+  app vea sus propios datos. El enrutado real vive en un Worker de
+  Cloudflare (ver `CLOUDFLARE.md` §5) — CDMON no soporta subdominios sin
+  darlos de alta en su propio panel, así que el Worker reescribe la
+  petición en el borde hacia la ruta que ya funciona en producción.
+- **Re-skin visual** (Entrega 2): tema claro, minimal, tipo Linear/Vercel,
+  deliberadamente distinto del portfolio público y del panel oscuro
+  original. Extraído a un bloque `.subdash` compartido en
+  `server/admin/partials/layout.php` para que cada página de `/admin` lo
+  reutilice sin duplicar CSS. La barra lateral y la topbar se quedan
+  oscuras a propósito (continuidad de navegación). Aplicado a todas las
+  páginas del panel; `login.php` y `setup.php` (documentos aislados)
+  llevan su propia versión del mismo tema.
+
+### Fixed
+
+- Dos sitios pintaban texto sobre un fondo del color equivocado bajo el
+  tema claro (`style="background:var(--bg)"` en el mensaje citado de
+  `messages.php`, y `var(--soft)` en miniaturas de `certifications.php` /
+  `posts.php` / `post-edit.php`) — reemplazados por las clases `.card.inset`
+  y `.soft-box`, que sí reaccionan al re-skin por página.
+
 ## [1.6.0.7] - 2026-09-04
 
 Auditoría SEO completa (10 agentes en paralelo: técnico, contenido, schema,

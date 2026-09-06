@@ -26,6 +26,21 @@
   RewriteRule ^ https://%1%{REQUEST_URI} [L,R=301]
 
   # -------------------------------------------------------------------------
+  # admin.eduolihez.com / api.eduolihez.com: NO se enrutan aqui.
+  #
+  # Se probo una reescritura interna por Host (RewriteCond %{HTTP_HOST}) pero
+  # CDMON solo la aplica si el subdominio esta dado de alta en SU panel -- sin
+  # eso, cualquier Host no reconocido cae al vhost del dominio principal y
+  # este .htaccess ni se llega a evaluar para esos hosts.
+  #
+  # El enrutado real vive en un Cloudflare Worker (ver CLOUDFLARE.md,
+  # seccion "admin./api. -> Worker de enrutado") que reescribe la peticion en
+  # el borde hacia eduolihez.com/admin/... o eduolihez.com/api/... -- la
+  # misma ruta que ya funciona en produccion, sin depender de como CDMON
+  # gestione subdominios.
+  # -------------------------------------------------------------------------
+
+  # -------------------------------------------------------------------------
   # /index.html -> /   (301 permanente)
   #
   # Son la MISMA pagina servida en dos URLs distintas, y Google tiene las dos

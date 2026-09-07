@@ -1,0 +1,341 @@
+# ===========================================================================
+#  .htaccess PRINCIPAL  (colocar en la RAIZ del sitio: public_html/.htaccess)
+#  Apache / CDMON
+#
+#  Hace: forzar HTTPS, cachear estaticos, proteger archivos sensibles,
+#  cabeceras de seguridad (incluida CSP estricta) y paginas de error.
+#
+#  NOTA: los clientes FTP ocultan los archivos que empiezan por punto.
+#  Activa "mostrar archivos ocultos" en FileZilla para verlo/subirlo.
+# ===========================================================================
+
+# --- Forzar HTTPS ---
+# ACTIVO por defecto. CDMON incluye certificado SSL gratuito (Let's Encrypt);
+# asegurate de que este emitido ANTES de subir esto. Si tu SSL aun NO esta
+# listo, comenta las 3 lineas del bloque HTTPS (pon # delante) y descomentalas
+# cuando el candado ya funcione.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # HTTP -> HTTPS
+  RewriteCond %{HTTPS} off
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  # www -> sin www  (comenta este bloque si prefieres usar www)
+  RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+  RewriteRule ^ https://%1%{REQUEST_URI} [L,R=301]
+
+  # -------------------------------------------------------------------------
+  # /index.html -> /   (301 permanente)
+  #
+  # Son la MISMA pagina servida en dos URLs distintas, y Google tiene las dos
+  # indexadas: en Search Console aparece www.eduolihez.com/index.html con
+  # impresiones propias. Mientras existan las dos, las senales de una no suman
+  # a la otra.
+  #
+  # Se comprueba THE_REQUEST (la linea de peticion ORIGINAL del navegador) y no
+  # REQUEST_URI a proposito: cuando Apache resuelve "/" internamente via
+  # DirectoryIndex, REQUEST_URI pasa a valer "/index.html" y la regla se
+  # dispararia contra su propia salida, entrando en bucle de redirecciones.
+  # THE_REQUEST no cambia en las resoluciones internas, asi que solo se activa
+  # cuando el index.html viene escrito de fuera.
+  # -------------------------------------------------------------------------
+  RewriteCond %{THE_REQUEST} \s/+(.*/)?index\.html[\s?] [NC]
+  RewriteRule ^(.*/)?index\.html$ /$1 [L,R=301]
+
+  # -------------------------------------------------------------------------
+  # Proyectos: estructura ANTIGUA -> NUEVA  (301 permanente)
+  #
+  # Hasta la reorganizacion, cada proyecto colgaba de la raiz (/fluence/,
+  # /zeora/...). Ahora viven en /projects/<nombre>/. Sin estas redirecciones
+  # cualquier enlace antiguo daria 404: y algunos NO se pueden cambiar, como
+  # la URL de politica de privacidad que figura en la ficha de las extensiones
+  # de Chrome (PromptMaster, Password Sentinel) o los enlaces ya compartidos.
+  #
+  # El 301 traslada ademas el posicionamiento acumulado a la URL nueva.
+  # -------------------------------------------------------------------------
+  RewriteRule ^(fluence|followguard|passwdcentinel|promptmaster|zeora)(/.*)?$ /projects/$1$2 [L,R=301]
+
+  # -------------------------------------------------------------------------
+  # Carpeta /src/ de la web ANTIGUA -> ubicacion actual  (301 permanente)
+  #
+  # La version anterior del sitio servia los archivos desde /src/. Esas URLs
+  # siguen indexadas y hoy responden 404. No es un detalle menor: segun Search
+  # Console los diplomas de Trend Micro en /src/certs/ acumulan MAS impresiones
+  # que cualquier pagina del sitio, portada incluida. Los archivos existen y
+  # responden 200 en /certificaciones/; lo unico que cambio fue la ruta.
+  #
+  # Sin flag NE a proposito: los nombres llevan espacios y el simbolo (TM), y
+  # hace falta que Apache los vuelva a escapar al construir la cabecera
+  # Location. Con NE saldrian espacios literales y la redireccion seria
+  # invalida.
+  # -------------------------------------------------------------------------
+  RewriteRule ^src/certs/(.*)$ /certificaciones/$1 [L,R=301]
+
+  # El CV ya no se publica como PDF: el boton del Hero abre un aviso y lleva a
+  # LinkedIn. La URL antigua conserva impresiones, asi que se manda a portada
+  # en vez de dejarla en 404.
+  RewriteRule ^src/Edu_Olivares_CV\.pdf$ / [L,R=301]
+
+  # Cualquier otro resto de la carpeta antigua.
+  RewriteRule ^src(/.*)?$ / [L,R=301]
+
+  # -------------------------------------------------------------------------
+  # /blog/post/?slug=X (y en/ca) -> /blog/post/X/  (reescritura interna)
+  #
+  # Hasta la conversion a paginas estaticas por slug, el detalle de un
+  # articulo era una unica pagina que leia ?slug= y rellenaba el contenido
+  # por JavaScript (ver src/lib/posts.ts). Ahora cada slug es una pagina real
+  # generada en build-time, pero enlaces ya compartidos, marcadores y el
+  # historial de Search Console siguen usando la URL vieja con query string.
+  #
+  # Esta regla vivia antes en public/.htaccess (Astro la copiaba tal cual a
+  # dist/.htaccess), un archivo DISTINTO de este que tambien aspira a ocupar
+  # la raiz del sitio -- dist/ y server/ se suben a la MISMA carpeta, asi que
+  # el segundo .htaccess que subas por FTP borra en silencio el primero.
+  # Vive aqui, en el unico .htaccess que de verdad llega a la raiz.
+  #
+  # Sin R=301 a proposito: es interna, la barra de direcciones y cualquier
+  # vista previa de enlace conservan la URL original con ?slug=.
+  RewriteCond %{QUERY_STRING} (?:^|&)slug=([^&]+)
+  RewriteRule ^blog/post/?$ /blog/post/%1/ [L]
+
+  RewriteCond %{QUERY_STRING} (?:^|&)slug=([^&]+)
+  RewriteRule ^en/blog/post/?$ /en/blog/post/%1/ [L]
+
+  RewriteCond %{QUERY_STRING} (?:^|&)slug=([^&]+)
+  RewriteRule ^ca/blog/post/?$ /ca/blog/post/%1/ [L]
+</IfModule>
+
+# ---------------------------------------------------------------------------
+# Sitemap de los articulos del blog.
+#
+# /sitemap.xml lo genera Astro al compilar, y ahi los articulos no existen:
+# viven en MySQL y se publican desde /admin sin recompilar. Este segundo
+# sitemap lo sirve PHP leyendo la tabla en cada peticion, asi que un articulo
+# nuevo entra sin tocar nada.
+#
+# Se sirve con extension .xml porque es lo que esperan los buscadores, aunque
+# detras haya un .php. Va en la RAIZ a proposito: un sitemap solo puede listar
+# URLs de su propia carpeta hacia abajo, asi que uno en /api/ no valdria para
+# listar /blog/.
+# ---------------------------------------------------------------------------
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^sitemap-posts\.xml$ /sitemap-posts.php [L]
+
+  # /llms-blog.txt: el texto integro de los articulos, para los rastreadores
+  # de IA. La mayoria (GPTBot, ClaudeBot, PerplexityBot, CCBot) descargan el
+  # HTML crudo y no ejecutan JavaScript, asi que el cuerpo del articulo -- que
+  # se pinta en cliente -- les resulta invisible. Aqui lo tienen en plano.
+  RewriteRule ^llms-blog\.txt$ /llms-blog.php [L]
+
+  # /blog/rss.xml: feed RSS del blog, mismo patron (lee la tabla en cada
+  # peticion, un articulo nuevo entra sin recompilar). Ver server/rss.php.
+  RewriteRule ^blog/rss\.xml$ /rss.php [L]
+</IfModule>
+
+# ---------------------------------------------------------------------------
+# BadaVeu y Mes Badalona: RETIRADOS
+#
+# Ambos proyectos se han eliminado del sitio. Sus URLs estaban indexadas, asi
+# que responden 410 Gone en vez de 404: el 410 le dice a Google que el
+# contenido se ha retirado a proposito y de forma permanente, y lo saca del
+# indice bastante mas rapido que un 404, que interpreta como algo que podria
+# volver.
+#
+# Cubre tanto la ruta antigua (/badaveu/) como la nueva (/projects/badaveu/).
+# Va FUERA del bloque mod_rewrite: Redirect no necesita ese modulo.
+# ---------------------------------------------------------------------------
+RedirectMatch 410 ^/(projects/)?badaveu(/.*)?$
+RedirectMatch 410 ^/(projects/)?mesbadalona(/.*)?$
+
+# ---------------------------------------------------------------------------
+# Blog EN/CA: sin articulos todavia (ver BlogPreview.astro y Header.astro).
+# El listado en esos idiomas no tiene nada que mostrar, asi que en vez de
+# servir un indice vacio se redirige a la home del idioma. Reversible: en
+# cuanto haya contenido real en EN/CA basta con borrar estas dos lineas.
+# Va FUERA del bloque mod_rewrite: Redirect no necesita ese modulo.
+# ---------------------------------------------------------------------------
+RedirectMatch 301 ^/en/blog/?$ /en/
+RedirectMatch 301 ^/ca/blog/?$ /ca/
+
+# Pagina propia para el 410, para que el visitante no vea la de Apache.
+# Con build.format 'directory', Astro la compila a /410/index.html.
+ErrorDocument 410 /410/index.html
+
+# --- Paginas de error personalizadas ---
+ErrorDocument 400 /400/index.html
+ErrorDocument 403 /403/index.html
+ErrorDocument 404 /404.html
+ErrorDocument 500 /500.html
+
+# --- Proteger archivos sensibles del backend ---
+<FilesMatch "^(config\.php|config\.example\.php|db\.php|bootstrap\.php)$">
+  Require all denied
+</FilesMatch>
+
+# Bloquear el acceso web directo a fuentes de datos, docs y ficheros de build.
+# (No deberian llegar nunca al servidor, pero si un dia subes la carpeta
+#  entera por error, quedan tapados.)
+<FilesMatch "\.(sql|md|log|sh|bak|inc|ini|yml|yaml|lock|ts|mjs|env)$">
+  Require all denied
+</FilesMatch>
+<FilesMatch "^(package(-lock)?\.json|composer\.(json|lock)|phpunit\.xml|tsconfig\.json|astro\.config\..*|tailwind\.config\..*)$">
+  Require all denied
+</FilesMatch>
+
+# Si alguna vez subes la carpeta entera y "composer install" ya corrio ahi,
+# /vendor/ tendria PHP ejecutable de terceros (PHPUnit incluido) alcanzable
+# por URL -- clase de RCE conocida (ver CVE-2017-9841). Igual que badaveu/
+# mesbadalona mas abajo, pero devolviendo 403 en vez de 410 porque esto no
+# es contenido retirado, es una carpeta que nunca deberia estar aqui.
+RedirectMatch 403 ^/vendor(/.*)?$
+
+# Ocultar el propio .htaccess y archivos ocultos
+<FilesMatch "^\.">
+  Require all denied
+</FilesMatch>
+
+# ...pero /.well-known/security.txt SI debe ser publico (RFC 9116).
+# (<FilesMatch "^\."> solo mira el NOMBRE del archivo, no la carpeta, asi que
+#  security.txt no queda bloqueado; esto lo deja explicito por si tu hosting
+#  anade reglas globales para carpetas que empiezan por punto.)
+<Files "security.txt">
+  Require all granted
+</Files>
+
+# Desactivar el listado de directorios
+Options -Indexes
+
+# --- Cabeceras de seguridad ---
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "DENY"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "geolocation=(), microphone=(), camera=(), interest-cohort=()"
+  Header always set Cross-Origin-Opener-Policy "same-origin"
+
+  # X-XSS-Protection: cabecera obsoleta (Chrome/Edge la ignoran desde 2019,
+  # Firefox nunca la soporto) que OWASP recomienda omitir o poner a "0" -- la
+  # proteccion real la da la CSP de arriba. La ponemos a "0" explicitamente
+  # en vez de dejarla ausente: mismo efecto, pero algunos escaneres
+  # automaticos solo comprueban si la cabecera esta presente.
+  Header always set X-XSS-Protection "0"
+
+  # HSTS: fuerza HTTPS durante 1 ano.
+  # ACTIVO: el sitio ya esta en produccion con SSL y Cloudflare delante.
+  # Si algun dia necesitas servir algo por HTTP puro, comenta esta linea Y
+  # limpia el HSTS del navegador (chrome://net-internals/#hsts).
+  # No incluimos "preload" a proposito: la lista de precarga es practicamente
+  # irreversible y no compensa para un portfolio.
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains" env=HTTPS
+
+  # Aisla el sitio de recursos de terceros que intenten incrustarlo.
+  Header always set Cross-Origin-Resource-Policy "same-origin"
+
+  # El panel y el API nunca deben indexarse (defensa extra al robots.txt).
+  <FilesMatch "\.php$">
+    Header always set X-Robots-Tag "noindex, nofollow, noarchive"
+  </FilesMatch>
+
+  # Excepcion a la regla de arriba: llms-blog.php es justo el archivo pensado
+  # para que las IAs lo lean e indexen (ver el comentario "Deliberadamente SIN
+  # X-Robots-Tag: noindex" en el propio server/llms-blog.php). El FilesMatch
+  # generico de arriba lo alcanzaba igual porque el rewrite a /llms-blog.txt es
+  # interno (sin redireccion), asi que Apache aplicaba la cabecera al archivo
+  # .php real, anulando en silencio el proposito del archivo.
+  <Files "llms-blog.php">
+    Header unset X-Robots-Tag
+  </Files>
+
+  # -------------------------------------------------------------------------
+  # Content-Security-Policy (CSP):
+  #  - Las paginas ESTATICAS (Astro) traen su propia CSP estricta en una <meta>,
+  #    con hashes calculados en cada build (script-src 'self' + sha256, SIN
+  #    'unsafe-inline'). Ver astro.config.mjs -> experimental.csp.
+  #  - El PANEL (PHP) fija su CSP por cabecera desde server/admin/auth.php.
+  #  Por eso NO ponemos aqui una CSP global: duplicarla con directivas como
+  #  script-src bloquearia los scripts (gana la interseccion mas restrictiva
+  #  entre la cabecera y el <meta>, y la cabecera no conoce los hashes).
+  #  X-Frame-Options: DENY (arriba) cubre el clickjacking en todas las paginas.
+  #
+  #  frame-ancestors SI se puede anadir por cabecera sin ese riesgo: el <meta>
+  #  la ignora por spec (igual que report-uri y sandbox, ver
+  #  https://www.w3.org/TR/CSP3/#meta-element), asi que no hay nada con lo que
+  #  intersecar. Solo a .html para no tocar /admin/ ni /api/, que ya mandan su
+  #  propia CSP completa por PHP -- "always set" la REEMPLAZARIA entera.
+  <FilesMatch "\.html$">
+    Header always set Content-Security-Policy "frame-ancestors 'none'"
+  </FilesMatch>
+  # -------------------------------------------------------------------------
+</IfModule>
+
+# --- Compresion (gzip) ---
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/javascript application/javascript application/json image/svg+xml text/xml application/xml
+</IfModule>
+
+# --- Cache de estaticos ---
+<IfModule mod_expires.c>
+  ExpiresActive On
+
+  # Recursos con hash en el nombre (/_astro/...) -> cache larga e inmutable.
+  # El hash cambia si el contenido cambia, asi que cachear "para siempre" es
+  # seguro: una URL nueva por cada version nueva.
+  <FilesMatch "\.(js|css|woff2|woff|ttf|eot)$">
+    ExpiresDefault "access plus 1 hour"
+    Header set Cache-Control "public, max-age=3600, must-revalidate"
+  </FilesMatch>
+
+  # Imagenes -> cache media
+  <FilesMatch "\.(jpg|jpeg|png|gif|webp|avif|svg|ico)$">
+    ExpiresDefault "access plus 30 days"
+    Header set Cache-Control "public, max-age=2592000"
+  </FilesMatch>
+
+  # HTML -> sin cache larga (para ver cambios al recompilar)
+  <FilesMatch "\.html$">
+    ExpiresDefault "access plus 0 seconds"
+    Header set Cache-Control "public, max-age=0, must-revalidate"
+  </FilesMatch>
+</IfModule>
+
+<IfModule mod_headers.c>
+  # Excepcion a la regla de arriba SOLO para los bundles con hash de Astro
+  # (/_astro/...): esos si pueden cachearse un ano como immutable, porque el
+  # nombre de archivo cambia cada vez que cambia el contenido. Todo lo demas
+  # con estas extensiones -- en concreto los .css/.js escritos a mano de las
+  # landing pages en public/projects/<slug>/ -- NUNCA cambia de nombre, asi
+  # que un "immutable" de un ano serviria la version vieja indefinidamente
+  # sin importar lo que se suba al origen despues. Esto fue justo lo que
+  # paso con public/projects/nowait/style.css: Cloudflare seguia sirviendo
+  # la version vieja desde cache (cf-cache-status: HIT) mucho despues de
+  # subir el archivo nuevo por FTP -- no era un problema del FTP.
+  #
+  # Header set (mas abajo, se evalua despues) sobreescribe el valor generico
+  # de arriba solo para las rutas que de verdad lo necesitan.
+  <If "%{REQUEST_URI} =~ m#^/_astro/#">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </If>
+</IfModule>
+
+# --- Tipos MIME correctos ---
+<IfModule mod_mime.c>
+  AddType application/manifest+json .webmanifest
+  AddType image/svg+xml .svg
+  AddType font/woff2 .woff2
+  AddType text/vcard .vcf
+</IfModule>
+
+# El HTML estatico de Astro solo declara el charset en <meta charset="UTF-8">
+# del <head>, nunca en la cabecera HTTP Content-Type. Los navegadores lo
+# resuelven bien porque leen el <meta>, pero un consumidor no-navegador
+# (algunos scrapers, validadores, y potencialmente algun rastreador de IA)
+# puede asumir Latin-1 por defecto sin el charset en la cabecera -- justo en
+# un sitio en espanol/catalan con tildes y enes en cada pagina. AddCharset
+# fuerza el charset en la cabecera HTTP para lo que Apache ya sirve como
+# texto, sin tocar los tipos MIME de arriba.
+<IfModule mod_mime.c>
+  AddCharset UTF-8 .html .htm .css .js .xml .svg .txt .webmanifest .vcf
+</IfModule>

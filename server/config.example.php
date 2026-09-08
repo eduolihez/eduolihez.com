@@ -94,6 +94,28 @@ return [
         'allowed_ext'   => ['jpg', 'jpeg', 'png', 'webp', 'gif'],
     ],
 
+    // --- Tarjetas SVG animadas de GitHub para el README de perfil ---
+    // (server/api/github-stats.php, github-langs.php, github-streak.php)
+    'github' => [
+        // Personal access token classic, SIN scopes: la API GraphQL de
+        // GitHub exige *algun* token autenticado incluso para leer datos
+        // publicos. Generalo en https://github.com/settings/tokens y
+        // pegalo aqui. NUNCA lo subas a un repositorio publico.
+        'token'    => '',
+        'username' => 'eduolihez',
+        // Minutos que se reutilizan los datos cacheados (tabla `settings`)
+        // antes de volver a consultar la API de GitHub.
+        'cache_ttl_minutes' => 360,
+        // Repos (por nombre, no sensible a mayusculas) que NO cuentan para
+        // la tarjeta de lenguajes: forks de codigo ajeno hecho a mano (no
+        // via el boton Fork, asi que isFork=false no los detecta) cuyo
+        // volumen de bytes no representa trabajo propio. Ahora mismo:
+        // northgate-browser (fork de Firefox/Mullvad, ~1GB de C++/JS/HTML
+        // que taparia Python por completo). Si son forks de verdad no hace
+        // falta listarlos aqui: la query ya filtra isFork:true.
+        'exclude_from_languages' => ['northgate-browser'],
+    ],
+
     // Zona horaria para las fechas del panel y de la base de datos.
     'timezone' => 'Europe/Madrid',
 

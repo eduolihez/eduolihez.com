@@ -165,7 +165,8 @@ function admin_header(string $title, string $active = ''): void
     --danger: #b3261e; --danger-soft: #fbe9e8;
     --warn: #a15c00; --warn-soft: #fdf1de;
     --green: #17794f; --green-soft: #e6f6ee;
-    --cyan: #0c8599; --violet: #7048e8;
+    --cyan: #0c8599; --cyan-soft: #e3f5f7;
+    --violet: #7048e8; --violet-soft: #f1ecfd;
     --shadow: 0 1px 2px rgba(20, 20, 30, 0.04), 0 12px 32px -16px rgba(20, 20, 30, 0.14);
     --shadow-sm: 0 1px 2px rgba(20, 20, 30, 0.05);
   }
@@ -585,16 +586,45 @@ function admin_header(string $title, string $active = ''): void
   .grid { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
   .grid4 { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
 
-  /* Selector de proyectos (index.php sin ?app=) */
-  .project-picker { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+  /* Selector de proyectos (index.php sin ?app=). Ancho maximo por tarjeta a
+     proposito (a diferencia de .grid): con 1-2 apps, dejar que se estiren a
+     todo el ancho disponible se veia desangelado (mucho hueco vacio dentro
+     de la propia tarjeta) -- mejor tarjetas de tamano fijo y que sobre
+     espacio alrededor, no dentro. */
+  .project-picker { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fill, minmax(300px, 360px)); }
   .project-picker-card {
     display: block; text-decoration: none; color: inherit; cursor: pointer;
-    transition: transform 0.2s ease, border-color 0.2s ease;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.2s ease, box-shadow 0.2s ease;
   }
-  .project-picker-card:hover { transform: translateY(-2px); border-color: var(--accent); }
-  .project-picker-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
-  .project-picker-stats .num { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--accent); display: block; }
-  .project-picker-stats .lbl { color: var(--muted); font-size: 0.75rem; display: block; margin-top: 0.2rem; }
+  .project-picker-card:hover { transform: translateY(-3px); border-color: var(--accent); box-shadow: 0 12px 24px -12px rgb(0 0 0 / 0.18); }
+
+  .picker-avatar {
+    width: 40px; height: 40px; border-radius: 0.6rem; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 1.05rem; font-family: 'JetBrains Mono', monospace;
+    background: var(--accent-soft); color: var(--accent);
+  }
+  .picker-avatar.cyan { background: var(--cyan-soft); color: var(--cyan); }
+  .picker-avatar.violet { background: var(--violet-soft); color: var(--violet); }
+  .picker-avatar.warn { background: var(--warn-soft); color: var(--warn); }
+
+  .picker-main-stat { display: flex; align-items: baseline; flex-wrap: wrap; }
+  .picker-main-stat .num { font-family: 'JetBrains Mono', monospace; font-size: 2.25rem; font-weight: 700; color: var(--accent); line-height: 1; }
+  .picker-main-stat .num.cyan { color: var(--cyan); }
+  .picker-main-stat .num.violet { color: var(--violet); }
+  .picker-main-stat .num.warn { color: var(--warn); }
+  .picker-main-stat .lbl { color: var(--muted); font-size: 0.82rem; font-weight: 500; }
+
+  .picker-mini-pills { display: flex; gap: 0.5rem; margin-top: 1rem; }
+  .mini-pill {
+    display: inline-block; padding: 0.2rem 0.6rem; border-radius: 0.375rem;
+    font-size: 0.72rem; font-weight: 600; background: var(--soft); color: var(--muted);
+    border: 1px solid var(--border);
+  }
+  .picker-cta {
+    margin-top: 1.25rem; padding-top: 0.85rem; border-top: 1px solid var(--border);
+    font-size: 0.82rem; font-weight: 600; color: var(--accent);
+  }
 
   .stat { 
     transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.25s ease;

@@ -36,7 +36,7 @@ if (empty($languages)) {
 $body = '';
 $barMaxWidth = 360;
 foreach ($languages as $i => $lang) {
-    $rowY = 50 + $i * 22;
+    $rowY = 50 + $i * 24;
     $delay = 0.1 + $i * 0.1;
     $nameEsc = svg_esc($lang['name']);
     $percentEsc = svg_esc($lang['percent'] . '%');

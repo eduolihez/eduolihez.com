@@ -5,6 +5,43 @@ Todos los cambios notables de este proyecto se documentan en este archivo.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/),
 y el versionado usa cuatro números (`MAJOR.MINOR.PATCH.MICRO`).
 
+## [1.9.0.0] - 2026-09-08
+
+### Added
+
+- **Selector de proyectos como nueva puerta de entrada a `/admin`**
+  (Delivery 3 de `docs/designs/admin-dashboard.md`; Delivery 1-2 —
+  `apps`/`app_events`, `analytics.php` app-scoped, reskin claro completo —
+  ya estaban en producción). `index.php` sin `?app=` muestra una tarjeta
+  por proyecto registrado (visitas de 7 días, dispositivo y navegador
+  top); elegir un proyecto con contenido propio abre su dashboard
+  completo, uno sin contenido propio va directo a `analytics.php` en vez
+  de duplicar esa vista con un dashboard vacío.
+- **`apps.has_content`** (columna nueva): qué apps muestran
+  Proyectos/Certificaciones/Blog/Mensajes en el menú lateral —
+  eduolihez.com sí, la app recién registrada **nowait** (sitio estático
+  en `public/projects/nowait/`, sin CMS) no. Editable desde
+  `app-edit.php`; visible en el listado de `apps.php`.
+- **`server/admin/integrations.php`**: panel de control de la integración
+  GitHub Stats (las 3 tarjetas SVG del README de perfil) — estado del
+  token, última consulta a GitHub, botón de refrescar caché, vista previa
+  en vivo, y formulario para usuario/TTL de caché/repos excluidos/**CSS
+  personalizado** de las tarjetas. Sus ajustes se mueven de `config.php`
+  (solo editable por FTP) a la tabla `settings` (claves
+  `github_stats_*`), con `config.php` como *fallback* automático mientras
+  no se guarde nada desde el panel.
+
+### Fixed
+
+- **`server/api/visit.php` nunca escribía `app_id` en visitas nuevas** —
+  solo el *backfill* histórico de Delivery 1 lo había puesto; llevaba 4
+  días con el filtro `analytics.php?app=` silenciosamente sin tráfico
+  nuevo de ninguna app, sin ningún error visible. `nowait` además no
+  llamaba a `/api/visit.php` en absoluto (sin tracking propio) — ambos se
+  corrigen en este commit.
+- **La navegación del panel no conservaba `?app=` al cambiar de página**:
+  cada clic del menú volvía silenciosamente a la vista "todas las apps".
+
 ## [1.8.0.0] - 2026-09-08
 
 ### Added

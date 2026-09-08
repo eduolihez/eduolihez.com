@@ -5,6 +5,44 @@ Todos los cambios notables de este proyecto se documentan en este archivo.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/),
 y el versionado usa cuatro números (`MAJOR.MINOR.PATCH.MICRO`).
 
+## [1.8.0.0] - 2026-09-08
+
+### Added
+
+- **Tarjetas SVG animadas de GitHub para el README de perfil**
+  (`server/api/github-stats.php`, `github-langs.php`, `github-streak.php`).
+  Sustituyen la dependencia de `github-readme-stats.vercel.app`, que caía
+  con 503 recurrentes (ver `eduolihez/eduolihez@1b6c10c`) y por eso se había
+  quitado del README. Ahora la disponibilidad depende solo de este hosting.
+  - `server/lib/github.php`: fetch vía GraphQL + cache en la tabla
+    `settings` (TTL configurable, `github.cache_ttl_minutes`). Los commits
+    totales se calculan sumando años naturales completos por alias GraphQL
+    en una sola petición, en vez de sumar la ventana móvil de 365 días del
+    query principal más los años naturales (eso habría contado dos veces
+    los meses que caen en ambos rangos).
+  - Los repos listados en `github.exclude_from_languages` no cuentan para
+    la tarjeta de lenguajes: `northgate-browser` (fork manual de
+    Firefox/Mullvad, sin usar el botón Fork de GitHub) trae ~1 GB de
+    C++/JS/HTML/C que tapaba Python por completo — confirmado contra la
+    cuenta real antes de este commit (32% de Python tras excluirlo, vs.
+    prácticamente 0% sin excluirlo).
+  - Sin nota de "rank" tipo letra (S/A+/A/B...): con los números reales de
+    la cuenta (362 commits, 29 PRs, 6 estrellas) esa fórmula, calibrada
+    para mantenedores de proyectos OSS muy activos, daba una "C" que no
+    refleja nada del trabajo real de un perfil centrado en seguridad. Se
+    sustituye por el % de días activos en los últimos 12 meses (un dato
+    propio, no comparativo).
+  - `server/lib/svg_card.php`: marco visual compartido (tema oscuro) y
+    animaciones vía CSS/SMIL (sin JavaScript, por eso funcionan dentro de
+    un `<img src="...svg">` de un README).
+  - Nueva sección `github` en `config.example.php` (token, username,
+    cache_ttl_minutes, exclude_from_languages).
+  - Validado end-to-end contra la API real de GitHub (curl) antes de este
+    commit: sin errores GraphQL, cifras de lenguajes/racha verificadas a
+    mano. Sin ejecutar en PHP (no había intérprete disponible en la máquina
+    de desarrollo) ni el guardado en `settings` (sin acceso a la base de
+    datos desde ahí) — pendiente de verificar tras el despliegue en CDMON.
+
 ## [1.7.2.0] - 2026-09-06
 
 ### Changed

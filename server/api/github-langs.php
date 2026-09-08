@@ -13,7 +13,7 @@ require_method('GET');
 
 if (!github_configured()) {
     svg_respond(svg_placeholder_card(
-        'Top Languages',
+        'github --langs',
         'Falta configurar el token de GitHub en config.php.'
     ));
 }
@@ -22,7 +22,7 @@ try {
     $profile = github_profile_cached();
 } catch (Throwable $e) {
     svg_respond(svg_placeholder_card(
-        'Top Languages',
+        'github --langs',
         'No se pudo consultar GitHub ahora mismo.'
     ), 300);
     exit;
@@ -30,7 +30,7 @@ try {
 
 $languages = $profile['languages'];
 if (empty($languages)) {
-    svg_respond(svg_placeholder_card('Top Languages', 'Sin datos de lenguajes todavia.'));
+    svg_respond(svg_placeholder_card('github --langs', 'Sin datos de lenguajes todavia.'));
 }
 
 $body = '';
@@ -49,4 +49,4 @@ SVG;
     $body .= svg_bar(20, $rowY + 6, $barMaxWidth, $lang['percent'], $lang['color'], $i);
 }
 
-svg_respond(svg_card('Top Languages', $body));
+svg_respond(svg_card('github --langs', $body));

@@ -14,7 +14,7 @@ require_method('GET');
 
 if (!github_configured()) {
     svg_respond(svg_placeholder_card(
-        "Eduardo's GitHub Stats",
+        'github --stats',
         'Falta configurar el token de GitHub en config.php.'
     ));
 }
@@ -23,7 +23,7 @@ try {
     $profile = github_profile_cached();
 } catch (Throwable $e) {
     svg_respond(svg_placeholder_card(
-        "Eduardo's GitHub Stats",
+        'github --stats',
         'No se pudo consultar GitHub ahora mismo.'
     ), 300);
     exit;
@@ -50,4 +50,4 @@ $body .= <<<SVG
   <text class="stat-label" x="340" y="140" text-anchor="middle" style="font-size:11px">Días activos (12m)</text>
 SVG;
 
-svg_respond(svg_card("Eduardo's GitHub Stats", $body));
+svg_respond(svg_card('github --stats', $body));

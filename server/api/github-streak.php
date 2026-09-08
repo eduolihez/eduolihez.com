@@ -13,7 +13,7 @@ require_method('GET');
 
 if (!github_configured()) {
     svg_respond(svg_placeholder_card(
-        'GitHub Streak (12 meses)',
+        'github --streak',
         'Falta configurar el token de GitHub en config.php.'
     ));
 }
@@ -22,7 +22,7 @@ try {
     $profile = github_profile_cached();
 } catch (Throwable $e) {
     svg_respond(svg_placeholder_card(
-        'GitHub Streak (12 meses)',
+        'github --streak',
         'No se pudo consultar GitHub ahora mismo.'
     ), 300);
     exit;
@@ -37,9 +37,9 @@ $ringPercent = $longest > 0 ? min(100, round($current / $longest * 100, 1)) : 0;
 
 $body = svg_stat_row(20, 60, 'Total (12 meses)', number_format($total), 0);
 $body .= svg_stat_row(20, 82, 'Racha mas larga', $longest . ' dias', 1);
-$body .= svg_progress_ring(340, 90, 34, $ringPercent, $t['accent'], $current . 'd');
+$body .= svg_progress_ring(340, 90, 34, $ringPercent, $t['accent2'], $current . 'd');
 $body .= <<<SVG
   <text class="stat-label" x="340" y="140" text-anchor="middle" style="font-size:11px">Racha actual</text>
 SVG;
 
-svg_respond(svg_card('GitHub Streak (12 meses)', $body));
+svg_respond(svg_card('github --streak', $body));

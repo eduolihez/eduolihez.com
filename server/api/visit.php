@@ -77,6 +77,37 @@ function clean_int(mixed $v, int $min, int $max): ?int
     return ($n >= $min && $n <= $max) ? $n : null;
 }
 
+/**
+ * Resuelve el slug de app del payload a su `apps.id` (docs/designs/admin-
+ * dashboard.md). Ausente o desconocido -> 'eduolihez' (el frontend de Astro
+ * actual no manda "app" todavia, asi que todo lo que llega sin ese campo es,
+ * por definicion, trafico de eduolihez.com). Cacheado en estatica porque este
+ * archivo puede llamarse muchas veces por segundo y el mapeo slug->id no
+ * cambia dentro de una misma peticion.
+ *
+ * OJO: antes de esto, ninguna fila nueva llevaba app_id (solo el backfill de
+ * `database/schema.sql` lo puso en las visitas historicas) -- analytics.php
+ * ?app= llevaba 4 dias sin ver trafico nuevo de ningun app sin que nadie se
+ * enterase, porque la ausencia de datos no lanza ningun error.
+ */
+function resolve_app_id(string $slug): ?int
+{
+    static $cache = [];
+    $slug = preg_match('/^[a-z0-9_-]{1,60}$/', $slug) ? $slug : 'eduolihez';
+    if (array_key_exists($slug, $cache)) {
+        return $cache[$slug];
+    }
+    try {
+        $st = db()->prepare('SELECT id FROM apps WHERE slug = ?');
+        $st->execute([$slug]);
+        $id = $st->fetchColumn();
+        $cache[$slug] = $id !== false ? (int) $id : null;
+    } catch (Throwable $e) {
+        $cache[$slug] = null;
+    }
+    return $cache[$slug];
+}
+
 $input = read_json_body();
 $action = ($input['action'] ?? 'hit') === 'beat' ? 'beat' : 'hit';
 
@@ -215,14 +246,17 @@ try {
         no_content();
     }
 
+    $appId = resolve_app_id((string) ($input['app'] ?? ''));
+
     $stmt = db()->prepare(
         'INSERT INTO visits
-            (path, referrer, ip_hash, user_agent, country, device, browser, os, lang, is_bot,
+            (app_id, path, referrer, ip_hash, user_agent, country, device, browser, os, lang, is_bot,
              session_id, hit_id, utm_source, utm_medium, utm_campaign, viewport, browser_lang,
              visited_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())'
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())'
     );
     $stmt->execute([
+        $appId,
         $path,
         $referrer,
         $ipHash,

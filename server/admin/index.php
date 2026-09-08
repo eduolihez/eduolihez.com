@@ -62,8 +62,88 @@ function rows_of(string $sql, array $params = []): array
     }
 }
 
-// Solo contamos visitas humanas (is_bot = 0) en los KPIs.
-$HUMAN = 'is_bot = 0';
+// --- Selector de proyectos (2026-09-08) ---------------------------------
+//
+// Sin ?app en la URL: en vez de saltar directo al dashboard de
+// eduolihez.com (que es lo que hacia esta pagina antes de que existiera mas
+// de una app), se muestra un selector con metricas generales de cada app
+// registrada -- el nuevo punto de entrada de /admin.
+//
+// Con ?app=<slug> de una app SIN contenido propio (has_content=0, p.ej.
+// nowait: sitio estatico sin CMS): no tiene sentido este dashboard (KPIs de
+// Proyectos/Certificaciones/Blog que esa app no tiene), asi que se redirige
+// a analytics.php?app=<slug>, que ya muestra exactamente lo que SI aplica
+// (visitas/dispositivos/navegador) sin duplicar esa vista aqui.
+$currentAppSlug = (string) ($_GET['app'] ?? '');
+
+if ($currentAppSlug === '') {
+    $apps = rows_of('SELECT id, slug, display_name, has_content FROM apps ORDER BY created_at ASC');
+
+    admin_header('Selector de proyectos', 'index.php');
+    show_flash();
+    ?>
+    <h1>¿Qué proyecto quieres ver?</h1>
+    <p class="hint" style="margin-bottom:1.5rem;">Métricas de los últimos 7 días. Elige un proyecto para entrar en su panel.</p>
+
+    <?php if (!$apps): ?>
+      <div class="card empty">Todavía no hay proyectos registrados. <a href="apps.php">Registra el primero →</a></div>
+    <?php else: ?>
+      <div class="project-picker">
+        <?php foreach ($apps as $app): ?>
+          <?php
+          $appId = (int) $app['id'];
+          $visits7 = count_of(
+              'SELECT COUNT(*) FROM visits WHERE app_id = ? AND is_bot = 0 AND visited_at > (NOW() - INTERVAL 7 DAY)',
+              [$appId]
+          );
+          $topDevice = rows_of(
+              "SELECT COALESCE(device,'—') AS k, COUNT(*) AS c FROM visits
+               WHERE app_id = ? AND is_bot = 0 AND visited_at > (NOW() - INTERVAL 30 DAY)
+               GROUP BY k ORDER BY c DESC LIMIT 1",
+              [$appId]
+          )[0]['k'] ?? '—';
+          $topBrowser = rows_of(
+              "SELECT COALESCE(browser,'—') AS k, COUNT(*) AS c FROM visits
+               WHERE app_id = ? AND is_bot = 0 AND visited_at > (NOW() - INTERVAL 30 DAY)
+               GROUP BY k ORDER BY c DESC LIMIT 1",
+              [$appId]
+          )[0]['k'] ?? '—';
+          $href = $app['has_content']
+              ? 'index.php?app=' . rawurlencode($app['slug'])
+              : 'analytics.php?app=' . rawurlencode($app['slug']);
+          ?>
+          <a class="card project-picker-card" href="<?= e($href) ?>">
+            <div class="toolbar" style="margin-bottom:.75rem;">
+              <strong style="font-size:1.05rem;"><?= e($app['display_name']) ?></strong>
+              <?php if (!$app['has_content']): ?><span class="pill">solo analítica</span><?php endif; ?>
+            </div>
+            <div class="project-picker-stats">
+              <div><span class="num"><?= number_format($visits7) ?></span><span class="lbl">visitas (7d)</span></div>
+              <div><span class="num" style="font-size:1rem;"><?= e($topDevice) ?></span><span class="lbl">dispositivo top</span></div>
+              <div><span class="num" style="font-size:1rem;"><?= e($topBrowser) ?></span><span class="lbl">navegador top</span></div>
+            </div>
+          </a>
+        <?php endforeach; ?>
+      </div>
+    <?php endif; ?>
+
+    <?php admin_footer();
+    exit;
+}
+
+// --- App sin contenido propio: no hay dashboard aqui, ver comentario arriba.
+$selectedApp = rows_of('SELECT id, has_content FROM apps WHERE slug = ?', [$currentAppSlug])[0] ?? null;
+if ($selectedApp !== null && !$selectedApp['has_content']) {
+    redirect('analytics.php?app=' . rawurlencode($currentAppSlug));
+}
+// $selectedApp === null pasa si la URL trae un ?app= que no existe en la
+// tabla (borrado entre medias, o escrito a mano): 0 nunca hace match con un
+// id real, asi que las secciones de trafico salen todas a cero en vez de
+// mostrar por error los datos de OTRA app.
+$appId = $selectedApp['id'] ?? 0;
+
+// Solo contamos visitas humanas (is_bot = 0) de ESTA app en los KPIs.
+$HUMAN = 'is_bot = 0 AND app_id = ' . (int) $appId;
 
 // --- Contenido ---------------------------------------------------------
 $projects     = count_of('SELECT COUNT(*) FROM projects');

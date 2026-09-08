@@ -101,5 +101,24 @@
         </div>
     </div>
 
+<script>
+  // Ver el mismo bloque en index.html: analítica propia mínima, sin
+  // terceros, etiquetada "app":"nowait" para que su tráfico se vea aparte
+  // en /admin.
+  (function () {
+    try {
+      var body = JSON.stringify({
+        app: 'nowait',
+        path: location.pathname,
+        referrer: document.referrer || ''
+      });
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon('/api/visit.php', body);
+      } else {
+        fetch('/api/visit.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body, keepalive: true }).catch(function () {});
+      }
+    } catch (e) { /* la analítica nunca debe romper la página */ }
+  })();
+</script>
 </body>
 </html>

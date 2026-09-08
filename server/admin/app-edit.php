@@ -11,7 +11,7 @@ require_login();
 $id = (int) ($_GET['id'] ?? 0);
 $isEdit = $id > 0;
 
-$a = ['slug' => '', 'display_name' => '', 'allowed_origins' => []];
+$a = ['slug' => '', 'display_name' => '', 'allowed_origins' => [], 'has_content' => false];
 
 if ($isEdit) {
     $stmt = db()->prepare('SELECT * FROM apps WHERE id = ?');
@@ -24,6 +24,7 @@ if ($isEdit) {
     $a['slug'] = $row['slug'];
     $a['display_name'] = $row['display_name'];
     $a['allowed_origins'] = json_decode((string) ($row['allowed_origins'] ?? '[]'), true) ?: [];
+    $a['has_content'] = (bool) $row['has_content'];
 }
 
 $errors = [];
@@ -40,6 +41,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     // y moz-extension://, no solo https://.
     $originsRaw = (string) ($_POST['allowed_origins'] ?? '');
     $a['allowed_origins'] = array_values(array_filter(array_map('trim', explode("\n", $originsRaw))));
+    $a['has_content'] = isset($_POST['has_content']);
 
     if ($a['display_name'] === '') {
         $errors[] = 'El nombre es obligatorio.';
@@ -54,11 +56,11 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
         $originsJson = json_encode($a['allowed_origins'], JSON_UNESCAPED_UNICODE);
         try {
             if ($isEdit) {
-                db()->prepare('UPDATE apps SET slug = ?, display_name = ?, allowed_origins = ? WHERE id = ?')
-                    ->execute([$a['slug'], $a['display_name'], $originsJson, $id]);
+                db()->prepare('UPDATE apps SET slug = ?, display_name = ?, allowed_origins = ?, has_content = ? WHERE id = ?')
+                    ->execute([$a['slug'], $a['display_name'], $originsJson, $a['has_content'] ? 1 : 0, $id]);
             } else {
-                db()->prepare('INSERT INTO apps (slug, display_name, allowed_origins, created_at) VALUES (?, ?, ?, NOW())')
-                    ->execute([$a['slug'], $a['display_name'], $originsJson]);
+                db()->prepare('INSERT INTO apps (slug, display_name, allowed_origins, has_content, created_at) VALUES (?, ?, ?, ?, NOW())')
+                    ->execute([$a['slug'], $a['display_name'], $originsJson, $a['has_content'] ? 1 : 0]);
             }
             $savedId = $isEdit ? $id : (int) db()->lastInsertId();
             log_activity($isEdit ? 'update' : 'create', 'app', $savedId, 'App: ' . $a['display_name']);
@@ -103,6 +105,16 @@ if ($errors) {
     <code>docs/designs/admin-dashboard.md</code>. Un cliente sin cabecera Origin (un programa
     de escritorio, no un navegador) no necesita estar aquí.
   </div>
+
+  <label class="checkline" style="margin-top:1rem;">
+    <input type="checkbox" name="has_content" value="1" <?= $a['has_content'] ? 'checked' : '' ?>>
+    <span>
+      <strong>Tiene secciones de contenido propias</strong>
+      <span class="hint">Activa Proyectos / Certificaciones / Blog / Mensajes en el menú cuando esta app
+        está seleccionada. Déjalo desmarcado para un sitio estático sin CMS (como nowait): solo
+        verá Analítica.</span>
+    </span>
+  </label>
 
   <div style="margin-top:1.5rem;">
     <button type="submit" class="btn"><?= $isEdit ? 'Guardar cambios' : 'Crear app' ?></button>

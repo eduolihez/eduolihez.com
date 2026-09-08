@@ -183,5 +183,29 @@
 </footer>
 
 <script src="script.js"></script>
+<script>
+  // Analítica propia, sin terceros (server/api/visit.php) -- nowait es
+  // estático (sin el layout de Astro que trackea el resto del sitio, ver
+  // src/scripts/analytics.ts), así que necesita su propio ping mínimo:
+  // solo "hit" en la carga, sin session_id/hit_id ni el "beat" de
+  // duración/scroll (ese detalle de comportamiento no aporta nada para un
+  // one-pager). "app":"nowait" es lo único que lo distingue de eduolihez.com
+  // -- server/api/visit.php resuelve ese slug a su propio app_id (ver
+  // resolve_app_id()), así que su tráfico se ve aparte en /admin.
+  (function () {
+    try {
+      var body = JSON.stringify({
+        app: 'nowait',
+        path: location.pathname,
+        referrer: document.referrer || ''
+      });
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon('/api/visit.php', body);
+      } else {
+        fetch('/api/visit.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body, keepalive: true }).catch(function () {});
+      }
+    } catch (e) { /* la analítica nunca debe romper la página */ }
+  })();
+</script>
 </body>
 </html>

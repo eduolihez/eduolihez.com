@@ -78,24 +78,34 @@ $currentAppSlug = (string) ($_GET['app'] ?? '');
 
 if ($currentAppSlug === '') {
     $apps = rows_of('SELECT id, slug, display_name, has_content FROM apps ORDER BY created_at ASC');
+    $sparkColors = ['', 'cyan', 'violet', 'warn']; // ciclan si hay mas de 4 apps
 
     admin_header('Selector de proyectos', 'index.php');
     show_flash();
     ?>
     <h1>¿Qué proyecto quieres ver?</h1>
-    <p class="hint" style="margin-bottom:1.5rem;">Métricas de los últimos 7 días. Elige un proyecto para entrar en su panel.</p>
+    <p class="hint" style="margin-bottom:1.5rem;">Últimos 7 días, comparado con los 7 anteriores. Elige un proyecto para entrar en su panel.</p>
 
     <?php if (!$apps): ?>
       <div class="card empty">Todavía no hay proyectos registrados. <a href="apps.php">Registra el primero →</a></div>
     <?php else: ?>
       <div class="project-picker">
-        <?php foreach ($apps as $app): ?>
+        <?php foreach ($apps as $i => $app): ?>
           <?php
           $appId = (int) $app['id'];
           $visits7 = count_of(
               'SELECT COUNT(*) FROM visits WHERE app_id = ? AND is_bot = 0 AND visited_at > (NOW() - INTERVAL 7 DAY)',
               [$appId]
           );
+          $visitsPrev7 = count_of(
+              'SELECT COUNT(*) FROM visits WHERE app_id = ? AND is_bot = 0
+               AND visited_at <= (NOW() - INTERVAL 7 DAY) AND visited_at > (NOW() - INTERVAL 14 DAY)',
+              [$appId]
+          );
+          $lastVisit = rows_of(
+              'SELECT visited_at FROM visits WHERE app_id = ? AND is_bot = 0 ORDER BY visited_at DESC LIMIT 1',
+              [$appId]
+          )[0]['visited_at'] ?? null;
           $topDevice = rows_of(
               "SELECT COALESCE(device,'—') AS k, COUNT(*) AS c FROM visits
                WHERE app_id = ? AND is_bot = 0 AND visited_at > (NOW() - INTERVAL 30 DAY)
@@ -108,20 +118,57 @@ if ($currentAppSlug === '') {
                GROUP BY k ORDER BY c DESC LIMIT 1",
               [$appId]
           )[0]['k'] ?? '—';
+
+          // Mismo relleno de dias-sin-visitas que usa el dashboard (evita huecos
+          // en el sparkline cuando un dia no tuvo ninguna visita).
+          $dailyRaw = rows_of(
+              "SELECT DATE(visited_at) AS d, COUNT(*) AS c FROM visits
+               WHERE app_id = ? AND is_bot = 0 AND visited_at > (NOW() - INTERVAL 14 DAY)
+               GROUP BY DATE(visited_at)",
+              [$appId]
+          );
+          $byDay = [];
+          foreach ($dailyRaw as $r) {
+              $byDay[$r['d']] = (int) $r['c'];
+          }
+          $sparkVals = [];
+          for ($d = 13; $d >= 0; $d--) {
+              $sparkVals[] = $byDay[date('Y-m-d', strtotime("-$d day"))] ?? 0;
+          }
+
           $href = $app['has_content']
               ? 'index.php?app=' . rawurlencode($app['slug'])
               : 'analytics.php?app=' . rawurlencode($app['slug']);
+          $color = $sparkColors[$i % count($sparkColors)];
+          $initial = mb_strtoupper(mb_substr($app['display_name'], 0, 1));
           ?>
           <a class="card project-picker-card" href="<?= e($href) ?>">
-            <div class="toolbar" style="margin-bottom:.75rem;">
-              <strong style="font-size:1.05rem;"><?= e($app['display_name']) ?></strong>
+            <div class="toolbar" style="margin-bottom:1rem; align-items:flex-start;">
+              <div style="display:flex; align-items:center; gap:.75rem;">
+                <div class="picker-avatar <?= e($color) ?>"><?= e($initial) ?></div>
+                <div>
+                  <strong style="font-size:1.05rem; display:block;"><?= e($app['display_name']) ?></strong>
+                  <span class="faint" style="font-size:.78rem;">
+                    <?= $lastVisit ? 'última visita ' . e(ago($lastVisit)) : 'sin visitas todavía' ?>
+                  </span>
+                </div>
+              </div>
               <?php if (!$app['has_content']): ?><span class="pill">solo analítica</span><?php endif; ?>
             </div>
-            <div class="project-picker-stats">
-              <div><span class="num"><?= number_format($visits7) ?></span><span class="lbl">visitas (7d)</span></div>
-              <div><span class="num" style="font-size:1rem;"><?= e($topDevice) ?></span><span class="lbl">dispositivo top</span></div>
-              <div><span class="num" style="font-size:1rem;"><?= e($topBrowser) ?></span><span class="lbl">navegador top</span></div>
+
+            <div class="picker-main-stat">
+              <span class="num <?= e($color) ?>"><?= number_format($visits7) ?></span>
+              <?= delta_badge($visits7, $visitsPrev7) ?>
+              <span class="lbl" style="margin:0 0 0 .5rem;">visitas (7d)</span>
             </div>
+            <?= sparkline($sparkVals, $color) ?>
+
+            <div class="picker-mini-pills">
+              <span class="mini-pill"><?= e($topDevice) ?></span>
+              <span class="mini-pill"><?= e($topBrowser) ?></span>
+            </div>
+
+            <div class="picker-cta">Ver panel &rarr;</div>
           </a>
         <?php endforeach; ?>
       </div>

@@ -399,6 +399,14 @@ CALL add_index_if_missing('visits', 'idx_country',   '`country`');
 CALL add_column_if_missing('visits', 'app_id', 'INT UNSIGNED NULL AFTER `id`');
 CALL add_index_if_missing('visits', 'idx_app_time', '`app_id`, `visited_at`');
 
+-- Rediseno del selector de proyectos de /admin (2026-09-08): que apps tienen
+-- secciones de contenido (Proyectos/Certificaciones/Blog) propias frente a
+-- las que son solo un sitio estatico sin CMS (nowait). 0 por defecto porque
+-- una app nueva registrada desde el panel normalmente NO trae contenido
+-- propio -- eduolihez.com es la excepcion, no la regla, y se marca explicita
+-- mas abajo.
+CALL add_column_if_missing('apps', 'has_content', "TINYINT(1) NOT NULL DEFAULT 0 AFTER `display_name`");
+
 -- Analitica de comportamiento y atribucion. Nada de esto es persistente ni
 -- identifica a nadie: session_id vive solo en sessionStorage (muere al
 -- cerrar la pestana) y solo sirve para agrupar las paginas vistas en una
@@ -1019,6 +1027,25 @@ UPDATE `visits`
 SET `app_id` = (SELECT `id` FROM `apps` WHERE `slug` = 'eduolihez')
 WHERE `app_id` IS NULL;
 
+-- eduolihez.com es la unica app con secciones de contenido propias
+-- (Proyectos/Certificaciones/Blog): marca su fila explicitamente. Guardado
+-- por `has_content = 0` (el DEFAULT recien anadido), no solo por slug -- si
+-- alguien lo desmarca a mano desde el panel mas adelante, reimportar esto no
+-- lo vuelve a marcar por encima.
+UPDATE `apps` SET `has_content` = 1 WHERE `slug` = 'eduolihez' AND `has_content` = 0;
+
+-- Registro de "nowait" (docs/designs/admin-dashboard.md, extension 2026-09-08):
+-- sitio estatico en public/projects/nowait/ (HTML/CSS/JS a mano, sin BD ni
+-- CMS), servido en /projects/nowait/... -- no tenia fila en `apps` hasta
+-- ahora, asi que su trafico no se podia ver por separado en el selector de
+-- proyectos. `has_content` se queda en el DEFAULT (0): no tiene
+-- Proyectos/Certificaciones/Blog que gestionar, solo analitica de visitas.
+-- Sin api_key_hash: no reporta eventos a server/api/events.php, solo
+-- visitas normales via server/api/visit.php (ver ese archivo: resolve_app_id()).
+INSERT INTO `apps` (`slug`, `display_name`)
+SELECT 'nowait', 'NoWait'
+WHERE NOT EXISTS (SELECT 1 FROM `apps` WHERE `slug` = 'nowait');
+
 -- ---------------------------------------------------------------------------
 -- Blog: enlazar "Automatizar el informe semanal del SOC con Python" al
 -- repositorio publico del generador completo (2026-09-01).
@@ -1213,6 +1240,16 @@ INSERT IGNORE INTO `settings` (`key`, `value`) VALUES
   ('announcement_on',   '0'),   -- banner superior activo
   ('announcement_es',   ''),    -- texto del banner en espanol
   ('announcement_en',   ''),    -- ... ingles
+  -- Integracion GitHub Stats (server/admin/integrations.php,
+  -- server/lib/github.php): antes vivian solo en config.php (no editable
+  -- desde el panel sin FTP); token vacio por defecto a proposito, config.php
+  -- se sigue leyendo como fallback si esto esta vacio (ver github_setting()
+  -- en server/lib/github.php) para no romper nada durante la migracion.
+  ('github_stats_token',              ''),
+  ('github_stats_username',           'eduolihez'),
+  ('github_stats_cache_ttl_minutes',  '360'),
+  ('github_stats_exclude_repos',      'northgate-browser'),
+  ('github_stats_custom_css',         ''),
   ('announcement_ca',   ''),    -- ... catalan
   ('announcement_url',  '');    -- enlace opcional del banner
 

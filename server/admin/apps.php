@@ -61,7 +61,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
 
 // --- Listado ------------------------------------------------------------
 $rows = db()->query(
-    'SELECT id, slug, display_name, api_key_hash, allowed_origins, key_rotated_at, created_at
+    'SELECT id, slug, display_name, has_content, api_key_hash, allowed_origins, key_rotated_at, created_at
      FROM apps ORDER BY created_at ASC'
 )->fetchAll();
 
@@ -85,6 +85,7 @@ show_flash();
         <tr>
           <th>App</th>
           <th>Slug</th>
+          <th>Contenido</th>
           <th>Clave de API</th>
           <th>Orígenes permitidos</th>
           <th>Creada</th>
@@ -93,13 +94,14 @@ show_flash();
       </thead>
       <tbody>
         <?php if (!$rows): ?>
-          <tr><td colspan="6" class="empty">Aún no hay apps registradas.</td></tr>
+          <tr><td colspan="7" class="empty">Aún no hay apps registradas.</td></tr>
         <?php endif; ?>
         <?php foreach ($rows as $a): ?>
           <?php $origins = json_decode((string) ($a['allowed_origins'] ?? '[]'), true) ?: []; ?>
           <tr>
             <td><strong><?= e($a['display_name']) ?></strong></td>
             <td class="mono faint"><?= e($a['slug']) ?></td>
+            <td><span class="pill <?= $a['has_content'] ? 'on' : '' ?>"><?= $a['has_content'] ? 'Sí' : 'Solo analítica' ?></span></td>
             <td>
               <?php if ($a['api_key_hash']): ?>
                 <span class="pill on">Configurada</span>

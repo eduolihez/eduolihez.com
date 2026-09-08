@@ -11,7 +11,12 @@
  * Requiere un token de GitHub (Settings -> Developer settings -> Personal
  * access tokens -> classic, sin scopes, solo para leer datos publicos via
  * GraphQL: la API GraphQL de GitHub exige *algun* token autenticado incluso
- * para datos publicos). Se configura en config.php, seccion 'github'.
+ * para datos publicos). Editable desde /admin/integrations.php (tabla
+ * `settings`, claves `github_stats_*`) -- asi se puede rotar el token o
+ * cambiar el TTL de cache sin tocar FTP. `config.php`, seccion 'github', se
+ * lee solo como FALLBACK si el ajuste correspondiente esta vacio: cubre el
+ * momento entre desplegar este cambio y rellenar los ajustes desde el panel,
+ * y a quien prefiera seguir gestionandolo por config.php sin usar el panel.
  *
  * Los resultados se cachean en la tabla `settings` (ya existente) para no
  * gastar la cuota de la API de GitHub en cada visita al README.
@@ -22,17 +27,31 @@ const GITHUB_GRAPHQL_URL = 'https://api.github.com/graphql';
 const GITHUB_CACHE_KEY   = 'gh_profile_cache_json';
 const GITHUB_CACHE_AT    = 'gh_profile_cache_at';
 
+/**
+ * Lee un ajuste `github_stats_<$key>` de la tabla `settings`; si esta vacio,
+ * cae a `config()['github'][$key]` (ver cabecera del archivo); si tampoco
+ * hay nada ahi, usa $default.
+ */
+function github_setting(string $key, string $default = ''): string
+{
+    $fromSettings = trim(setting_get('github_stats_' . $key, ''));
+    if ($fromSettings !== '') {
+        return $fromSettings;
+    }
+    $fromConfig = trim((string) (config()['github'][$key] ?? ''));
+    return $fromConfig !== '' ? $fromConfig : $default;
+}
+
 /** True si hay un token configurado (si no, las tarjetas muestran un aviso). */
 function github_configured(): bool
 {
-    return trim((string) (config()['github']['token'] ?? '')) !== '';
+    return github_setting('token') !== '';
 }
 
 /** Usuario de GitHub cuyo perfil se representa (por defecto: eduolihez). */
 function github_username(): string
 {
-    $u = trim((string) (config()['github']['username'] ?? ''));
-    return $u !== '' ? $u : 'eduolihez';
+    return github_setting('username', 'eduolihez');
 }
 
 /**
@@ -41,9 +60,9 @@ function github_username(): string
  */
 function github_graphql(string $query, array $variables = []): array
 {
-    $token = trim((string) (config()['github']['token'] ?? ''));
+    $token = github_setting('token');
     if ($token === '') {
-        throw new RuntimeException('Falta el token de GitHub en config.php (seccion "github").');
+        throw new RuntimeException('Falta el token de GitHub (ver /admin/integrations.php o config.php).');
     }
 
     $payload = json_encode(['query' => $query, 'variables' => $variables], JSON_UNESCAPED_UNICODE);
@@ -182,9 +201,19 @@ function github_fetch_profile(string $username): array
     // northgate-browser trae el arbol fuente entero de Firefox/Mullvad
     // (~1 GB de C++/JS/HTML/C), que taparia por completo Python -- el
     // lenguaje que de verdad usa a diario (ver About Me del README). Se
-    // excluyen de LENGUAJES via config()['github']['exclude_from_languages'],
-    // pero SI cuentan para las estrellas (esas si son merito real).
-    $excluded = array_map('strtolower', (array) (config()['github']['exclude_from_languages'] ?? []));
+    // excluyen de LENGUAJES via el ajuste `github_stats_exclude_repos` (CSV;
+    // ver /admin/integrations.php), pero SI cuentan para las estrellas (esas
+    // si son merito real). Si el ajuste esta vacio, cae a config.php --
+    // ahi el formato historico es un array PHP, no CSV, asi que este caso
+    // concreto no puede reutilizar github_setting() (que solo sabe leer
+    // valores de config.php como texto).
+    $excludedCsv = trim(setting_get('github_stats_exclude_repos', ''));
+    if ($excludedCsv !== '') {
+        $excludedList = explode(',', $excludedCsv);
+    } else {
+        $excludedList = (array) (config()['github']['exclude_from_languages'] ?? []);
+    }
+    $excluded = array_filter(array_map(static fn($r) => strtolower(trim((string) $r)), $excludedList));
     $totalStars = 0;
     $languageBytes = []; // name => ['bytes' => int, 'color' => string]
     foreach ((array) ($user['repositories']['nodes'] ?? []) as $repo) {
@@ -302,12 +331,12 @@ function github_calc_streaks(array $days): array
 
 /**
  * Devuelve los datos de perfil, usando la cache de `settings` si todavia es
- * valida. $ttlMinutes viene de config()['github']['cache_ttl_minutes'].
+ * valida. $ttlMinutes viene del ajuste `github_stats_cache_ttl_minutes`.
  */
 function github_profile_cached(): array
 {
     $username    = github_username();
-    $ttlMinutes  = (int) (config()['github']['cache_ttl_minutes'] ?? 360);
+    $ttlMinutes  = (int) github_setting('cache_ttl_minutes', '360');
     $cachedAt    = setting_get(GITHUB_CACHE_AT, '');
     $cachedJson  = setting_get(GITHUB_CACHE_KEY, '');
 

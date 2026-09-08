@@ -41,18 +41,32 @@ function admin_header(string $title, string $active = ''): void
     // se esta viendo. Mismo patron try/catch que $countSafe -- la tabla
     // puede no existir todavia si la migracion no se ha corrido.
     try {
-        $appsList = db()->query('SELECT slug, display_name FROM apps ORDER BY created_at ASC')->fetchAll();
+        $appsList = db()->query('SELECT slug, display_name, has_content FROM apps ORDER BY created_at ASC')->fetchAll();
     } catch (Throwable $e) {
         $appsList = [];
     }
     $currentAppSlug = (string) ($_GET['app'] ?? '');
     $currentAppName = null;
+    $currentAppHasContent = null; // null = ningun app concreto seleccionado ("todas las apps")
     foreach ($appsList as $ap) {
         if ($ap['slug'] === $currentAppSlug) {
             $currentAppName = $ap['display_name'];
+            $currentAppHasContent = (bool) $ap['has_content'];
             break;
         }
     }
+    // Selector de proyectos (2026-09-08): secciones de contenido propio
+    // (Proyectos/Certificaciones/Blog/Mensajes) solo tienen sentido para una
+    // app que de verdad los gestiona -- eduolihez.com si, nowait (sitio
+    // estatico sin CMS) no. "Todas las apps" (sin selecionar ninguna) se
+    // trata como el contexto por defecto de siempre, para no cambiar el
+    // comportamiento de nadie que no haya tocado el selector todavia.
+    $showContentNav = $currentAppSlug === '' || $currentAppHasContent === true;
+    $contentOnlyPages = ['projects.php', 'certifications.php', 'posts.php', 'messages.php'];
+    // Query string que mantiene viva la app seleccionada al navegar por el
+    // menu -- sin esto, cada clic del sidebar perdia el ?app= y volvia
+    // silenciosamente a la vista "todas las apps" en la pagina siguiente.
+    $appQs = $currentAppSlug !== '' ? '?app=' . rawurlencode($currentAppSlug) : '';
 
     // [etiqueta_grupo, url, [titulo, badge, icono, tipo_badge]]. tipo_badge:
     // 'alert' (verde/llamada a la accion, como Mensajes) o 'count' (gris,
@@ -76,11 +90,27 @@ function admin_header(string $title, string $active = ''): void
             'apps.php' => ['Apps', (string) $countSafe('SELECT COUNT(*) FROM apps'), '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>', 'count'],
         ],
         'Sistema' => [
+            'integrations.php' => ['Integraciones', '', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 010 5.656l-3 3a4 4 0 01-5.656-5.656l1.5-1.5M10.172 13.828a4 4 0 010-5.656l3-3a4 4 0 015.656 5.656l-1.5 1.5" /></svg>', 'count'],
             'security.php' => ['Seguridad', '', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>', 'count'],
             'settings.php' => ['Ajustes', '', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>', 'count'],
             'backup.php'   => ['Backup', '', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" /></svg>', 'count'],
         ],
     ];
+
+    // Oculta las secciones de contenido propio (Proyectos/Certificaciones/
+    // Blog/Mensajes) cuando la app seleccionada no las gestiona (ver
+    // $showContentNav mas arriba). Si un grupo se queda sin items despues de
+    // filtrar, se quita entero para no imprimir una cabecera vacia.
+    if (!$showContentNav) {
+        foreach ($navGroups as $groupLabel => $items) {
+            foreach ($contentOnlyPages as $page) {
+                unset($navGroups[$groupLabel][$page]);
+            }
+            if (!$navGroups[$groupLabel]) {
+                unset($navGroups[$groupLabel]);
+            }
+        }
+    }
     ?>
 <!doctype html>
 <html lang="es">
@@ -554,7 +584,18 @@ function admin_header(string $title, string $active = ''): void
 
   .grid { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
   .grid4 { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
-  
+
+  /* Selector de proyectos (index.php sin ?app=) */
+  .project-picker { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+  .project-picker-card {
+    display: block; text-decoration: none; color: inherit; cursor: pointer;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+  }
+  .project-picker-card:hover { transform: translateY(-2px); border-color: var(--accent); }
+  .project-picker-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+  .project-picker-stats .num { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--accent); display: block; }
+  .project-picker-stats .lbl { color: var(--muted); font-size: 0.75rem; display: block; margin-top: 0.2rem; }
+
   .stat { 
     transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.25s ease;
     position: relative;
@@ -780,9 +821,9 @@ function admin_header(string $title, string $active = ''): void
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6" /></svg>
             </summary>
             <div class="app-switcher-menu">
-              <a href="analytics.php" class="<?= $currentAppSlug === '' ? 'active' : '' ?>">Todas las apps</a>
+              <a href="index.php" class="<?= $currentAppSlug === '' ? 'active' : '' ?>">Selector de proyectos</a>
               <?php foreach ($appsList as $ap): ?>
-                <a href="analytics.php?app=<?= e(rawurlencode($ap['slug'])) ?>"
+                <a href="index.php?app=<?= e(rawurlencode($ap['slug'])) ?>"
                    class="<?= $currentAppSlug === $ap['slug'] ? 'active' : '' ?>"><?= e($ap['display_name']) ?></a>
               <?php endforeach; ?>
               <a href="apps.php" class="app-switcher-manage">Gestionar apps &rarr;</a>
@@ -801,7 +842,7 @@ function admin_header(string $title, string $active = ''): void
           <p class="nav-group-label"><?= e($groupLabel) ?></p>
         <?php endif; ?>
         <?php foreach ($items as $file => [$label, $badge, $icon, $badgeType]): ?>
-          <a href="<?= e($file) ?>" class="menu-item <?= $active === $file ? 'active' : '' ?>">
+          <a href="<?= e($file . $appQs) ?>" class="menu-item <?= $active === $file ? 'active' : '' ?>">
             <span class="menu-icon"><?= $icon ?></span>
             <span class="menu-label"><?= e($label) ?></span>
             <?php if ($badge !== ''): ?>

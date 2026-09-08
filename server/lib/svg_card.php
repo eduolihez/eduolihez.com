@@ -48,6 +48,31 @@ function svg_esc(string $s): string
 }
 
 /**
+ * CSS propio del usuario (ajuste `github_stats_custom_css`, editable desde
+ * /admin/integrations.php), como bloque <style> adicional que se pinta
+ * DESPUES del <style> con las reglas por defecto -- mismo empate de
+ * especificidad, gana el ultimo en orden de documento, asi que sobreescribe
+ * sin tener que tocar el CSS base.
+ *
+ * No hay sanitizado de propiedades: quien lo escribe es el propio dueno del
+ * sitio, autenticado en /admin (mismo nivel de confianza que editar
+ * config.php a mano). El unico filtro es evitar que el texto rompa la
+ * propia etiqueta <style> si contiene literalmente "</style" -- eso NO es
+ * una defensa contra el autor, es una defensa contra un error tonto (pegar
+ * CSS que por lo que sea trae ese texto) que dejaria el SVG entero mal
+ * formado.
+ */
+function svg_custom_css_block(): string
+{
+    $css = trim(setting_get('github_stats_custom_css', ''));
+    if ($css === '') {
+        return '';
+    }
+    $css = (string) preg_replace('#</style#i', '<\\/style', $css);
+    return "<style>{$css}</style>";
+}
+
+/**
  * Corchetes de esquina (estilo mira/HUD) -- firma visual del marco, en las
  * 4 esquinas, a un margen fijo del borde.
  */
@@ -84,6 +109,7 @@ function svg_card(string $title, string $body, int $width = CARD_WIDTH, int $hei
     $inset = $width - 16; // ancho de la barra de acento superior, con margen de 8px a cada lado
     $font = SVG_FONT_MONO;
     $brackets = svg_corner_brackets($width, $height, $t['accent']);
+    $customCss = svg_custom_css_block();
 
     return <<<SVG
 <svg width="{$width}" height="{$height}" viewBox="0 0 {$width} {$height}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="{$titleEsc}">
@@ -106,6 +132,7 @@ function svg_card(string $title, string $body, int $width = CARD_WIDTH, int $hei
     .pulse-dot { animation: pulse 2s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
     @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.75); } }
   </style>
+  {$customCss}
   <g clip-path="url(#cardClip)">
     <rect x="0.5" y="0.5" rx="8" width="{$width}" height="{$height}" fill="{$t['bg']}" stroke="{$t['border']}" />
     <rect x="0" y="-40" width="{$width}" height="40" fill="url(#scan)">

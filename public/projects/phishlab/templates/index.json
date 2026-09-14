@@ -1,0 +1,22 @@
+{
+  "_comentario": "Índice de la demo pública. Generado por tools/build-demo.js.",
+  "emails": [
+    "administracion-notificacion-electronica",
+    "banca-cargo-no-reconocido",
+    "banca-nuevo-dispositivo",
+    "banca-transferencia-pendiente",
+    "logistica-paquete-retenido",
+    "rrhh-evaluacion-desempeno",
+    "rrhh-fraude-ceo",
+    "rrhh-nomina",
+    "saas-documento-compartido",
+    "saas-mfa-solicitud",
+    "tarjeta-regalo-antiguedad"
+  ],
+  "landings": [
+    "banca-verificacion-login",
+    "canjeo-tarjeta-regalo",
+    "pagina-formativa",
+    "portal-corporativo-login"
+  ]
+}

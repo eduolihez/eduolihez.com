@@ -567,6 +567,28 @@ SELECT 'phishing-triage', 'phishing-triage',
 WHERE EXISTS (SELECT 1 FROM `projects`)
   AND NOT EXISTS (SELECT 1 FROM `projects` WHERE `title_es` = 'phishing-triage');
 
+-- Proyectos: anadir PhishLab (2026-09-14, docs/EDUOLIHEZ.md en el repo de
+-- PhishLab). Repo privado -- el codigo compone material de phishing con
+-- marca real, no tiene sentido publicarlo -- por eso repo_url va a NULL y el
+-- badge es private-code, mismo patron que Zeora. demo_url SI es publica:
+-- una copia estatica de la demo (marcas ficticias, sin exportacion) vive en
+-- public/projects/phishlab/, igual que nowait o passwdcentinel -- el sitio
+-- esta publicado aunque el codigo no. Esta app tambien tiene fila en `apps`
+-- (ver el INSERT de mas arriba en este archivo) para reportar analitica al
+-- panel multi-proyecto.
+INSERT INTO `projects`
+  (`title_es`, `title_en`, `summary_es`, `summary_en`, `description_es`, `description_en`, `stack`, `badges`,
+   `repo_url`, `demo_url`, `store_url`, `featured`, `sort_order`, `status`)
+SELECT 'PhishLab — Biblioteca de plantillas de phishing', 'PhishLab — Phishing Template Library',
+       'Generador de material para simulaciones de phishing autorizadas: plantillas por bloques, calibradas por senal, con exportacion lista para GoPhish. Demo publica con marcas ficticias.',
+       'Template generator for authorized phishing simulations: block-based templates calibrated by detection signal, with ready-to-import GoPhish export. Public demo uses fictional brands only.',
+       '<p>Herramienta interna que uso para preparar ejercicios de concienciacion en seguridad: cada plantilla se compone por bloques anotados y se calibra por seis senales de deteccion independientes (urgencia, erratas, saludo generico, dominio del remitente, enlace que no coincide, incoherencia de marca), asi que el informe final puede decir que senal concreta se le paso a cada persona, no solo si pico o no.</p><p>Wizard guiado de 4 pasos (correo, landing, marca, exportar), biblioteca filtrable por senal, compania o categoria, e importacion de material real (.eml o HTML pegado) saneado automaticamente antes de guardarlo.</p><p>La version completa (marcas reales, exportacion a GoPhish) se queda en local a proposito. Lo que ves aqui es la demo publica: marcas inventadas, sin exportacion, pensada para ensenar la arquitectura sin publicar un kit de phishing funcional.</p>',
+       '<p>Internal tool I use to prepare security-awareness exercises: every template is composed from annotated blocks and calibrated across six independent detection signals (urgency, typos, generic greeting, sender domain, mismatched link, brand inconsistency), so the final report can say exactly which signal a given person missed, not just whether they clicked.</p><p>Guided 4-step wizard (email, landing, branding, export), a library filterable by signal, company or category, and import of real captured material (.eml or pasted HTML), sanitized automatically before saving.</p><p>The full tool (real brands, GoPhish export) stays local on purpose. What you see here is the public demo: fictional brands, no export, built to show the architecture without publishing a working phishing kit.</p>',
+       '["JavaScript","ES Modules","Node.js","GoPhish"]', '["private-code"]',
+       NULL, '/projects/phishlab/', NULL, 1, 12, 'published'
+WHERE EXISTS (SELECT 1 FROM `projects`)
+  AND NOT EXISTS (SELECT 1 FROM `projects` WHERE `title_es` = 'PhishLab — Biblioteca de plantillas de phishing');
+
 -- PromptMaster es de codigo privado, no open-source (correccion 2026-08-25).
 -- Cubre la fila que ya estuviera insertada con el badge antiguo (el INSERT de
 -- arriba solo aplica el valor nuevo si la fila no existe todavia).
@@ -1045,6 +1067,25 @@ UPDATE `apps` SET `has_content` = 1 WHERE `slug` = 'eduolihez' AND `has_content`
 INSERT INTO `apps` (`slug`, `display_name`)
 SELECT 'nowait', 'NoWait'
 WHERE NOT EXISTS (SELECT 1 FROM `apps` WHERE `slug` = 'nowait');
+
+-- Registro de "phishlab" (2026-09-14, docs/EDUOLIHEZ.md en el repo de
+-- PhishLab): a diferencia de nowait, esta SI lleva api_key_hash desde el
+-- principio -- la clave se genero fuera del panel (Claude Code, en la misma
+-- sesion que preparo esta migracion) y aqui solo se guarda su SHA-256, nunca
+-- la clave en claro, mismo tratamiento que ya describe
+-- docs/designs/admin-dashboard.md para toda `apps.api_key_hash`. La clave
+-- real se le entrego a Eduardo una sola vez fuera de este archivo y ya esta
+-- copiada en `assets/telemetry.config.json` (gitignored) del repo de
+-- PhishLab, listo para que la demo empiece a mandar eventos con solo
+-- desplegar. allowed_origins solo permite el propio dominio: la demo vive en
+-- public/projects/phishlab/, mismo origen que el resto del sitio.
+-- has_content se queda en el DEFAULT (0): sin Proyectos/Certificaciones/Blog
+-- propios, solo analitica de visitas y eventos.
+INSERT INTO `apps` (`slug`, `display_name`, `api_key_hash`, `allowed_origins`)
+SELECT 'phishlab', 'PhishLab',
+       'afa925ac36e50099ff7e3d32dd3e88a21e22a317c54d07b01bfeb9d36cb84a28',
+       '["https://eduolihez.com"]'
+WHERE NOT EXISTS (SELECT 1 FROM `apps` WHERE `slug` = 'phishlab');
 
 -- ---------------------------------------------------------------------------
 -- Blog: enlazar "Automatizar el informe semanal del SOC con Python" al

@@ -1,0 +1,48 @@
+{
+  "schema": 2,
+  "nombre": "Página formativa (post-clic)",
+  "descripcion": "Explica que era un simulacro autorizado y enseña las señales. Va en el Redirect to de GoPhish.",
+  "familia": "rrhh",
+  "categoria": "formacion",
+  "tags": [
+    "formativa",
+    "post-clic",
+    "concienciacion"
+  ],
+  "idiomas": [
+    "es",
+    "ca",
+    "en"
+  ],
+  "demo": true,
+  "origen": {
+    "tipo": "escrito-a-mano",
+    "fecha": "2026-09-10",
+    "notas": "Página de aterrizaje formativa. Va en el Redirect to de GoPhish."
+  },
+  "captura": null,
+  "formativa": true,
+  "campos": [],
+  "bloques": [
+    {
+      "id": "senales-detectadas",
+      "etiqueta": "Lista de señales del correo",
+      "opcional": true,
+      "defecto": true,
+      "ayuda": "Lo que se le enseña al empleado que tenía delante. Es el núcleo formativo de la página."
+    },
+    {
+      "id": "que-hacer",
+      "etiqueta": "Qué hacer la próxima vez",
+      "opcional": true,
+      "defecto": true
+    },
+    {
+      "id": "aviso-final",
+      "etiqueta": "Aviso para quien introdujo la contraseña",
+      "opcional": true,
+      "defecto": true,
+      "ayuda": "Importante dejarlo puesto: es lo que evita que alguien se quede callado por vergüenza."
+    }
+  ]
+}

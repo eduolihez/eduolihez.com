@@ -5,15 +5,17 @@
 # recibe 401, nunca ve el HTML. Esto es la defensa real, no el robots.txt de
 # dentro del build (que sigue ahí como capa extra).
 #
-# .htpasswd vive en esta misma carpeta a propósito: AuthUserFile con ruta
-# relativa se resuelve contra el directorio del .htaccess, y no hace falta
-# conocer la ruta absoluta del hosting (varía por cuenta en CDMON). El propio
-# .htaccess raíz del repo (<FilesMatch "^\.">) ya bloquea la descarga directa
-# de cualquier archivo que empiece por punto, .htpasswd incluido.
+# AuthUserFile en ruta ABSOLUTA (no relativa): en el hosting de CDMON de este
+# proyecto, una ruta relativa (".htpasswd") deja pasar el reto 401 pero falla
+# con 500 al validar credenciales correctas -- confirmado en vivo (2026-09-15),
+# no una suposición. La ruta absoluta de este hosting es
+# /usr/home/eduolihez.com/web (verificada con __DIR__ desde un script PHP
+# temporal fuera de la carpeta protegida). Si migras de hosting, vuelve a
+# comprobar esta ruta antes de asumir que sigue siendo la misma.
 #
 # Generar una contraseña nueva: openssl passwd -apr1 "la-contraseña-nueva"
 # y sustituye la línea de abajo (usuario "phishlab-lab").
 AuthType Basic
 AuthName "PhishLab — acceso restringido"
-AuthUserFile .htpasswd
+AuthUserFile /usr/home/eduolihez.com/web/lab-app/.htpasswd
 Require valid-user

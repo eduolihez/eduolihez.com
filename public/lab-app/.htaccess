@@ -1,0 +1,19 @@
+# PhishLab "lab" — herramienta completa (marca real), acceso restringido.
+#
+# AuthType Basic bloquea CUALQUIER fichero de este directorio (index.html
+# incluido) antes de que Apache lo sirva: un rastreador sin credenciales
+# recibe 401, nunca ve el HTML. Esto es la defensa real, no el robots.txt de
+# dentro del build (que sigue ahí como capa extra).
+#
+# .htpasswd vive en esta misma carpeta a propósito: AuthUserFile con ruta
+# relativa se resuelve contra el directorio del .htaccess, y no hace falta
+# conocer la ruta absoluta del hosting (varía por cuenta en CDMON). El propio
+# .htaccess raíz del repo (<FilesMatch "^\.">) ya bloquea la descarga directa
+# de cualquier archivo que empiece por punto, .htpasswd incluido.
+#
+# Generar una contraseña nueva: openssl passwd -apr1 "la-contraseña-nueva"
+# y sustituye la línea de abajo (usuario "phishlab-lab").
+AuthType Basic
+AuthName "PhishLab — acceso restringido"
+AuthUserFile .htpasswd
+Require valid-user

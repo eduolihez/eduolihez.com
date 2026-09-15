@@ -589,6 +589,17 @@ SELECT 'PhishLab — Biblioteca de plantillas de phishing', 'PhishLab — Phishi
 WHERE EXISTS (SELECT 1 FROM `projects`)
   AND NOT EXISTS (SELECT 1 FROM `projects` WHERE `title_es` = 'PhishLab — Biblioteca de plantillas de phishing');
 
+-- Correccion (2026-09-15, docs/EDUOLIHEZ.md): la version completa de
+-- PhishLab ya NO se queda solo en local -- vive en lab.eduolihez.com detras
+-- de HTTP Basic Auth (ver CLOUDFLARE.md, seccion 5), disponible bajo peticion
+-- en vez de "se queda en local a proposito". Guardado por el valor ANTERIOR
+-- exacto, para no pisar una edicion manual hecha despues desde /admin.
+UPDATE `projects` SET
+  `description_es` = '<p>Herramienta interna que uso para preparar ejercicios de concienciacion en seguridad: cada plantilla se compone por bloques anotados y se calibra por seis senales de deteccion independientes (urgencia, erratas, saludo generico, dominio del remitente, enlace que no coincide, incoherencia de marca), asi que el informe final puede decir que senal concreta se le paso a cada persona, no solo si pico o no.</p><p>Wizard guiado de 4 pasos (correo, landing, marca, exportar), biblioteca filtrable por senal, compania o categoria, e importacion de material real (.eml o HTML pegado) saneado automaticamente antes de guardarlo.</p><p>Lo que ves aqui es la demo publica: marcas inventadas, sin exportacion. La version completa (marcas reales, exportacion a GoPhish) esta disponible bajo peticion -- escribeme si quieres probarla de verdad.</p>',
+  `description_en` = '<p>Internal tool I use to prepare security-awareness exercises: every template is composed from annotated blocks and calibrated across six independent detection signals (urgency, typos, generic greeting, sender domain, mismatched link, brand inconsistency), so the final report can say exactly which signal a given person missed, not just whether they clicked.</p><p>Guided 4-step wizard (email, landing, branding, export), a library filterable by signal, company or category, and import of real captured material (.eml or pasted HTML), sanitized automatically before saving.</p><p>What you see here is the public demo: fictional brands, no export. The full tool (real brands, GoPhish export) is available on request -- reach out if you would like to try it for real.</p>'
+WHERE `title_es` = 'PhishLab — Biblioteca de plantillas de phishing'
+  AND `description_es` = '<p>Herramienta interna que uso para preparar ejercicios de concienciacion en seguridad: cada plantilla se compone por bloques anotados y se calibra por seis senales de deteccion independientes (urgencia, erratas, saludo generico, dominio del remitente, enlace que no coincide, incoherencia de marca), asi que el informe final puede decir que senal concreta se le paso a cada persona, no solo si pico o no.</p><p>Wizard guiado de 4 pasos (correo, landing, marca, exportar), biblioteca filtrable por senal, compania o categoria, e importacion de material real (.eml o HTML pegado) saneado automaticamente antes de guardarlo.</p><p>La version completa (marcas reales, exportacion a GoPhish) se queda en local a proposito. Lo que ves aqui es la demo publica: marcas inventadas, sin exportacion, pensada para ensenar la arquitectura sin publicar un kit de phishing funcional.</p>';
+
 -- PromptMaster es de codigo privado, no open-source (correccion 2026-08-25).
 -- Cubre la fila que ya estuviera insertada con el badge antiguo (el INSERT de
 -- arriba solo aplica el valor nuevo si la fila no existe todavia).

@@ -1087,6 +1087,17 @@ SELECT 'phishlab', 'PhishLab',
        '["https://eduolihez.com"]'
 WHERE NOT EXISTS (SELECT 1 FROM `apps` WHERE `slug` = 'phishlab');
 
+-- Correccion (2026-09-15, docs/EDUOLIHEZ.md): la extension de captura de
+-- PhishLab tambien reporta eventos a este mismo endpoint, desde su propio
+-- service worker -- que manda `Origin: chrome-extension://<id>` en cada
+-- fetch cross-origin, no el origen del sitio. El id es estable porque el
+-- manifest de la extension fija su clave publica (campo "key"), asi que no
+-- cambia entre instalaciones. Guardado por el valor ANTERIOR exacto, segun
+-- la regla de mas arriba, para no pisar un allowed_origins editado a mano
+-- desde /admin despues del seed inicial.
+UPDATE `apps` SET `allowed_origins` = '["https://eduolihez.com","chrome-extension://mjdcdfamonohblhifhmdkceepgaelkld"]'
+WHERE `slug` = 'phishlab' AND `allowed_origins` = '["https://eduolihez.com"]';
+
 -- ---------------------------------------------------------------------------
 -- Blog: enlazar "Automatizar el informe semanal del SOC con Python" al
 -- repositorio publico del generador completo (2026-09-01).

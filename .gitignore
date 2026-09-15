@@ -43,6 +43,13 @@ filezilla.xml
 .ftpconfig
 deployment-config.json
 
+# Hash de la contrasena que protege lab.eduolihez.com (PhishLab completo,
+# marca real -- ver public/lab-app/.htaccess y CLOUDFLARE.md). Aunque es un
+# hash APR1-MD5 y no la contrasena en claro, ese algoritmo se rompe por fuerza
+# bruta offline sin mucho esfuerzo, y este repo es publico: se sube por FTP a
+# mano, igual que server/config.php.
+public/lab-app/.htpasswd
+
 # ---------------------------------------------------------------------------
 # 2. DATOS PERSONALES Y VOLCADOS DE BASE DE DATOS
 #    Un export de phpMyAdmin o del panel lleva dentro los mensajes del

@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="{{idioma}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>{{tituloPagina}}</title>
+<style>
+  /* Recreación del inicio de sesión de LinkedIn. Escrita a mano, no un
+     volcado del sitio real. */
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 15px;
+    color: #000000e6;
+    background-color: #f9fafb;
+  }
+
+  .barra-superior {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    border-bottom: 1px solid #e8e8e8;
+    background: #ffffff;
+  }
+  .marca-tenant { min-height: 24px; }
+  .marca-tenant img { max-width: 140px; max-height: 36px; display: block; }
+
+  .subtitulo { margin: 0 0 22px; font-size: 15px; color: #000000e6; }
+  .subtitulo a { color: #0a66c2; text-decoration: none; font-weight: 600; }
+
+  .recordar { display: flex; align-items: center; gap: 8px; margin: 0 0 22px; font-size: 14px; }
+  .recordar input { width: 16px; height: 16px; accent-color: #057642; }
+
+  .contenido { flex: 1; display: flex; align-items: center; justify-content: center; padding: 32px 16px; }
+
+  .envoltorio { width: 100%; max-width: 380px; }
+
+  .marca-li { display: flex; align-items: center; gap: 8px; }
+  .marca-li .icono {
+    width: 30px; height: 30px; background: #0a66c2; color: #fff; border-radius: 3px;
+    display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px;
+  }
+  .marca-li span.texto { font-size: 17px; font-weight: 600; }
+
+  .tarjeta {
+    background: #ffffff;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    padding: 32px 28px;
+  }
+
+  h1 { margin: 0 0 20px; font-size: 24px; font-weight: 600; }
+
+  .aviso {
+    margin: 0 0 18px;
+    font-size: 13px;
+    line-height: 19px;
+    color: #7a5100;
+    background: #fdf0d5;
+    padding: 11px 13px;
+    border-radius: 6px;
+  }
+  .aviso:empty { display: none; padding: 0; margin: 0; }
+
+  .grupo-campo { margin-bottom: 18px; }
+  label { display: block; margin-bottom: 6px; font-size: 14px; font-weight: 600; }
+
+  .campo {
+    width: 100%;
+    padding: 11px 12px;
+    font-family: inherit;
+    font-size: 16px;
+    color: #000000e6;
+    background: #ffffff;
+    border: 1px solid #00000066;
+    border-radius: 4px;
+    outline: none;
+  }
+  .campo:focus { border: 2px solid #0a66c2; padding: 10px 11px; }
+
+  .enlace-olvido { margin: -8px 0 20px; font-size: 14px; }
+  .enlace-olvido a { color: #0a66c2; text-decoration: none; font-weight: 600; }
+
+  .boton {
+    width: 100%;
+    padding: 12px;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 600;
+    color: #ffffff;
+    background: #0a66c2;
+    border: 0;
+    border-radius: 24px;
+    cursor: pointer;
+  }
+  .boton:hover { background: #004182; }
+
+  .separador { display: flex; align-items: center; gap: 10px; margin: 22px 0; color: #00000099; font-size: 12px; }
+  .separador::before, .separador::after { content: ''; flex: 1; height: 1px; background: #e8e8e8; }
+
+  .enlaces-secundarios { text-align: center; font-size: 14px; }
+  .enlaces-secundarios a { color: #0a66c2; text-decoration: none; font-weight: 600; }
+
+  .pie {
+    text-align: center;
+    margin-top: 22px;
+    font-size: 12px;
+    color: #00000099;
+  }
+  .pie a { color: #00000099; text-decoration: none; margin: 0 6px; }
+</style>
+</head>
+<body>
+
+<div class="barra-superior">
+  <div class="marca-tenant">{{logoHtml}}</div>
+  <!--@bloque:marca @opcional-->
+  <div class="marca-li" aria-hidden="true">
+    <svg
+style="display:block;height:26px;width:auto"    xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="1000"
+   height="250"
+   viewBox="0 0 264.58332 66.145835"
+   version="1.1"
+   id="svg1291">
+  <defs
+     id="defs1285" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.35"
+     inkscape:cx="996.28572"
+     inkscape:cy="-674.20459"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     units="px"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     inkscape:window-x="1912"
+     inkscape:window-y="-6"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata1288">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(171.37441,202.2851)">
+    <g
+       class="linkedin-scaling-icon"
+       id="g1917"
+       transform="matrix(3.1498015,0,0,3.1498015,-171.37441,-202.2851)"
+       style="stroke-width:0.084">
+      <g
+         class="linkedin-logo-21dp"
+         id="g1915"
+         style="stroke-width:0.084">
+        <g
+           class="linkedin-dpi-1"
+           id="g1913"
+           style="stroke-width:0.084">
+          <g
+             style="fill:none;fill-rule:evenodd;stroke-width:0.084"
+             class="linkedin-inbug"
+             id="g1905">
+            <path
+               style="fill:#ffffff;stroke-width:0.084"
+               inkscape:connector-curvature="0"
+               d="M 82.479,0 H 64.583 C 63.727,0 63,0.677 63,1.511 V 19.488 C 63,20.323 63.477,21 64.333,21 H 82.229 C 83.086,21 84,20.323 84,19.488 V 1.511 C 84,0.677 83.336,0 82.479,0"
+               class="linkedin-bug-text-color"
+               id="path1901" />
+            <path
+               style="fill:#0a66c2;stroke-width:0.084"
+               inkscape:connector-curvature="0"
+               d="M 82.479,0 H 64.583 C 63.727,0 63,0.677 63,1.511 V 19.488 C 63,20.323 63.477,21 64.333,21 H 82.229 C 83.086,21 84,20.323 84,19.488 V 1.511 C 84,0.677 83.336,0 82.479,0 Z M 71,8 h 2.827 v 1.441 h 0.031 C 74.289,8.664 75.562,7.875 77.136,7.875 80.157,7.875 81,9.479 81,12.45 V 18 H 78 V 12.997 C 78,11.667 77.469,10.5 76.227,10.5 74.719,10.5 74,11.521 74,13.197 V 18 h -3 z m -5,10 h 3 V 8 H 66 Z M 69.375,4.5 A 1.8745001,1.8745001 0 1 1 65.626,4.501 1.8745001,1.8745001 0 0 1 69.375,4.5 Z"
+               class="linkedin-background"
+               id="path1903" />
+          </g>
+          <g
+             style="fill:#0a66c2;stroke-width:0.084"
+             class="linkedin-linkedin-text"
+             id="g1911">
+            <path
+               inkscape:connector-curvature="0"
+               d="m 60,18 h -2.8 v -1.191 h -0.03 c -0.623,0.722 -1.705,1.316 -3.539,1.316 -2.5,0 -4.653,-1.881 -4.653,-5.114 0,-3.08 2.122,-5.136 4.747,-5.136 1.625,0 2.634,0.578 3.245,1.316 H 57 V 3 h 3 z m -5.521,-7.875 c -1.715,0 -2.679,1.223 -2.679,2.849 0,1.627 0.964,2.901 2.679,2.901 1.717,0 2.721,-1.241 2.721,-2.901 0,-1.706 -1.004,-2.849 -2.721,-2.849 z m -6.818,6.264 c -0.708,0.917 -2.166,1.736 -4.52,1.736 -3.14,0 -5.14,-2.08 -5.14,-5.347 0,-2.903 1.811,-4.903 5.228,-4.903 2.951,0 4.771,1.938 4.771,5.347 0,0.34 -0.055,0.678 -0.055,0.678 h -7.114 l 0.017,0.309 c 0.197,0.862 0.848,1.916 2.342,1.916 1.304,0 2.198,-0.701 2.602,-1.25 l 1.87,1.514 z m -2.548,-4.39 c 0.02,-1.054 -0.754,-2.124 -1.974,-2.124 -1.452,0 -2.227,1.134 -2.308,2.125 h 4.282 z"
+               id="path1907"
+               style="stroke-width:0.084" />
+            <path
+               inkscape:connector-curvature="0"
+               d="M 38,8 H 34.5 L 31,12 V 3 h -3 v 15 h 3 v -5 l 3.699,5 h 3.542 L 34,12.533 Z M 16,8 h 2.827 v 1.441 h 0.031 C 19.289,8.664 20.562,7.875 22.136,7.875 25.157,7.875 26,9.792 26,12.45 V 18 H 23 V 12.997 C 23,11.525 22.469,10.5 21.227,10.5 19.719,10.5 19,11.694 19,13.197 V 18 h -3 z m -5,10 h 3 V 8 H 11 Z M 12.501,6.3 a 1.8,1.8 0 1 0 0,-3.599 1.8,1.8 0 0 0 0,3.599 z M 3,3 H 0 V 18 H 9 V 15 H 3 Z"
+               id="path1909"
+               style="stroke-width:0.084" />
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>
+
+  </div>
+  <!--@/bloque-->
+</div>
+
+<div class="contenido">
+  <div class="envoltorio">
+
+    <div class="tarjeta">
+      <h1>{{tituloPagina}}</h1>
+      <!--@bloque:cta-registro @opcional-->
+      <p class="subtitulo">{{subtitulo}} <a href="#">{{enlaceCrearCuenta}}</a></p>
+      <!--@/bloque-->
+
+      <!--@bloque:aviso-verificacion @senal:urgencia-->
+      <p class="aviso">{{aviso}}</p>
+      <!--@/bloque-->
+
+      <!--
+        Campos "email"/"password" exactos: es como GoPhish sabe cuál
+        descartar cuando "Capture Passwords" está desmarcada en la campaña.
+      -->
+      <form method="post" action="" autocomplete="off">
+        <div class="grupo-campo">
+          <label for="email">{{etiquetaEmail}}</label>
+          <input class="campo" type="email" id="email" name="email" required autofocus>
+        </div>
+        <div class="grupo-campo">
+          <label for="password">{{etiquetaPassword}}</label>
+          <input class="campo" type="password" id="password" name="password" required>
+        </div>
+        <div class="enlace-olvido"><a href="#">{{enlaceOlvido}}</a></div>
+        <label class="recordar"><input type="checkbox" checked>{{textoRecordar}}</label>
+        <button class="boton" type="submit">{{btnEntrar}}</button>
+      </form>
+    </div>
+
+    <!--@bloque:pie-legal @senal:!incoherencia-marca-->
+    <div class="pie">
+      <a href="https://www.linkedin.com/help/linkedin" target="_blank" rel="noopener">{{enlaceAyuda}}</a>
+      <a href="https://www.linkedin.com/legal/privacy-policy" target="_blank" rel="noopener">{{enlacePrivacidad}}</a>
+      <a href="https://www.linkedin.com/legal/user-agreement" target="_blank" rel="noopener">{{enlaceCondiciones}}</a>
+    </div>
+    <!--@/bloque-->
+  </div>
+</div>
+
+</body>
+</html>

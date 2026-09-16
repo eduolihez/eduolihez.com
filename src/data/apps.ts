@@ -260,8 +260,8 @@ export const apps: AppData[] = [
     ],
     privacy: {
       intro: {
-        es: 'Password Centinel es 100% local. No opera ningún backend propio, no tiene servidores de analítica ni telemetría, y no envía tus contraseñas, tu vault ni ningún dato personal a ningún sitio.',
-        en: 'Password Centinel is 100% local. It runs no first-party backend, has no analytics or telemetry servers, and never sends your passwords, vault or personal data anywhere.',
+        es: 'Password Centinel es 100% local. No envía tus contraseñas, tu vault ni ningún dato personal a ningún sitio. Solo reporta un evento anónimo de instalación/actualización (versión y navegador) a un endpoint propio para saber cuánta gente usa la extensión.',
+        en: 'Password Centinel is 100% local. It never sends your passwords, vault or personal data anywhere. It only reports a single anonymous install/update event (version and browser) to a first-party endpoint to gauge usage.',
       },
       points: [
         {
@@ -273,8 +273,8 @@ export const apps: AppData[] = [
           en: 'The only network call is the k-anonymity lookup to api.pwnedpasswords.com: SHA-1 is computed locally and only the first 5 characters of the hash are sent.',
         },
         {
-          es: 'No usa analítica ni herramientas de tracking de ningún tipo (sin Google Analytics, sin Sentry).',
-          en: 'It uses no analytics or tracking tools of any kind (no Google Analytics, no Sentry).',
+          es: 'No usa herramientas de tracking de terceros (sin Google Analytics, sin Sentry, sin cookies). El único evento reportado es la instalación/actualización, y nunca incluye datos de uso, dominios visitados ni nada del vault.',
+          en: 'It uses no third-party tracking tools (no Google Analytics, no Sentry, no cookies). The only event reported is install/update, and it never includes usage data, visited domains or anything from the vault.',
         },
         {
           es: 'La importación de CSV y el manejo de claves se procesan enteramente en el navegador; los archivos que subes no se envían a ningún servidor.',
@@ -344,8 +344,8 @@ export const apps: AppData[] = [
       {
         question: { es: '¿Qué datos recopila?', en: 'What data does it collect?' },
         answer: {
-          es: 'Ninguno. Todo el vault se guarda cifrado en local; la única llamada de red es la consulta k-anonimato a Have I Been Pwned, que nunca revela tu contraseña completa.',
-          en: 'None. The whole vault is stored encrypted locally; the only network call is the k-anonymity lookup to Have I Been Pwned, which never reveals your full password.',
+          es: 'Ninguno de tu vault: se guarda cifrado en local, y la única llamada de red es la consulta k-anonimato a Have I Been Pwned, que nunca revela tu contraseña completa. La extensión reporta además un evento anónimo de instalación/actualización (versión y navegador) para saber cuánta gente la usa.',
+          en: 'None from your vault: it is stored encrypted locally, and the only network call is the k-anonymity lookup to Have I Been Pwned, which never reveals your full password. The extension also reports a single anonymous install/update event (version and browser) to gauge usage.',
         },
       },
       {
@@ -442,6 +442,10 @@ export const apps: AppData[] = [
         {
           es: 'Los prompts guardados, el estado PRO y el contador de uso se guardan exclusivamente en el almacenamiento local del navegador.',
           en: 'Saved prompts, PRO status and the usage counter are stored exclusively in browser-local storage.',
+        },
+        {
+          es: 'Reporta a un endpoint propio (api.eduolihez.com) eventos anónimos de instalación/actualización y de uso categorizado (p. ej. "se usó mejorar", "se guardó un prompt") para saber cómo se usa la extensión — nunca el texto de tus prompts ni las respuestas de la IA.',
+          en: 'It reports anonymous install/update and categorized usage events (e.g. "enhance used", "prompt saved") to a first-party endpoint (api.eduolihez.com) to understand how the extension is used — never your prompt text or AI responses.',
         },
       ],
     },

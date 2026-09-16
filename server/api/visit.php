@@ -281,6 +281,7 @@ try {
     if (random_int(1, 100) === 1) {
         db()->query('DELETE FROM visits WHERE visited_at < (NOW() - INTERVAL 400 DAY)');
         db()->query('DELETE FROM login_attempts WHERE attempted_at < (NOW() - INTERVAL 90 DAY)');
+        db()->query('DELETE FROM lab_login_attempts WHERE attempted_at < (NOW() - INTERVAL 90 DAY)');
         db()->query('DELETE FROM activity_log WHERE created_at < (NOW() - INTERVAL 365 DAY)');
     }
 } catch (Throwable $e) {

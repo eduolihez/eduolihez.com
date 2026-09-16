@@ -1,21 +1,17 @@
 # PhishLab "lab" — herramienta completa (marca real), acceso restringido.
 #
-# AuthType Basic bloquea CUALQUIER fichero de este directorio (index.html
-# incluido) antes de que Apache lo sirva: un rastreador sin credenciales
-# recibe 401, nunca ve el HTML. Esto es la defensa real, no el robots.txt de
-# dentro del build (que sigue ahí como capa extra).
+# Ya NO es HTTP Basic Auth: el gate lo hace index.php en PHP, con cuentas
+# individuales en la tabla lab_users (gestionadas desde /admin ->
+# lab-users.php) y bloqueo por fuerza bruta real -- Apache Basic Auth no
+# sabe contar intentos fallidos, así que ese bloqueo solo es posible
+# pasando por PHP. Ver server/lab/auth.php.
 #
-# AuthUserFile en ruta ABSOLUTA (no relativa): en el hosting de CDMON de este
-# proyecto, una ruta relativa (".htpasswd") deja pasar el reto 401 pero falla
-# con 500 al validar credenciales correctas -- confirmado en vivo (2026-09-15),
-# no una suposición. La ruta absoluta de este hosting es
-# /usr/home/eduolihez.com/web (verificada con __DIR__ desde un script PHP
-# temporal fuera de la carpeta protegida). Si migras de hosting, vuelve a
-# comprobar esta ruta antes de asumir que sigue siendo la misma.
-#
-# Generar una contraseña nueva: openssl passwd -apr1 "la-contraseña-nueva"
-# y sustituye la línea de abajo (usuario "phishlab-lab").
-AuthType Basic
-AuthName "PhishLab — acceso restringido"
-AuthUserFile /usr/home/eduolihez.com/web/lab-app/.htpasswd
-Require valid-user
+# Todo lo que llegue a /lab-app/ se reescribe a index.php, EXCEPTO login.php
+# y logout.php (que tienen que poder cargarse ellos mismos sin sesión
+# todavía). index.php resuelve la ruta pedida contra _content/ (que tiene su
+# propio .htaccess con "Require all denied": ni siquiera una URL directa a
+# /lab-app/_content/... se sirve sin pasar por aquí).
+RewriteEngine On
+RewriteCond %{REQUEST_URI} !^/lab-app/login\.php$
+RewriteCond %{REQUEST_URI} !^/lab-app/logout\.php$
+RewriteRule ^ index.php [L]

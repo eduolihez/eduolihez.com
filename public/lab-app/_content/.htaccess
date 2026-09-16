@@ -1,0 +1,4 @@
+# Bloquea CUALQUIER acceso HTTP directo a este contenido. Solo index.php
+# (en el directorio padre) puede leerlo, vía filesystem PHP -- eso sí pasa
+# por el gate de sesión. Ver ../index.php y server/lab/auth.php.
+Require all denied

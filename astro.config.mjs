@@ -40,11 +40,18 @@ export default defineConfig({
         "default-src 'self'",
         "img-src 'self' data: https:",
         "font-src 'self'",
-        "connect-src 'self' https://formspree.io",
+        // https://static.cloudflareinsights.com: beacon de Cloudflare Web
+        // Analytics (envia sus datos por fetch/sendBeacon a ese mismo host).
+        // Ver CLOUDFLARE.md, seccion "Web Analytics".
+        "connect-src 'self' https://formspree.io https://static.cloudflareinsights.com",
         "form-action 'self' https://formspree.io",
         "base-uri 'self'",
         "object-src 'none'",
       ],
+      scriptDirective: {
+        // Permite cargar el script del beacon de Cloudflare Web Analytics.
+        resources: ["'self'", 'https://static.cloudflareinsights.com'],
+      },
       styleDirective: {
         // Tailwind/estilos: permitimos estilos en linea (no ejecutan codigo).
         resources: ["'self'", "'unsafe-inline'"],

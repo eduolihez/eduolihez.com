@@ -158,6 +158,14 @@ export const SITE = {
   // secreta en server/config.php. Ademas anade challenges.cloudflare.com a la
   // CSP del .htaccess. Ver CLOUDFLARE.md.
   turnstileSiteKey: '',
+
+  // Cloudflare Web Analytics (capa ADICIONAL a la analitica propia de
+  // src/scripts/analytics.ts, no la sustituye). Cookieless, sin banner de
+  // consentimiento. Deja el placeholder para desactivarlo -- BaseLayout.astro
+  // solo inyecta el <script> del beacon si esto NO es el placeholder.
+  // Sustituyelo por el token real de Cloudflare Dashboard > Analytics & Logs
+  // > Web Analytics > Add a site. Ver CLOUDFLARE.md.
+  cfBeaconToken: 'CLOUDFLARE_WEB_ANALYTICS_TOKEN',
 } as const;
 
 /** Construye la URL de un endpoint del API PHP. */

@@ -23,6 +23,7 @@ import Footer from '../components/Footer.astro';
 import Announcement from '../components/Announcement.astro';
 import type { Lang } from '../i18n/ui';
 import { useTranslations } from '../i18n/utils';
+import { SITE } from '../config';
 
 interface Props {
   title: string;
@@ -105,6 +106,20 @@ const t = useTranslations(lang);
       ogType={ogType}
       article={article}
     />
+
+    {/* Cloudflare Web Analytics: capa ADICIONAL a la analitica propia
+        (src/scripts/analytics.ts), no la sustituye. Sustituye
+        CLOUDFLARE_WEB_ANALYTICS_TOKEN en src/config.ts (SITE.cfBeaconToken)
+        por el token real desde Cloudflare Dashboard > Analytics & Logs >
+        Web Analytics > Add a site (ver CLOUDFLARE.md). Mientras quede el
+        placeholder, este script no se inyecta. */}
+    {SITE.cfBeaconToken !== 'CLOUDFLARE_WEB_ANALYTICS_TOKEN' && (
+      <script
+        defer
+        src="https://static.cloudflareinsights.com/beacon.min.js"
+        data-cf-beacon={`{"token": "${SITE.cfBeaconToken}"}`}
+      />
+    )}
   </head>
 
   <body>

@@ -52,6 +52,38 @@ function gitLastMod(paths: string[]): string {
 
 const buildDate = new Date().toISOString().slice(0, 10);
 
+/**
+ * Paginas de las extensiones de navegador: tienen version ES y EN, pero no
+ * CA (ver src/data/apps.ts), asi que declaran solo esas dos hermanas y no
+ * entran en `translatedGroups` (que exige las tres).
+ */
+const appGroups: { paths: Record<'es' | 'en', string>; lastmod: string }[] = [
+  {
+    paths: { es: '/apps/nowait/', en: '/en/apps/nowait/' },
+    lastmod: gitLastMod([
+      'src/pages/apps/nowait.astro',
+      'src/pages/en/apps/nowait.astro',
+      'src/data/apps.ts',
+    ]),
+  },
+  {
+    paths: { es: '/apps/password-centinel/', en: '/en/apps/password-centinel/' },
+    lastmod: gitLastMod([
+      'src/pages/apps/password-centinel.astro',
+      'src/pages/en/apps/password-centinel.astro',
+      'src/data/apps.ts',
+    ]),
+  },
+  {
+    paths: { es: '/apps/prompt-master/', en: '/en/apps/prompt-master/' },
+    lastmod: gitLastMod([
+      'src/pages/apps/prompt-master.astro',
+      'src/pages/en/apps/prompt-master.astro',
+      'src/data/apps.ts',
+    ]),
+  },
+];
+
 /** Grupos de paginas traducidas: las tres versiones son la misma pagina. */
 const translatedGroups: { paths: Record<'es' | 'en' | 'ca', string>; lastmod: string }[] = [
   {
@@ -127,22 +159,6 @@ const singleLangPages: { path: string; lastmod: string }[] = [
     path: '/projects/followguard/',
     lastmod: gitLastMod(['public/projects/followguard/index.html']),
   },
-  {
-    path: '/projects/passwdcentinel/',
-    lastmod: gitLastMod(['public/projects/passwdcentinel/index.html']),
-  },
-  {
-    path: '/projects/passwdcentinel/politica.html',
-    lastmod: gitLastMod(['public/projects/passwdcentinel/politica.html']),
-  },
-  {
-    path: '/projects/promptmaster/',
-    lastmod: gitLastMod(['public/projects/promptmaster/index.html']),
-  },
-  {
-    path: '/projects/promptmaster/privacy.html',
-    lastmod: gitLastMod(['public/projects/promptmaster/privacy.html']),
-  },
   { path: '/projects/zeora/', lastmod: gitLastMod(['public/projects/zeora/index.html']) },
 ];
 
@@ -166,13 +182,23 @@ export const GET: APIRoute = () => {
     return (['es', 'en', 'ca'] as const).map((l) => entry(url(group.paths[l]), group.lastmod, alternates));
   });
 
-  // --- 2. Paginas de un solo idioma -------------------------------------------
+  // --- 2. Paginas de las extensiones (ES + EN, sin CA) ------------------------
+  const appPages = appGroups.flatMap((group) => {
+    const alternates = (['es', 'en'] as const)
+      .map((l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${url(group.paths[l])}"/>`)
+      .concat(`    <xhtml:link rel="alternate" hreflang="x-default" href="${url(group.paths.es)}"/>`)
+      .join('\n');
+
+    return (['es', 'en'] as const).map((l) => entry(url(group.paths[l]), group.lastmod, alternates));
+  });
+
+  // --- 3. Paginas de un solo idioma -------------------------------------------
   const singleLang = singleLangPages.map((p) => entry(url(p.path), p.lastmod));
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
-${[...translated, ...singleLang].join('\n')}
+${[...translated, ...appPages, ...singleLang].join('\n')}
 </urlset>
 `;
 

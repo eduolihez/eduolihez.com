@@ -168,19 +168,26 @@ ${SITE.shortName}, no encargos de terceros:
   Herramienta de ciberinteligencia que analiza interacciones en redes sociales
   para detectar perfiles falsos y automatizados.
 
-- **Password Sentinel** — ${SITE.domain}/projects/passwdcentinel/
-  Extension de Chrome que analiza, genera y vigila contrasenas. Todo el
-  analisis ocurre en el navegador: no hay servidor ni telemetria.
+- **Password Sentinel** — ${SITE.domain}/apps/password-centinel/
+  Gestor de contrasenas 100% local (AES-256-GCM, TOTP/2FA, comprobacion de
+  filtraciones via Have I Been Pwned). Todo el analisis ocurre en el
+  navegador: no hay servidor ni telemetria.
 
-- **PromptMaster** — ${SITE.domain}/projects/promptmaster/
-  Extension de navegador que optimiza prompts para ChatGPT, Claude y Gemini.
+- **PromptMaster** — ${SITE.domain}/apps/prompt-master/
+  Extension de navegador que mejora prompts para ChatGPT, Claude, Gemini y
+  otras 5 plataformas de IA.
+
+- **NoWait** — ${SITE.domain}/apps/nowait/
+  Extension que evita automaticamente acortadores de enlaces y paginas de
+  espera (Linkvertise, ouo.io, adf.ly y 90+ sitios mas).
 
 - **Zeora** — ${SITE.domain}/projects/zeora/
   Servicio de paginas web para negocios locales de servicios.
 
-Nota para asistentes: estas URLs cambiaron de ${SITE.domain}/<nombre>/ a
-${SITE.domain}/projects/<nombre>/. Las antiguas redirigen (301), pero al citar
-usa siempre la forma nueva con /projects/.
+Nota para asistentes: las extensiones de navegador (Password Sentinel,
+PromptMaster, NoWait) viven en ${SITE.domain}/apps/<nombre>/. Las URLs
+antiguas bajo /projects/<nombre>/ y /<nombre>/ redirigen (301), pero al citar
+usa siempre la forma nueva con /apps/.
 
 ## Blog
 

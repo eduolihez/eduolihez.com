@@ -1,0 +1,50 @@
+---
+/**
+ * /apps/prompt-master/ — landing de la extension PromptMaster.
+ * Sustituye a public/projects/promptmaster/. Contenido en src/data/apps.ts,
+ * migrado desde prompt-master/landing/index.html (solo copy, no su CSS).
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AppPage from '../../components/AppPage.astro';
+import { getApp } from '../../data/apps';
+import { SITE } from '../../config';
+import { pick } from '../../i18n/utils';
+
+const app = getApp('prompt-master')!;
+const lang = 'es';
+const title = 'PromptMaster — Mejora tus prompts de IA | Eduardo Olivares';
+const description = pick(app.tagline, lang);
+
+const softwareApp = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: app.name,
+  description: pick(app.description, lang),
+  url: new URL('/apps/prompt-master/', SITE.domain).href,
+  applicationCategory: 'BrowserApplication',
+  operatingSystem: 'Chrome, Chromium, Firefox',
+  offers: [
+    { '@type': 'Offer', name: 'Free', price: '0', priceCurrency: 'EUR' },
+    { '@type': 'Offer', name: 'PRO', price: '20', priceCurrency: 'EUR' },
+  ],
+};
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  lang={lang}
+  path="/apps/prompt-master/"
+  withFaq={false}
+  breadcrumbName="PromptMaster"
+  breadcrumbs={[{ name: 'Proyectos', path: '/projects/' }]}
+  alternates={{
+    es: '/apps/prompt-master/',
+    en: '/en/apps/prompt-master/',
+    ca: '/apps/prompt-master/',
+  }}
+>
+  <AppPage app={app} lang={lang} backHref="/projects/" backLabel="Volver a Proyectos" />
+
+  <script type="application/ld+json" set:html={JSON.stringify(softwareApp)} />
+</BaseLayout>

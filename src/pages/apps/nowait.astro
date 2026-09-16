@@ -1,0 +1,44 @@
+---
+/**
+ * /apps/nowait/ — landing de la extension NoWait.
+ *
+ * Sustituye al HTML suelto de public/projects/nowait/ (nunca enlazado desde
+ * ningun sitio del portfolio). Contenido en src/data/apps.ts.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AppPage from '../../components/AppPage.astro';
+import { getApp } from '../../data/apps';
+import { SITE } from '../../config';
+import { pick } from '../../i18n/utils';
+
+const app = getApp('nowait')!;
+const lang = 'es';
+const title = 'NoWait — Salta acortadores de enlaces | Eduardo Olivares';
+const description = pick(app.tagline, lang);
+
+const softwareApp = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: app.name,
+  description: pick(app.description, lang),
+  url: new URL('/apps/nowait/', SITE.domain).href,
+  applicationCategory: 'BrowserApplication',
+  operatingSystem: 'Chrome, Chromium, Firefox',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
+};
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  lang={lang}
+  path="/apps/nowait/"
+  withFaq={false}
+  breadcrumbName="NoWait"
+  breadcrumbs={[{ name: 'Proyectos', path: '/projects/' }]}
+  alternates={{ es: '/apps/nowait/', en: '/en/apps/nowait/', ca: '/apps/nowait/' }}
+>
+  <AppPage app={app} lang={lang} backHref="/projects/" backLabel="Volver a Proyectos" />
+
+  <script type="application/ld+json" set:html={JSON.stringify(softwareApp)} />
+</BaseLayout>

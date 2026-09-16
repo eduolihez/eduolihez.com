@@ -28,12 +28,26 @@ export interface AppFaqItem {
   answer: Localized;
 }
 
+export interface AppFeature {
+  title: Localized;
+  description: Localized;
+  /** Nombre de icono de src/components/Icon.astro. */
+  icon: string;
+}
+
+export interface AppStep {
+  title: Localized;
+  description: Localized;
+}
+
 export interface AppData {
   id: string;
   name: string;
   tagline: Localized;
   description: Localized;
-  features: { title: Localized; description: Localized }[];
+  features: AppFeature[];
+  /** 3 pasos para la seccion "Como funciona" en el hero. */
+  howItWorks: AppStep[];
   privacy: {
     intro: Localized;
     points: Localized[];
@@ -71,6 +85,7 @@ export const apps: AppData[] = [
           es: 'Cada acortador tiene su propio mecanismo de espera o captcha resuelto de forma específica: Linkvertise, ouo.io, adf.ly, sh.st, work.ink y muchos más.',
           en: 'Each shortener has its own waiting or captcha mechanism, resolved with a dedicated bypass: Linkvertise, ouo.io, adf.ly, sh.st, work.ink and many more.',
         },
+        icon: 'bolt',
       },
       {
         title: { es: 'Bloqueo de IP loggers', en: 'IP logger blocking' },
@@ -78,6 +93,7 @@ export const apps: AppData[] = [
           es: 'Si un enlace no se puede evadir y además registra tu dirección IP, NoWait lo bloquea en vez de dejarte navegar a él.',
           en: 'If a link cannot be bypassed and also logs your IP address, NoWait blocks it instead of letting you navigate there.',
         },
+        icon: 'shield',
       },
       {
         title: { es: 'Evasión de rastreadores de enlaces', en: 'Link tracker evasion' },
@@ -85,6 +101,7 @@ export const apps: AppData[] = [
           es: 'bit.ly, t.co, goo.gl y similares se resuelven sin pasar por la página intermedia.',
           en: 'bit.ly, t.co, goo.gl and similar are resolved without ever loading the intermediate page.',
         },
+        icon: 'search',
       },
       {
         title: { es: 'Crowd bypass (opcional, desactivado por defecto)', en: 'Crowd bypass (optional, off by default)' },
@@ -92,6 +109,7 @@ export const apps: AppData[] = [
           es: 'Para acortadores sin bypass automática todavía, consulta y comparte destinos ya descubiertos por la comunidad de FastForward.',
           en: 'For shorteners without an automatic bypass yet, it looks up and shares destinations already discovered by the FastForward community.',
         },
+        icon: 'refresh',
       },
       {
         title: { es: 'Lista blanca configurable', en: 'Configurable whitelist' },
@@ -99,12 +117,37 @@ export const apps: AppData[] = [
           es: 'Excluye dominios propios por wildcard para que NoWait nunca actúe sobre ellos.',
           en: 'Exclude your own domains by wildcard so NoWait never acts on them.',
         },
+        icon: 'check',
       },
       {
         title: { es: 'Manifest V3 nativo en ambos navegadores', en: 'Native Manifest V3 on both browsers' },
         description: {
           es: 'Build independiente para Chrome/Chromium y Firefox, cada uno con su propio manifest — no es un empaquetado genérico adaptado a posteriori.',
           en: 'Independent build for Chrome/Chromium and Firefox, each with its own manifest — not a generic package retrofitted after the fact.',
+        },
+        icon: 'code',
+      },
+    ],
+    howItWorks: [
+      {
+        title: { es: 'Detecta el enlace', en: 'Detects the link' },
+        description: {
+          es: 'El content script identifica si el dominio tiene un bypass registrado antes de hacer nada.',
+          en: 'The content script checks whether the domain has a registered bypass before doing anything.',
+        },
+      },
+      {
+        title: { es: 'Resuelve el bypass', en: 'Resolves the bypass' },
+        description: {
+          es: 'Aplica el módulo específico de ese acortador, sin llegar a cargar su página intermedia.',
+          en: 'It runs that shortener’s dedicated module, without ever loading its intermediate page.',
+        },
+      },
+      {
+        title: { es: 'Llegas al destino', en: 'You land on the destination' },
+        description: {
+          es: 'Te redirige directo a la URL final, sin captchas, anuncios ni temporizadores.',
+          en: 'You get redirected straight to the final URL — no captchas, ads or timers.',
         },
       },
     ],
@@ -219,6 +262,7 @@ export const apps: AppData[] = [
           es: 'Clave derivada de tu clave maestra vía PBKDF2 (100.000 iteraciones, SHA-256). La clave maestra nunca sale de la memoria del navegador.',
           en: 'Key derived from your master password via PBKDF2 (100,000 iterations, SHA-256). The master password never leaves browser memory.',
         },
+        icon: 'lock',
       },
       {
         title: { es: 'TOTP / 2FA integrado', en: 'Built-in TOTP / 2FA' },
@@ -226,6 +270,7 @@ export const apps: AppData[] = [
           es: 'Genera códigos de un solo uso directamente desde el vault, sin depender de una app externa.',
           en: 'Generate one-time codes directly from the vault, with no external app required.',
         },
+        icon: 'shield',
       },
       {
         title: { es: 'Comprobación de filtraciones (HIBP)', en: 'Breach checking (HIBP)' },
@@ -233,6 +278,7 @@ export const apps: AppData[] = [
           es: 'Usa el modelo de k-anonimato de Have I Been Pwned: solo se envían 5 caracteres de un hash SHA-1, nunca tu contraseña.',
           en: 'Uses the Have I Been Pwned k-anonymity model: only 5 characters of a SHA-1 hash are sent, never your password.',
         },
+        icon: 'search',
       },
       {
         title: { es: 'Análisis de fortaleza', en: 'Strength analysis' },
@@ -240,6 +286,7 @@ export const apps: AppData[] = [
           es: 'Detecta patrones débiles y contraseñas reutilizadas en tu vault.',
           en: 'Detects weak patterns and reused passwords across your vault.',
         },
+        icon: 'bolt',
       },
       {
         title: { es: 'Generador de passphrases', en: 'Passphrase generator' },
@@ -247,12 +294,37 @@ export const apps: AppData[] = [
           es: 'Genera passphrases y contraseñas aleatorias seguras, configurables.',
           en: 'Generates secure passphrases and random passwords, fully configurable.',
         },
+        icon: 'refresh',
       },
       {
         title: { es: 'Importación CSV', en: 'CSV import' },
         description: {
           es: 'Importa credenciales desde otros gestores de contraseñas sin salir del navegador.',
           en: 'Import credentials from other password managers without leaving the browser.',
+        },
+        icon: 'database',
+      },
+    ],
+    howItWorks: [
+      {
+        title: { es: 'Crea tu vault', en: 'Create your vault' },
+        description: {
+          es: 'Defines una clave maestra; el vault se cifra en local con AES-256-GCM desde el primer segundo.',
+          en: 'Set a master password; your vault is encrypted locally with AES-256-GCM from the very first second.',
+        },
+      },
+      {
+        title: { es: 'Guarda y genera', en: 'Save and generate' },
+        description: {
+          es: 'Añade credenciales existentes o genera contraseñas y passphrases seguras al vuelo.',
+          en: 'Add existing credentials or generate secure passwords and passphrases on the fly.',
+        },
+      },
+      {
+        title: { es: 'Comprueba y protege', en: 'Check and protect' },
+        description: {
+          es: 'Analiza la fortaleza y consulta filtraciones (HIBP) sin que tu contraseña salga nunca del navegador.',
+          en: 'Analyze strength and check for breaches (HIBP) without your password ever leaving the browser.',
         },
       },
     ],
@@ -383,6 +455,7 @@ export const apps: AppData[] = [
           es: 'Pulsa el atajo en cualquier campo de texto de una plataforma de IA compatible y tu prompt se transforma en una instrucción de nivel experto en segundos.',
           en: 'Press the shortcut in any text field on a supported AI platform and your prompt is transformed into an expert-level instruction in seconds.',
         },
+        icon: 'bolt',
       },
       {
         title: { es: 'Biblioteca de prompts guardados', en: 'Saved prompt library' },
@@ -390,6 +463,7 @@ export const apps: AppData[] = [
           es: 'Todos tus prompts mejorados se guardan automáticamente en el panel lateral. Cópialos, reúsalos o expórtalos como JSON con un clic.',
           en: 'All your enhanced prompts are automatically saved in the side panel. Copy, reuse, or export them as JSON with one click.',
         },
+        icon: 'database',
       },
       {
         title: { es: '20 prompts PRO de alta conversión', en: '20 high-converting PRO prompts' },
@@ -397,6 +471,7 @@ export const apps: AppData[] = [
           es: 'Prompts probados para copywriting, SEO, email marketing, ventas y análisis de datos, listos para usar.',
           en: 'Battle-tested prompts for copywriting, SEO, email marketing, sales and data analysis, ready to use.',
         },
+        icon: 'award',
       },
       {
         title: { es: '20 roles de IA de élite', en: '20 elite AI roles' },
@@ -404,6 +479,7 @@ export const apps: AppData[] = [
           es: 'Convierte a Claude o ChatGPT en un Tech Lead de Google, un CFO Partner de McKinsey o un Director Creativo de Apple.',
           en: 'Turn Claude or ChatGPT into a Google Tech Lead, a McKinsey CFO Partner, or an Apple Creative Director.',
         },
+        icon: 'robot',
       },
       {
         title: { es: 'Compatible con 8 plataformas', en: 'Works on 8 platforms' },
@@ -411,12 +487,37 @@ export const apps: AppData[] = [
           es: 'ChatGPT, Claude, Gemini, Copilot, Grok, DeepSeek, Perplexity y Mistral, sin perder tu flujo de trabajo al cambiar.',
           en: 'ChatGPT, Claude, Gemini, Copilot, Grok, DeepSeek, Perplexity and Mistral, without losing your workflow when switching.',
         },
+        icon: 'external',
       },
       {
         title: { es: '100% privado y local', en: '100% private and local' },
         description: {
           es: 'Sin cuenta obligatoria, sin rastreo de tus conversaciones. Tus prompts guardados viven en tu navegador, no en un servidor externo.',
           en: 'No mandatory account, no tracking of your conversations. Your saved prompts live in your browser, not on an external server.',
+        },
+        icon: 'lock',
+      },
+    ],
+    howItWorks: [
+      {
+        title: { es: 'Escribe tu idea', en: 'Write your idea' },
+        description: {
+          es: 'Una instrucción básica en el campo de texto de tu plataforma de IA favorita.',
+          en: 'A basic instruction in the text field of your favorite AI platform.',
+        },
+      },
+      {
+        title: { es: 'Pulsa Ctrl + M', en: 'Press Ctrl + M' },
+        description: {
+          es: 'El atajo transforma el texto en un prompt de nivel experto al instante.',
+          en: 'The shortcut turns the text into an expert-level prompt instantly.',
+        },
+      },
+      {
+        title: { es: 'Guarda y reutiliza', en: 'Save and reuse' },
+        description: {
+          es: 'El resultado se guarda en tu biblioteca para usarlo cuando quieras.',
+          en: 'The result is saved to your library for whenever you need it again.',
         },
       },
     ],

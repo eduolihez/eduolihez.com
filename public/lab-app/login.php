@@ -15,9 +15,13 @@ if (is_lab_logged_in()) {
 }
 
 $error = '';
-$next  = (string) ($_GET['next'] ?? $_POST['next'] ?? '');
-if ($next !== '' && !str_starts_with($next, '/lab-app')) {
-    $next = ''; // no seguir redirects fuera de esta app
+// $next ya viene SIN el prefijo /lab-app (require_lab_login() lo quita antes
+// de mandarlo al navegador, ver server/lab/auth.php) -- validar que empiece
+// por una sola barra (ruta relativa al propio host) y no por "//", que un
+// navegador interpretaria como protocol-relative hacia OTRO dominio.
+$next = (string) ($_GET['next'] ?? $_POST['next'] ?? '');
+if ($next !== '' && (!str_starts_with($next, '/') || str_starts_with($next, '//'))) {
+    $next = ''; // no seguir redirects fuera de este host
 }
 
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {

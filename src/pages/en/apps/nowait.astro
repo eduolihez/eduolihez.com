@@ -1,0 +1,45 @@
+---
+/**
+ * /en/apps/nowait/ — English landing for the NoWait extension.
+ * See src/pages/apps/nowait.astro for the Spanish version and data source
+ * (src/data/apps.ts). There is no English /projects/ index yet, so the back
+ * link and breadcrumb point to the Spanish one (same gap as other project
+ * pages on this site).
+ */
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import AppPage from '../../../components/AppPage.astro';
+import { getApp } from '../../../data/apps';
+import { SITE } from '../../../config';
+import { pick } from '../../../i18n/utils';
+
+const app = getApp('nowait')!;
+const lang = 'en';
+const title = 'NoWait — Skip link shorteners | Eduardo Olivares';
+const description = pick(app.tagline, lang);
+
+const softwareApp = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: app.name,
+  description: pick(app.description, lang),
+  url: new URL('/en/apps/nowait/', SITE.domain).href,
+  applicationCategory: 'BrowserApplication',
+  operatingSystem: 'Chrome, Chromium, Firefox',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
+};
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  lang={lang}
+  path="/en/apps/nowait/"
+  withFaq={false}
+  breadcrumbName="NoWait"
+  breadcrumbs={[{ name: 'Projects', path: '/projects/' }]}
+  alternates={{ es: '/apps/nowait/', en: '/en/apps/nowait/', ca: '/apps/nowait/' }}
+>
+  <AppPage app={app} lang={lang} backHref="/projects/" backLabel="Back to Projects" />
+
+  <script type="application/ld+json" set:html={JSON.stringify(softwareApp)} />
+</BaseLayout>

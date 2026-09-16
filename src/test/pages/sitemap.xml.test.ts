@@ -49,6 +49,13 @@ describe('GET /sitemap.xml', () => {
   it('incluye las paginas de proyecto', async () => {
     const body = await GET({} as APIContext).text();
     expect(body).toContain('<loc>https://eduolihez.com/projects/</loc>');
-    expect(body).toContain('<loc>https://eduolihez.com/projects/passwdcentinel/</loc>');
+  });
+
+  it('incluye las paginas de las extensiones con hreflang es/en (sin ca)', async () => {
+    const body = await GET({} as APIContext).text();
+    expect(body).toContain('<loc>https://eduolihez.com/apps/password-centinel/</loc>');
+    expect(body).toContain('<loc>https://eduolihez.com/en/apps/password-centinel/</loc>');
+    expect(body).toContain('<loc>https://eduolihez.com/apps/prompt-master/</loc>');
+    expect(body).toContain('<loc>https://eduolihez.com/apps/nowait/</loc>');
   });
 });

@@ -137,6 +137,38 @@ CREATE TABLE IF NOT EXISTS `login_attempts` (
   KEY `idx_ip_time` (`ip_address`, `attempted_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Cuentas de acceso a lab.eduolihez.com (PhishLab completo, marca real,
+-- detras de este gate en PHP -- ver server/lab/auth.php y
+-- public/lab-app/index.php). Gestionadas desde /admin -> lab-users.php.
+-- lockout_enabled: interruptor por usuario para el bloqueo por fuerza bruta
+-- (ver lab_login_is_locked() en server/lab/auth.php) -- por si algun dia hay
+-- una cuenta de confianza (ej. una intranet) para la que no tiene sentido.
+CREATE TABLE IF NOT EXISTS `lab_users` (
+  `id`               INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `username`         VARCHAR(60)  NOT NULL,
+  `password_hash`    VARCHAR(255) NOT NULL,
+  `active`           TINYINT(1)   NOT NULL DEFAULT 1,
+  `lockout_enabled`  TINYINT(1)   NOT NULL DEFAULT 1,
+  `last_login`       DATETIME     NULL,
+  `created_at`       DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_lab_username` (`username`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Intentos de login de lab.eduolihez.com (control de fuerza bruta), separado
+-- de login_attempts (ese es del panel /admin) para no mezclar dos superficies
+-- de acceso distintas en el mismo contador.
+CREATE TABLE IF NOT EXISTS `lab_login_attempts` (
+  `id`           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `ip_address`   VARCHAR(45)  NOT NULL,
+  `username`     VARCHAR(60)  NULL,
+  `success`      TINYINT(1)   NOT NULL DEFAULT 0,
+  `attempted_at` DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_ip_time` (`ip_address`, `attempted_at`),
+  KEY `idx_user_time` (`username`, `attempted_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Registro de auditoria del panel: quien hizo que y cuando.
 -- Se purga solo: se borran los registros de mas de 365 dias.
 CREATE TABLE IF NOT EXISTS `activity_log` (

@@ -537,13 +537,29 @@ WHERE EXISTS (SELECT 1 FROM `projects`)
 INSERT INTO `projects`
   (`title_es`, `title_en`, `summary_es`, `summary_en`, `stack`, `badges`,
    `repo_url`, `demo_url`, `store_url`, `featured`, `sort_order`, `status`)
-SELECT 'Password Sentinel', 'Password Sentinel',
-       'Extension de Chrome que comprueba la seguridad de tus contrasenas con Have I Been Pwned, sin enviar datos a ningun servidor.',
-       'Chrome extension that checks password safety against Have I Been Pwned, without sending data to any server.',
-       '["JavaScript","Chrome Extension","Have I Been Pwned API"]', '["open-source"]',
-       NULL, '/projects/passwdcentinel/', NULL, 0, 4, 'published'
+SELECT 'Password Centinel', 'Password Centinel',
+       'Gestor de contrasenas 100% local para Chrome: cifrado AES-256-GCM, TOTP/2FA y comprobacion de filtraciones con Have I Been Pwned, sin enviar datos a ningun servidor propio.',
+       'Fully local password manager for Chrome: AES-256-GCM encryption, built-in TOTP/2FA and breach checking via Have I Been Pwned, without sending data to any first-party server.',
+       '["JavaScript","Chrome Extension","Have I Been Pwned API"]', '["private-code"]',
+       NULL, '/projects/password-centinel/', 'https://chromewebstore.google.com/detail/fiephcocbhccfidlfnklglonoplmggcl', 0, 4, 'published'
 WHERE EXISTS (SELECT 1 FROM `projects`)
-  AND NOT EXISTS (SELECT 1 FROM `projects` WHERE `title_es` = 'Password Sentinel');
+  AND NOT EXISTS (SELECT 1 FROM `projects` WHERE `title_es` = 'Password Centinel');
+
+-- Correccion (2026-09-17): "Password Sentinel" -> "Password Centinel" (el
+-- nombre real del producto; "Sentinel" quedo mal desde el alta original),
+-- badge de open-source a private-code (el repo de GitHub es privado), y
+-- demo_url/store_url al slug y ficha de tienda reales. La extension ya
+-- estaba publicada en Chrome Web Store bajo el nombre antiguo; el nombre
+-- mostrado en la tienda se actualiza aparte, al subir la v1.0.0. Guardado
+-- por los valores anteriores exactos para no pisar una edicion manual hecha
+-- despues desde /admin.
+UPDATE `projects` SET
+  `title_es` = 'Password Centinel',
+  `title_en` = 'Password Centinel',
+  `badges` = '["private-code"]',
+  `demo_url` = '/projects/password-centinel/',
+  `store_url` = 'https://chromewebstore.google.com/detail/fiephcocbhccfidlfnklglonoplmggcl'
+WHERE `title_es` = 'Password Sentinel' AND `badges` = '["open-source"]';
 
 INSERT INTO `projects`
   (`title_es`, `title_en`, `summary_es`, `summary_en`, `stack`, `badges`,
@@ -552,9 +568,15 @@ SELECT 'PromptMaster Universal AI', 'PromptMaster Universal AI',
        'Extension de Chrome que optimiza tus prompts para ChatGPT, Claude y Gemini.',
        'Chrome extension that optimizes your prompts for ChatGPT, Claude and Gemini.',
        '["JavaScript","Chrome Extension","Prompt Engineering"]', '["private-code"]',
-       NULL, '/projects/promptmaster/', 'https://addons.mozilla.org/es-ES/firefox/addon/promptmaster/', 0, 5, 'published'
+       NULL, '/projects/prompt-master/', 'https://addons.mozilla.org/es-ES/firefox/addon/promptmaster/', 0, 5, 'published'
 WHERE EXISTS (SELECT 1 FROM `projects`)
   AND NOT EXISTS (SELECT 1 FROM `projects` WHERE `title_es` = 'PromptMaster Universal AI');
+
+-- Correccion (2026-09-17): demo_url de PromptMaster al slug nuevo
+-- (prompt-master, con guion, igual que /apps/prompt-master/) en vez del
+-- slug viejo (promptmaster, sin guion) que ya no sirve ninguna pagina.
+UPDATE `projects` SET `demo_url` = '/projects/prompt-master/'
+WHERE `title_es` = 'PromptMaster Universal AI' AND `demo_url` = '/projects/promptmaster/';
 
 -- Proyectos: Blue Team Hub (2026-09-04). Portal de herramientas de
 -- ciberseguridad para analistas SOC, con vigilancia automatizada del
@@ -663,20 +685,33 @@ WHERE EXISTS (SELECT 1 FROM `projects`)
 -- Proyectos: anadir NoWait (2026-09-06). Extension de navegador (fork de
 -- FastForward, Unlicense) que evade acortadores de enlaces; el content
 -- script solo se inyecta en los dominios con bypass real, no en <all_urls>.
--- Tiene landing propia en public/projects/nowait/ (demo_url), igual que
--- Blue Team Hub lleva repo_url y demo_url a la vez -- el repo de GitHub es
--- privado por ahora, asi que status queda en 'draft' hasta que se publique
--- (en la Chrome Web Store o al hacer publico el repo).
+-- Tiene landing de bienvenida propia en /projects/nowait/ (demo_url), igual
+-- que Blue Team Hub lleva repo_url y demo_url a la vez.
+--
+-- Actualizado 2026-09-17: el repo de GitHub paso a privado (repo_url NULL,
+-- badge private-code en vez de open-source) y la extension se publica esta
+-- misma semana, asi que status pasa de 'draft' a 'published'.
 INSERT INTO `projects`
   (`title_es`, `title_en`, `summary_es`, `summary_en`, `stack`, `badges`,
    `repo_url`, `demo_url`, `store_url`, `featured`, `sort_order`, `status`)
 SELECT 'NoWait', 'NoWait',
        'Extension de navegador que evade automaticamente las pantallas de espera de los acortadores de enlaces y bloquea registradores de IP. Mas de 90 bypasses especificos por sitio, inyectados solo donde realmente hacen falta.',
        'Browser extension that automatically bypasses link-shortener wait screens and blocks IP loggers. 90+ site-specific bypasses, injected only where they''re actually needed.',
-       '["JavaScript","Chrome Extension","Manifest V3"]', '["open-source"]',
-       'https://github.com/eduolihez/nowait', '/projects/nowait/', NULL, 0, 11, 'draft'
+       '["JavaScript","Chrome Extension","Manifest V3"]', '["private-code"]',
+       NULL, '/projects/nowait/', NULL, 0, 11, 'published'
 WHERE EXISTS (SELECT 1 FROM `projects`)
   AND NOT EXISTS (SELECT 1 FROM `projects` WHERE `title_es` = 'NoWait');
+
+-- Correccion (2026-09-17): cubre la fila de NoWait que ya estuviera
+-- insertada con los valores antiguos (el INSERT de arriba solo aplica el
+-- valor nuevo si la fila no existe todavia). Guardado por los valores
+-- anteriores exactos para no pisar una edicion manual hecha despues desde
+-- /admin.
+UPDATE `projects` SET
+  `badges` = '["private-code"]',
+  `repo_url` = NULL,
+  `status` = 'published'
+WHERE `title_es` = 'NoWait' AND `badges` = '["open-source"]' AND `status` = 'draft';
 
 -- ---------------------------------------------------------------------------
 -- Certificaciones: correcciones y ampliacion con las insignias de Credly

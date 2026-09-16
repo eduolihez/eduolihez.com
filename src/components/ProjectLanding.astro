@@ -1,0 +1,167 @@
+---
+/**
+ * <ProjectLanding /> - Landing de "bienvenida" para /projects/<id>/ y
+ * /en/projects/<id>/.
+ *
+ * Distinta a proposito de <AppPage /> (que vive en /apps/<id>/): AppPage es
+ * la ficha informativa para SEO/IA (features, permisos, FAQ, JSON-LD).
+ * ProjectLanding es la pagina de "ya esta instalado, esto es lo que puedes
+ * hacer ahora" -- el tono es de bienvenida/celebracion, un salto visual mas
+ * grande, y menos tabla-de-permisos y mas "primeros pasos". Comparte los
+ * mismos datos de src/data/apps.ts (features, howItWorks, links) para no
+ * duplicar contenido en dos sitios.
+ */
+import type { AppData } from '../data/apps';
+import type { Lang } from '../i18n/ui';
+import { pick } from '../i18n/utils';
+import Icon from './Icon.astro';
+
+interface Props {
+  app: AppData;
+  lang: Lang;
+  moreHref: string;
+  moreLabel: string;
+}
+
+const { app, lang, moreHref, moreLabel } = Astro.props;
+
+const t = {
+  es: {
+    installed: 'Instalado y listo',
+    heroSuffix: 'ya está activo en tu navegador.',
+    quickStart: 'Primeros pasos',
+    highlights: 'Lo más útil',
+    rate: 'Puntúa la extensión',
+    more: moreLabel,
+    chrome: 'Abrir en Chrome Web Store',
+    firefox: 'Abrir en Firefox Add-ons',
+    credit: 'Hecho por',
+    creditLink: 'Eduardo Olivares',
+    otherProjects: 'Ver más proyectos',
+  },
+  en: {
+    installed: 'Installed and ready',
+    heroSuffix: 'is now active in your browser.',
+    quickStart: 'Quick start',
+    highlights: 'Worth knowing',
+    rate: 'Rate the extension',
+    more: moreLabel,
+    chrome: 'Open on Chrome Web Store',
+    firefox: 'Open on Firefox Add-ons',
+    credit: 'Made by',
+    creditLink: 'Eduardo Olivares',
+    otherProjects: 'See more projects',
+  },
+}[lang === 'ca' ? 'es' : lang];
+
+const topFeatures = app.features.slice(0, 3);
+---
+
+<section class="relative overflow-hidden border-b border-bg-border py-24 sm:py-32">
+  <div class="container-page max-w-3xl text-center">
+    <div class="reveal mx-auto mb-8 flex flex-col items-center">
+      <div class="relative mb-6">
+        <img
+          src={app.iconPath}
+          alt={`Icono de ${app.name}`}
+          width="80"
+          height="80"
+          class="h-20 w-20 rounded-2xl border border-bg-border bg-bg-card object-contain p-3"
+        />
+        <span class="absolute -bottom-2 -right-2 flex h-7 w-7 items-center justify-center rounded-full border-2 border-bg bg-accent text-ink">
+          <Icon name="check" class="h-4 w-4" />
+        </span>
+      </div>
+      <p class="section-kicker text-accent">{t.installed}</p>
+      <h1 class="mb-4 text-4xl font-bold tracking-tight text-text sm:text-6xl">{app.name}</h1>
+      <p class="max-w-xl text-base leading-relaxed text-text-muted sm:text-lg">
+        <strong class="text-text">{app.name}</strong> {t.heroSuffix}
+        {' '}{pick(app.tagline, lang)}
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="border-b border-bg-border bg-bg-soft py-20 sm:py-28">
+  <div class="container-page max-w-4xl">
+    <div class="reveal mb-12 text-center">
+      <p class="section-kicker">{app.name}</p>
+      <h2 class="section-title">{t.quickStart}</h2>
+    </div>
+
+    <ol class="reveal grid gap-10 sm:grid-cols-3">
+      {
+        app.howItWorks.map((step, i) => (
+          <li class="text-center">
+            <span class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full border border-accent/30 bg-accent/10 font-mono text-lg font-semibold text-accent">
+              {i + 1}
+            </span>
+            <h3 class="mb-2 text-base font-semibold text-text">{pick(step.title, lang)}</h3>
+            <p class="mx-auto max-w-xs text-sm leading-relaxed text-text-muted">{pick(step.description, lang)}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<section class="border-b border-bg-border py-20 sm:py-28">
+  <div class="container-page max-w-4xl">
+    <div class="reveal mb-12 text-center">
+      <p class="section-kicker">{app.name}</p>
+      <h2 class="section-title">{t.highlights}</h2>
+    </div>
+
+    <ul class="reveal grid gap-6 sm:grid-cols-3">
+      {
+        topFeatures.map((f) => (
+          <li class="card p-6 text-center">
+            <span class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl border border-bg-border bg-bg text-accent">
+              <Icon name={f.icon} class="h-5 w-5" />
+            </span>
+            <h3 class="mb-2 text-base font-semibold text-text">{pick(f.title, lang)}</h3>
+            <p class="text-sm leading-relaxed text-text-muted">{pick(f.description, lang)}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<section class="py-20 sm:py-28">
+  <div class="container-page max-w-2xl text-center">
+    <div class="reveal mb-8">
+      <p class="section-kicker">{t.rate}</p>
+      <h2 class="section-title">
+        {lang === 'en' ? 'Enjoying it so far?' : '¿Te está siendo útil?'}
+      </h2>
+    </div>
+
+    <div class="reveal mb-10 flex flex-wrap justify-center gap-3">
+      {
+        app.links.chromeWebStore && (
+          <a href={app.links.chromeWebStore} class="btn-primary" target="_blank" rel="noopener noreferrer">
+            <Icon name="store" class="h-4 w-4" /> {t.chrome}
+          </a>
+        )
+      }
+      {
+        app.links.firefoxAddons && (
+          <a href={app.links.firefoxAddons} class="btn-ghost" target="_blank" rel="noopener noreferrer">
+            <Icon name="external" class="h-4 w-4" /> {t.firefox}
+          </a>
+        )
+      }
+      <a href={moreHref} class="btn-ghost">
+        <Icon name="shield" class="h-4 w-4" /> {t.more}
+      </a>
+    </div>
+
+    <p class="reveal font-mono text-xs text-text-faint">
+      {t.credit}{' '}
+      <a href="/" class="link-accent">{t.creditLink}</a>
+      {' · '}
+      <a href="/projects/" class="link-accent">{t.otherProjects}</a>
+    </p>
+  </div>
+</section>

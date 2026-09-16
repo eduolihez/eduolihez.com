@@ -72,22 +72,22 @@
   RewriteRule ^(fluence|followguard|passwdcentinel|promptmaster|zeora)(/.*)?$ /projects/$1$2 [L,R=301]
 
   # -------------------------------------------------------------------------
-  # Extensiones de navegador: HTML estatico bajo /projects/<nombre>/ ->
-  # paginas Astro reales bajo /apps/<nombre>/  (301 permanente)
+  # Extensiones de navegador: HTML estatico LEGACY bajo /projects/<slug-viejo>/
+  # -> paginas Astro informativas bajo /apps/<nombre>/  (301 permanente)
   #
-  # NoWait, Password Centinel y PromptMaster dejaron de ser HTML suelto en
-  # public/projects/<nombre>/ para pasar a ser paginas Astro con SEO/CSP
+  # Password Centinel y PromptMaster dejaron de ser HTML suelto en
+  # public/projects/<slug-viejo>/ para pasar a ser paginas Astro con SEO/CSP
   # completos en /apps/<nombre>/. La URL de politica de privacidad de
   # Password Centinel y PromptMaster (registrada en Chrome Web Store /
-  # addons.mozilla.org) usaba /projects/<nombre>/, asi que esta redireccion
+  # addons.mozilla.org) usaba estos slugs viejos, asi que esta redireccion
   # no es opcional: sin ella, esas fichas de tienda quedarian rotas.
   #
-  # passwdcentinel -> password-centinel y promptmaster -> prompt-master
-  # (los slugs cambian de nombre a la vez que de ruta); nowait mantiene el
-  # mismo slug. Cubre tambien las subpaginas sueltas (politica.html,
-  # privacy.html) y sus variantes en /en/.
+  # OJO: /projects/nowait, /projects/password-centinel y /projects/prompt-master
+  # (con el slug NUEVO, sin guion bajo) NO se redirigen -- desde 2026-09-17 son
+  # paginas Astro propias (la landing de bienvenida post-instalacion, ver
+  # src/components/ProjectLanding.astro), distintas de /apps/<nombre>/ (la
+  # ficha informativa para SEO/IA). Solo los slugs legacy de abajo redirigen.
   # -------------------------------------------------------------------------
-  RewriteRule ^(en/)?projects/nowait(/.*)?$ /$1apps/nowait$2 [L,R=301]
   RewriteRule ^(en/)?projects/passwdcentinel(/.*)?$ /$1apps/password-centinel$2 [L,R=301]
   RewriteRule ^(en/)?projects/promptmaster(/.*)?$ /$1apps/prompt-master$2 [L,R=301]
 

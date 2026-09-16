@@ -1,0 +1,33 @@
+---
+/**
+ * /en/projects/prompt-master/ — English welcome landing for PromptMaster.
+ * See src/pages/projects/prompt-master.astro for the Spanish version.
+ */
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import ProjectLanding from '../../../components/ProjectLanding.astro';
+import { getApp } from '../../../data/apps';
+import { pick } from '../../../i18n/utils';
+
+const app = getApp('prompt-master')!;
+const lang = 'en';
+const title = "You're all set! — PromptMaster | Eduardo Olivares";
+const description = pick(app.tagline, lang);
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  lang={lang}
+  path="/en/projects/prompt-master/"
+  withFaq={false}
+  noindex={true}
+  breadcrumbName="PromptMaster"
+  breadcrumbs={[{ name: 'Projects', path: '/projects/' }]}
+  alternates={{
+    es: '/projects/prompt-master/',
+    en: '/en/projects/prompt-master/',
+    ca: '/projects/prompt-master/',
+  }}
+>
+  <ProjectLanding app={app} lang={lang} moreHref="/en/apps/prompt-master/" moreLabel="More details and privacy" />
+</BaseLayout>

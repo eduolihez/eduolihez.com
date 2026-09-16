@@ -3,8 +3,9 @@
  * <AppPage /> - Plantilla compartida para /apps/<id>/ y /en/apps/<id>/.
  *
  * Recibe un AppData completo (src/data/apps.ts) y el idioma, y renderiza:
- * hero (nombre, tagline, badges, CTA a tienda o badge de estado), features,
- * privacidad/seguridad, capturas o mockup inline, y FAQ.
+ * hero (nombre, tagline, badges, CTA a tienda o badge de estado, con la
+ * captura/mockup principal integrada), como funciona (3 pasos), features
+ * con icono, privacidad/seguridad, capturas adicionales si las hay, y FAQ.
  *
  * El SoftwareApplication JSON-LD se pasa a Seo/BaseLayout desde la propia
  * pagina .astro (necesita `path`/`alternates`, que son distintos por
@@ -29,9 +30,10 @@ const t = {
   es: {
     permissions: 'Permisos y por qué se piden',
     privacy: 'Privacidad y seguridad',
-    features: 'Qué hace',
+    features: 'Qué incluye',
+    howItWorks: 'Cómo funciona',
     faq: 'Preguntas frecuentes',
-    screenshots: 'Capturas',
+    screenshots: 'Más capturas',
     mockupBefore: 'Antes',
     mockupAfter: 'Después',
     chrome: 'Chrome Web Store',
@@ -46,9 +48,10 @@ const t = {
   en: {
     permissions: 'Permissions and why they are requested',
     privacy: 'Privacy and security',
-    features: 'What it does',
+    features: 'What it includes',
+    howItWorks: 'How it works',
     faq: 'Frequently asked questions',
-    screenshots: 'Screenshots',
+    screenshots: 'More screenshots',
     mockupBefore: 'Before',
     mockupAfter: 'After',
     chrome: 'Chrome Web Store',
@@ -70,35 +73,52 @@ const statusClass = {
 }[app.status];
 
 const hasStoreLink = Boolean(app.links.chromeWebStore || app.links.firefoxAddons);
+
+const mockups: Record<string, { before: string; after: string }> = {
+  nowait: { before: 'linkvertise.com/1234/abc?r=…', after: 'destino-final.com/pagina-real' },
+  'password-centinel': { before: 'contraseña123', after: 'xK9#mQ2$vL7pR4wZ — TOTP: 482 913' },
+  'prompt-master': {
+    before: '"escríbeme un email de ventas"',
+    after: 'Actúa como copywriter B2B con 10 años de experiencia. Escribe un email de ventas para…',
+  },
+};
+const mockup = mockups[app.id];
+const heroScreenshot = app.screenshots[0];
+const moreScreenshots = app.screenshots.slice(1);
 ---
 
 <section class="border-b border-bg-border py-20 sm:py-28">
-  <div class="container-page max-w-4xl">
+  <div class="container-page">
     <a
       href={backHref}
-      class="group mb-8 inline-flex items-center gap-2 font-mono text-xs text-text-muted transition hover:text-accent"
+      class="group mb-10 inline-flex items-center gap-2 font-mono text-xs text-text-muted transition hover:text-accent"
     >
       <span class="transition-transform group-hover:-translate-x-1">&larr;</span> {backLabel}
     </a>
 
-    <div class="reveal flex flex-col gap-8 sm:flex-row sm:items-start">
-      <img
-        src={app.iconPath}
-        alt={`Icono de ${app.name}`}
-        width="96"
-        height="96"
-        class="h-20 w-20 shrink-0 rounded-2xl border border-bg-border bg-bg-card object-contain p-3 sm:h-24 sm:w-24"
-      />
-      <div class="min-w-0">
-        <div class="mb-3 flex flex-wrap items-center gap-2">
-          <span class={`inline-flex items-center rounded-sm border px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wider ${statusClass}`}>
-            {statusLabel}
-          </span>
-          <span class="badge">{t.platformChrome}</span>
-          <span class="badge">{t.platformFirefox}</span>
+    <div class="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:items-center lg:gap-16">
+      <div class="reveal min-w-0">
+        <div class="mb-5 flex items-center gap-4">
+          <img
+            src={app.iconPath}
+            alt={`Icono de ${app.name}`}
+            width="56"
+            height="56"
+            class="h-14 w-14 shrink-0 rounded-xl border border-bg-border bg-bg-card object-contain p-2.5"
+          />
+          <div class="flex flex-wrap items-center gap-2">
+            <span
+              class={`inline-flex items-center rounded-sm border px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wider ${statusClass}`}
+            >
+              {statusLabel}
+            </span>
+            <span class="badge">{t.platformChrome}</span>
+            <span class="badge">{t.platformFirefox}</span>
+          </div>
         </div>
-        <h1 class="mb-3 text-3xl font-bold tracking-tight text-text sm:text-5xl">{app.name}</h1>
-        <p class="mb-6 max-w-2xl text-base leading-relaxed text-text-muted sm:text-lg">
+
+        <h1 class="mb-4 text-4xl font-bold tracking-tight text-text sm:text-5xl">{app.name}</h1>
+        <p class="mb-8 max-w-xl text-base leading-relaxed text-text-muted sm:text-lg">
           {pick(app.tagline, lang)}
         </p>
 
@@ -126,6 +146,40 @@ const hasStoreLink = Boolean(app.links.chromeWebStore || app.links.firefoxAddons
           }
         </div>
       </div>
+
+      <div class="reveal">
+        {
+          heroScreenshot ? (
+            <img
+              src={heroScreenshot}
+              alt={`Captura de ${app.name}`}
+              loading="eager"
+              class="w-full rounded-xl border border-bg-border object-cover shadow-2xl"
+            />
+          ) : (
+            <div class="rounded-xl border border-bg-border bg-bg-card p-6 shadow-2xl">
+              <div class="mb-4 flex gap-1.5">
+                <span class="h-2.5 w-2.5 rounded-full bg-danger/70" />
+                <span class="h-2.5 w-2.5 rounded-full bg-warn/70" />
+                <span class="h-2.5 w-2.5 rounded-full bg-accent/70" />
+              </div>
+              <p class="mb-1 font-mono text-[10px] font-semibold uppercase tracking-wider text-text-faint">
+                {t.mockupBefore}
+              </p>
+              <p class="mb-4 rounded-md border border-bg-border bg-bg px-4 py-3 font-mono text-xs text-text-muted">
+                {mockup.before}
+              </p>
+              <p class="mb-4 text-center font-mono text-accent">&darr;</p>
+              <p class="mb-1 font-mono text-[10px] font-semibold uppercase tracking-wider text-accent">
+                {t.mockupAfter}
+              </p>
+              <p class="rounded-md border border-accent/30 bg-accent-soft/20 px-4 py-3 font-mono text-xs text-text">
+                {mockup.after}
+              </p>
+            </div>
+          )
+        }
+      </div>
     </div>
   </div>
 </section>
@@ -134,16 +188,44 @@ const hasStoreLink = Boolean(app.links.chromeWebStore || app.links.firefoxAddons
   <div class="container-page max-w-4xl">
     <div class="reveal mb-12">
       <p class="section-kicker">{app.name}</p>
-      <h2 class="section-title">{t.features}</h2>
+      <h2 class="section-title">{t.howItWorks}</h2>
       <p class="section-subtitle">{pick(app.description, lang)}</p>
+    </div>
+
+    <ol class="reveal grid gap-8 sm:grid-cols-3">
+      {
+        app.howItWorks.map((step, i) => (
+          <li class="relative">
+            <span class="mb-3 flex h-9 w-9 items-center justify-center rounded-full border border-accent/30 bg-accent/10 font-mono text-sm font-semibold text-accent">
+              {i + 1}
+            </span>
+            <h3 class="mb-2 text-base font-semibold text-text">{pick(step.title, lang)}</h3>
+            <p class="text-sm leading-relaxed text-text-muted">{pick(step.description, lang)}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<section class="border-b border-bg-border py-20 sm:py-28">
+  <div class="container-page max-w-4xl">
+    <div class="reveal mb-12">
+      <p class="section-kicker">{app.name}</p>
+      <h2 class="section-title">{t.features}</h2>
     </div>
 
     <ul class="reveal grid gap-5 sm:grid-cols-2">
       {
         app.features.map((f) => (
-          <li class="card p-6">
-            <h3 class="mb-2 text-base font-semibold text-text">{pick(f.title, lang)}</h3>
-            <p class="text-sm leading-relaxed text-text-muted">{pick(f.description, lang)}</p>
+          <li class="card flex gap-4 p-6">
+            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-bg-border bg-bg text-accent">
+              <Icon name={f.icon} class="h-4 w-4" />
+            </span>
+            <div class="min-w-0">
+              <h3 class="mb-1.5 text-base font-semibold text-text">{pick(f.title, lang)}</h3>
+              <p class="text-sm leading-relaxed text-text-muted">{pick(f.description, lang)}</p>
+            </div>
           </li>
         ))
       }
@@ -152,15 +234,15 @@ const hasStoreLink = Boolean(app.links.chromeWebStore || app.links.firefoxAddons
 </section>
 
 {
-  app.screenshots.length > 0 ? (
-    <section class="border-b border-bg-border py-20 sm:py-28">
+  moreScreenshots.length > 0 && (
+    <section class="border-b border-bg-border bg-bg-soft py-20 sm:py-28">
       <div class="container-page max-w-4xl">
         <div class="reveal mb-10">
           <p class="section-kicker">{t.screenshots}</p>
           <h2 class="section-title">{app.name}</h2>
         </div>
-        <div class="reveal grid gap-5 sm:grid-cols-2">
-          {app.screenshots.map((src) => (
+        <div class="reveal grid gap-5 sm:grid-cols-3">
+          {moreScreenshots.map((src) => (
             <img
               src={src}
               alt={`Captura de ${app.name}`}
@@ -171,47 +253,10 @@ const hasStoreLink = Boolean(app.links.chromeWebStore || app.links.firefoxAddons
         </div>
       </div>
     </section>
-  ) : (
-    <section class="border-b border-bg-border py-20 sm:py-28">
-      <div class="container-page max-w-4xl">
-        <div class="reveal mb-10">
-          <p class="section-kicker">{t.screenshots}</p>
-          <h2 class="section-title">{app.name}</h2>
-        </div>
-        <div class="reveal mx-auto max-w-xl rounded-xl border border-bg-border bg-bg-card p-6 shadow-sm">
-          <div class="mb-4 flex gap-1.5">
-            <span class="h-2.5 w-2.5 rounded-full bg-danger/70" />
-            <span class="h-2.5 w-2.5 rounded-full bg-warn/70" />
-            <span class="h-2.5 w-2.5 rounded-full bg-accent/70" />
-          </div>
-          <p class="mb-1 font-mono text-[10px] font-semibold uppercase tracking-wider text-text-faint">
-            {t.mockupBefore}
-          </p>
-          <p class="mb-4 rounded-md border border-bg-border bg-bg px-4 py-3 font-mono text-xs text-text-muted">
-            {app.id === 'nowait'
-              ? 'linkvertise.com/1234/abc?r=…'
-              : app.id === 'password-centinel'
-                ? 'contraseña123'
-                : '"escríbeme un email de ventas"'}
-          </p>
-          <p class="mb-4 text-center font-mono text-accent">&darr;</p>
-          <p class="mb-1 font-mono text-[10px] font-semibold uppercase tracking-wider text-accent">
-            {t.mockupAfter}
-          </p>
-          <p class="rounded-md border border-accent/30 bg-accent-soft/20 px-4 py-3 font-mono text-xs text-text">
-            {app.id === 'nowait'
-              ? 'destino-final.com/pagina-real'
-              : app.id === 'password-centinel'
-                ? 'xK9#mQ2$vL7pR4wZ — TOTP: 482 913'
-                : 'Actúa como copywriter B2B con 10 años de experiencia. Escribe un email de ventas para…'}
-          </p>
-        </div>
-      </div>
-    </section>
   )
 }
 
-<section class="border-b border-bg-border bg-bg-soft py-20 sm:py-28">
+<section class:list={["border-b border-bg-border py-20 sm:py-28", { "bg-bg-soft": moreScreenshots.length === 0 }]}>
   <div class="container-page max-w-4xl">
     <div class="reveal mb-10">
       <p class="section-kicker">{t.privacy}</p>
@@ -219,7 +264,7 @@ const hasStoreLink = Boolean(app.links.chromeWebStore || app.links.firefoxAddons
       <p class="section-subtitle">{pick(app.privacy.intro, lang)}</p>
     </div>
 
-    <ul class="reveal mb-12 flex flex-col gap-3">
+    <ul class="reveal mb-12 grid gap-3 sm:grid-cols-2">
       {
         app.privacy.points.map((p) => (
           <li class="flex gap-3 rounded-lg border border-bg-border bg-bg-card p-4">

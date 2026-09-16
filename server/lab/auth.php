@@ -72,11 +72,22 @@ function is_lab_logged_in(): bool
     return !empty($_SESSION['lab_user_id']);
 }
 
-/** Protege una pagina: si no hay sesion, va al login preservando la URL pedida. */
+/**
+ * Protege una pagina: si no hay sesion, va al login preservando la URL pedida.
+ *
+ * REQUEST_URI trae el prefijo /lab-app (lo añade el Worker de Cloudflare al
+ * reescribir la peticion hacia eduolihez.com -- ver CLOUDFLARE.md). Ese
+ * prefijo es invisible para quien navega: en su barra de direcciones solo
+ * existe lab.eduolihez.com/algo, nunca /lab-app/algo. Si se lo devolvemos tal
+ * cual en el redirect, el navegador pide lab.eduolihez.com/lab-app/algo, el
+ * Worker le vuelve a anteponer /lab-app y acaba pidiendo /lab-app/lab-app/algo
+ * -- 404. Se quita aqui, antes de que ese valor salga hacia el navegador.
+ */
 function require_lab_login(): void
 {
     if (!is_lab_logged_in()) {
         $next = (string) ($_SERVER['REQUEST_URI'] ?? '');
+        $next = preg_replace('#^/lab-app#', '', $next) ?? '';
         lab_redirect('login.php' . ($next !== '' ? '?next=' . rawurlencode($next) : ''));
     }
 }

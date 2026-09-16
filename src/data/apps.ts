@@ -50,7 +50,6 @@ export interface AppData {
   };
   /** Tecnologias/base para el chip de stack (coherencia con /projects/). */
   stack: string[];
-  repo?: string;
 }
 
 export const apps: AppData[] = [
@@ -102,10 +101,10 @@ export const apps: AppData[] = [
         },
       },
       {
-        title: { es: 'Código abierto y auditable', en: 'Open source and auditable' },
+        title: { es: 'Manifest V3 nativo en ambos navegadores', en: 'Native Manifest V3 on both browsers' },
         description: {
-          es: 'Licencia Unlicense (dominio público). El repositorio completo, incluida la lista de bypasses, es público.',
-          en: 'Unlicense (public domain). The full repository, including the bypass list, is public.',
+          es: 'Build independiente para Chrome/Chromium y Firefox, cada uno con su propio manifest — no es un empaquetado genérico adaptado a posteriori.',
+          en: 'Independent build for Chrome/Chromium and Firefox, each with its own manifest — not a generic package retrofitted after the fact.',
         },
       },
     ],
@@ -167,8 +166,8 @@ export const apps: AppData[] = [
       {
         question: { es: '¿Es de pago?', en: 'Is it paid?' },
         answer: {
-          es: 'No. NoWait es gratuito y de código abierto (licencia Unlicense).',
-          en: 'No. NoWait is free and open source (Unlicense).',
+          es: 'No. NoWait es completamente gratuito, sin plan de pago ni versión PRO.',
+          en: 'No. NoWait is completely free, with no paid plan or PRO tier.',
         },
       },
       {
@@ -193,14 +192,13 @@ export const apps: AppData[] = [
         },
       },
     ],
-    status: 'oss',
+    status: 'closed',
     iconPath: '/img/apps/nowait/icon.png',
     screenshots: [],
     links: {
       // TODO: publicar en Chrome Web Store / addons.mozilla.org y anadir aqui.
     },
     stack: ['JavaScript', 'Chrome API', 'WebExtensions'],
-    repo: 'https://github.com/eduolihez/nowait',
   },
 
   {
@@ -330,8 +328,8 @@ export const apps: AppData[] = [
       {
         question: { es: '¿Es de pago?', en: 'Is it paid?' },
         answer: {
-          es: 'No. Password Centinel es gratuito y de código abierto (licencia MIT).',
-          en: 'No. Password Centinel is free and open source (MIT license).',
+          es: 'No. Password Centinel es completamente gratuito.',
+          en: 'No. Password Centinel is completely free.',
         },
       },
       {
@@ -356,14 +354,15 @@ export const apps: AppData[] = [
         },
       },
     ],
-    status: 'oss',
+    status: 'closed',
     iconPath: '/img/apps/password-centinel/icon.png',
     screenshots: [],
     links: {
-      // TODO: publicar en Chrome Web Store y anadir aqui.
+      // Ficha ya publicada (aun bajo el nombre antiguo "Password Sentinel -
+      // Mejorado"); se actualizara el nombre mostrado al subir la v1.0.0.
+      chromeWebStore: 'https://chromewebstore.google.com/detail/fiephcocbhccfidlfnklglonoplmggcl',
     },
     stack: ['JavaScript', 'Chrome API', 'HIBP', 'AES-256-GCM'],
-    repo: 'https://github.com/eduolihez/password-centinel',
   },
 
   {

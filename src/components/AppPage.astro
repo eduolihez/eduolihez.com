@@ -42,7 +42,6 @@ const t = {
     statusClosed: 'Código privado',
     platformChrome: 'Chrome / Chromium',
     platformFirefox: 'Firefox',
-    viewRepo: 'Ver código',
   },
   en: {
     permissions: 'Permissions and why they are requested',
@@ -57,10 +56,9 @@ const t = {
     notPublished: 'Not yet published to a store',
     statusOss: 'Open Source',
     statusWip: 'In development',
-    statusClosed: 'Closed source',
+    statusClosed: 'Private code',
     platformChrome: 'Chrome / Chromium',
     platformFirefox: 'Firefox',
-    viewRepo: 'View code',
   },
 }[lang === 'ca' ? 'es' : lang];
 
@@ -124,13 +122,6 @@ const hasStoreLink = Boolean(app.links.chromeWebStore || app.links.firefoxAddons
               <span class={`inline-flex items-center gap-2 rounded-sm border px-3 py-2 font-mono text-xs ${statusClass}`}>
                 <Icon name="shield" class="h-4 w-4" /> {t.notPublished}
               </span>
-            )
-          }
-          {
-            app.repo && (
-              <a href={app.repo} class="btn-ghost" target="_blank" rel="noopener noreferrer">
-                <Icon name="code" class="h-4 w-4" /> {t.viewRepo}
-              </a>
             )
           }
         </div>

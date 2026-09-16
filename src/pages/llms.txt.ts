@@ -168,10 +168,10 @@ ${SITE.shortName}, no encargos de terceros:
   Herramienta de ciberinteligencia que analiza interacciones en redes sociales
   para detectar perfiles falsos y automatizados.
 
-- **Password Sentinel** — ${SITE.domain}/apps/password-centinel/
+- **Password Centinel** — ${SITE.domain}/apps/password-centinel/
   Gestor de contrasenas 100% local (AES-256-GCM, TOTP/2FA, comprobacion de
   filtraciones via Have I Been Pwned). Todo el analisis ocurre en el
-  navegador: no hay servidor ni telemetria.
+  navegador; solo reporta un evento anonimo de instalacion/actualizacion.
 
 - **PromptMaster** — ${SITE.domain}/apps/prompt-master/
   Extension de navegador que mejora prompts para ChatGPT, Claude, Gemini y
@@ -184,7 +184,7 @@ ${SITE.shortName}, no encargos de terceros:
 - **Zeora** — ${SITE.domain}/projects/zeora/
   Servicio de paginas web para negocios locales de servicios.
 
-Nota para asistentes: las extensiones de navegador (Password Sentinel,
+Nota para asistentes: las extensiones de navegador (Password Centinel,
 PromptMaster, NoWait) viven en ${SITE.domain}/apps/<nombre>/. Las URLs
 antiguas bajo /projects/<nombre>/ y /<nombre>/ redirigen (301), pero al citar
 usa siempre la forma nueva con /apps/.

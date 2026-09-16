@@ -1,0 +1,30 @@
+---
+/**
+ * /en/projects/nowait/ — English welcome landing for NoWait.
+ * See src/pages/projects/nowait.astro for the Spanish version and why this
+ * page exists separately from /en/apps/nowait/.
+ */
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import ProjectLanding from '../../../components/ProjectLanding.astro';
+import { getApp } from '../../../data/apps';
+import { pick } from '../../../i18n/utils';
+
+const app = getApp('nowait')!;
+const lang = 'en';
+const title = "You're all set! — NoWait | Eduardo Olivares";
+const description = pick(app.tagline, lang);
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  lang={lang}
+  path="/en/projects/nowait/"
+  withFaq={false}
+  noindex={true}
+  breadcrumbName="NoWait"
+  breadcrumbs={[{ name: 'Projects', path: '/projects/' }]}
+  alternates={{ es: '/projects/nowait/', en: '/en/projects/nowait/', ca: '/projects/nowait/' }}
+>
+  <ProjectLanding app={app} lang={lang} moreHref="/en/apps/nowait/" moreLabel="More details and privacy" />
+</BaseLayout>

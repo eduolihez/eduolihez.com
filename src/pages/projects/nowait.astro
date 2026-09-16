@@ -1,0 +1,33 @@
+---
+/**
+ * /projects/nowait/ — landing de bienvenida tras instalar NoWait.
+ *
+ * Distinta de /apps/nowait/ (ficha informativa para SEO/IA): esta es la
+ * pagina de "ya esta instalado" pensada para abrirse justo despues de anadir
+ * la extension. Mismos datos (src/data/apps.ts), presentacion distinta
+ * (src/components/ProjectLanding.astro).
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProjectLanding from '../../components/ProjectLanding.astro';
+import { getApp } from '../../data/apps';
+import { pick } from '../../i18n/utils';
+
+const app = getApp('nowait')!;
+const lang = 'es';
+const title = '¡Ya está listo! — NoWait | Eduardo Olivares';
+const description = pick(app.tagline, lang);
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  lang={lang}
+  path="/projects/nowait/"
+  withFaq={false}
+  noindex={true}
+  breadcrumbName="NoWait"
+  breadcrumbs={[{ name: 'Proyectos', path: '/projects/' }]}
+  alternates={{ es: '/projects/nowait/', en: '/en/projects/nowait/', ca: '/projects/nowait/' }}
+>
+  <ProjectLanding app={app} lang={lang} moreHref="/apps/nowait/" moreLabel="Más detalles y privacidad" />
+</BaseLayout>

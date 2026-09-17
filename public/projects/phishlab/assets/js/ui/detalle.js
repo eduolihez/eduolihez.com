@@ -1,13 +1,16 @@
 /**
- * Vista de detalle de una plantilla.
+ * Workspace de una plantilla.
  *
- * A la izquierda todo lo que se puede tocar (preset, señales, bloques, campos,
- * marca); a la derecha la plantilla compuesta de verdad, no una aproximación.
- * Cada cambio recompone y repinta, con un pequeño retardo para no rehacer el
- * iframe en cada tecla.
+ * Es la única pantalla donde se calibra, se edita, se marca y se exporta una
+ * plantilla: sustituye a lo que en v2 eran tres sitios distintos (el wizard
+ * `/nueva`, este mismo detalle en tres pasos, y la página de referencia
+ * `/senales`). A la izquierda tres pestañas — Ajustes, Marca, Exportar — que
+ * no son un wizard secuencial: se puede saltar entre ellas libremente porque
+ * no hay un orden que respetar. A la derecha, siempre visible sea cual sea la
+ * pestaña activa, la plantilla compuesta de verdad, editable al clic.
  */
 
-import { el, pintarEn, interruptor, brindis, peso, icono, pasos } from './dom.js';
+import { el, pintarEn, interruptor, brindis, peso, icono } from './dom.js';
 import {
   estado,
   actualizar,
@@ -17,12 +20,21 @@ import {
   reiniciarBloques,
   plantilla,
 } from '../core/estado.js';
-import { componer, camposConDefectos } from '../core/componer.js';
+import { componer, componerSms, camposConDefectos } from '../core/componer.js';
 import { esPersonalizado, sugerirRemitente } from '../core/senales.js';
 import { conDatosDeEjemplo, variablesGophish } from '../core/engine.js';
+import { paraEditar } from '../core/edicionInline.js';
 import { construirCampos } from './fields.js';
 import { panelMarca } from './marca.js';
-import { editorDeCopy } from './editor.js';
+import { panelExportar } from './exportar.js';
+import { activarEdicionEnVivo } from './editorEnVivo.js';
+import { bandejaPreview } from './bandejaPreview.js';
+
+const PESTANAS = [
+  { id: 'ajustes', etiqueta: 'Ajustes' },
+  { id: 'marca', etiqueta: 'Marca' },
+  { id: 'exportar', etiqueta: 'Exportar' },
+];
 
 export function vistaDetalle({ id }) {
   const meta = plantilla(id);
@@ -31,40 +43,54 @@ export function vistaDetalle({ id }) {
   }
 
   // Al abrir una plantilla se selecciona para la campaña y se rellenan sus
-  // campos: entrar a mirarla y que luego "Campaña" no sepa nada de ella sería
-  // desconcertante.
-  const seleccion = meta.tipo === 'emails' ? { emailId: meta.id } : meta.formativa ? { formativaId: meta.id } : { landingId: meta.id };
+  // campos: entrar a mirarla y que luego "Exportar" no sepa nada de ella
+  // sería desconcertante.
+  // Un sms no se empareja con nada (no hay landing que pasar de correo a
+  // SMS con GoPhish, que no envía SMS): abrirlo no toca la selección de
+  // campaña de correo/landing, solo rellena sus propios campos.
+  const esSms = meta.tipo === 'sms';
+  const seleccion = esSms ? {} : meta.tipo === 'emails' ? { emailId: meta.id } : meta.formativa ? { formativaId: meta.id } : { landingId: meta.id };
   Object.assign(estado, seleccion, { campos: camposConDefectos(meta, estado.campos) });
 
-  const marcoVista = el('iframe', {
+  // Un sms es texto plano: no hay HTML que renderizar en un iframe, así que
+  // la preview es directamente el texto compuesto. Tampoco hay edición en
+  // línea sobre la preview (no hay DOM en el que hacer clic) — se edita
+  // desde el bloque «Campos» de siempre, como el resto de variables.
+  const marcoVista = esSms ? null : el('iframe', {
     title: `Previsualización de ${meta.nombre}`,
     // allow-scripts sin allow-same-origin: el JS de la landing corre (hace
-    // falta para ver el segundo paso del login) pero en un origen opaco, y
-    // sin allow-forms el formulario no puede enviarse desde aquí.
+    // falta para ver el segundo paso del login, y para el propio script de
+    // edición en línea) pero en un origen opaco, y sin allow-forms el
+    // formulario no puede enviarse desde aquí.
     sandbox: 'allow-scripts',
   });
+  const cajaTextoSms = esSms ? el('.preview-sms') : null;
 
-  const lienzo = el(`.lienzo${estado.dispositivo === 'movil' ? '.movil' : ''}`, [marcoVista]);
+  const lienzo = el(`.lienzo${estado.dispositivo === 'movil' ? '.movil' : ''}`, [esSms ? cajaTextoSms : marcoVista]);
   const estadoVista = el('span', { texto: '' });
   const pesoVista = el('span.peso');
   const panelAjustes = el('.panel-ajustes');
-  const barraPasos = el('div');
   const cajaAvisos = el('div');
+  const cajaGuardado = el('div', { style: { margin: '0 0 20px' } });
+  // Solo los correos tienen bandeja: una landing o un sms no se «abren»
+  // desde una bandeja de entrada.
+  const cajaBandeja = meta.tipo === 'emails' ? el('div') : null;
 
   const raiz = el('.detalle', [
-    barraPasos,
     el('.detalle-cuerpo', [
       panelAjustes,
-      el('.panel-vista', [barraDeVista(), lienzo, el('.pie-vista', [estadoVista, pesoVista])]),
+      el('.panel-vista', [barraDeVista(), cajaBandeja, lienzo, el('.pie-vista', [estadoVista, pesoVista])]),
     ]),
   ]);
 
-  // Wizard de configuración: Plantilla (qué enseña) → Contenido (campos y
-  // textos) → Marca. "Exportar" vive en /nueva porque ahí es donde se
-  // emparejan correo y landing para el paquete final.
-  let pasoActual = 1;
+  let pestanaActual = 'ajustes';
   let temporizador = null;
   let ultimo = null;
+
+  const { barraGuardado } = esSms
+    ? { barraGuardado: () => null }
+    : activarEdicionEnVivo({ marco: marcoVista, meta, obtenerUltimo: () => ultimo, recomponer });
+  pintarEn(cajaGuardado, barraGuardado());
 
   pintarPanel();
   recomponer();
@@ -76,10 +102,32 @@ export function vistaDetalle({ id }) {
   function recomponer(retardo = 60) {
     clearTimeout(temporizador);
     temporizador = setTimeout(async () => {
+      if (esSms) {
+        const r = await componerSms(meta, estado);
+        ultimo = r;
+        pintarEn(cajaTextoSms, el('.telefono-sms', [el('.burbuja-sms', { texto: r.texto })]));
+        const tope = meta.caracteres || 160;
+        estadoVista.textContent = `${r.texto.length} caracteres` + (r.texto.length > tope ? ` — se partirá en ${Math.ceil(r.texto.length / tope)} SMS` : '');
+        pesoVista.textContent = '';
+        pintarAvisos(r);
+        if (pestanaActual === 'ajustes') pintarPanel();
+        return;
+      }
+
       const r = await componer(meta, estado);
       ultimo = r;
 
-      marcoVista.srcdoc = estado.ejemplo ? conDatosDeEjemplo(r.html) : r.html;
+      const base = estado.ejemplo ? conDatosDeEjemplo(r.html) : r.html;
+      marcoVista.srcdoc = paraEditar(base, estado.edicionesCrudas[meta.id] ?? {});
+
+      if (cajaBandeja) {
+        pintarEn(cajaBandeja, bandejaPreview({
+          remitente: sugerirRemitente(meta, estado.marca, r.activas ?? new Set()),
+          asunto: conDatosDeEjemplo(r.asunto ?? ''),
+          preheader: conDatosDeEjemplo(r.preheader ?? ''),
+          empresa: estado.marca.empresa,
+        }));
+      }
 
       const vars = variablesGophish(r.html);
       estadoVista.textContent = vars.length
@@ -88,7 +136,7 @@ export function vistaDetalle({ id }) {
       pesoVista.textContent = peso(r.html);
 
       pintarAvisos(r);
-      pintarPanel();
+      if (pestanaActual === 'ajustes') pintarPanel();
     }, retardo);
   }
 
@@ -103,7 +151,7 @@ export function vistaDetalle({ id }) {
   function barraDeVista() {
     return el('.barra-vista', [
       el('.pestanas', [
-        el('span.pildora', { texto: meta.tipo === 'emails' ? 'CORREO' : 'LANDING' }),
+        el('span.pildora', { texto: meta.tipo === 'emails' ? 'CORREO' : meta.tipo === 'sms' ? 'SMS' : 'LANDING' }),
         el('span.pildora', { texto: meta.id }),
       ]),
       el('.controles-vista', [
@@ -122,31 +170,17 @@ export function vistaDetalle({ id }) {
             onclick: () => {
               actualizar({ dispositivo: d });
               lienzo.classList.toggle('movil', d === 'movil');
-              pintarPanel();
             },
           })
         )),
-        estado.modoDemo ? null : el('button.btn.btn-mini', {
-          type: 'button',
-          texto: 'Copiar HTML',
-          onclick: async () => {
-            if (!ultimo) return;
-            try {
-              await navigator.clipboard.writeText(ultimo.html);
-              brindis('HTML copiado — pégalo en GoPhish con el botón <>');
-            } catch {
-              brindis('El navegador bloqueó el portapapeles; usa la descarga desde Campaña');
-            }
-          },
-        }),
       ]),
     ]);
   }
 
   // ----------------------------------------------------------------- panel ---
 
-  function cambiarPaso(n) {
-    pasoActual = n;
+  function cambiarPestana(id) {
+    pestanaActual = id;
     pintarPanel();
   }
 
@@ -154,38 +188,27 @@ export function vistaDetalle({ id }) {
     const senalActiva = (id) => ultimo?.activas?.has(id) ?? false;
     const personalizado = esPersonalizado(estado.catalogo.presets, estado.preset, ultimo?.senales ?? {});
 
-    const contenidoDelPaso = {
-      1: () => [origen(), bloqueDificultad(personalizado), bloqueSenales(senalActiva), bloqueBloques()],
-      2: () => [bloqueCampos(), bloqueEditor(), bloqueIdioma()],
-      3: () => [panelMarca(() => recomponer(140))],
-    }[pasoActual]();
-
-    pintarEn(barraPasos, pasos(pasoActual, [
-      { etiqueta: 'Plantilla', onclick: () => cambiarPaso(1) },
-      { etiqueta: 'Contenido', onclick: () => cambiarPaso(2) },
-      { etiqueta: 'Marca', onclick: () => cambiarPaso(3) },
-      { etiqueta: 'Exportar', onclick: () => { location.hash = '#/nueva'; } },
-    ]));
+    const contenidoDePestana = {
+      ajustes: () => [origen(), bloqueDificultad(personalizado), bloqueSenales(senalActiva), bloqueBloques(), bloqueCampos(), bloqueIdioma()],
+      marca: () => [panelMarca(() => recomponer(140))],
+      exportar: () => [panelExportar(meta, () => recomponer(140))],
+    }[pestanaActual]();
 
     pintarEn(panelAjustes,
       el('a.volver', { href: '#/biblioteca' }, [icono('flecha', 13), 'Biblioteca']),
       el('h2.titulo-detalle', { texto: meta.nombre }),
       el('p.desc-detalle', { texto: meta.descripcion ?? '' }),
+      cajaGuardado,
       cajaAvisos,
-      ...contenidoDelPaso,
-      piePaso()
+      el('.pestanas.pestanas-panel', PESTANAS.map((p) =>
+        el(`button.pestana${pestanaActual === p.id ? '.activa' : ''}`, {
+          type: 'button',
+          texto: p.etiqueta,
+          onclick: () => cambiarPestana(p.id),
+        })
+      )),
+      ...contenidoDePestana
     );
-  }
-
-  function piePaso() {
-    return el('.pie-paso', [
-      pasoActual > 1
-        ? el('button.btn.btn-mini', { type: 'button', onclick: () => cambiarPaso(pasoActual - 1) }, [icono('flecha', 12), 'Anterior'])
-        : el('span'),
-      pasoActual < 3
-        ? el('button.btn.btn-primario.btn-mini', { type: 'button', onclick: () => cambiarPaso(pasoActual + 1) }, ['Siguiente'])
-        : el('a.btn.btn-primario.btn-mini', { href: '#/nueva' }, [icono('descargar', 12), 'Ir a exportar']),
-    ]);
   }
 
   function origen() {
@@ -194,6 +217,7 @@ export function vistaDetalle({ id }) {
     return el('.bloque-ajustes', [
       el('.nota', [
         el('strong', { texto: 'Origen: ' }), linea,
+        meta.origen.urlOrigen ? el('div', { style: { marginTop: '5px' }, texto: `Clonado de: ${meta.origen.urlOrigen}` }) : null,
         meta.origen.autorizacion ? el('div', { style: { marginTop: '5px' }, texto: `Autorización: ${meta.origen.autorizacion}` }) : null,
         meta.origen.notas ? el('div', { style: { marginTop: '5px' }, texto: meta.origen.notas }) : null,
       ]),
@@ -324,12 +348,4 @@ export function vistaDetalle({ id }) {
         : null,
     ]);
   }
-
-  function bloqueEditor() {
-    return el('.bloque-ajustes', [
-      el('h3.titulo-bloque', { texto: 'Textos' }),
-      editorDeCopy(meta, ultimo, () => recomponer(0)),
-    ]);
-  }
-
 }

@@ -96,11 +96,18 @@ export async function componer(meta, estado) {
     fragmentos: copy,
   });
 
-  const salida = render(podado.html, ctx);
+  // Se marca siempre, no solo en el workspace: el marcado es un <span> inerte
+  // sin estilo propio, así que no cambia nada de lo que ve una miniatura o el
+  // HTML exportado (que pasa por `edicionInline.finalizar` antes de salir).
+  const salida = render(podado.html, ctx, { marcar: (clave) => clave in copy });
 
   return {
     html: salida.html,
     asunto: render(copy.asunto ?? '', ctx).html,
+    // Igual que el asunto: resuelto aparte del HTML para la vista previa de
+    // bandeja de entrada (ver ui/bandejaPreview.js), que no quiere ir a
+    // buscarlo dentro del div oculto del correo compuesto.
+    preheader: render(copy.preheader ?? '', ctx).html,
     faltantes: salida.faltantes,
     eliminados: podado.eliminados,
     copy,
@@ -108,6 +115,40 @@ export async function componer(meta, estado) {
     senales,
     activas: senalesActivas,
     vivos,
+  };
+}
+
+/**
+ * Compone una plantilla de tipo `sms`: sin layout ni bloques, solo el
+ * `cuerpo` del copy resuelto por señal y con las variables sustituidas. Ver
+ * el mismo razonamiento en `tools/render.js#componerSms` (el equivalente
+ * Node, usado por el linter y los tests).
+ *
+ * @returns {Promise<{texto: string, faltantes: string[], copy: object, senales: object, activas: Set<string>}>}
+ */
+export async function componerSms(meta, estado) {
+  if (!meta) return { texto: '', faltantes: [], copy: {}, senales: {}, activas: new Set() };
+
+  const senales = resolverSenales(estado.catalogo.presets, estado.preset, estado.overridesSenales);
+  const senalesActivas = activas(senales);
+
+  const copyCrudo = await copyDe(meta, estado.idioma);
+  const copy = resolverCopy(copyCrudo, senalesActivas);
+
+  const ctx = construirContexto({
+    marca: contextoMarca(estado.marca, estado.idioma),
+    campos: estado.campos,
+    fragmentos: copy,
+  });
+
+  const salida = render(copy.cuerpo ?? '', ctx);
+
+  return {
+    texto: salida.html,
+    faltantes: salida.faltantes,
+    copy,
+    senales,
+    activas: senalesActivas,
   };
 }
 

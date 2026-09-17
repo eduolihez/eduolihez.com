@@ -20,10 +20,8 @@ import { registrarVisita, activarTelemetriaLocal } from './core/telemetry.js';
 
 import { vistaBiblioteca } from './ui/biblioteca.js';
 import { vistaDetalle } from './ui/detalle.js';
-import { vistaCampana } from './ui/campana.js';
-import { vistaNuevaCampana } from './ui/nuevaCampana.js';
 import { vistaImportar } from './ui/importar.js';
-import { vistaSenales } from './ui/senales.js';
+import { vistaInforme } from './ui/informe.js';
 
 arrancar().catch((e) => {
   console.error(e);
@@ -41,9 +39,14 @@ arrancar().catch((e) => {
 });
 
 async function arrancar() {
-  // El modo demo lo marca el generador del estático público. En la herramienta
-  // local nunca está puesto.
+  // El modo demo/lab lo marca el generador del estático público
+  // correspondiente (tools/build-demo.js / tools/build-lab.js). En la
+  // herramienta local nunca está puesto. "lab" es la herramienta completa
+  // (marca real) detrás de un muro de acceso — comparte con "demo" la falta
+  // de servidor Node (sin importar ni guardar plantillas propias), pero no
+  // su mensaje de "marcas ficticias", que en lab sería falso.
   estado.modoDemo = document.documentElement.dataset.modo === 'demo';
+  estado.sinServidorEstatico = estado.modoDemo || document.documentElement.dataset.modo === 'lab';
 
   const [catalogo] = await Promise.all([cargarCatalogo(), detectarServidor()]);
 
@@ -58,7 +61,7 @@ async function arrancar() {
   registrarVisita();
 
   alNavegar(marcarNavegacion);
-  await arrancarRouter($('#vista-principal'), '/nueva');
+  await arrancarRouter($('#vista-principal'), '/biblioteca');
 }
 
 const CLAVE_AVISO = 'phishlab_aviso_aceptado_v1';
@@ -135,20 +138,21 @@ function sanearSeleccion() {
 }
 
 function conectarRutas() {
-  registrar('/nueva', () => vistaNuevaCampana());
   registrar('/biblioteca', () => vistaBiblioteca());
   registrar('/plantilla/:tipo/:id', (params) => vistaDetalle(params));
-  registrar('/campana', () => vistaCampana());
-  registrar('/senales', () => vistaSenales());
+  // Acceso secundario a propósito: no hay tercer enlace en la barra (ver
+  // DESIGN.md, 2026-09-15). Se llega desde el botón de la pestaña Exportar
+  // o desde la biblioteca, o escribiendo la ruta a mano.
+  registrar('/informe', () => vistaInforme());
 
-  if (estado.modoDemo) {
+  if (estado.sinServidorEstatico) {
     registrar('/importar', () => el('.pagina.columna-estrecha', [
       el('.cabecera-pagina', [
         el('.rotulo', { texto: '03 / Entrada' }),
         el('h1', { texto: 'Importar' }),
       ]),
       el('.nota.alerta', [
-        el('strong', { texto: 'Desactivado en la demo. ' }),
+        el('strong', { texto: 'Desactivado aquí. ' }),
         'La importación escribe en el disco del equipo que ejecuta la herramienta, así que solo existe en la instalación local.',
       ]),
     ]));
@@ -170,7 +174,7 @@ function pintarCronica() {
     return;
   }
 
-  const total = estado.catalogo.emails.length + estado.catalogo.landings.length;
+  const total = estado.catalogo.emails.length + estado.catalogo.landings.length + (estado.catalogo.sms?.length ?? 0);
 
   pintarEn(acciones,
     el('span.pildora', { texto: `${total} plantillas` }),
@@ -180,8 +184,7 @@ function pintarCronica() {
         : 'Sin servidor local: se puede componer y exportar, pero no importar ni guardar en disco.',
       texto: hayServidor() ? 'servidor local' : 'solo lectura',
       class: hayServidor() ? 'pildora pildora-acento' : 'pildora pildora-alerta',
-    }),
-    el('a.btn.btn-primario.btn-mini', { href: '#/nueva', texto: 'Montar campaña' })
+    })
   );
 }
 

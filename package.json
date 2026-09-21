@@ -18,12 +18,12 @@
     "@fontsource-variable/inter": "^5.1.0",
     "@fontsource-variable/jetbrains-mono": "^5.1.0",
     "@resvg/resvg-js": "^2.6.2",
-    "astro": "^7.3.2"
+    "astro": "^7.3.3"
   },
   "devDependencies": {
     "@tailwindcss/cli": "^4.3.3",
     "@tailwindcss/vite": "^4.3.3",
-    "jsdom": "^30.0.1",
+    "jsdom": "^30.1.0",
     "tailwindcss": "^4.3.3",
     "vitest": "^4.1.11"
   }

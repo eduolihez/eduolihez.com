@@ -62,12 +62,20 @@ function rows_of(string $sql, array $params = []): array
     }
 }
 
-// --- Selector de proyectos (2026-09-08) ---------------------------------
+// --- Selector de sitios (2026-09-08) -------------------------------------
 //
 // Sin ?app en la URL: en vez de saltar directo al dashboard de
 // eduolihez.com (que es lo que hacia esta pagina antes de que existiera mas
 // de una app), se muestra un selector con metricas generales de cada app
 // registrada -- el nuevo punto de entrada de /admin.
+//
+// Llamado "sitios" y no "proyectos" a proposito: "Proyectos" ya es el nombre
+// de la seccion de contenido (tabla `projects`, tarjetas del portfolio) y
+// esto es otra cosa -- elegir entre eduolihez.com y el resto de apps
+// registradas (tabla `apps`). Mismo nombre para dos conceptos distintos fue
+// la primera confusion que se detecto al disenar esto (ver el comentario
+// equivalente en database/schema.sql); esta pagina llevaba el nombre viejo
+// en el texto aunque la tabla ya se corrigiera.
 //
 // Con ?app=<slug> de una app SIN contenido propio (has_content=0, p.ej.
 // nowait: sitio estatico sin CMS): no tiene sentido este dashboard (KPIs de
@@ -80,16 +88,16 @@ if ($currentAppSlug === '') {
     $apps = rows_of('SELECT id, slug, display_name, has_content FROM apps ORDER BY created_at ASC');
     $sparkColors = ['', 'cyan', 'violet', 'warn']; // ciclan si hay mas de 4 apps
 
-    admin_header('Selector de proyectos', 'index.php');
+    admin_header('Selector de sitios', 'index.php');
     show_flash();
     ?>
-    <h1>¿Qué proyecto quieres ver?</h1>
-    <p class="hint" style="margin-bottom:1.5rem;">Últimos 7 días, comparado con los 7 anteriores. Elige un proyecto para entrar en su panel.</p>
+    <h1>¿Qué sitio quieres ver?</h1>
+    <p class="hint" style="margin-bottom:1.5rem;">Últimos 7 días, comparado con los 7 anteriores. Elige un sitio para entrar en su panel.</p>
 
     <?php if (!$apps): ?>
-      <div class="card empty">Todavía no hay proyectos registrados. <a href="apps.php">Registra el primero →</a></div>
+      <div class="card empty">Todavía no hay sitios registrados. <a href="apps.php">Registra el primero →</a></div>
     <?php else: ?>
-      <div class="project-picker">
+      <div class="app-picker">
         <?php foreach ($apps as $i => $app): ?>
           <?php
           $appId = (int) $app['id'];
@@ -142,7 +150,7 @@ if ($currentAppSlug === '') {
           $color = $sparkColors[$i % count($sparkColors)];
           $initial = mb_strtoupper(mb_substr($app['display_name'], 0, 1));
           ?>
-          <a class="card project-picker-card" href="<?= e($href) ?>">
+          <a class="card app-picker-card" href="<?= e($href) ?>">
             <div class="toolbar" style="margin-bottom:1rem; align-items:flex-start;">
               <div style="display:flex; align-items:center; gap:.75rem;">
                 <div class="picker-avatar <?= e($color) ?>"><?= e($initial) ?></div>

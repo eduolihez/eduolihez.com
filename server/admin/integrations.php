@@ -177,6 +177,20 @@ show_flash();
     Estas imágenes se sirven con caché HTTP corta; si acabas de refrescar o guardar,
     puede que tu navegador siga mostrando la versión anterior — recarga forzando (Ctrl/Cmd+Shift+R) si hace falta.
   </p>
+  <?php
+    // Absoluta a proposito, mismo dominio que usa el enlace "Ver web" del
+    // sidebar (server/admin/partials/layout.php): esto se pega en un README
+    // de GitHub, no en una pagina de este sitio, asi que una ruta relativa
+    // no serviria.
+    $ghMarkdown = "![GitHub Stats](https://eduolihez.com/api/github-stats.php)\n"
+        . "![Top Languages](https://eduolihez.com/api/github-langs.php)\n"
+        . "![GitHub Streak](https://eduolihez.com/api/github-streak.php)";
+  ?>
+  <label for="gh-markdown-snippet" style="margin-top:1.25rem;">Markdown para el README</label>
+  <div class="copy-row" style="align-items:flex-start;">
+    <textarea id="gh-markdown-snippet" readonly rows="3" style="font-family:'JetBrains Mono',monospace; font-size:.82rem;" onclick="this.select()"><?= e($ghMarkdown) ?></textarea>
+    <button type="button" class="btn sm" data-copy="#gh-markdown-snippet">Copiar</button>
+  </div>
 </div>
 
 <h2>Ajustes</h2>

@@ -6,10 +6,12 @@
  * propia clave de API para reportar a server/api/events.php.
  *
  * La clave se genera/rota aqui y se ensena UNA SOLA VEZ, justo tras
- * generarla, via el flash de sesion normal (mismo mecanismo que cualquier
- * otro aviso de esta pagina: se lee y se borra de $_SESSION en la misma
- * peticion que la pinta). Nunca se guarda en claro en la base de datos --
- * solo su SHA-256 en apps.api_key_hash.
+ * generarla, en su propia tarjeta con copiado automatico al portapapeles
+ * (ver $newApiKey mas abajo) -- misma idea de un solo uso que el flash de
+ * sesion normal (set_flash()/show_flash()), pero fuera de ese mecanismo
+ * porque el flash se imprime escapado como texto plano, sin boton de copiar.
+ * Nunca se guarda en claro en la base de datos -- solo su SHA-256 en
+ * apps.api_key_hash.
  */
 require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/partials/layout.php';
@@ -50,8 +52,12 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
                     db()->prepare('UPDATE apps SET api_key_hash = ?, key_rotated_at = NOW() WHERE id = ?')
                         ->execute([$hash, $id]);
                     log_activity('update', 'app', $id, 'Clave de API generada/rotada para: ' . $row['display_name']);
-                    set_flash('ok', 'Nueva clave para "' . $row['display_name'] . '": '
-                        . $rawKey . ' — cópiala ahora, no se volverá a mostrar.');
+                    // La clave en claro NO va en el flash normal (se imprime
+                    // escapada como texto plano ahi, sin boton de copiar).
+                    // Va en su propia variable de sesion, de un solo uso, para
+                    // poder pintarla en una tarjeta con copia automatica.
+                    $_SESSION['new_api_key'] = ['app' => $row['display_name'], 'key' => $rawKey];
+                    set_flash('ok', 'Nueva clave generada para "' . $row['display_name'] . '".');
                     break;
             }
         }
@@ -67,7 +73,24 @@ $rows = db()->query(
 
 admin_header('Apps', 'apps.php');
 show_flash();
+
+// Revelado de un solo uso: se lee y se borra de sesion en la misma peticion
+// que la pinta, igual que el flash normal (ver set_flash()/show_flash()) --
+// un F5 despues de verla ya no la vuelve a mostrar.
+$newApiKey = $_SESSION['new_api_key'] ?? null;
+unset($_SESSION['new_api_key']);
+if ($newApiKey):
 ?>
+<div class="card" style="border-color: var(--warn); background: var(--warn-soft);">
+  <h3 style="color: var(--warn); margin-bottom: .5rem;">Clave de API para "<?= e($newApiKey['app']) ?>"</h3>
+  <p class="hint" style="margin-top: 0;">Cópiala ahora: no se volverá a mostrar. Se copia sola al portapapeles.</p>
+  <div class="copy-row">
+    <input type="text" id="new-api-key-value" readonly value="<?= e($newApiKey['key']) ?>"
+           data-autocopy onclick="this.select()">
+    <button type="button" class="btn sm" data-copy="#new-api-key-value">Copiar</button>
+  </div>
+</div>
+<?php endif; ?>
 <div class="toolbar">
   <h1 style="margin:0;">Apps <span class="faint" style="font-size:1rem;">(<?= count($rows) ?>)</span></h1>
   <a class="btn" href="app-edit.php">+ Nueva app</a>

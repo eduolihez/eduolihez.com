@@ -14,6 +14,7 @@ export interface CertificationSummary {
   issuer?: string;
   category?: string;
   credential_url?: string;
+  logo_url?: string;
   issue_date?: string;
 }
 

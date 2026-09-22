@@ -3,7 +3,12 @@
  * GET /api/projects.php?lang=es|en|ca
  * Devuelve los proyectos PUBLICADOS, ya localizados. Incluye la descripcion
  * larga para el modal de detalle. En catalan cae a espanol (no hay campos ca).
- * Ordena: primero los destacados, luego por sort_order.
+ * Ordena: primero los destacados, luego por ultima actualizacion (mas
+ * reciente primero). `sort_order` ya no participa en el orden publico -- se
+ * queda en la tabla y en /admin por si algun dia hace falta un orden
+ * curado a mano, pero mientras tanto `updated_at` (que /admin pone a NOW()
+ * en cada guardado) refleja mejor "lo mas nuevo o lo ultimo que se toco"
+ * sin depender de que alguien mantenga un numero al dia.
  */
 require_once __DIR__ . '/../lib/http.php';
 
@@ -20,7 +25,7 @@ try {
                 stack, badges, repo_url, demo_url, store_url, featured, sort_order
          FROM projects
          WHERE status = 'published'
-         ORDER BY featured DESC, sort_order ASC, id DESC"
+         ORDER BY featured DESC, updated_at DESC, id DESC"
     );
     $rows = $stmt->fetchAll();
 } catch (Throwable $e) {

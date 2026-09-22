@@ -234,9 +234,10 @@ show_flash();
 </div>
 
 <p class="hint">
-  El orden de la web es: primero los <strong>destacados</strong>, y dentro de cada grupo
-  por el numero de <strong>orden</strong> (menor primero). Las flechas ↑ ↓ intercambian
-  ese numero con el proyecto vecino.
+  El orden de la web es automatico: primero los <strong>destacados</strong>, y dentro de
+  cada grupo el que se <strong>actualizo mas reciente</strong> primero. La columna "Orden"
+  y las flechas ↑ ↓ ya no cambian ese orden (se conservan por si algun dia vuelve a hacer
+  falta uno curado a mano) -- para mover un proyecto arriba, destacalo o edítalo y guarda.
 </p>
 
 <?php admin_footer(); ?>

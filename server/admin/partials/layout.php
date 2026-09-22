@@ -55,7 +55,7 @@ function admin_header(string $title, string $active = ''): void
             break;
         }
     }
-    // Selector de proyectos (2026-09-08): secciones de contenido propio
+    // Selector de sitios (2026-09-08): secciones de contenido propio
     // (Proyectos/Certificaciones/Blog/Mensajes) solo tienen sentido para una
     // app que de verdad los gestiona -- eduolihez.com si, nowait (sitio
     // estatico sin CMS) no. "Todas las apps" (sin selecionar ninguna) se
@@ -84,13 +84,21 @@ function admin_header(string $title, string $active = ''): void
             'messages.php'  => ['Mensajes', $unread > 0 ? (string) $unread : '', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>', 'alert'],
             'analytics.php' => ['Analítica', '', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>', 'count'],
         ],
-        'Multi-proyecto' => [
+        // Antes "Multi-proyecto": colisionaba con "Proyectos" de arriba
+        // (tarjetas del portfolio, tabla `projects`) aunque hablan de cosas
+        // distintas -- este grupo es sobre `apps` (sitios con su propio
+        // sub-dashboard en admin.eduolihez.com). Ver tambien el comentario
+        // en database/schema.sql sobre esta misma confusion de nombres.
+        'Apps' => [
             // admin.eduolihez.com (docs/designs/admin-dashboard.md): registro
             // de apps con su propio sub-dashboard y clave de ingesta.
-            'apps.php' => ['Apps', (string) $countSafe('SELECT COUNT(*) FROM apps'), '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>', 'count'],
+            'apps.php' => ['Gestionar apps', (string) $countSafe('SELECT COUNT(*) FROM apps'), '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>', 'count'],
             // Cuentas de lab.eduolihez.com (PhishLab completo) -- gate propio
             // en PHP, ver server/lab/auth.php. Vive aparte de admin_users.
-            'lab-users.php' => ['PhishLab · Usuarios', (string) $countSafe('SELECT COUNT(*) FROM lab_users'), '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>', 'count'],
+            // Etiqueta acortada de "PhishLab · Usuarios": con el nombre largo
+            // partia en dos lineas a los 260px del sidebar. El icono de
+            // persona + el contador ya dejan claro que es la lista de accesos.
+            'lab-users.php' => ['PhishLab', (string) $countSafe('SELECT COUNT(*) FROM lab_users'), '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>', 'count'],
         ],
         'Sistema' => [
             'integrations.php' => ['Integraciones', '', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 010 5.656l-3 3a4 4 0 01-5.656-5.656l1.5-1.5M10.172 13.828a4 4 0 010-5.656l3-3a4 4 0 015.656 5.656l-1.5 1.5" /></svg>', 'count'],
@@ -383,6 +391,13 @@ function admin_header(string $title, string $active = ''): void
 
   .menu-label {
     flex-grow: 1;
+    /* Una linea, con puntos suspensivos si no cabe, en vez de partir el item
+       en dos lineas y romper el ritmo vertical del menu (paso con "PhishLab
+       - Usuarios" antes de acortar la etiqueta mas abajo). */
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .badge-count {
@@ -589,17 +604,19 @@ function admin_header(string $title, string $active = ''): void
   .grid { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
   .grid4 { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
 
-  /* Selector de proyectos (index.php sin ?app=). Ancho maximo por tarjeta a
-     proposito (a diferencia de .grid): con 1-2 apps, dejar que se estiren a
-     todo el ancho disponible se veia desangelado (mucho hueco vacio dentro
-     de la propia tarjeta) -- mejor tarjetas de tamano fijo y que sobre
-     espacio alrededor, no dentro. */
-  .project-picker { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fill, minmax(300px, 360px)); }
-  .project-picker-card {
+  /* Selector de sitios (index.php sin ?app=) -- antes ".project-picker",
+     renombrado para no leerse como si fuera la seccion Proyectos (tabla
+     `projects`, tarjetas del portfolio). Ancho maximo por tarjeta a proposito
+     (a diferencia de .grid): con 1-2 apps, dejar que se estiren a todo el
+     ancho disponible se veia desangelado (mucho hueco vacio dentro de la
+     propia tarjeta) -- mejor tarjetas de tamano fijo y que sobre espacio
+     alrededor, no dentro. */
+  .app-picker { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fill, minmax(300px, 360px)); }
+  .app-picker-card {
     display: block; text-decoration: none; color: inherit; cursor: pointer;
     transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.2s ease, box-shadow 0.2s ease;
   }
-  .project-picker-card:hover { transform: translateY(-3px); border-color: var(--accent); box-shadow: 0 12px 24px -12px rgb(0 0 0 / 0.18); }
+  .app-picker-card:hover { transform: translateY(-3px); border-color: var(--accent); box-shadow: 0 12px 24px -12px rgb(0 0 0 / 0.18); }
 
   .picker-avatar {
     width: 40px; height: 40px; border-radius: 0.6rem; flex-shrink: 0;
@@ -720,6 +737,15 @@ function admin_header(string $title, string $active = ''): void
   .pill.danger { color: var(--danger); border-color: transparent; background: var(--danger-soft); }
 
   .actions { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+
+  /* Fila "valor de solo lectura + boton Copiar" (clave de API, URL de
+     tarjeta...): mismo input que el resto del formulario, mono para que un
+     secreto largo se lea caracter a caracter en vez de con el kerning
+     proporcional de Inter. */
+  .copy-row { display: flex; gap: 0.5rem; align-items: stretch; }
+  .copy-row input { font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; }
+  .copy-row .btn { flex-shrink: 0; }
+
   .flash { padding: 0.85rem 1.25rem; border-radius: 0.5rem; margin-bottom: 1.5rem; font-size: 0.88rem; font-weight: 500; }
   .flash.ok { background: var(--green-soft); color: var(--green); border: 1px solid transparent; }
   .flash.err { background: var(--danger-soft); color: var(--danger); border: 1px solid transparent; }
@@ -854,7 +880,7 @@ function admin_header(string $title, string $active = ''): void
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6" /></svg>
             </summary>
             <div class="app-switcher-menu">
-              <a href="index.php" class="<?= $currentAppSlug === '' ? 'active' : '' ?>">Selector de proyectos</a>
+              <a href="index.php" class="<?= $currentAppSlug === '' ? 'active' : '' ?>">Selector de sitios</a>
               <?php foreach ($appsList as $ap): ?>
                 <a href="index.php?app=<?= e(rawurlencode($ap['slug'])) ?>"
                    class="<?= $currentAppSlug === $ap['slug'] ? 'active' : '' ?>"><?= e($ap['display_name']) ?></a>

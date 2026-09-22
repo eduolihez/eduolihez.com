@@ -50,6 +50,15 @@ deployment-config.json
 # mano, igual que server/config.php.
 public/lab-app/.htpasswd
 
+# El contenido del lab de PhishLab: plantillas de marca real (Google,
+# Microsoft, PayPal, BBVA...) con formularios de captura de credenciales.
+# El .htaccess de esta misma carpeta bloquea el acceso HTTP directo en el
+# SERVIDOR real, pero eso no protege nada aqui: este repositorio es publico
+# en GitHub, que sirve el contenido de los ficheros versionados sin pasar
+# por Apache. Se sube SOLO por FTP a mano, nunca por git -- purgado del
+# historial el 2026-09-22 tras detectar que llevaba meses commiteado.
+public/lab-app/_content/
+
 # ---------------------------------------------------------------------------
 # 2. DATOS PERSONALES Y VOLCADOS DE BASE DE DATOS
 #    Un export de phpMyAdmin o del panel lleva dentro los mensajes del

@@ -167,3 +167,28 @@ jobs:
             e2e/test-results/
           if-no-files-found: ignore
           retention-days: 7
+
+  # ---------------------------------------------------------------------------
+  # Empaquetado: scripts/pack-admin.sh arma el paquete de subida FTP de
+  # server/ (lo que va a public_html/). release.yml lo usa en cada Release, asi
+  # que si se rompe aqui se detecta antes de llegar a master. fetch-depth 0:
+  # el modo changes y los tests necesitan tags e historial.
+  # ---------------------------------------------------------------------------
+  empaquetado:
+    name: Empaquetado del panel
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Descargar el repositorio
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Tests del script de empaquetado
+        run: bash scripts/pack-admin.test.sh
+
+      # Humo contra el repo real: las guardas (sin config.php, sin claves)
+      # abortan el paso si algo prohibido llegara a estar trackeado.
+      - name: Empaquetar server/ (humo)
+        run: bash scripts/pack-admin.sh --mode full --out "$RUNNER_TEMP/pack"

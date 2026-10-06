@@ -14,6 +14,9 @@
  *   [data-autocopy]     en cualquier elemento -> copia su texto solo, en
  *                        cuanto la pagina carga (p.ej. una clave de API que
  *                        se muestra una sola vez).
+ *   [data-toggle-hidden="id"] en un <button> -> muestra/oculta el elemento
+ *                        con ese id (atributo hidden) y actualiza aria-expanded.
+ *   [data-select-on-click] -> selecciona el texto del campo al hacer clic.
  *   #theme-toggle       -> alterna data-theme (light/dark) en <html>, lo guarda
  *                        en localStorage ('admin-theme') y actualiza aria-pressed.
  *                        El tema inicial lo fija theme.js desde el <head>.
@@ -132,6 +135,23 @@
     for (var i = 0; i < autocopy.length; i++) {
       copyText(elementText(autocopy[i]));
     }
+  });
+
+  // --- Mostrar/ocultar y seleccionar al clic (sustituyen a onclick="" en
+  // linea, que la CSP script-src 'self' bloquea sin avisar) ----------------
+  document.addEventListener('click', function (e) {
+    if (!e.target || !e.target.closest) return;
+    var toggler = e.target.closest('[data-toggle-hidden]');
+    if (toggler) {
+      var panel = document.getElementById(toggler.getAttribute('data-toggle-hidden'));
+      if (panel) {
+        panel.hidden = !panel.hidden;
+        toggler.setAttribute('aria-expanded', panel.hidden ? 'false' : 'true');
+      }
+      return;
+    }
+    var selectable = e.target.closest('[data-select-on-click]');
+    if (selectable && typeof selectable.select === 'function') selectable.select();
   });
 
   // --- Confirmacion por boton concreto (acciones en lote) -------------------

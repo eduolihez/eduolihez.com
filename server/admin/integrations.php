@@ -188,7 +188,7 @@ show_flash();
   ?>
   <label for="gh-markdown-snippet" style="margin-top:1.25rem;">Markdown para el README</label>
   <div class="copy-row" style="align-items:flex-start;">
-    <textarea id="gh-markdown-snippet" readonly rows="3" style="font-family:'JetBrains Mono',monospace; font-size:.82rem;" onclick="this.select()"><?= e($ghMarkdown) ?></textarea>
+    <textarea id="gh-markdown-snippet" readonly rows="3" style="font-family:'JetBrains Mono',monospace; font-size:.82rem;" data-select-on-click><?= e($ghMarkdown) ?></textarea>
     <button type="button" class="btn sm" data-copy="#gh-markdown-snippet">Copiar</button>
   </div>
 </div>

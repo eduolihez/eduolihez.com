@@ -86,7 +86,7 @@ if ($newApiKey):
   <p class="hint" style="margin-top: 0;">Cópiala ahora: no se volverá a mostrar. Se copia sola al portapapeles.</p>
   <div class="copy-row">
     <input type="text" id="new-api-key-value" readonly value="<?= e($newApiKey['key']) ?>"
-           data-autocopy onclick="this.select()">
+           data-autocopy data-select-on-click>
     <button type="button" class="btn sm" data-copy="#new-api-key-value">Copiar</button>
   </div>
 </div>

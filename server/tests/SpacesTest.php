@@ -213,6 +213,16 @@ final class SpacesTest extends TestCase
         }
     }
 
+    public function testPaginasDeEdicionPertenecenAlEspacioDeSuPadre(): void
+    {
+        $this->assertSame([SPACE_SITE], page_spaces('project-edit.php'));
+        $this->assertSame([SPACE_SITE], page_spaces('post-edit.php'));
+        $this->assertSame([SPACE_SITE], page_spaces('cert-edit.php'));
+        $this->assertSame([SPACE_GLOBAL], page_spaces('app-edit.php'));
+        $this->assertSame('site', resolve_space([], ['admin_space' => 'site'], self::APPS, 'post-edit.php'));
+        $this->assertSame('site', resolve_space([], [], self::APPS, 'cert-edit.php'));
+    }
+
     public function testSpaceNavNoDevuelveGruposVacios(): void
     {
         foreach (['global', 'site', 'phishlab', 'app:nowait'] as $space) {

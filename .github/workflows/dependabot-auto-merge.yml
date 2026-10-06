@@ -28,10 +28,21 @@ jobs:
       # Menor/parche (npm) y cualquier bump de GitHub Actions: se agrupan en
       # dependabot.yml precisamente porque casi nunca rompen nada. Un "major"
       # de npm (ej. Astro 7 -> 8) se queda fuera para revision manual.
+      # EXCEPCION /e2e (@playwright/test): el unico check obligatorio es
+      # "Vitest", y los tests E2E (admin.yml) NO lo son. Auto-fusionar un bump
+      # de Playwright porque Vitest esta en verde no probaria nada sobre
+      # Playwright, asi que esos PRs esperan revision manual. Se detecta de dos
+      # formas por robustez: el output `directory` de fetch-metadata y el
+      # nombre de la rama (Dependabot incluye el directorio en las ramas de
+      # los directorios no raiz: dependabot/npm_and_yarn/e2e/...).
       - name: Auto-aprobar y activar auto-merge (squash)
         if: |
-          steps.metadata.outputs.update-type != 'version-update:semver-major' ||
-          steps.metadata.outputs.package-ecosystem == 'github_actions'
+          (
+            steps.metadata.outputs.update-type != 'version-update:semver-major' ||
+            steps.metadata.outputs.package-ecosystem == 'github_actions'
+          ) &&
+          !startsWith(steps.metadata.outputs.directory, '/e2e') &&
+          !contains(github.head_ref, '/e2e/')
         run: |
           gh pr review --approve "$PR_URL"
           gh pr merge --squash --auto "$PR_URL"

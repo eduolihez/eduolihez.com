@@ -16,6 +16,7 @@ on:
       - "composer.json"
       - "phpunit.xml"
       - ".github/workflows/admin.yml"
+      - ".github/workflows/release.yml"
   pull_request:
     branches: [ "master" ]
     paths:
@@ -26,6 +27,7 @@ on:
       - "composer.json"
       - "phpunit.xml"
       - ".github/workflows/admin.yml"
+      - ".github/workflows/release.yml"
 
 permissions:
   contents: read
@@ -146,6 +148,11 @@ jobs:
       - name: Instalar dependencias (npm)
         working-directory: e2e
         run: npm ci
+
+      # Tests unitarios de la guarda que lee server/config.php (db-guard.cjs).
+      - name: Tests de la guarda de BD
+        working-directory: e2e
+        run: npm run test:guard
 
       - name: Instalar Chromium de Playwright
         working-directory: e2e

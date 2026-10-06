@@ -3,12 +3,10 @@
 # No toca el repo real. Uso: bash scripts/pack-admin.test.sh
 set -uo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || exit 1
+SELF="$SCRIPT_DIR/$(basename "${BASH_SOURCE[0]}")"
 PACK="$SCRIPT_DIR/pack-admin.sh"
-
-TMP="$(mktemp -d)"
-# Solo se borra el directorio temporal que creamos arriba.
-trap 'rm -rf "$TMP"' EXIT
+REAL_REPO="$(cd "$SCRIPT_DIR/.." && pwd)" || exit 1
 
 PASS=0
 FAIL=0
@@ -19,10 +17,71 @@ check() { local d="$1"; shift; if "$@" >/dev/null 2>&1; then ok "$d"; else bad "
 # nocheck: PASS si el comando sale con != 0
 nocheck() { local d="$1"; shift; if "$@" >/dev/null 2>&1; then bad "$d"; else ok "$d"; fi; }
 
+# --- Seguridad del propio test -------------------------------------------------
+# Este script hace "git init", "git config" y commits forzados de un config.php
+# falso. Si el directorio temporal no se pudiera crear o entrar, eso ocurriria
+# en el repositorio REAL. Por eso: nada de git hasta haber validado el
+# directorio, y la limpieza solo borra lo que este script creo.
+aborta() { echo "ABORTADO: $*" >&2; exit 1; }
+
+# Modos de autocomprobacion (los lanza este mismo script mas abajo): simulan un
+# mktemp roto y git queda sustituido por una funcion que delata cualquier uso.
+SIM="${1:-}"
+case "$SIM" in
+  --simula-mktemp-falla)  mktemp() { return 1; } ;;
+  --simula-mktemp-vacio)  mktemp() { echo ""; } ;;
+  --simula-mktemp-ajeno)  mktemp() { pwd; } ;;   # devuelve un dir que no hemos creado
+  "") ;;
+  *) aborta "argumento desconocido: $SIM" ;;
+esac
+if [ -n "$SIM" ]; then
+  git() { echo "GIT-LLAMADO: el test habria tocado git con un directorio temporal inutilizable" >&2; exit 97; }
+fi
+
+TMP_PREFIX="pack-admin-test"
+TMP="$(mktemp -d "${TMPDIR:-/tmp}/$TMP_PREFIX.XXXXXX")" || aborta "mktemp -d fallo"
+[ -n "$TMP" ] && [ -d "$TMP" ] || aborta "directorio temporal vacio o inexistente ('$TMP')"
+case "$(basename "$TMP")" in "$TMP_PREFIX".*) ;; *) aborta "'$TMP' no parece un directorio creado por este test" ;; esac
+TMP="$(cd "$TMP" && pwd -P)" || aborta "no se puede entrar en '$TMP'"
+[ "$TMP" != "$REAL_REPO" ] && [ "$TMP" != "$(pwd -P)" ] || aborta "el directorio temporal es el directorio actual o el repo real"
+
+# Solo se borra lo que este script creo (nombre con nuestro prefijo).
+limpiar() {
+  case "$(basename "$TMP")" in
+    "$TMP_PREFIX".*) [ -d "$TMP" ] && rm -rf "$TMP" ;;
+  esac
+}
+trap limpiar EXIT
+
+# Autocomprobacion: con un mktemp roto el test debe abortar (exit 1) SIN llegar
+# a ejecutar git, y el repo real no cambia. Se lanza desde el repo real a
+# proposito: si la guarda fallara, git (sustituido) delataria el intento.
+if [ -z "$SIM" ]; then
+  snap() { git -C "$REAL_REPO" status --porcelain; git -C "$REAL_REPO" rev-parse HEAD; git -C "$REAL_REPO" config --local --list; }
+  ANTES="$(snap 2>&1)"
+  for modo in --simula-mktemp-falla --simula-mktemp-vacio --simula-mktemp-ajeno; do
+    SALIDA="$(cd "$REAL_REPO" && bash "$SELF" "$modo" 2>&1)"; RC=$?
+    if [ "$RC" -eq 1 ] && echo "$SALIDA" | grep -q "ABORTADO" && ! echo "$SALIDA" | grep -q "GIT-LLAMADO"; then
+      ok "guarda del test: aborta sin tocar git ($modo)"
+    else
+      bad "guarda del test: aborta sin tocar git ($modo) [rc=$RC]"
+    fi
+  done
+  if [ "$ANTES" = "$(snap 2>&1)" ]; then ok "guarda del test: el repo real queda intacto"; else bad "guarda del test: el repo real queda intacto"; fi
+fi
+[ -z "$SIM" ] || aborta "modo $SIM: la guarda no ha abortado"
+
 REPO="$TMP/repo"
-mkdir -p "$REPO"
-cd "$REPO"
-git init -q .
+mkdir -p "$REPO" || aborta "no se pudo crear $REPO"
+cd "$REPO" || aborta "no se pudo entrar en $REPO"
+# Ultima barrera antes de "git init": estamos dentro del temporal y, si git ve
+# un repo aqui, es uno de dentro del temporal (nunca el real).
+case "$(pwd -P)" in "$TMP"/*) ;; *) aborta "cwd fuera del directorio temporal: $(pwd -P)" ;; esac
+if TOP="$(git rev-parse --show-toplevel 2>/dev/null)"; then
+  case "$TOP" in "$TMP"/*) ;; *) aborta "git ve un repo fuera del temporal: $TOP" ;; esac
+fi
+git init -q . || aborta "git init fallo"
+git config core.ignorecase false   # NTFS lo activa; los casos de mayusculas necesitan indice sensible
 git config user.name test
 git config user.email test@example.invalid
 git config commit.gpgsign false
@@ -164,6 +223,75 @@ git commit -q -m "telemetry"
 nocheck "guarda telemetry.config.json: sale != 0" run --mode full --out "$(out tele)"
 git rm -q server/api/telemetry.config.json
 git commit -q -m "sin telemetry"
+
+# 8b. config.php anidado (no es de ruta fija: lo frena la guarda posterior) ---
+mkf server/admin/config.php "<?php // config anidada"
+git add -f server/admin/config.php
+git commit -q -m "config anidada"
+nocheck "guarda config.php anidado (server/admin/config.php): sale != 0" run --mode full --out "$(out cfgnest)"
+git rm -q server/admin/config.php
+git commit -q -m "sin config anidada"
+
+# Entradas del indice sin tocar el arbol de trabajo (en Windows/macOS no se
+# pueden crear dos ficheros que solo difieren en mayusculas, ni uno con "*").
+track() {
+  local sha
+  sha="$(printf '%s\n' "$2" | git hash-object -w --stdin)" || return 1
+  git update-index --add --cacheinfo "100644,$sha,$1"
+}
+untrack() { GIT_LITERAL_PATHSPECS=1 git rm -q --cached -f -- "$@"; git commit -q -m "quita $*"; }
+sin_prohibidos() { [ -d "$1" ] && [ -z "$(find "$1" \( -iname config.php -o -iname setup.php \) -print)" ]; }
+
+# 8c. mayusculas: server/Config.PHP y server/admin/Setup.php se excluyen ------
+track server/Config.PHP "<?php // CONFIG SECRETA mayusculas"
+track server/admin/Setup.php "<?php // setup mayusculas"
+git commit -q -m "mayusculas"
+O="$(out mayus)"
+if run --mode full --out "$O" >/dev/null 2>&1; then ok "mayusculas: full termina con 0"; else bad "mayusculas: full termina con 0"; fi
+check "mayusculas: ni Config.PHP ni Setup.php (ni variantes) en el paquete" sin_prohibidos "$O"
+O="$(out mayus-chg)"
+run --mode changes --from HEAD~1 --to HEAD --out "$O" >/dev/null 2>&1
+check "mayusculas: en changes tampoco se empaquetan ni se sugiere borrarlos" bash -c "! find '$O' -iname config.php -o -iname setup.php | grep -q . && ! { [ -f '$O/ELIMINAR.txt' ] && grep -qi -e config.php -e setup.php '$O/ELIMINAR.txt'; }"
+untrack server/Config.PHP server/admin/Setup.php
+
+# 8d. rutas con metacaracteres de glob se toman literales ------------------------
+# "server/c*.php" como pathspec arrastraria server/config.php al paquete.
+# (En Windows tar no puede extraer un fichero con "*": el exit puede ser != 0,
+# lo que importa es que config.php no llegue a la salida.)
+if track 'server/c*.php' "<?php // comodin" 2>/dev/null; then
+  git commit -q -m "comodin"
+  O="$(out glob-star)"
+  run --mode full --out "$O" >/dev/null 2>&1
+  check "glob: server/c*.php no arrastra server/config.php" bash -c "! find '$O' -iname config.php 2>/dev/null | grep -q ."
+  untrack 'server/c*.php'
+else
+  echo "SKIP  glob: este sistema de ficheros/git no admite '*' en rutas (se cubre en Linux/CI)"
+fi
+track 'server/admin/s[e]tup.php' "<?php // corchetes"
+git commit -q -m "corchetes"
+O="$(out glob-br)"
+run --mode full --out "$O" >/dev/null 2>&1
+check "glob: server/admin/s[e]tup.php no arrastra setup.php" bash -c "! find '$O' -iname setup.php 2>/dev/null | grep -q ."
+untrack 'server/admin/s[e]tup.php'
+
+# 8e. guarda de secretos: mayusculas, comillas simples, api_key, .env, PHP -------
+KEYUP="$(printf '%s' "$KEY" | tr 'a-f' 'A-F')"
+secreto() {  # secreto "descripcion" ruta contenido
+  track "$2" "$3"
+  git commit -q -m "secreto"
+  nocheck "guarda secretos: $1" run --mode full --out "$(out "sec-$(printf '%s' "$1" | tr -c 'a-zA-Z0-9' _)")"
+  untrack "$2"
+}
+secreto "hex en mayusculas" server/api/s1.json "{\"apiKey\": \"$KEYUP\"}"
+secreto "comillas simples (JS)" server/api/s2.js "const c = { apiKey: '$KEY' };"
+secreto "api_key => (PHP)" server/api/s3.php "<?php return ['api_key' => '$KEY'];"
+secreto "API_KEY= estilo .env" server/api/s4.env "API_KEY=\"$KEYUP\""
+secreto "apikey sin comillas" server/api/s5.txt "apikey: $KEY"
+# Falsos positivos: 64 hex sin nombre de clave y una clave corta no abortan.
+track server/api/hash.json "{\"sha\": \"$KEY\", \"apiKey\": \"corta\"}"
+git commit -q -m "benigno"
+check "guarda secretos: 64 hex sin nombre de clave / clave corta no abortan" run --mode full --out "$(out benigno)"
+untrack server/api/hash.json
 
 # 9. --zip produce un zip valido ----------------------------------------------------
 ziplist() {

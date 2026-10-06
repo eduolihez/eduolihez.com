@@ -56,7 +56,12 @@ INVOKE_DIR="$PWD"
 # Raiz del repo: el script puede lanzarse desde cualquier directorio.
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO="$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel)" || die "no estoy dentro de un repositorio git"
-cd "$REPO"
+cd "$REPO" || die "no se pudo entrar en $REPO"
+
+# Las rutas de git (ls-tree, diff, archive) se toman LITERALES: un fichero
+# trackeado llamado "c*.php" o "a[bc].php" no debe expandirse como glob y
+# arrastrar otros (p.ej. config.php) al paquete.
+export GIT_LITERAL_PATHSPECS=1
 
 # --out y --zip relativos se interpretan desde el directorio de invocacion, no
 # desde la raiz del repo (quien lanza el script espera eso).
@@ -76,12 +81,17 @@ if [ "$MODE" = changes ]; then
 fi
 
 # Lo que jamas se despliega (ni se sugiere borrar en el host).
+# Sin distinguir mayusculas (server/Config.PHP, Setup.php...): nocasematch
+# existe desde bash 3.1 y solo se activa dentro de la funcion.
 excluida() {
+  local rc=1
+  shopt -s nocasematch
   case "$1" in
-    server/config.php|server/config.example.php|server/admin/setup.php) return 0 ;;
-    server/tests/*) return 0 ;;
+    server/config.php|server/config.example.php|server/admin/setup.php) rc=0 ;;
+    server/tests/*) rc=0 ;;
   esac
-  return 1
+  shopt -u nocasematch
+  return $rc
 }
 
 FILES=()
@@ -155,14 +165,16 @@ fi
 # --- Guardas de seguridad: abortan sin borrar nada --------------------------
 FALLO=0
 echo "Guardas de seguridad:"
-prohibidos="$(find "$OUT" \( -name 'config.php' -o -name 'config.example.php' -o -name 'setup.php' \
-  -o -name 'telemetry.config.json' -o -name '.git*' \) -print; find "$OUT" -type d -name tests -print)"
+prohibidos="$(find "$OUT" \( -iname 'config.php' -o -iname 'config.example.php' -o -iname 'setup.php' \
+  -o -iname 'telemetry.config.json' -o -iname '.git*' \) -print; find "$OUT" -type d -iname tests -print)"
 if [ -n "$prohibidos" ]; then
   echo "  [FALLO] ficheros prohibidos en el paquete:"; echo "$prohibidos" | sed 's/^/    /'; FALLO=1
 else
   echo "  [ok] sin config.php, config.example.php, setup.php, tests/, telemetry.config.json ni .git*"
 fi
-secretos="$(grep -rlE '"apiKey"[[:space:]]*:[[:space:]]*"[a-f0-9]{64}"' "$OUT" 2>/dev/null || true)"
+# Misma idea que NoSecretsTest: api_key/apikey/api-key/apiKey (clave con o sin
+# comillas) seguido de :, = o => y 64 hex (mayusculas o minusculas).
+secretos="$(grep -rliE "api[_-]?key[\"']?[[:space:]]*(:|=>|=)[[:space:]]*[\"']?[a-f0-9]{64}([^a-f0-9]|$)" "$OUT" 2>/dev/null || true)"
 if [ -n "$secretos" ]; then
   echo "  [FALLO] posible apiKey de 64 hex en:"; echo "$secretos" | sed 's/^/    /'; FALLO=1
 else

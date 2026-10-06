@@ -89,7 +89,9 @@ function admin_header(string $title, string $active = ''): void
     $ctx      = admin_space_context();
     $space    = $ctx['space'];
     $appsRows = $ctx['apps'];
-    $_SESSION['admin_space'] = $space;
+    if (($_SESSION['admin_space'] ?? null) !== $space) {
+        $_SESSION['admin_space'] = $space;
+    }
 
     // Contadores para los "badges" del menu. Cada uno tolera que falte la
     // tabla (BD recien creada, migracion a medias) devolviendo 0 en vez de
@@ -107,6 +109,7 @@ function admin_header(string $title, string $active = ''): void
         $counts['unread'] = $countSafe('SELECT COUNT(*) FROM messages WHERE is_read = 0 AND is_archived = 0');
         $counts['apps']   = $countSafe('SELECT COUNT(*) FROM apps');
     } elseif ($space === SPACE_SITE) {
+        $counts['unread']   = $countSafe('SELECT COUNT(*) FROM messages WHERE is_read = 0 AND is_archived = 0');
         $counts['projects'] = $countSafe("SELECT COUNT(*) FROM projects WHERE status = 'published'");
         $counts['certs']    = $countSafe('SELECT COUNT(*) FROM certifications WHERE visible = 1');
         $counts['posts']    = $countSafe('SELECT COUNT(*) FROM posts WHERE visible = 1');
@@ -123,13 +126,6 @@ function admin_header(string $title, string $active = ''): void
             break;
         }
     }
-    // Pagina de inicio de cada espacio (destino de las opciones del selector).
-    $spaceHome = static function (string $id): string {
-        $page = $id === SPACE_GLOBAL ? 'index.php'
-            : ($id === SPACE_SITE ? 'projects.php'
-            : ($id === SPACE_PHISHLAB ? 'lab-users.php' : 'analytics.php'));
-        return $page . '?space=' . rawurlencode($id);
-    };
     ?>
 <!doctype html>
 <html lang="es">
@@ -171,7 +167,7 @@ function admin_header(string $title, string $active = ''): void
           </summary>
           <div class="app-switcher-menu">
             <?php foreach ($spaceOptions as $opt): ?>
-              <a href="<?= e($spaceHome($opt['id'])) ?>"
+              <a href="<?= e(space_home($opt['id'])) ?>"
                  class="<?= $opt['id'] === $space ? 'active' : '' ?>"><?= e($opt['label']) ?></a>
             <?php endforeach; ?>
           </div>

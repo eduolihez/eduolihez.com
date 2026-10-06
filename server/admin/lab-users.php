@@ -177,7 +177,7 @@ show_flash();
       </thead>
       <tbody>
         <?php if (!$users): ?>
-          <tr><td colspan="6" class="empty">Aún no hay cuentas de PhishLab lab.</td></tr>
+          <tr><td colspan="6" class="empty">Aún no hay cuentas de lab.eduolihez.com.</td></tr>
         <?php endif; ?>
         <?php foreach ($users as $u): ?>
           <?php $blocked = ($lockedNow[$u['username']] ?? 0) >= LAB_LOGIN_MAX_ATTEMPTS; ?>

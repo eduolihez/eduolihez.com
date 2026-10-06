@@ -158,6 +158,8 @@ function admin_header(string $title, string $active = ''): void
   JetBrains Mono Variable, subconjunto latino, licencia OFL). Se copian a
   assets/fonts/ para que el panel siga siendo autonomo y sin compilacion.
 */ ?>
+<?php /* Sincrono y antes del CSS: fija data-theme sin destello (CSP: script-src 'self'). */ ?>
+<script src="<?= e(asset_url('theme.js')) ?>"></script>
 <link rel="stylesheet" href="<?= e(asset_url('admin.css')) ?>">
 </head>
 <body>
@@ -224,6 +226,11 @@ function admin_header(string $title, string $active = ''): void
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
           Ver web
         </a>
+        <button type="button" id="theme-toggle" class="action-btn" aria-label="Cambiar tema" aria-pressed="false">
+          <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z" /></svg>
+          <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path stroke-linecap="round" stroke-linejoin="round" d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4l1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></svg>
+          Cambiar tema
+        </button>
         <form method="post" action="logout.php" style="display:inline; width:100%;">
           <?= csrf_field() ?>
           <button type="submit" class="action-btn danger-text">

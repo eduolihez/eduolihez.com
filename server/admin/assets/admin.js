@@ -14,9 +14,40 @@
  *   [data-autocopy]     en cualquier elemento -> copia su texto solo, en
  *                        cuanto la pagina carga (p.ej. una clave de API que
  *                        se muestra una sola vez).
+ *   #theme-toggle       -> alterna data-theme (light/dark) en <html>, lo guarda
+ *                        en localStorage ('admin-theme') y actualiza aria-pressed.
+ *                        El tema inicial lo fija theme.js desde el <head>.
  */
 (function () {
   'use strict';
+
+  // --- Interruptor de tema -----------------------------------------------
+  // Si localStorage esta bloqueado el tema cambia igual, solo que no persiste.
+  function initThemeToggle() {
+    var btn = document.getElementById('theme-toggle');
+    if (!btn) return;
+    var root = document.documentElement;
+    function sync() {
+      btn.setAttribute('aria-pressed', root.dataset.theme === 'dark' ? 'true' : 'false');
+    }
+    sync();
+    btn.addEventListener('click', function () {
+      var next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+      root.dataset.theme = next;
+      try {
+        localStorage.setItem('admin-theme', next);
+      } catch (err) {
+        // silencioso: el tema vale para esta pagina aunque no se guarde.
+      }
+      sync();
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initThemeToggle);
+  } else {
+    initThemeToggle();
+  }
 
   // --- Copiar al portapapeles ------------------------------------------------
   // Texto a copiar: el valor de un <input>/<textarea>, o el textContent de

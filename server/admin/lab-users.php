@@ -133,10 +133,7 @@ try {
 admin_header('PhishLab · Usuarios', 'lab-users.php');
 show_flash();
 ?>
-<div class="toolbar">
-  <h1 style="margin:0;">PhishLab · Usuarios de <code>lab.eduolihez.com</code>
-    <span class="faint" style="font-size:1rem;">(<?= count($users) ?>)</span></h1>
-</div>
+<?php page_header('PhishLab · Usuarios de lab.eduolihez.com', '', '', '(' . count($users) . ')'); ?>
 <p class="hint" style="margin-top:-1rem; margin-bottom:1.5rem;">
   Cuentas con acceso a la herramienta completa de PhishLab (marca real, exportación
   activa). Bloqueo automático tras <?= LAB_LOGIN_MAX_ATTEMPTS ?> intentos fallidos en
@@ -165,7 +162,7 @@ show_flash();
 </form>
 
 <h2 style="margin-top:2rem;">Cuentas</h2>
-<div class="card" style="padding:0;">
+<div class="card p-0">
   <div class="scroll-x">
     <table>
       <thead>
@@ -175,7 +172,7 @@ show_flash();
           <th>Bloqueo</th>
           <th>Último acceso</th>
           <th>Creado</th>
-          <th style="text-align:right;">Acciones</th>
+          <th class="text-right">Acciones</th>
         </tr>
       </thead>
       <tbody>
@@ -206,13 +203,13 @@ show_flash();
             <td class="faint nowrap"><?= e(fdate($u['created_at'])) ?></td>
             <td>
               <div class="actions" style="justify-content:flex-end; flex-wrap:wrap;">
-                <form method="post" style="display:inline;">
+                <form method="post" class="d-inline">
                   <?= csrf_field() ?>
                   <input type="hidden" name="action" value="toggle_active">
                   <input type="hidden" name="id" value="<?= (int) $u['id'] ?>">
                   <button type="submit" class="btn ghost sm"><?= $u['active'] ? 'Desactivar' : 'Activar' ?></button>
                 </form>
-                <form method="post" style="display:inline;">
+                <form method="post" class="d-inline">
                   <?= csrf_field() ?>
                   <input type="hidden" name="action" value="toggle_lockout">
                   <input type="hidden" name="id" value="<?= (int) $u['id'] ?>">
@@ -221,7 +218,7 @@ show_flash();
                   </button>
                 </form>
                 <?php if ($blocked): ?>
-                  <form method="post" data-confirm="¿Desbloquear a &quot;<?= e($u['username']) ?>&quot; ahora?" style="display:inline;">
+                  <form method="post" data-confirm="¿Desbloquear a &quot;<?= e($u['username']) ?>&quot; ahora?" class="d-inline">
                     <?= csrf_field() ?>
                     <input type="hidden" name="action" value="unlock">
                     <input type="hidden" name="id" value="<?= (int) $u['id'] ?>">
@@ -231,7 +228,7 @@ show_flash();
                 <button type="button" class="btn ghost sm" onclick="document.getElementById('pw-<?= (int) $u['id'] ?>').hidden = !document.getElementById('pw-<?= (int) $u['id'] ?>').hidden;">
                   Cambiar contraseña
                 </button>
-                <form method="post" data-confirm="¿Eliminar a &quot;<?= e($u['username']) ?>&quot;? No se puede deshacer." style="display:inline;">
+                <form method="post" data-confirm="¿Eliminar a &quot;<?= e($u['username']) ?>&quot;? No se puede deshacer." class="d-inline">
                   <?= csrf_field() ?>
                   <input type="hidden" name="action" value="delete">
                   <input type="hidden" name="id" value="<?= (int) $u['id'] ?>">

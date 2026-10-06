@@ -96,6 +96,13 @@ node_modules/
 .temp/
 .vite/
 
+# Suite E2E del panel (e2e/): capturas, trazas e informe HTML de cada pasada,
+# y la cookie de sesion del admin de TEST que guarda tests/auth.setup.cjs.
+# (e2e/node_modules/ ya lo cubre la regla node_modules/ de arriba.)
+/e2e/test-results/
+/e2e/playwright-report/
+/e2e/.auth/
+
 # Dependencias de Composer (PHPUnit para server/tests/). Se reinstalan con
 # "composer install" a partir de composer.json + composer.lock.
 /vendor/

@@ -297,6 +297,23 @@ function delta_badge(int $now, int $before): string
     return '<span class="delta ' . $cls . '">' . $sig . $pct . '%</span>';
 }
 
+/**
+ * Cabecera comun de pagina: titulo, descripcion opcional y acciones a la derecha.
+ * $title, $description y $titleMeta se escapan; $actionsHtml es HTML de confianza
+ * generado por el llamador (botones, formularios con csrf_field(), etc.).
+ * $titleMeta: texto atenuado junto al titulo, p. ej. "(3 visibles de 5)".
+ */
+function page_header(string $title, string $description = '', string $actionsHtml = '', string $titleMeta = ''): void
+{
+    echo '<div class="page-header"><div class="page-header-text"><h1>' . e($title)
+        . ($titleMeta !== '' ? ' <span class="faint page-title-meta">' . e($titleMeta) . '</span>' : '')
+        . '</h1>'
+        . ($description !== '' ? '<p class="hint">' . e($description) . '</p>' : '')
+        . '</div>'
+        . ($actionsHtml !== '' ? '<div class="page-actions">' . $actionsHtml . '</div>' : '')
+        . '</div>';
+}
+
 /** Titulo de seccion con icono SVG delante (mismo tamano que h2). */
 function h2_icon(string $svg, string $text): void
 {

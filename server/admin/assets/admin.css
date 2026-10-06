@@ -22,12 +22,12 @@
      valores re-pinta el panel entero sin tocar cada pagina. */
   :root {
     --bg: #fbfbfa; --soft: #f2f1ee; --card: #ffffff; --border: #e5e4e0;
-    --text: #16151a; --muted: #6b6b74; --faint: #9c9ba3;
+    --text: #16151a; --muted: #5f5f69; --faint: #6b6b75; --faint-ui: #9c9ba3;
     --accent: #5b5bd6; --accent-hover: #4747c2; --accent-soft: #eeeefc;
     --danger: #b3261e; --danger-soft: #fbe9e8;
     --warn: #a15c00; --warn-soft: #fdf1de;
     --green: #17794f; --green-soft: #e6f6ee;
-    --cyan: #0c8599; --cyan-soft: #e3f5f7;
+    --cyan: #0a7284; --cyan-soft: #e3f5f7;
     --violet: #7048e8; --violet-soft: #f1ecfd;
     --shadow: 0 1px 2px rgba(20, 20, 30, 0.04), 0 12px 32px -16px rgba(20, 20, 30, 0.14);
     --shadow-sm: 0 1px 2px rgba(20, 20, 30, 0.05);
@@ -41,7 +41,7 @@
   /* Tema oscuro: theme.js pone data-theme en <html> antes de pintar. */
   [data-theme="dark"] {
     --bg: #0e0f13; --soft: #14151b; --card: #171821; --border: #262833;
-    --text: #e7e7ec; --muted: #8b8c98; --faint: #757683;
+    --text: #e7e7ec; --muted: #a3a4b0; --faint: #8b8c98; --faint-ui: #757683;
     --accent: #8b8bf0; --accent-hover: #a3a3f5; --accent-soft: #23244a;
     --danger: #f0827a; --danger-soft: #3a1a19;
     --warn: #e0a54a; --warn-soft: #3a2b10;
@@ -284,7 +284,7 @@
      mirar" (badge-count, verde): mismo hueco, tono neutro. */
   .badge-muted {
     background: var(--border);
-    color: var(--faint);
+    color: var(--muted);
     font-size: 0.7rem;
     font-weight: 700;
     font-family: 'JetBrains Mono', monospace;
@@ -554,7 +554,7 @@
   }
   .delta.up { color: var(--green); background: var(--green-soft); }
   .delta.down { color: var(--danger); background: var(--danger-soft); }
-  .delta.flat { color: var(--faint); background: var(--border); }
+  .delta.flat { color: var(--muted); background: var(--border); }
 
   /* Tablas */
   table { width: 100%; border-collapse: collapse; }
@@ -606,7 +606,7 @@
     background: var(--soft); color: var(--muted); 
   }
   .pill.on { color: var(--green); border-color: transparent; background: var(--green-soft); }
-  .pill.off { color: var(--faint); background: var(--border); }
+  .pill.off { color: var(--muted); background: var(--border); }
   .pill.warn { color: var(--warn); border-color: transparent; background: var(--warn-soft); }
   .pill.danger { color: var(--danger); border-color: transparent; background: var(--danger-soft); }
 
@@ -686,7 +686,7 @@
      un vistazo mucho mas rapido que una tabla de filas clave/valor. */
   .health-grid { display: grid; gap: 0.75rem; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); }
   .health-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.85rem 1rem; background: var(--soft); border: 1px solid var(--border); border-radius: 0.6rem; }
-  .health-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; background: var(--faint); box-shadow: 0 0 0 3px var(--border); }
+  .health-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; background: var(--faint-ui); box-shadow: 0 0 0 3px var(--border); }
   .health-dot.ok { background: var(--green); box-shadow: 0 0 0 3px var(--green-soft); }
   .health-dot.warn { background: var(--warn); box-shadow: 0 0 0 3px var(--warn-soft); }
   .health-dot.danger { background: var(--danger); box-shadow: 0 0 0 3px var(--danger-soft); }

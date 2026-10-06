@@ -62,26 +62,15 @@ function rows_of(string $sql, array $params = []): array
     }
 }
 
-// --- Selector de sitios (2026-09-08) -------------------------------------
+// --- Espacios (sustituye al selector de sitios de 2026-09-08) -----------
 //
-// Sin ?app en la URL: en vez de saltar directo al dashboard de
-// eduolihez.com (que es lo que hacia esta pagina antes de que existiera mas
-// de una app), se muestra un selector con metricas generales de cada app
-// registrada -- el nuevo punto de entrada de /admin.
-//
-// Llamado "sitios" y no "proyectos" a proposito: "Proyectos" ya es el nombre
-// de la seccion de contenido (tabla `projects`, tarjetas del portfolio) y
-// esto es otra cosa -- elegir entre eduolihez.com y el resto de apps
-// registradas (tabla `apps`). Mismo nombre para dos conceptos distintos fue
-// la primera confusion que se detecto al disenar esto (ver el comentario
-// equivalente en database/schema.sql); esta pagina llevaba el nombre viejo
-// en el texto aunque la tabla ya se corrigiera.
-//
-// Con ?app=<slug> de una app SIN contenido propio (has_content=0, p.ej.
-// nowait: sitio estatico sin CMS): no tiene sentido este dashboard (KPIs de
-// Proyectos/Certificaciones/Blog que esa app no tiene), asi que se redirige
-// a analytics.php?app=<slug>, que ya muestra exactamente lo que SI aplica
-// (visitas/dispositivos/navegador) sin duplicar esa vista aqui.
+// Sin ?space= explicito esta pagina abre Global (resumen de todas las apps,
+// tabla `apps`). Con ?space=<id> -- o el alias legado ?app=<slug> -- se ve el
+// espacio pedido; una app SIN contenido propio (has_content=0, p.ej. nowait:
+// sitio estatico sin CMS) se redirige a analytics.php, que ya muestra lo que
+// SI aplica (visitas/dispositivos/navegador) sin duplicar esa vista aqui.
+// "Sitios"/"espacios" y no "proyectos" a proposito: "Proyectos" es la seccion
+// de contenido (tabla `projects`), otra cosa.
 // El espacio activo (admin_space(), que acepta ?space= y el alias ?app=)
 // decide la vista: ver index_view() en partials/spaces.php.
 $currentSpace = admin_space();

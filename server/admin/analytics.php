@@ -25,19 +25,22 @@ if (!in_array($days, $allowedDays, true)) {
 $withBots = ($_GET['bots'] ?? '') === '1';
 
 // --- App (docs/designs/admin-dashboard.md): filtra por app_id si se pide -----
-// Sin ?app=, se ve todo (compatibilidad con el /admin de un solo sitio de
-// hoy). El futuro selector de apps enlazara aqui con ?app=<slug>. $appId sale
-// siempre de una consulta parametrizada -> se puede interpolar como INT en el
-// resto de SQL de este archivo sin riesgo de inyeccion.
 // El slug sale del espacio activo (?space=, o ?app= como alias legado);
-// Global -> '' -> sin filtro.
+// Global -> '' -> sin filtro. $appId sale siempre de una consulta
+// parametrizada -> se puede interpolar como INT en el resto de SQL de este
+// archivo sin riesgo de inyeccion. Si la tabla `apps` no existe se trata como
+// "sin fila" (sin filtro).
 $appSlug = admin_app_slug() ?? '';
 $appId   = null;
 $appName = null;
 if ($appSlug !== '') {
-    $appRow = db()->prepare('SELECT id, display_name FROM apps WHERE slug = ?');
-    $appRow->execute([$appSlug]);
-    $appRow = $appRow->fetch();
+    try {
+        $appStmt = db()->prepare('SELECT id, display_name FROM apps WHERE slug = ?');
+        $appStmt->execute([$appSlug]);
+        $appRow = $appStmt->fetch();
+    } catch (Throwable $e) {
+        $appRow = false;
+    }
     if ($appRow) {
         $appId   = (int) $appRow['id'];
         $appName = (string) $appRow['display_name'];

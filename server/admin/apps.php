@@ -136,7 +136,7 @@ if ($newApiKey):
             <td class="faint nowrap"><?= e(fdate($a['created_at'])) ?></td>
             <td>
               <div class="actions justify-end">
-                <a class="btn ghost sm" href="analytics.php?app=<?= rawurlencode($a['slug']) ?>">Analitica</a>
+                <a class="btn ghost sm" href="analytics.php?space=<?= e(urlencode(space_for_app_slug((string) $a['slug']))) ?>">Analitica</a>
                 <a class="btn ghost sm" href="app-edit.php?id=<?= (int) $a['id'] ?>">Editar</a>
                 <form method="post"
                       data-confirm="<?= e($a['api_key_hash'] ? '¿Rotar la clave? La anterior dejará de funcionar al instante.' : '¿Generar clave de API para esta app?') ?>"

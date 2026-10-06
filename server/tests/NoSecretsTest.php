@@ -13,18 +13,53 @@ final class NoSecretsTest extends TestCase
 {
     private const ROOT = __DIR__ . '/../../';
     private const EXAMPLE = 'public/projects/phishlab/assets/telemetry.config.example.json';
-    private const SCAN_EXTENSIONS = ['json', 'php', 'js', 'ts', 'md', 'yml'];
+    /** Extensiones de texto que se escanean (ademas de cualquier fichero llamado .env*). */
+    private const SCAN_EXTENSIONS = [
+        'json', 'php', 'js', 'cjs', 'mjs', 'ts', 'tsx', 'astro', 'md', 'yml', 'yaml',
+        'html', 'txt', 'env', 'ini', 'sh', 'css', 'xml',
+    ];
+    /** Rutas con fixtures o dumps que no se escanean. */
+    private const SKIP_PREFIXES = ['server/tests/', 'e2e/tests/', 'database/'];
+    /** Mas de esto no es codigo escrito a mano (lockfiles, bundles, binarios). */
+    private const MAX_BYTES = 1048576;
 
     /**
-     * Pares JSON "apiKey": "<64 hex>" encontrados en un texto (la clave de
-     * una app se genera como 32 bytes aleatorios en hexadecimal).
+     * Asignaciones api_key = "<64 hex>" encontradas en un texto (la clave de
+     * una app se genera como 32 bytes aleatorios en hexadecimal). Cubre JSON
+     * ("apiKey": "..."), objetos JS (apiKey: '...'), arrays PHP
+     * ('api_key' => '...') y estilo .env (API_KEY="..."), con la clave entre
+     * comillas dobles, simples o sin ellas, y el hex en mayusculas o minusculas.
      *
      * @return list<string> las claves encontradas
      */
     public static function findApiKeyLeaks(string $text): array
     {
-        preg_match_all('/"api_?key"\s*:\s*"([0-9a-f]{64})"/i', $text, $m);
+        preg_match_all('/api[_-]?key["\']?\s*(?::|=>|=)\s*["\']([0-9a-f]{64})["\']/i', $text, $m);
         return $m[1];
+    }
+
+    /** Si un fichero versionado entra en el escaneo (por ruta y extension). */
+    public static function shouldScan(string $file): bool
+    {
+        foreach (self::SKIP_PREFIXES as $prefix) {
+            if (str_starts_with($file, $prefix)) {
+                return false;
+            }
+        }
+        if (str_starts_with(strtolower(basename($file)), '.env')) {
+            return true;
+        }
+        return in_array(strtolower(pathinfo($file, PATHINFO_EXTENSION)), self::SCAN_EXTENSIONS, true);
+    }
+
+    public function testQueFicherosSeEscanean(): void
+    {
+        foreach (['src/a.ts', 'public/x/app.cjs', 'README.md', '.github/workflows/a.yml', '.env', '.env.local', 'e2e/playwright.config.cjs', 'scripts/pack.sh', 'src/p.astro'] as $f) {
+            $this->assertTrue(self::shouldScan($f), $f);
+        }
+        foreach (['server/tests/X.php', 'e2e/tests/a.cjs', 'database/schema.sql', 'package-lock.lock', 'img/a.png', 'fonts/a.woff2'] as $f) {
+            $this->assertFalse(self::shouldScan($f), $f);
+        }
     }
 
     // --- El propio detector, con entradas falsas ----------------------------
@@ -36,6 +71,37 @@ final class NoSecretsTest extends TestCase
         $upper = strtoupper($fake);
         $this->assertSame([$upper], self::findApiKeyLeaks("{\n  \"apiKey\":\"" . $upper . "\"\n}"));
         $this->assertCount(2, self::findApiKeyLeaks('{"apiKey":"' . $fake . '"} {"api_key": "' . $fake . '"}'));
+    }
+
+    public function testElDetectorCubreCadaEstiloDeAsignacion(): void
+    {
+        $k = str_repeat('0f', 32);
+        $K = strtoupper($k);
+        $casos = [
+            'par JSON' => '{"apiKey": "' . $k . '"}',
+            'objeto JS con comillas simples' => "const c = { apiKey: '$k' };",
+            'objeto JS con valor entre comillas dobles' => 'cfg = { apiKey: "' . $k . '" }',
+            'array PHP' => "return ['api_key' => '$k'];",
+            'array PHP, comillas dobles' => 'return ["apikey" => "' . $k . '"];',
+            '.env' => 'API_KEY="' . $K . '"',
+            '.env, comillas simples' => "API_KEY='$k'",
+            'guion' => '"api-key": "' . $k . '"',
+            'YAML' => "apiKey: '$k'",
+            'hex en mayusculas' => '{"apiKey":"' . $K . '"}',
+        ];
+        foreach ($casos as $nombre => $texto) {
+            $this->assertCount(1, self::findApiKeyLeaks($texto), $nombre);
+        }
+    }
+
+    public function testElDetectorNoMarcaCasosBenignos(): void
+    {
+        $k = str_repeat('0f', 32);
+        $this->assertSame([], self::findApiKeyLeaks('{"apiKey": "0f0f0f"}'), 'hex corto');
+        $this->assertSame([], self::findApiKeyLeaks('const sha = "' . $k . '";'), '64 hex sin nombre de clave');
+        $this->assertSame([], self::findApiKeyLeaks('integrity: sha256-' . base64_encode(random_bytes(32))), 'integrity base64');
+        $this->assertSame([], self::findApiKeyLeaks('"integrity": "sha512-' . str_repeat('A1b2', 20) . '=="'), 'integrity sha512');
+        $this->assertSame([], self::findApiKeyLeaks('apiKey: process.env.API_KEY'), 'lee del entorno');
     }
 
     public function testElDetectorIgnoraPlaceholdersYCadenasQueNoSonClaves(): void
@@ -67,21 +133,22 @@ final class NoSecretsTest extends TestCase
 
     public function testNingunArchivoVersionadoLlevaUnaClave(): void
     {
-        $files = $this->git(['ls-files', '--', 'public', 'server']);
+        $files = $this->git(['ls-files']);
         $this->assertNotEmpty($files, 'git ls-files no devolvio nada');
 
         $scanned = 0;
         $leaks = [];
         foreach ($files as $file) {
-            if (str_starts_with($file, 'server/tests/') || str_starts_with($file, 'database/')) {
+            if (!self::shouldScan($file)) {
                 continue;
             }
-            if (!in_array(strtolower(pathinfo($file, PATHINFO_EXTENSION)), self::SCAN_EXTENSIONS, true)) {
-                continue;
+            $size = @filesize(self::ROOT . $file);
+            if ($size === false || $size > self::MAX_BYTES) {
+                continue; // borrado en el arbol de trabajo, o demasiado grande
             }
             $text = @file_get_contents(self::ROOT . $file);
             if (!is_string($text)) {
-                continue; // borrado en el arbol de trabajo pero aun en el indice
+                continue;
             }
             $scanned++;
             if (self::findApiKeyLeaks($text)) {

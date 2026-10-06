@@ -354,12 +354,7 @@ admin_header('Analitica', 'analytics.php');
 // partials/layout.php (bloque ".subdash"), reutilizados por todas las
 // paginas re-skinadas de la Entrega 2 -- no se duplican aqui.
 ?>
-<div class="toolbar">
-  <h1 style="margin:0;">
-    Analitica
-    <?php if ($appName !== null): ?><span class="faint" style="font-size:1rem;">— <?= e($appName) ?></span><?php endif; ?>
-  </h1>
-  <div class="actions">
+<?php ob_start(); ?>
     <?php foreach ($allowedDays as $d): ?>
       <a class="btn <?= $d === $days ? '' : 'ghost' ?> sm"
          href="?days=<?= $d ?><?= $withBots ? '&bots=1' : '' ?><?= e($appQs) ?>"><?= $d === 1 ? '24 h' : $d . 'd' ?></a>
@@ -368,10 +363,9 @@ admin_header('Analitica', 'analytics.php');
       <?= $withBots ? '✓ Bots incluidos' : 'Incluir bots' ?>
     </a>
     <a class="btn ghost sm" href="?days=<?= $days ?>&amp;export=csv<?= e($appQs) ?>">Exportar CSV</a>
-  </div>
-</div>
+<?php page_header('Analitica', '', ob_get_clean(), $appName !== null ? '— ' . $appName : ''); ?>
 <?php if ($appSlug !== '' && $appId === null): ?>
-  <p class="hint" style="color:var(--warn, #c77);">
+  <p class="hint" style="color:var(--warn);">
     No se encontro ninguna app con slug "<?= e($appSlug) ?>" — mostrando datos de todas las apps.
   </p>
 <?php endif; ?>
@@ -586,10 +580,10 @@ admin_header('Analitica', 'analytics.php');
 </div>
 
 <h2>Atribucion (UTM)</h2>
-<div class="card" style="padding:0;">
+<div class="card p-0">
   <div class="scroll-x">
     <table>
-      <thead><tr><th>Origen</th><th>Medio</th><th>Campana</th><th style="text-align:right;">Visitas</th></tr></thead>
+      <thead><tr><th>Origen</th><th>Medio</th><th>Campana</th><th class="text-right">Visitas</th></tr></thead>
       <tbody>
         <?php if (!$utmRows): ?>
           <tr><td colspan="4" class="empty">Sin datos: ningun enlace de entrada trae parametros utm_*.</td></tr>
@@ -599,7 +593,7 @@ admin_header('Analitica', 'analytics.php');
             <td><?= e((string) $r['utm_source']) ?></td>
             <td><?= e((string) ($r['utm_medium'] ?? '—')) ?></td>
             <td><?= e((string) ($r['utm_campaign'] ?? '—')) ?></td>
-            <td style="text-align:right;"><?= (int) $r['c'] ?></td>
+            <td class="text-right"><?= (int) $r['c'] ?></td>
           </tr>
         <?php endforeach; ?>
       </tbody>
@@ -612,10 +606,10 @@ admin_header('Analitica', 'analytics.php');
 </p>
 
 <h2>Origen del trafico (referrers)</h2>
-<div class="card" style="padding:0;">
+<div class="card p-0">
   <div class="scroll-x">
     <table>
-      <thead><tr><th>Referrer</th><th>Canal</th><th style="text-align:right;">Visitas</th></tr></thead>
+      <thead><tr><th>Referrer</th><th>Canal</th><th class="text-right">Visitas</th></tr></thead>
       <tbody>
         <?php if (!$topRefs): ?>
           <tr><td colspan="3" class="empty">Sin datos: todo el trafico llega directo.</td></tr>
@@ -624,7 +618,7 @@ admin_header('Analitica', 'analytics.php');
           <tr>
             <td style="word-break:break-all;"><?= e($r['referrer']) ?></td>
             <td><span class="pill"><?= e(referrer_channel($r['referrer'])) ?></span></td>
-            <td style="text-align:right;"><?= (int) $r['c'] ?></td>
+            <td class="text-right"><?= (int) $r['c'] ?></td>
           </tr>
         <?php endforeach; ?>
       </tbody>
@@ -633,10 +627,10 @@ admin_header('Analitica', 'analytics.php');
 </div>
 
 <h2>Bots y rastreadores</h2>
-<div class="card" style="padding:0;">
+<div class="card p-0">
   <div class="scroll-x">
     <table>
-      <thead><tr><th>User-Agent</th><th style="text-align:right;">Peticiones</th></tr></thead>
+      <thead><tr><th>User-Agent</th><th class="text-right">Peticiones</th></tr></thead>
       <tbody>
         <?php if (!$topBots): ?>
           <tr><td colspan="2" class="empty">Ningun bot registrado en este rango.</td></tr>
@@ -646,7 +640,7 @@ admin_header('Analitica', 'analytics.php');
             <td class="mono faint" style="word-break:break-all; font-size:.78rem;">
               <?= e(mb_substr((string) $r['user_agent'], 0, 140)) ?>
             </td>
-            <td style="text-align:right;"><?= (int) $r['c'] ?></td>
+            <td class="text-right"><?= (int) $r['c'] ?></td>
           </tr>
         <?php endforeach; ?>
       </tbody>
@@ -658,7 +652,7 @@ admin_header('Analitica', 'analytics.php');
   PerplexityBot...). Que aparezcan es buena senal: significa que te estan indexando.
 </p>
 
-<p class="hint" style="margin-top:1.5rem;">
+<p class="hint mt-3">
   <strong>Privacidad:</strong> las IPs se guardan hasheadas con sal (mas user-agent), no se
   usan cookies de seguimiento y no se comparte nada con terceros. Los referrers se almacenan
   sin parametros de query. La sesion (rebote, entrada/salida) se identifica con un id que vive

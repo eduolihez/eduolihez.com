@@ -79,10 +79,7 @@ if ($errors) {
     echo '<div class="flash err">' . e(implode(' ', $errors)) . '</div>';
 }
 ?>
-<div class="toolbar">
-  <h1 style="margin:0;"><?= $isEdit ? 'Editar app' : 'Nueva app' ?></h1>
-  <a class="btn ghost" href="apps.php">&larr; Volver</a>
-</div>
+<?php page_header($isEdit ? 'Editar app' : 'Nueva app', '', '<a class="btn ghost" href="apps.php">&larr; Volver</a>'); ?>
 
 <form method="post" class="card">
   <?= csrf_field() ?>
@@ -106,7 +103,7 @@ if ($errors) {
     de escritorio, no un navegador) no necesita estar aquí.
   </div>
 
-  <label class="checkline" style="margin-top:1rem;">
+  <label class="checkline mt-2">
     <input type="checkbox" name="has_content" value="1" <?= $a['has_content'] ? 'checked' : '' ?>>
     <span>
       <strong>Tiene secciones de contenido propias</strong>
@@ -116,7 +113,7 @@ if ($errors) {
     </span>
   </label>
 
-  <div style="margin-top:1.5rem;">
+  <div class="mt-3">
     <button type="submit" class="btn"><?= $isEdit ? 'Guardar cambios' : 'Crear app' ?></button>
     <a class="btn ghost" href="apps.php">Cancelar</a>
   </div>

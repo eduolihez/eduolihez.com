@@ -71,7 +71,7 @@ $b = static fn(string $k, bool $d = true): bool => setting_on($k, $d);
 admin_header('Ajustes', 'settings.php');
 show_flash();
 ?>
-<h1>Ajustes del sitio</h1>
+<?php page_header('Ajustes del sitio'); ?>
 <?php if ($errors): ?>
   <div class="flash err"><?= e(implode(' ', $errors)) ?></div>
 <?php endif; ?>
@@ -132,7 +132,7 @@ show_flash();
       </span>
     </label>
 
-    <div class="row3" style="margin-bottom:1rem;">
+    <div class="row3 mb-2">
       <div>
         <label for="announcement_es">Texto en español (Markdown)</label>
         <textarea id="announcement_es" name="announcement_es" maxlength="1000" rows="3"
@@ -152,7 +152,7 @@ show_flash();
                   style="width:100%; font-family:monospace; resize:vertical; font-size:0.85rem;"><?= e($v('announcement_ca')) ?></textarea>
       </div>
     </div>
-    <div class="hint" style="margin-bottom:1rem;">Si dejas el inglés o el catalán vacíos, se usará el texto en español. Puedes usar negritas (<code>**texto**</code>), cursivas (<code>*texto*</code>), código (<code>`texto`</code>) y enlaces (<code>[texto](URL)</code>).</div>
+    <div class="hint mb-2">Si dejas el inglés o el catalán vacíos, se usará el texto en español. Puedes usar negritas (<code>**texto**</code>), cursivas (<code>*texto*</code>), código (<code>`texto`</code>) y enlaces (<code>[texto](URL)</code>).</div>
 
     <label for="announcement_url">Enlace del aviso <span class="faint">(opcional)</span></label>
     <input type="text" id="announcement_url" name="announcement_url" maxlength="300"

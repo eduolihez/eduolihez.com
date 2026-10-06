@@ -102,8 +102,7 @@ if ($indexView['view'] === 'picker') {
     admin_header('Resumen global', 'index.php');
     show_flash();
     ?>
-    <h1>Resumen global</h1>
-    <p class="hint" style="margin-bottom:1.5rem;">Últimos 7 días, comparado con los 7 anteriores. Elige un sitio para entrar en su panel.</p>
+    <?php page_header('Resumen global', 'Últimos 7 días, comparado con los 7 anteriores. Elige un sitio para entrar en su panel.'); ?>
 
     <?php if (!$apps): ?>
       <div class="card empty">Todavía no hay sitios registrados. <a href="apps.php">Registra el primero →</a></div>
@@ -380,7 +379,7 @@ $icoShield  = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fi
 admin_header('Panel', 'index.php');
 show_flash();
 ?>
-<h1>Hola, <?= e(current_admin()) ?> 👋</h1>
+<?php page_header('Hola, ' . current_admin() . ' 👋'); ?>
 
 <?php foreach ($warnings as [$type, $html]): ?>
   <div class="flash <?= $type === 'danger' ? 'err' : 'warn' ?>"><?= $html ?></div>
@@ -486,7 +485,7 @@ show_flash();
 <div class="row3">
   <div>
     <h2>Ultimos mensajes</h2>
-    <div class="card" style="padding:0;">
+    <div class="card p-0">
       <table>
         <tbody>
           <?php if (!$lastMessages): ?>
@@ -504,7 +503,7 @@ show_flash();
                 <?php endif; ?>
                 <div class="faint"><?= e($m['subject'] !== '' ? $m['subject'] : '(sin asunto)') ?></div>
               </td>
-              <td class="faint nowrap" style="text-align:right;"><?= e(ago($m['created_at'])) ?></td>
+              <td class="faint nowrap text-right"><?= e(ago($m['created_at'])) ?></td>
             </tr>
           <?php endforeach; ?>
         </tbody>
@@ -526,7 +525,7 @@ show_flash();
 
   <div>
     <h2>Frescura de contenido</h2>
-    <div class="card" style="padding:0;">
+    <div class="card p-0">
       <table>
         <tbody>
           <tr>
@@ -538,7 +537,7 @@ show_flash();
                 <span class="muted">Sin proyectos</span>
               <?php endif; ?>
             </td>
-            <td class="faint nowrap" style="text-align:right;"><?= e(ago($lastProject['d'] ?? null)) ?></td>
+            <td class="faint nowrap text-right"><?= e(ago($lastProject['d'] ?? null)) ?></td>
           </tr>
           <tr>
             <td>
@@ -549,7 +548,7 @@ show_flash();
                 <span class="muted">Sin certificaciones</span>
               <?php endif; ?>
             </td>
-            <td class="faint nowrap" style="text-align:right;"><?= e(ago($lastCert['d'] ?? null)) ?></td>
+            <td class="faint nowrap text-right"><?= e(ago($lastCert['d'] ?? null)) ?></td>
           </tr>
           <tr>
             <td>
@@ -560,7 +559,7 @@ show_flash();
                 <span class="muted">Sin entradas</span>
               <?php endif; ?>
             </td>
-            <td class="faint nowrap" style="text-align:right;"><?= e(ago($lastPost['d'] ?? null)) ?></td>
+            <td class="faint nowrap text-right"><?= e(ago($lastPost['d'] ?? null)) ?></td>
           </tr>
         </tbody>
       </table>

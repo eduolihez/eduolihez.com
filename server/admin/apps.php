@@ -91,17 +91,14 @@ if ($newApiKey):
   </div>
 </div>
 <?php endif; ?>
-<div class="toolbar">
-  <h1 style="margin:0;">Apps <span class="faint" style="font-size:1rem;">(<?= count($rows) ?>)</span></h1>
-  <a class="btn" href="app-edit.php">+ Nueva app</a>
-</div>
+<?php page_header('Apps', '', '<a class="btn" href="app-edit.php">+ Nueva app</a>', '(' . count($rows) . ')'); ?>
 <p class="hint" style="margin-top:-1rem; margin-bottom:1.5rem;">
   Cada app tiene su propio sub-dashboard en <code>admin.eduolihez.com</code> y su propia
   clave para reportar eventos a <code>api.eduolihez.com</code>.
   Ver <code>docs/designs/admin-dashboard.md</code>.
 </p>
 
-<div class="card" style="padding:0;">
+<div class="card p-0">
   <div class="scroll-x">
     <table>
       <thead>
@@ -112,7 +109,7 @@ if ($newApiKey):
           <th>Clave de API</th>
           <th>Orígenes permitidos</th>
           <th>Creada</th>
-          <th style="text-align:right;">Acciones</th>
+          <th class="text-right">Acciones</th>
         </tr>
       </thead>
       <tbody>
@@ -138,18 +135,18 @@ if ($newApiKey):
             <td class="faint"><?= $origins ? (string) count($origins) : '—' ?></td>
             <td class="faint nowrap"><?= e(fdate($a['created_at'])) ?></td>
             <td>
-              <div class="actions" style="justify-content:flex-end;">
+              <div class="actions justify-end">
                 <a class="btn ghost sm" href="analytics.php?app=<?= rawurlencode($a['slug']) ?>">Analitica</a>
                 <a class="btn ghost sm" href="app-edit.php?id=<?= (int) $a['id'] ?>">Editar</a>
                 <form method="post"
                       data-confirm="<?= e($a['api_key_hash'] ? '¿Rotar la clave? La anterior dejará de funcionar al instante.' : '¿Generar clave de API para esta app?') ?>"
-                      style="display:inline;">
+                      class="d-inline">
                   <?= csrf_field() ?>
                   <input type="hidden" name="action" value="generate_key">
                   <input type="hidden" name="id" value="<?= (int) $a['id'] ?>">
                   <button type="submit" class="btn ghost sm"><?= $a['api_key_hash'] ? 'Rotar clave' : 'Generar clave' ?></button>
                 </form>
-                <form method="post" data-confirm="¿Eliminar esta app? Los eventos ya recibidos se conservan." style="display:inline;">
+                <form method="post" data-confirm="¿Eliminar esta app? Los eventos ya recibidos se conservan." class="d-inline">
                   <?= csrf_field() ?>
                   <input type="hidden" name="action" value="delete">
                   <input type="hidden" name="id" value="<?= (int) $a['id'] ?>">

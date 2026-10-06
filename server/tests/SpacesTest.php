@@ -231,4 +231,46 @@ final class SpacesTest extends TestCase
             }
         }
     }
+
+    public function testSpaceForAppSlug(): void
+    {
+        $this->assertSame('site', space_for_app_slug('eduolihez'));
+        $this->assertSame('phishlab', space_for_app_slug('phishlab'));
+        $this->assertSame('app:nowait', space_for_app_slug('nowait'));
+    }
+
+    public function testIndexViewGlobalEsSelector(): void
+    {
+        $this->assertSame(['view' => 'picker', 'to' => null], index_view('global', null));
+    }
+
+    public function testIndexViewSiteConContenidoEsDashboard(): void
+    {
+        $this->assertSame(['view' => 'dashboard', 'to' => null], index_view('site', ['has_content' => 1]));
+    }
+
+    public function testIndexViewAppSinContenidoRedirigeAAnalitica(): void
+    {
+        $this->assertSame(
+            ['view' => 'redirect', 'to' => 'analytics.php?space=app%3Anowait'],
+            index_view('app:nowait', ['has_content' => 0])
+        );
+    }
+
+    public function testIndexViewAppConContenidoEsDashboard(): void
+    {
+        $this->assertSame('dashboard', index_view('app:otra', ['has_content' => '1'])['view']);
+    }
+
+    public function testIndexViewPhishlabRedirigeSiempre(): void
+    {
+        $expected = ['view' => 'redirect', 'to' => 'analytics.php?space=phishlab'];
+        $this->assertSame($expected, index_view('phishlab', null));
+        $this->assertSame($expected, index_view('phishlab', ['has_content' => 1]));
+    }
+
+    public function testIndexViewFilaDesconocidaEsDashboardAZeros(): void
+    {
+        $this->assertSame(['view' => 'dashboard', 'to' => null], index_view('app:fantasma', null));
+    }
 }

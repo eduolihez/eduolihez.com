@@ -29,7 +29,9 @@ $withBots = ($_GET['bots'] ?? '') === '1';
 // hoy). El futuro selector de apps enlazara aqui con ?app=<slug>. $appId sale
 // siempre de una consulta parametrizada -> se puede interpolar como INT en el
 // resto de SQL de este archivo sin riesgo de inyeccion.
-$appSlug = (string) ($_GET['app'] ?? '');
+// El slug sale del espacio activo (?space=, o ?app= como alias legado);
+// Global -> '' -> sin filtro.
+$appSlug = admin_app_slug() ?? '';
 $appId   = null;
 $appName = null;
 if ($appSlug !== '') {
@@ -42,7 +44,7 @@ if ($appSlug !== '') {
     }
 }
 $appFilterSql = $appId !== null ? " AND app_id = $appId" : '';
-$appQs        = $appSlug !== '' ? '&app=' . rawurlencode($appSlug) : '';
+$appQs        = '&space=' . urlencode(admin_space());
 
 $botFilter = ($withBots ? '1=1' : 'is_bot = 0') . $appFilterSql;
 

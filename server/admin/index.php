@@ -82,16 +82,27 @@ function rows_of(string $sql, array $params = []): array
 // Proyectos/Certificaciones/Blog que esa app no tiene), asi que se redirige
 // a analytics.php?app=<slug>, que ya muestra exactamente lo que SI aplica
 // (visitas/dispositivos/navegador) sin duplicar esa vista aqui.
-$currentAppSlug = (string) ($_GET['app'] ?? '');
+// El espacio activo (admin_space(), que acepta ?space= y el alias ?app=)
+// decide la vista: ver index_view() en partials/spaces.php.
+$currentSpace = admin_space();
+$currentAppSlug = (string) admin_app_slug();
+$selectedApp = $currentAppSlug !== ''
+    ? (rows_of('SELECT id, has_content FROM apps WHERE slug = ?', [$currentAppSlug])[0] ?? null)
+    : null;
+$indexView = index_view($currentSpace, $selectedApp);
 
-if ($currentAppSlug === '') {
+if ($indexView['view'] === 'redirect') {
+    redirect($indexView['to']);
+}
+
+if ($indexView['view'] === 'picker') {
     $apps = rows_of('SELECT id, slug, display_name, has_content FROM apps ORDER BY created_at ASC');
     $sparkColors = ['', 'cyan', 'violet', 'warn']; // ciclan si hay mas de 4 apps
 
-    admin_header('Selector de sitios', 'index.php');
+    admin_header('Resumen global', 'index.php');
     show_flash();
     ?>
-    <h1>¿Qué sitio quieres ver?</h1>
+    <h1>Resumen global</h1>
     <p class="hint" style="margin-bottom:1.5rem;">Últimos 7 días, comparado con los 7 anteriores. Elige un sitio para entrar en su panel.</p>
 
     <?php if (!$apps): ?>
@@ -144,9 +155,10 @@ if ($currentAppSlug === '') {
               $sparkVals[] = $byDay[date('Y-m-d', strtotime("-$d day"))] ?? 0;
           }
 
+          $appSpace = urlencode(space_for_app_slug((string) $app['slug']));
           $href = $app['has_content']
-              ? 'index.php?app=' . rawurlencode($app['slug'])
-              : 'analytics.php?app=' . rawurlencode($app['slug']);
+              ? 'index.php?space=' . $appSpace
+              : 'analytics.php?space=' . $appSpace;
           $color = $sparkColors[$i % count($sparkColors)];
           $initial = mb_strtoupper(mb_substr($app['display_name'], 0, 1));
           ?>
@@ -186,11 +198,7 @@ if ($currentAppSlug === '') {
     exit;
 }
 
-// --- App sin contenido propio: no hay dashboard aqui, ver comentario arriba.
-$selectedApp = rows_of('SELECT id, has_content FROM apps WHERE slug = ?', [$currentAppSlug])[0] ?? null;
-if ($selectedApp !== null && !$selectedApp['has_content']) {
-    redirect('analytics.php?app=' . rawurlencode($currentAppSlug));
-}
+// App sin contenido propio: ya redirigida arriba (index_view).
 // $selectedApp === null pasa si la URL trae un ?app= que no existe en la
 // tabla (borrado entre medias, o escrito a mano): 0 nunca hace match con un
 // id real, asi que las secciones de trafico salen todas a cero en vez de

@@ -111,6 +111,37 @@ function resolve_space(array $get, array $session, array $appSlugs, string $page
     return page_spaces($page)[0];
 }
 
+/** Id de espacio de una app de la tabla `apps` (inverso de space_app_slug). */
+function space_for_app_slug(string $slug): string
+{
+    if ($slug === 'eduolihez') {
+        return SPACE_SITE;
+    }
+    if ($slug === 'phishlab') {
+        return SPACE_PHISHLAB;
+    }
+    return 'app:' . $slug;
+}
+
+/**
+ * Decide que muestra index.php. $appRow = fila de `apps` del espacio (al menos
+ * 'has_content') o null si no existe. Devuelve ['view' => 'picker'|'dashboard'|
+ * 'redirect', 'to' => url|null]. Global -> selector; PhishLab y apps sin
+ * contenido -> redirect a analytics.php; resto (incluida fila desconocida, que
+ * da el dashboard a ceros) -> dashboard.
+ */
+function index_view(string $space, ?array $appRow): array
+{
+    if ($space === SPACE_GLOBAL) {
+        return ['view' => 'picker', 'to' => null];
+    }
+    $noContent = $space === SPACE_PHISHLAB || ($appRow !== null && !$appRow['has_content']);
+    if ($noContent) {
+        return ['view' => 'redirect', 'to' => 'analytics.php?space=' . urlencode($space)];
+    }
+    return ['view' => 'dashboard', 'to' => null];
+}
+
 /**
  * Opciones del selector de espacio. $apps = filas ['slug','display_name'].
  * Global, eduolihez.com, PhishLab y despues cada app restante.

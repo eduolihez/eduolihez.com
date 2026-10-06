@@ -15,7 +15,8 @@ Cubre el lado **TypeScript/Astro** (`src/`).
 El backend en PHP (`server/`) usa **PHPUnit** (`composer.json` +
 `phpunit.xml`, raíz del repo) — instalación e iniciativa separadas de Vitest,
 sin relación entre ambos runners. Cubre solo código SIN dependencias externas
-(de momento: `server/lib/text.php` y `server/lib/validate.php`) —
+(de momento: `server/lib/text.php`, `server/lib/validate.php` y la lógica
+de espacios del panel, `server/admin/partials/spaces.php` e `icons.php`) —
 `server/tests/bootstrap.php` deja claro por qué no arranca
 `server/lib/http.php` ni `config.php`: eso abriría una conexión real a MySQL
 de producción, que no existe (ni debe existir) en un entorno de test o CI, y
@@ -29,6 +30,13 @@ npm test              # TypeScript/Astro (Vitest)
 composer install       # PHP: instala PHPUnit (solo la primera vez)
 composer test          # PHP (PHPUnit)
 ```
+
+`npm test` corre en CI en cada push/PR a `master`
+(`.github/workflows/test.yml`, check "Vitest"). La suite de PHPUnit **no**
+está todavía en ese workflow — se montó en esta misma sesión sin un entorno
+PHP a mano para verificarla en ejecución real, así que antes de darla por
+buena en CI hay que correr `composer test` una vez en una máquina con PHP
+8.1+ y confirmar que pasa.
 
 ### PHP en local sin Composer
 
@@ -48,13 +56,6 @@ tests de `server/tests/` no deben cargar `auth.php`, `http.php` ni `db.php`
 (ver el comentario de `server/tests/bootstrap.php`). Por eso
 `server/admin/partials/spaces.php` y `icons.php` son puras: sin dependencias
 de esos archivos, se pueden testear (`SpacesTest`).
-
-`npm test` corre en CI en cada push/PR a `master`
-(`.github/workflows/test.yml`, check "Vitest"). La suite de PHPUnit **no**
-está todavía en ese workflow — se montó en esta misma sesión sin un entorno
-PHP a mano para verificarla en ejecución real, así que antes de darla por
-buena en CI hay que correr `composer test` una vez en una máquina con PHP
-8.1+ y confirmar que pasa.
 
 ## Capas de test
 
@@ -77,7 +78,9 @@ buena en CI hay que correr `composer test` una vez en una máquina con PHP
   de los artículos del blog) y `validate_public_url()` (el esquema de URL
   permitido en los formularios de `/admin`, incluidos los mismos bypass de
   `\`/`//`/tabulador que en `safeUrl()` — misma regla, dos implementaciones
-  independientes que no comparten fuente).
+  independientes que no comparten fuente). También la lógica pura de
+  espacios del panel admin (`server/admin/partials/spaces.php`, en
+  `server/tests/SpacesTest.php`).
 - **Integration / E2E:** no hay todavía. El sitio es principalmente
   contenido estático + un backend PHP que no se puede correr en local sin
   PHP instalado (ver `PRODUCT.md`, sección "Operating Context").

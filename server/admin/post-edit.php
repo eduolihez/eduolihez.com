@@ -178,7 +178,7 @@ admin_header($isEdit ? 'Editar Artículo' : 'Nuevo Artículo', 'posts.php');
     </div>
     <div>
       <label for="slug">Enlace (Slug) <span class="faint">(auto-generado)</span></label>
-      <input type="text" id="slug" name="slug" value="<?= e($p['slug']) ?>" placeholder="ej-deteccion-ransomware-windows" required>
+      <input type="text" id="slug" name="slug" value="<?= e($p['slug']) ?>" placeholder="ej-deteccion-ransomware-windows" required<?= $isEdit ? '' : ' data-slug-auto' ?>>
     </div>
   </div>
 
@@ -264,37 +264,7 @@ admin_header($isEdit ? 'Editar Artículo' : 'Nuevo Artículo', 'posts.php');
   </div>
 </form>
 
-<script>
-  // Autogeneración del slug a partir del título en tiempo real (solo al crear)
-  document.addEventListener('DOMContentLoaded', () => {
-    const titleIn = document.getElementById('title');
-    const slugIn = document.getElementById('slug');
-    const isEdit = <?= $isEdit ? 'true' : 'false' ?>;
-
-    let manualSlug = isEdit;
-
-    if (slugIn) {
-      slugIn.addEventListener('input', () => {
-        manualSlug = true;
-      });
-    }
-
-    if (titleIn && slugIn && !isEdit) {
-      titleIn.addEventListener('input', () => {
-        if (!manualSlug) {
-          slugIn.value = titleIn.value
-            .toLowerCase()
-            .normalize('NFD') // Quitar acentos
-            .replace(/[\u0300-\u036f]/g, '')
-            .replace(/[^a-z0-9\s-]/g, '') // Eliminar caracteres especiales
-            .trim()
-            .replace(/\s+/g, '-') // Cambiar espacios por guiones
-            .replace(/-+/g, '-'); // Quitar guiones duplicados
-        }
-      });
-    }
-  });
-</script>
+<script src="<?= e(asset_url('post-edit.js')) ?>"></script>
 <?php
 admin_footer();
 ?>

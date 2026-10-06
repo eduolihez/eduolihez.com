@@ -1,0 +1,169 @@
+name: "Admin"
+
+# Tests del backend PHP (server/) y del panel /admin. Separado de test.yml a
+# proposito: el job "Vitest" de alli es un check OBLIGATORIO de la proteccion
+# de rama y no puede llevar filtro de rutas (un PR que no lo lanzara se
+# quedaria esperando para siempre). Estos jobs no son obligatorios, asi que
+# si pueden saltarse cuando el cambio no toca nada del backend.
+on:
+  push:
+    branches: [ "master" ]
+    paths:
+      - "server/**"
+      - "database/**"
+      - "e2e/**"
+      - "scripts/**"
+      - "composer.json"
+      - "phpunit.xml"
+      - ".github/workflows/admin.yml"
+  pull_request:
+    branches: [ "master" ]
+    paths:
+      - "server/**"
+      - "database/**"
+      - "e2e/**"
+      - "scripts/**"
+      - "composer.json"
+      - "phpunit.xml"
+      - ".github/workflows/admin.yml"
+
+permissions:
+  contents: read
+
+# Igual que en test.yml: evita ejecuciones solapadas sobre la misma rama.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # PHPUnit: codigo PHP sin base de datos (server/tests/bootstrap.php explica
+  # por que esta suite no carga auth.php/http.php/db.php).
+  # ---------------------------------------------------------------------------
+  phpunit:
+    name: PHPUnit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Descargar el repositorio
+        uses: actions/checkout@v7
+
+      - name: Configurar PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          extensions: mbstring, pdo_mysql
+          coverage: none
+
+      - name: Instalar dependencias (Composer)
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Ejecutar PHPUnit
+        run: composer test
+
+  # ---------------------------------------------------------------------------
+  # E2E: el panel de verdad (PHP + MariaDB) en Chromium, con Playwright.
+  # La base de datos es un contenedor desechable que nace vacio en cada
+  # ejecucion: las credenciales de abajo NO son secretos, solo valen dentro
+  # de este job y el contenedor se destruye al terminar.
+  # ---------------------------------------------------------------------------
+  e2e:
+    name: E2E (Playwright)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      mariadb:
+        image: mariadb:10.11
+        env:
+          MARIADB_ROOT_PASSWORD: ci-only-root-throwaway
+          MARIADB_DATABASE: eduolihez_test
+        ports:
+          - 3306:3306
+        # healthcheck.sh viene en la imagen oficial: espera a que InnoDB este
+        # listo, no solo a que el puerto escuche (si no, el import de abajo
+        # puede llegar antes de tiempo).
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
+
+    env:
+      DB_HOST: 127.0.0.1
+      DB_PORT: "3306"
+      DB_NAME: eduolihez_test
+      DB_USER: root
+      DB_PASS: ci-only-root-throwaway
+      E2E_USER: e2e
+      E2E_PASSWORD: ci-only-e2e-password
+      E2E_BASE_URL: http://127.0.0.1:8081
+
+    steps:
+      - name: Descargar el repositorio
+        uses: actions/checkout@v7
+
+      - name: Configurar PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          # fileinfo: lo usa server/lib/upload.php (finfo) para validar imagenes.
+          extensions: mbstring, pdo_mysql, fileinfo
+          coverage: none
+
+      - name: Configurar Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: e2e/package-lock.json
+
+      - name: Importar el esquema en MariaDB
+        env:
+          MYSQL_PWD: ${{ env.DB_PASS }}
+        run: >-
+          mysql --host="$DB_HOST" --port="$DB_PORT" --user="$DB_USER"
+          --default-character-set=utf8mb4 "$DB_NAME" < database/schema.sql
+
+      # config.php no se versiona: se genera desde la plantilla apuntando al
+      # contenedor y con el correo apagado (el formulario de contacto no se
+      # prueba aqui y no hay servidor de correo).
+      - name: Generar server/config.php
+        run: |
+          sed \
+            -e "s/'host'    => 'localhost'/'host'    => '$DB_HOST'/" \
+            -e "s/'TU_BASE_DE_DATOS'/'$DB_NAME'/" \
+            -e "s/'TU_USUARIO_DB'/'$DB_USER'/" \
+            -e "s/'TU_PASSWORD_DB'/'$DB_PASS'/" \
+            -e "s/'enabled' => true/'enabled' => false/" \
+            server/config.example.php > server/config.php
+          php -r '$c = require "server/config.php"; if ($c["db"]["host"] !== getenv("DB_HOST") || $c["db"]["name"] !== getenv("DB_NAME") || $c["mail"]["enabled"] !== false) { fwrite(STDERR, "config.php mal generado\n"); exit(1); } echo "config.php OK\n";'
+
+      - name: Sembrar datos de test
+        run: php e2e/seed/seed.php
+
+      - name: Instalar dependencias (npm)
+        working-directory: e2e
+        run: npm ci
+
+      - name: Instalar Chromium de Playwright
+        working-directory: e2e
+        run: npx playwright install --with-deps chromium
+
+      # El webServer de playwright.config.cjs arranca `php -S` con el PHP de
+      # arriba (no hay servidor previo que reutilizar).
+      - name: Ejecutar Playwright
+        working-directory: e2e
+        run: npx playwright test
+
+      - name: Subir informe y capturas
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: |
+            e2e/playwright-report/
+            e2e/test-results/
+          if-no-files-found: ignore
+          retention-days: 7

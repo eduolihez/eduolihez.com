@@ -120,7 +120,13 @@ y el versionado usa cuatro números (`MAJOR.MINOR.PATCH.MICRO`).
 
 - Lo más cómodo es el zip `eduolihez.com-admin-cambios-<tag>.zip` de la
   Release (o `bash scripts/pack-admin.sh --mode changes --from <tag-anterior>`):
-  trae solo lo que cambió, con la estructura de `public_html/`.
+  trae solo lo que cambió, con la estructura de `public_html/`. Solo es
+  correcto si el hosting está exactamente en el tag anterior (el
+  versionado automático crea un tag por push): si te saltaste versiones, usa
+  el zip completo o `--mode changes --from <tag desplegado>`.
+- Los paquetes del panel nunca incluyen `setup.php`; una instalación **nueva**
+  lo necesita para crear el primer usuario: sube `server/admin/setup.php`
+  desde la carpeta `server` de `eduolihez.com-<tag>.zip` y bórralo después.
 - Archivos nuevos en `server/admin/`: `assets/admin.css`, `assets/theme.js`,
   `assets/post-edit.js`, `assets/auth.css`, `assets/favicon.svg`,
   `partials/spaces.php` y `partials/icons.php`. Modificados: `auth.php`,

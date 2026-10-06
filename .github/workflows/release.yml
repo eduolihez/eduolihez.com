@@ -124,6 +124,8 @@ jobs:
           - Descomprime y copia el contenido de `public_html/` sobre el `public_html/` del hosting, sobrescribiendo.
           - Si el zip trae `ELIMINAR.txt`, borra a mano en el hosting los ficheros que lista.
           - No subas ni sobrescribas `config.php` ni `setup.php`: no van en el paquete.
+          - El zip de cambios solo es correcto si el hosting está exactamente en la versión anterior (se crea un tag por push). Si te saltaste versiones, usa el zip completo o `bash scripts/pack-admin.sh --mode changes --from <tag desplegado>`.
+          - Primera instalación: los paquetes del panel no incluyen `setup.php`, que hace falta para crear el usuario administrador. Súbelo desde la carpeta `server` de `eduolihez.com-<tag>.zip` (`server/admin/setup.php`) y bórralo del hosting después.
           EOF
 
       # La lista de "files" es multilinea; las lineas vacias se ignoran, asi que

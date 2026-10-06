@@ -214,6 +214,14 @@ Cada push a `master` crea un tag y una Release en GitHub (`release.yml`) con el 
 `eduolihez.com-admin-<tag>.zip` (completo) y `eduolihez.com-admin-cambios-<tag>.zip`
 (solo lo que cambió desde el tag anterior; no se genera si no cambió nada en `server/`).
 
+El zip de cambios solo es correcto si el hosting está exactamente en el tag anterior
+(el versionado automático crea un tag por push): si te saltaste versiones, sube el zip
+completo o genera el rango con `bash scripts/pack-admin.sh --mode changes --from <tag desplegado>`.
+Ninguno de los paquetes incluye `admin/setup.php`, que una instalación **nueva** necesita
+(paso «Crea tu usuario de administrador»): en la primera instalación sube
+`server/admin/setup.php` desde la carpeta `server` del zip `eduolihez.com-<tag>.zip` (o del
+repo) y bórralo del hosting después.
+
 ---
 
 ## Más documentación

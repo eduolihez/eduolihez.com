@@ -17,9 +17,38 @@
  *   #theme-toggle       -> alterna data-theme (light/dark) en <html>, lo guarda
  *                        en localStorage ('admin-theme') y actualiza aria-pressed.
  *                        El tema inicial lo fija theme.js desde el <head>.
+ *   #sidebar-open-btn / #sidebar-close-btn / #sidebar-overlay -> abren y
+ *                        cierran el cajon lateral movil (clase .open en
+ *                        #admin-sidebar y en el overlay).
  */
 (function () {
   'use strict';
+
+  // --- Cajon lateral movil -------------------------------------------------
+  function initSidebarDrawer() {
+    var openBtn = document.getElementById('sidebar-open-btn');
+    var closeBtn = document.getElementById('sidebar-close-btn');
+    var overlay = document.getElementById('sidebar-overlay');
+    var sidebar = document.getElementById('admin-sidebar');
+
+    function toggleSidebar(state) {
+      if (sidebar && overlay) {
+        sidebar.classList.toggle('open', state);
+        overlay.classList.toggle('open', state);
+        document.body.style.overflow = state ? 'hidden' : '';
+      }
+    }
+
+    if (openBtn) openBtn.addEventListener('click', function () { toggleSidebar(true); });
+    if (closeBtn) closeBtn.addEventListener('click', function () { toggleSidebar(false); });
+    if (overlay) overlay.addEventListener('click', function () { toggleSidebar(false); });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSidebarDrawer);
+  } else {
+    initSidebarDrawer();
+  }
 
   // --- Interruptor de tema -----------------------------------------------
   // Si localStorage esta bloqueado el tema cambia igual, solo que no persiste.

@@ -30,15 +30,59 @@ function asset_url(string $file): string
     return 'assets/' . $file . '?v=' . filemtime($path);
 }
 
+require_once __DIR__ . '/spaces.php';
+require_once __DIR__ . '/icons.php';
+
+/**
+ * Contexto de espacio de la peticion actual: ['space' => id, 'apps' => filas
+ * slug/display_name]. UNICO sitio donde se resuelve el espacio (lo usan
+ * admin_header y admin_space). Memoizado; la tabla `apps` puede no existir
+ * todavia (migracion sin correr) -> [] sin tumbar el panel.
+ */
+function admin_space_context(): array
+{
+    static $ctx = null;
+    if ($ctx !== null) {
+        return $ctx;
+    }
+    try {
+        $apps = db()->query('SELECT slug, display_name FROM apps ORDER BY created_at ASC')->fetchAll();
+    } catch (Throwable $e) {
+        $apps = [];
+    }
+    $slugs = array_map(static fn(array $a): string => (string) $a['slug'], $apps);
+    $page  = basename((string) ($_SERVER['SCRIPT_NAME'] ?? ''));
+    $ctx = [
+        'space' => resolve_space($_GET, $_SESSION ?? [], $slugs, $page),
+        'apps'  => $apps,
+    ];
+    return $ctx;
+}
+
+/** Espacio activo de la peticion actual (valido antes y despues de admin_header). */
+function admin_space(): string
+{
+    return admin_space_context()['space'];
+}
+
+/** Slug de `apps` del espacio activo, o null en Global. */
+function admin_app_slug(): ?string
+{
+    return space_app_slug(admin_space());
+}
+
 function admin_header(string $title, string $active = ''): void
 {
     $user = function_exists('current_admin') ? current_admin() : '';
 
+    $ctx      = admin_space_context();
+    $space    = $ctx['space'];
+    $appsRows = $ctx['apps'];
+    $_SESSION['admin_space'] = $space;
+
     // Contadores para los "badges" del menu. Cada uno tolera que falte la
     // tabla (BD recien creada, migracion a medias) devolviendo 0 en vez de
-    // tumbar el panel entero -- por eso el conteo pasa por un closure que
-    // atrapa el Throwable de cada query por separado en lugar de una sola
-    // vez alrededor de las cuatro.
+    // tumbar el panel entero, y solo se piden los del espacio visible.
     $countSafe = static function (string $sql): int {
         try {
             return (int) db()->query($sql)->fetchColumn();
@@ -46,96 +90,34 @@ function admin_header(string $title, string $active = ''): void
             return 0;
         }
     };
-    $unread             = $countSafe('SELECT COUNT(*) FROM messages WHERE is_read = 0 AND is_archived = 0');
-    $publishedProjects  = $countSafe("SELECT COUNT(*) FROM projects WHERE status = 'published'");
-    $visibleCerts       = $countSafe('SELECT COUNT(*) FROM certifications WHERE visible = 1');
-    $visiblePosts       = $countSafe('SELECT COUNT(*) FROM posts WHERE visible = 1');
-
-    // Selector de apps (docs/designs/admin-dashboard.md): que sub-dashboard
-    // se esta viendo. Mismo patron try/catch que $countSafe -- la tabla
-    // puede no existir todavia si la migracion no se ha corrido.
-    try {
-        $appsList = db()->query('SELECT slug, display_name, has_content FROM apps ORDER BY created_at ASC')->fetchAll();
-    } catch (Throwable $e) {
-        $appsList = [];
+    $counts = [];
+    if ($space === SPACE_GLOBAL) {
+        $counts['unread'] = $countSafe('SELECT COUNT(*) FROM messages WHERE is_read = 0 AND is_archived = 0');
+        $counts['apps']   = $countSafe('SELECT COUNT(*) FROM apps');
+    } elseif ($space === SPACE_SITE) {
+        $counts['projects'] = $countSafe("SELECT COUNT(*) FROM projects WHERE status = 'published'");
+        $counts['certs']    = $countSafe('SELECT COUNT(*) FROM certifications WHERE visible = 1');
+        $counts['posts']    = $countSafe('SELECT COUNT(*) FROM posts WHERE visible = 1');
+    } elseif ($space === SPACE_PHISHLAB) {
+        $counts['lab_users'] = $countSafe('SELECT COUNT(*) FROM lab_users');
     }
-    $currentAppSlug = (string) ($_GET['app'] ?? '');
-    $currentAppName = null;
-    $currentAppHasContent = null; // null = ningun app concreto seleccionado ("todas las apps")
-    foreach ($appsList as $ap) {
-        if ($ap['slug'] === $currentAppSlug) {
-            $currentAppName = $ap['display_name'];
-            $currentAppHasContent = (bool) $ap['has_content'];
+
+    $navGroups    = space_nav($space, $counts);
+    $spaceOptions = space_options($appsRows);
+    $spaceLabel   = $space;
+    foreach ($spaceOptions as $opt) {
+        if ($opt['id'] === $space) {
+            $spaceLabel = $opt['label'];
             break;
         }
     }
-    // Selector de sitios (2026-09-08): secciones de contenido propio
-    // (Proyectos/Certificaciones/Blog/Mensajes) solo tienen sentido para una
-    // app que de verdad los gestiona -- eduolihez.com si, nowait (sitio
-    // estatico sin CMS) no. "Todas las apps" (sin selecionar ninguna) se
-    // trata como el contexto por defecto de siempre, para no cambiar el
-    // comportamiento de nadie que no haya tocado el selector todavia.
-    $showContentNav = $currentAppSlug === '' || $currentAppHasContent === true;
-    $contentOnlyPages = ['projects.php', 'certifications.php', 'posts.php', 'messages.php'];
-    // Query string que mantiene viva la app seleccionada al navegar por el
-    // menu -- sin esto, cada clic del sidebar perdia el ?app= y volvia
-    // silenciosamente a la vista "todas las apps" en la pagina siguiente.
-    $appQs = $currentAppSlug !== '' ? '?app=' . rawurlencode($currentAppSlug) : '';
-
-    // [etiqueta_grupo, url, [titulo, badge, icono, tipo_badge]]. tipo_badge:
-    // 'alert' (verde/llamada a la accion, como Mensajes) o 'count' (gris,
-    // solo informativo). Grupo '' no imprime cabecera (Panel va suelto).
-    $navGroups = [
-        '' => [
-            'index.php' => ['Panel', '', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>', 'count'],
-        ],
-        'Contenido' => [
-            'projects.php'       => ['Proyectos', (string) $publishedProjects, '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>', 'count'],
-            'certifications.php' => ['Certificaciones', (string) $visibleCerts, '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg>', 'count'],
-            'posts.php'          => ['Blog', (string) $visiblePosts, '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 4a2 2 0 012 2v6a2 2 0 01-2 2h-2m-4-6h.01M9 16h.01M9 12h.01M12 12h.01M12 16h.01M16 16h.01M16 12h.01" /></svg>', 'count'],
-        ],
-        'Actividad' => [
-            'messages.php'  => ['Mensajes', $unread > 0 ? (string) $unread : '', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>', 'alert'],
-            'analytics.php' => ['Analítica', '', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>', 'count'],
-        ],
-        // Antes "Multi-proyecto": colisionaba con "Proyectos" de arriba
-        // (tarjetas del portfolio, tabla `projects`) aunque hablan de cosas
-        // distintas -- este grupo es sobre `apps` (sitios con su propio
-        // sub-dashboard en admin.eduolihez.com). Ver tambien el comentario
-        // en database/schema.sql sobre esta misma confusion de nombres.
-        'Apps' => [
-            // admin.eduolihez.com (docs/designs/admin-dashboard.md): registro
-            // de apps con su propio sub-dashboard y clave de ingesta.
-            'apps.php' => ['Gestionar apps', (string) $countSafe('SELECT COUNT(*) FROM apps'), '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>', 'count'],
-            // Cuentas de lab.eduolihez.com (PhishLab completo) -- gate propio
-            // en PHP, ver server/lab/auth.php. Vive aparte de admin_users.
-            // Etiqueta acortada de "PhishLab · Usuarios": con el nombre largo
-            // partia en dos lineas a los 260px del sidebar. El icono de
-            // persona + el contador ya dejan claro que es la lista de accesos.
-            'lab-users.php' => ['PhishLab', (string) $countSafe('SELECT COUNT(*) FROM lab_users'), '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>', 'count'],
-        ],
-        'Sistema' => [
-            'integrations.php' => ['Integraciones', '', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 010 5.656l-3 3a4 4 0 01-5.656-5.656l1.5-1.5M10.172 13.828a4 4 0 010-5.656l3-3a4 4 0 015.656 5.656l-1.5 1.5" /></svg>', 'count'],
-            'security.php' => ['Seguridad', '', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>', 'count'],
-            'settings.php' => ['Ajustes', '', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>', 'count'],
-            'backup.php'   => ['Backup', '', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" /></svg>', 'count'],
-        ],
-    ];
-
-    // Oculta las secciones de contenido propio (Proyectos/Certificaciones/
-    // Blog/Mensajes) cuando la app seleccionada no las gestiona (ver
-    // $showContentNav mas arriba). Si un grupo se queda sin items despues de
-    // filtrar, se quita entero para no imprimir una cabecera vacia.
-    if (!$showContentNav) {
-        foreach ($navGroups as $groupLabel => $items) {
-            foreach ($contentOnlyPages as $page) {
-                unset($navGroups[$groupLabel][$page]);
-            }
-            if (!$navGroups[$groupLabel]) {
-                unset($navGroups[$groupLabel]);
-            }
-        }
-    }
+    // Pagina de inicio de cada espacio (destino de las opciones del selector).
+    $spaceHome = static function (string $id): string {
+        $page = $id === SPACE_GLOBAL ? 'index.php'
+            : ($id === SPACE_SITE ? 'projects.php'
+            : ($id === SPACE_PHISHLAB ? 'lab-users.php' : 'analytics.php'));
+        return $page . '?space=' . rawurlencode($id);
+    };
     ?>
 <!doctype html>
 <html lang="es">
@@ -170,22 +152,18 @@ function admin_header(string $title, string $active = ''): void
     <div class="sidebar-header">
       <div class="brand-block">
         <a href="index.php" class="brand">&gt;_ <span>admin</span></a>
-        <?php if ($appsList): ?>
-          <details class="app-switcher">
-            <summary>
-              <span class="app-switcher-current"><?= e($currentAppName ?? 'Todas las apps') ?></span>
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6" /></svg>
-            </summary>
-            <div class="app-switcher-menu">
-              <a href="index.php" class="<?= $currentAppSlug === '' ? 'active' : '' ?>">Selector de sitios</a>
-              <?php foreach ($appsList as $ap): ?>
-                <a href="index.php?app=<?= e(rawurlencode($ap['slug'])) ?>"
-                   class="<?= $currentAppSlug === $ap['slug'] ? 'active' : '' ?>"><?= e($ap['display_name']) ?></a>
-              <?php endforeach; ?>
-              <a href="apps.php" class="app-switcher-manage">Gestionar apps &rarr;</a>
-            </div>
-          </details>
-        <?php endif; ?>
+        <details class="app-switcher">
+          <summary>
+            <span class="app-switcher-current"><?= e($spaceLabel) ?></span>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6" /></svg>
+          </summary>
+          <div class="app-switcher-menu">
+            <?php foreach ($spaceOptions as $opt): ?>
+              <a href="<?= e($spaceHome($opt['id'])) ?>"
+                 class="<?= $opt['id'] === $space ? 'active' : '' ?>"><?= e($opt['label']) ?></a>
+            <?php endforeach; ?>
+          </div>
+        </details>
       </div>
       <button id="sidebar-close-btn" class="sidebar-toggle-btn mobile-only" aria-label="Cerrar menu">
         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
@@ -193,16 +171,16 @@ function admin_header(string $title, string $active = ''): void
     </div>
     
     <nav class="sidebar-menu">
-      <?php foreach ($navGroups as $groupLabel => $items): ?>
-        <?php if ($groupLabel !== ''): ?>
-          <p class="nav-group-label"><?= e($groupLabel) ?></p>
+      <?php foreach ($navGroups as $group): ?>
+        <?php if ($group['label'] !== ''): ?>
+          <p class="nav-group-label"><?= e($group['label']) ?></p>
         <?php endif; ?>
-        <?php foreach ($items as $file => [$label, $badge, $icon, $badgeType]): ?>
-          <a href="<?= e($file . $appQs) ?>" class="menu-item <?= $active === $file ? 'active' : '' ?>">
-            <span class="menu-icon"><?= $icon ?></span>
-            <span class="menu-label"><?= e($label) ?></span>
-            <?php if ($badge !== ''): ?>
-              <span class="badge-<?= $badgeType === 'alert' ? 'count' : 'muted' ?>"><?= e($badge) ?></span>
+        <?php foreach ($group['items'] as $item): ?>
+          <a href="<?= e($item['href']) ?>" class="menu-item <?= $active === $item['page'] ? 'active' : '' ?>">
+            <span class="menu-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><?= nav_icon($item['icon']) ?></svg></span>
+            <span class="menu-label"><?= e($item['label']) ?></span>
+            <?php if ($item['badge'] !== ''): ?>
+              <span class="badge-<?= $item['badge_type'] === 'alert' ? 'count' : 'muted' ?>"><?= e($item['badge']) ?></span>
             <?php endif; ?>
           </a>
         <?php endforeach; ?>
@@ -265,27 +243,7 @@ function admin_footer(): void
   </div>
 </div>
 
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const openBtn = document.getElementById('sidebar-open-btn');
-    const closeBtn = document.getElementById('sidebar-close-btn');
-    const overlay = document.getElementById('sidebar-overlay');
-    const sidebar = document.getElementById('admin-sidebar');
-
-    const toggleSidebar = (state) => {
-      if (sidebar && overlay) {
-        sidebar.classList.toggle('open', state);
-        overlay.classList.toggle('open', state);
-        document.body.style.overflow = state ? 'hidden' : '';
-      }
-    };
-
-    if (openBtn) openBtn.addEventListener('click', () => toggleSidebar(true));
-    if (closeBtn) closeBtn.addEventListener('click', () => toggleSidebar(false));
-    if (overlay) overlay.addEventListener('click', () => toggleSidebar(false));
-  });
-</script>
-<script src="assets/admin.js"></script>
+<script src="<?= e(asset_url('admin.js')) ?>"></script>
 </body>
 </html>
 <?php

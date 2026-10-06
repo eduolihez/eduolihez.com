@@ -168,10 +168,11 @@ show_flash();
 </form>
 
 <h2>Que NO se edita aqui</h2>
-<div class="card">
+<div class="card p-0">
+  <div class="scroll-x">
   <table>
     <tr>
-      <th style="width:220px;">Experiencia laboral</th>
+      <th style="width:40%;">Experiencia laboral</th>
       <td class="muted">Es estatica: <code>src/data/experience.ts</code> + <code>npm run build</code>.</td>
     </tr>
     <tr>
@@ -191,6 +192,7 @@ show_flash();
       <td class="muted"><code>server/config.php</code> por FTP. Estado en <a href="security.php">Seguridad</a>.</td>
     </tr>
   </table>
+  </div>
 </div>
 
 <?php admin_footer(); ?>

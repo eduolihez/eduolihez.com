@@ -84,7 +84,7 @@
   /* Grid Layout Principal */
   .admin-layout {
     display: grid;
-    grid-template-columns: 260px 1fr;
+    grid-template-columns: 260px minmax(0, 1fr);
     min-height: 100vh;
   }
 
@@ -572,6 +572,9 @@
     border: 1px solid var(--border); border-radius: 0.5rem; color: var(--text);
     font-size: 0.92rem; font-family: inherit; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
+  /* El selector de archivo tiene un ancho intrinseco (~300 px) que no encoge:
+     sin tope desbordaba la pagina en movil (portada de post-edit.php). */
+  input[type=file] { max-width: 100%; }
   input:focus, textarea:focus, select:focus {
     outline: none; border-color: var(--accent);
     box-shadow: 0 0 0 3px var(--accent-soft);
@@ -579,8 +582,14 @@
   }
   textarea { resize: vertical; min-height: 120px; }
   
-  .row2 { display: grid; gap: 1.5rem; grid-template-columns: 1fr 1fr; }
-  .row3 { display: grid; gap: 1.5rem; grid-template-columns: repeat(3, 1fr); }
+  /* minmax(0, 1fr) y no 1fr: con 1fr (= minmax(auto, 1fr)) la columna crece
+     hasta el ancho minimo de su contenido -- un grafico .chart de 30 barras,
+     una fila nowrap -- y la pagina entera desborda en movil. */
+  .row2 { display: grid; gap: 1.5rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .row3 { display: grid; gap: 1.5rem; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  @media (max-width: 640px) {
+    .row2, .row3 { grid-template-columns: minmax(0, 1fr); }
+  }
 
   /* Botones */
   .btn {
@@ -715,7 +724,7 @@
   /* Responsive Sidebar rules */
   @media (max-width: 900px) {
     .admin-layout {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
     }
     .sidebar {
       position: fixed;

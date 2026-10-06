@@ -146,7 +146,7 @@ $checks = [
 admin_header('Seguridad', 'security.php');
 show_flash();
 ?>
-<h1>Seguridad</h1>
+<?php page_header('Seguridad'); ?>
 
 <div class="grid4">
   <div class="card stat">
@@ -168,7 +168,7 @@ show_flash();
 </div>
 
 <h2>Revision de la configuracion</h2>
-<div class="card" style="padding:0;">
+<div class="card p-0">
   <table>
     <tbody>
       <?php foreach ($checks as [$label, $ok, $why]): ?>
@@ -212,9 +212,9 @@ show_flash();
 </form>
 
 <h2>IPs bloqueadas ahora mismo</h2>
-<div class="card" style="padding:0;">
+<div class="card p-0">
   <table>
-    <thead><tr><th>IP</th><th>Fallos</th><th>Ultimo intento</th><th style="text-align:right;">Accion</th></tr></thead>
+    <thead><tr><th>IP</th><th>Fallos</th><th>Ultimo intento</th><th class="text-right">Accion</th></tr></thead>
     <tbody>
       <?php if (!$blocked): ?>
         <tr><td colspan="4" class="empty">Ninguna IP bloqueada. Todo tranquilo.</td></tr>
@@ -225,8 +225,8 @@ show_flash();
           <td><span class="pill danger"><?= (int) $b['fails'] ?></span></td>
           <td class="faint"><?= e(fdate($b['last_try'])) ?> · <?= e(ago($b['last_try'])) ?></td>
           <td>
-            <div class="actions" style="justify-content:flex-end;">
-              <form method="post" data-confirm="¿Desbloquear esta IP?" style="display:inline;">
+            <div class="actions justify-end">
+              <form method="post" data-confirm="¿Desbloquear esta IP?" class="d-inline">
                 <?= csrf_field() ?>
                 <input type="hidden" name="action" value="unblock">
                 <input type="hidden" name="ip" value="<?= e($b['ip_address']) ?>">
@@ -245,13 +245,13 @@ show_flash();
 
 <div class="toolbar" style="margin-top:1.75rem;">
   <h2 style="margin:0;">Intentos de acceso recientes</h2>
-  <form method="post" data-confirm="¿Vaciar todo el historial de intentos de acceso?" style="display:inline;">
+  <form method="post" data-confirm="¿Vaciar todo el historial de intentos de acceso?" class="d-inline">
     <?= csrf_field() ?>
     <input type="hidden" name="action" value="clear_attempts">
     <button type="submit" class="btn ghost sm">Vaciar historial</button>
   </form>
 </div>
-<div class="card" style="padding:0;">
+<div class="card p-0">
   <div class="scroll-x">
     <table>
       <thead><tr><th>Resultado</th><th>Usuario probado</th><th>IP</th><th>Cuando</th></tr></thead>
@@ -273,7 +273,7 @@ show_flash();
 </div>
 
 <h2>Registro de auditoria</h2>
-<div class="card" style="padding:0;">
+<div class="card p-0">
   <div class="scroll-x">
     <table>
       <thead><tr><th>Accion</th><th>Detalle</th><th>Usuario</th><th>IP</th><th>Cuando</th></tr></thead>

@@ -21,3 +21,7 @@
  */
 require_once __DIR__ . '/../lib/text.php';
 require_once __DIR__ . '/../lib/validate.php';
+// Partials del panel admin SIN dependencias (puros: sin auth.php/db.php/sesion).
+// layout.php NO va aqui: requiere auth.php y mataria el proceso de PHPUnit.
+require_once __DIR__ . '/../admin/partials/icons.php';
+require_once __DIR__ . '/../admin/partials/spaces.php';

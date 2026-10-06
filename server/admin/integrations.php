@@ -118,7 +118,7 @@ $cachedAt = setting_get(GITHUB_CACHE_AT, '');
 admin_header('Integraciones', 'integrations.php');
 show_flash();
 ?>
-<h1>Integraciones</h1>
+<?php page_header('Integraciones'); ?>
 <p class="hint" style="margin-bottom:1.25rem;">
   Servicios externos que este sitio consulta y cachea. Hoy solo hay uno: las
   tarjetas SVG animadas de GitHub que usa el
@@ -135,7 +135,7 @@ show_flash();
 </div>
 
 <div class="card">
-  <table style="margin-bottom:1rem;">
+  <table class="mb-2">
     <tr>
       <th style="width:220px;">Token</th>
       <td>
@@ -159,7 +159,7 @@ show_flash();
     </tr>
   </table>
 
-  <form method="post" style="display:inline;">
+  <form method="post" class="d-inline">
     <?= csrf_field() ?>
     <input type="hidden" name="action" value="refresh_cache">
     <button type="submit" class="btn ghost sm">Refrescar caché ahora</button>
@@ -177,6 +177,20 @@ show_flash();
     Estas imágenes se sirven con caché HTTP corta; si acabas de refrescar o guardar,
     puede que tu navegador siga mostrando la versión anterior — recarga forzando (Ctrl/Cmd+Shift+R) si hace falta.
   </p>
+  <?php
+    // Absoluta a proposito, mismo dominio que usa el enlace "Ver web" del
+    // sidebar (server/admin/partials/layout.php): esto se pega en un README
+    // de GitHub, no en una pagina de este sitio, asi que una ruta relativa
+    // no serviria.
+    $ghMarkdown = "![GitHub Stats](https://eduolihez.com/api/github-stats.php)\n"
+        . "![Top Languages](https://eduolihez.com/api/github-langs.php)\n"
+        . "![GitHub Streak](https://eduolihez.com/api/github-streak.php)";
+  ?>
+  <label for="gh-markdown-snippet" style="margin-top:1.25rem;">Markdown para el README</label>
+  <div class="copy-row" style="align-items:flex-start;">
+    <textarea id="gh-markdown-snippet" readonly rows="3" style="font-family:'JetBrains Mono',monospace; font-size:.82rem;" onclick="this.select()"><?= e($ghMarkdown) ?></textarea>
+    <button type="button" class="btn sm" data-copy="#gh-markdown-snippet">Copiar</button>
+  </div>
 </div>
 
 <h2>Ajustes</h2>
@@ -189,7 +203,7 @@ show_flash();
            value="<?= e($username) ?>" pattern="[A-Za-z0-9_-]+" required>
     <div class="hint">El perfil cuyas estadísticas se muestran.</div>
 
-    <label for="github_token" style="margin-top:1rem;">Token de GitHub</label>
+    <label for="github_token" class="mt-2">Token de GitHub</label>
     <input type="password" id="github_token" name="github_token" maxlength="255"
            placeholder="<?= $hasToken ? '•••••••••••••••••••••• (déjalo en blanco para no cambiarlo)' : 'ghp_…' ?>"
            autocomplete="off">
@@ -198,11 +212,11 @@ show_flash();
       Nunca se vuelve a mostrar una vez guardado; deja el campo en blanco para conservar el actual.
     </div>
 
-    <label for="github_ttl" style="margin-top:1rem;">Minutos de caché</label>
+    <label for="github_ttl" class="mt-2">Minutos de caché</label>
     <input type="number" id="github_ttl" name="github_ttl" min="5" max="10080" value="<?= (int) $ttl ?>" required style="max-width:160px;">
     <div class="hint">Cuánto se reutilizan los datos antes de volver a consultar GitHub. 360 = 6 horas.</div>
 
-    <label for="github_exclude" style="margin-top:1rem;">Repos excluidos del cálculo de lenguajes</label>
+    <label for="github_exclude" class="mt-2">Repos excluidos del cálculo de lenguajes</label>
     <input type="text" id="github_exclude" name="github_exclude" maxlength="500"
            value="<?= e($excludeCsv) ?>" placeholder="northgate-browser, otro-repo">
     <div class="hint">
@@ -211,7 +225,7 @@ show_flash();
       que introdujo esto).
     </div>
 
-    <label for="github_custom_css" style="margin-top:1rem;">CSS personalizado para las tarjetas</label>
+    <label for="github_custom_css" class="mt-2">CSS personalizado para las tarjetas</label>
     <textarea id="github_custom_css" name="github_custom_css" rows="8" maxlength="20000"
               placeholder=".card-title { fill: #ff00ff; }"
               style="width:100%; font-family:monospace; resize:vertical; font-size:.85rem;"><?= e($customCssValue) ?></textarea>

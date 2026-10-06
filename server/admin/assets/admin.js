@@ -8,9 +8,131 @@
  *   #check-all          -> marca/desmarca todas las .row-check.
  *   #bulk-form          -> avisa si no hay nada seleccionado.
  *   [data-autosubmit]   -> envia el formulario al cambiar el control.
+ *   [data-copy]         en un <button> -> copia el texto del elemento que
+ *                        selecciona (querySelector) al portapapeles y
+ *                        confirma con "Copiado" durante 1.6s.
+ *   [data-autocopy]     en cualquier elemento -> copia su texto solo, en
+ *                        cuanto la pagina carga (p.ej. una clave de API que
+ *                        se muestra una sola vez).
+ *   #theme-toggle       -> alterna data-theme (light/dark) en <html>, lo guarda
+ *                        en localStorage ('admin-theme') y actualiza aria-pressed.
+ *                        El tema inicial lo fija theme.js desde el <head>.
+ *   #sidebar-open-btn / #sidebar-close-btn / #sidebar-overlay -> abren y
+ *                        cierran el cajon lateral movil (clase .open en
+ *                        #admin-sidebar y en el overlay).
  */
 (function () {
   'use strict';
+
+  // --- Cajon lateral movil -------------------------------------------------
+  function initSidebarDrawer() {
+    var openBtn = document.getElementById('sidebar-open-btn');
+    var closeBtn = document.getElementById('sidebar-close-btn');
+    var overlay = document.getElementById('sidebar-overlay');
+    var sidebar = document.getElementById('admin-sidebar');
+
+    function toggleSidebar(state) {
+      if (sidebar && overlay) {
+        sidebar.classList.toggle('open', state);
+        overlay.classList.toggle('open', state);
+        document.body.style.overflow = state ? 'hidden' : '';
+      }
+    }
+
+    if (openBtn) openBtn.addEventListener('click', function () { toggleSidebar(true); });
+    if (closeBtn) closeBtn.addEventListener('click', function () { toggleSidebar(false); });
+    if (overlay) overlay.addEventListener('click', function () { toggleSidebar(false); });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSidebarDrawer);
+  } else {
+    initSidebarDrawer();
+  }
+
+  // --- Interruptor de tema -----------------------------------------------
+  // Si localStorage esta bloqueado el tema cambia igual, solo que no persiste.
+  function initThemeToggle() {
+    var btn = document.getElementById('theme-toggle');
+    if (!btn) return;
+    var root = document.documentElement;
+    function sync() {
+      btn.setAttribute('aria-pressed', root.dataset.theme === 'dark' ? 'true' : 'false');
+    }
+    sync();
+    btn.addEventListener('click', function () {
+      var next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+      root.dataset.theme = next;
+      try {
+        localStorage.setItem('admin-theme', next);
+      } catch (err) {
+        // silencioso: el tema vale para esta pagina aunque no se guarde.
+      }
+      sync();
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initThemeToggle);
+  } else {
+    initThemeToggle();
+  }
+
+  // --- Copiar al portapapeles ------------------------------------------------
+  // Texto a copiar: el valor de un <input>/<textarea>, o el textContent de
+  // cualquier otro elemento -- asi el mismo helper sirve tanto para el campo
+  // de solo-lectura de una clave de API como para un <code> suelto.
+  function elementText(el) {
+    if (!el) return '';
+    if ('value' in el) return el.value;
+    return el.textContent || '';
+  }
+
+  function copyText(text, onDone) {
+    if (!text) return;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(onDone, onDone);
+      return;
+    }
+    // Sin API de portapapeles (contexto no seguro, navegador antiguo):
+    // fallback con un <textarea> temporal + document.execCommand.
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try {
+      document.execCommand('copy');
+    } catch (err) {
+      // silencioso: el usuario siempre puede seleccionar el texto a mano.
+    }
+    document.body.removeChild(ta);
+    if (onDone) onDone();
+  }
+
+  document.addEventListener('click', function (e) {
+    var btn = e.target && e.target.closest ? e.target.closest('[data-copy]') : null;
+    if (!btn) return;
+    var target = document.querySelector(btn.getAttribute('data-copy'));
+    var original = btn.textContent;
+    copyText(elementText(target), function () {
+      btn.textContent = btn.getAttribute('data-copy-label') || 'Copiado ✓';
+      btn.disabled = true;
+      setTimeout(function () {
+        btn.textContent = original;
+        btn.disabled = false;
+      }, 1600);
+    });
+  });
+
+  document.addEventListener('DOMContentLoaded', function () {
+    var autocopy = document.querySelectorAll('[data-autocopy]');
+    for (var i = 0; i < autocopy.length; i++) {
+      copyText(elementText(autocopy[i]));
+    }
+  });
 
   // --- Confirmacion por boton concreto (acciones en lote) -------------------
   // Se guarda en el formulario para que el handler de submit sepa que ya se

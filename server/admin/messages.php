@@ -171,16 +171,13 @@ if ($viewId > 0) {
     admin_header('Mensaje', 'messages.php');
     show_flash();
     ?>
-    <div class="toolbar">
-      <h1 style="margin:0;">Mensaje #<?= (int) $m['id'] ?></h1>
-      <div class="actions">
+    <?php ob_start(); ?>
         <a class="btn ghost sm <?= $prevId ? '' : 'disabled' ?>"
            href="<?= $prevId ? 'messages.php?id=' . $prevId : '#' ?>" <?= $prevId ? '' : 'disabled' ?>>&uarr; Mas reciente</a>
         <a class="btn ghost sm <?= $nextId ? '' : 'disabled' ?>"
            href="<?= $nextId ? 'messages.php?id=' . $nextId : '#' ?>" <?= $nextId ? '' : 'disabled' ?>>&darr; Mas antiguo</a>
         <a class="btn ghost sm" href="messages.php">&larr; Volver al buzon</a>
-      </div>
-    </div>
+    <?php page_header('Mensaje #' . (int) $m['id'], '', ob_get_clean()); ?>
 
     <div class="card">
       <table>
@@ -199,31 +196,31 @@ if ($viewId > 0) {
       <h2>Contenido</h2>
       <div class="card inset" style="white-space:pre-wrap;"><?= e($m['message']) ?></div>
 
-      <div class="actions" style="margin-top:1rem;">
+      <div class="actions mt-2">
         <a class="btn" href="mailto:<?= e($m['email']) ?>?subject=<?= rawurlencode('RE: ' . $m['subject']) ?>">Responder por email</a>
 
-        <form method="post" style="display:inline;">
+        <form method="post" class="d-inline">
           <?= csrf_field() ?>
           <input type="hidden" name="action" value="<?= (int) $m['is_starred'] ? 'unstar' : 'star' ?>">
           <input type="hidden" name="id" value="<?= (int) $m['id'] ?>">
           <button class="btn ghost" type="submit"><?= (int) $m['is_starred'] ? 'Quitar destacado' : '★ Destacar' ?></button>
         </form>
 
-        <form method="post" style="display:inline;">
+        <form method="post" class="d-inline">
           <?= csrf_field() ?>
           <input type="hidden" name="action" value="unread">
           <input type="hidden" name="id" value="<?= (int) $m['id'] ?>">
           <button class="btn ghost" type="submit">Marcar como no leido</button>
         </form>
 
-        <form method="post" style="display:inline;">
+        <form method="post" class="d-inline">
           <?= csrf_field() ?>
           <input type="hidden" name="action" value="<?= (int) $m['is_archived'] ? 'unarchive' : 'archive' ?>">
           <input type="hidden" name="id" value="<?= (int) $m['id'] ?>">
           <button class="btn ghost" type="submit"><?= (int) $m['is_archived'] ? 'Desarchivar' : 'Archivar' ?></button>
         </form>
 
-        <form method="post" data-confirm="¿Eliminar este mensaje? No se puede deshacer." style="display:inline;">
+        <form method="post" data-confirm="¿Eliminar este mensaje? No se puede deshacer." class="d-inline">
           <?= csrf_field() ?>
           <input type="hidden" name="action" value="delete">
           <input type="hidden" name="id" value="<?= (int) $m['id'] ?>">
@@ -234,13 +231,13 @@ if ($viewId > 0) {
 
     <?php if ($others): ?>
       <h2>Otros mensajes de <?= e($m['email']) ?></h2>
-      <div class="card" style="padding:0;">
+      <div class="card p-0">
         <table>
           <tbody>
             <?php foreach ($others as $o): ?>
               <tr>
                 <td><a href="messages.php?id=<?= (int) $o['id'] ?>"><?= e($o['subject'] !== '' ? $o['subject'] : '(sin asunto)') ?></a></td>
-                <td class="faint nowrap" style="text-align:right;"><?= e(fdate($o['created_at'])) ?></td>
+                <td class="faint nowrap text-right"><?= e(fdate($o['created_at'])) ?></td>
               </tr>
             <?php endforeach; ?>
           </tbody>
@@ -327,19 +324,16 @@ $tabs = [
 admin_header('Mensajes', 'messages.php');
 show_flash();
 ?>
-<div class="toolbar">
-  <h1 style="margin:0;">Buzon de contacto</h1>
-  <div class="actions">
+<?php ob_start(); ?>
     <?php if ($counts['unread'] > 0): ?>
-      <form method="post" data-confirm="¿Marcar TODOS los mensajes como leidos?" style="display:inline;">
+      <form method="post" data-confirm="¿Marcar TODOS los mensajes como leidos?" class="d-inline">
         <?= csrf_field() ?>
         <input type="hidden" name="action" value="mark_all_read">
         <button class="btn ghost sm" type="submit">Marcar todo como leido</button>
       </form>
     <?php endif; ?>
     <a class="btn ghost sm" href="<?= e(list_url($filter, $search)) ?>&amp;export=csv">Exportar CSV</a>
-  </div>
-</div>
+<?php page_header('Buzon de contacto', '', ob_get_clean()); ?>
 
 <div class="tabs">
   <?php foreach ($tabs as $key => $label): ?>
@@ -374,7 +368,7 @@ show_flash();
             data-confirm-btn="¿Eliminar los mensajes seleccionados? No se puede deshacer.">Borrar</button>
   </div>
 
-  <div class="card" style="padding:0;">
+  <div class="card p-0">
     <div class="scroll-x">
       <table>
         <thead>
@@ -383,7 +377,7 @@ show_flash();
             <th>De</th>
             <th>Asunto</th>
             <th>Fecha</th>
-            <th style="text-align:right;">Acciones</th>
+            <th class="text-right">Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -412,7 +406,7 @@ show_flash();
               </td>
               <td class="faint nowrap"><?= e(fdate($m['created_at'])) ?><br><span style="font-size:.75rem;"><?= e(ago($m['created_at'])) ?></span></td>
               <td>
-                <div class="actions" style="justify-content:flex-end;">
+                <div class="actions justify-end">
                   <a class="btn ghost sm" href="messages.php?id=<?= (int) $m['id'] ?>">Ver</a>
                 </div>
               </td>

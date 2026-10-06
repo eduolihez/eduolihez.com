@@ -125,10 +125,7 @@ $last = count($rows) - 1;
 admin_header('Proyectos', 'projects.php');
 show_flash();
 ?>
-<div class="toolbar">
-  <h1 style="margin:0;">Proyectos <span class="faint" style="font-size:1rem;">(<?= $published ?> publicados de <?= $totalAll ?>)</span></h1>
-  <a class="btn" href="project-edit.php">+ Nuevo proyecto</a>
-</div>
+<?php page_header('Proyectos', '', '<a class="btn" href="project-edit.php">+ Nuevo proyecto</a>', '(' . $published . ' publicados de ' . $totalAll . ')'); ?>
 
 <form method="get" class="card" style="display:flex; gap:.6rem; align-items:center; padding:.75rem 1rem;">
   <input type="search" name="q" value="<?= e($search) ?>" placeholder="Buscar por titulo o tecnologia..." style="flex:1;">
@@ -136,7 +133,7 @@ show_flash();
   <?php if ($search !== ''): ?><a class="btn ghost sm" href="projects.php">Limpiar</a><?php endif; ?>
 </form>
 
-<div class="card" style="padding:0;">
+<div class="card p-0">
   <div class="scroll-x">
     <table>
       <thead>
@@ -147,7 +144,7 @@ show_flash();
           <th>Destacado</th>
           <th>Orden</th>
           <th>Actualizado</th>
-          <th style="text-align:right;">Acciones</th>
+          <th class="text-right">Acciones</th>
         </tr>
       </thead>
       <tbody>
@@ -171,7 +168,7 @@ show_flash();
               <div class="faint">ID <?= (int) $p['id'] ?></div>
             </td>
             <td>
-              <form method="post" style="display:inline;">
+              <form method="post" class="d-inline">
                 <?= csrf_field() ?>
                 <input type="hidden" name="action" value="toggle_status">
                 <input type="hidden" name="id" value="<?= (int) $p['id'] ?>">
@@ -182,7 +179,7 @@ show_flash();
               </form>
             </td>
             <td>
-              <form method="post" style="display:inline;">
+              <form method="post" class="d-inline">
                 <?= csrf_field() ?>
                 <input type="hidden" name="action" value="toggle_featured">
                 <input type="hidden" name="id" value="<?= (int) $p['id'] ?>">
@@ -194,13 +191,13 @@ show_flash();
             <td class="faint">
               <div class="actions" style="gap:.2rem;">
                 <span class="mono"><?= (int) $p['sort_order'] ?></span>
-                <form method="post" style="display:inline;">
+                <form method="post" class="d-inline">
                   <?= csrf_field() ?>
                   <input type="hidden" name="action" value="move_up">
                   <input type="hidden" name="id" value="<?= (int) $p['id'] ?>">
                   <button class="btn icon ghost" type="submit" title="Subir" <?= $i === 0 ? 'disabled' : '' ?>>↑</button>
                 </form>
-                <form method="post" style="display:inline;">
+                <form method="post" class="d-inline">
                   <?= csrf_field() ?>
                   <input type="hidden" name="action" value="move_down">
                   <input type="hidden" name="id" value="<?= (int) $p['id'] ?>">
@@ -210,15 +207,15 @@ show_flash();
             </td>
             <td class="faint nowrap"><?= e(ago($p['updated_at'])) ?></td>
             <td>
-              <div class="actions" style="justify-content:flex-end;">
+              <div class="actions justify-end">
                 <a class="btn ghost sm" href="project-edit.php?id=<?= (int) $p['id'] ?>">Editar</a>
-                <form method="post" data-confirm="¿Duplicar este proyecto?" style="display:inline;">
+                <form method="post" data-confirm="¿Duplicar este proyecto?" class="d-inline">
                   <?= csrf_field() ?>
                   <input type="hidden" name="action" value="duplicate">
                   <input type="hidden" name="id" value="<?= (int) $p['id'] ?>">
                   <button type="submit" class="btn ghost sm">Duplicar</button>
                 </form>
-                <form method="post" data-confirm="¿Eliminar este proyecto? Se borrara tambien su imagen." style="display:inline;">
+                <form method="post" data-confirm="¿Eliminar este proyecto? Se borrara tambien su imagen." class="d-inline">
                   <?= csrf_field() ?>
                   <input type="hidden" name="action" value="delete">
                   <input type="hidden" name="id" value="<?= (int) $p['id'] ?>">
@@ -234,9 +231,10 @@ show_flash();
 </div>
 
 <p class="hint">
-  El orden de la web es: primero los <strong>destacados</strong>, y dentro de cada grupo
-  por el numero de <strong>orden</strong> (menor primero). Las flechas ↑ ↓ intercambian
-  ese numero con el proyecto vecino.
+  El orden de la web es automatico: primero los <strong>destacados</strong>, y dentro de
+  cada grupo el que se <strong>actualizo mas reciente</strong> primero. La columna "Orden"
+  y las flechas ↑ ↓ ya no cambian ese orden (se conservan por si algun dia vuelve a hacer
+  falta uno curado a mano) -- para mover un proyecto arriba, destacalo o edítalo y guarda.
 </p>
 
 <?php admin_footer(); ?>

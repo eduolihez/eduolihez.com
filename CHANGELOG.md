@@ -5,6 +5,84 @@ Todos los cambios notables de este proyecto se documentan en este archivo.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/),
 y el versionado usa cuatro números (`MAJOR.MINOR.PATCH.MICRO`).
 
+## [Unreleased]
+
+### Added
+
+- **Espacios en el panel admin.** El panel trabaja por espacio: `Global`
+  (por defecto) o una app registrada. Hay un selector de espacio en la
+  cabecera y el menú lateral cambia según el espacio activo. El espacio se
+  elige con `?space=<slug>`; `?app=<slug>` sigue funcionando como alias. La
+  sesión recuerda el espacio solo si la página visitada pertenece a él.
+  `analytics.php` e `index.php` filtran por el espacio activo, e `index.php`
+  en Global pasa a ser el "Resumen global".
+- **Tema claro/oscuro** con interruptor en el panel (`assets/theme.js`). La
+  preferencia se guarda en `localStorage`; sin preferencia guardada se usa
+  `prefers-color-scheme`.
+- **`partials/spaces.php` y `partials/icons.php`**: lógica de espacios e
+  iconos sin dependencias de `auth.php`, `http.php` ni `db.php`, para poder
+  testearlas.
+- **Tests**: `SpacesTest` (PHPUnit) y `scripts/php-test.sh` para correr la
+  suite PHP en local sin Composer.
+
+### Changed
+
+- El CSS del panel sale de `partials/layout.php` a `assets/admin.css`, con
+  versión por `filemtime` para la caché.
+- Las páginas del panel usan un `page_header` común y unas utilidades de
+  CSS en lugar de estilos en línea.
+- El script en línea del cajón móvil pasa a `assets/admin.js` (requisito de
+  la CSP).
+- `analytics.php` sin parámetros ahora hereda el espacio de la sesión (antes
+  mostraba todas las apps).
+- `?app=<slug>` con un slug desconocido ya no muestra un dashboard vacío: se
+  usa el espacio de la sesión si la página lo admite y, si no, el espacio de
+  origen de la página (Global en `index.php` y `analytics.php`).
+- `index.php` ignora el espacio recordado en la sesión y abre siempre Global
+  salvo que `?space=`/`?app=` sea explícito (así el enlace de la marca y el
+  aterrizaje tras el login son Global).
+
+### Fixed
+
+- La autogeneración del slug en `post-edit.php` no funcionaba: era un
+  `<script>` en línea y la CSP del panel (`script-src 'self'`) lo bloqueaba.
+  Pasa a `assets/post-edit.js`; el campo lleva `data-slug-auto` solo al crear.
+
+### Security
+
+- `public/projects/phishlab/assets/telemetry.config.json` dejó de
+  versionarse: contenía la clave de ingesta de PhishLab en claro. Queda solo
+  en local/FTP (se copia desde `telemetry.config.example.json`) y está en
+  `.gitignore`. **La clave sigue en el historial de git**: hay que rotarla
+  desde `admin.eduolihez.com` → Apps → phishlab y poner la nueva en el
+  archivo local. Al hacer merge, git borrará la copia local del archivo en el
+  checkout principal: guárdala antes si la necesitas para subir por FTP.
+- `analytics.php`: si el espacio es una app que no se resuelve en `apps`
+  (fila borrada, tabla ausente o consulta fallida), avisa y no pinta datos;
+  antes mostraba los de todas las apps bajo el nombre de esa.
+- Los fallos tolerados del layout (tabla `apps`, contadores del menú) y la
+  búsqueda de app en `analytics.php` se registran en el log del servidor con
+  `error_log`, sin mostrar el mensaje al usuario.
+- `scripts/php-test.sh` fija PHPUnit 10.5.66 por versión y SHA-256 y no
+  ejecuta un phar que no coincida.
+
+### Deployment / Despliegue
+
+- Archivos nuevos a subir por FTP: `server/admin/assets/admin.css`,
+  `server/admin/assets/theme.js`, `server/admin/assets/post-edit.js`,
+  `server/admin/partials/spaces.php` y `server/admin/partials/icons.php`.
+- Archivos modificados: `server/admin/partials/layout.php`,
+  `server/admin/assets/admin.js`, `server/admin/index.php`,
+  `server/admin/analytics.php`, `server/admin/post-edit.php` y el resto de
+  páginas de `server/admin/`.
+- No hay migración de base de datos.
+- La verificación visual en páginas reales (claro, oscuro y móvil, con base
+  de datos real) NO se hizo durante el desarrollo. Hay que hacerla antes o
+  justo después de subir. Sí se hicieron `php -l` sobre todo `server/admin/`,
+  la suite PHPUnit y un recorrido con Playwright (menú por espacio, selector,
+  tema, cajón móvil a 375 px y CSP real) sobre un arnés con el `layout.php`
+  real y páginas de relleno, no sobre las páginas reales.
+
 ## [1.9.0.0] - 2026-09-08
 
 ### Added

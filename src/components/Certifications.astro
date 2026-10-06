@@ -15,6 +15,7 @@ import type { Lang } from '../i18n/ui';
 import { api } from '../config';
 import { fetchCertificationSummaries } from '../lib/certifications';
 import { safeUrl } from '../scripts/shared';
+import { issuerColor } from '../scripts/certifications';
 import StatusPanel from './StatusPanel.astro';
 import Icon from './Icon.astro';
 
@@ -145,21 +146,36 @@ const labels = {
 
     <div
       id="certs-grid"
-      class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"
+      class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5"
       data-api={apiUrl}
       data-labels={JSON.stringify(labels)}
     >
-      {ssrCerts.map((c) => (
-        <a
-          href={safeUrl(c.credential_url) || undefined}
-          target={safeUrl(c.credential_url) ? '_blank' : undefined}
-          rel={safeUrl(c.credential_url) ? 'noopener noreferrer' : undefined}
-          class="flex flex-col rounded-lg border border-bg-border bg-bg-card p-4"
-        >
-          <span class="text-sm font-semibold text-text-title">{c.name}</span>
-          <span class="mt-1 text-xs text-text-muted">{[c.issuer, c.issue_date].filter(Boolean).join(' · ')}</span>
-        </a>
-      ))}
+      {ssrCerts.map((c) => {
+        const color = issuerColor((c.issuer || c.name || '?').trim());
+        const logo = safeUrl(c.logo_url);
+        const link = safeUrl(c.credential_url);
+        return (
+          <a
+            href={link || undefined}
+            target={link ? '_blank' : undefined}
+            rel={link ? 'noopener noreferrer' : undefined}
+            class="flex flex-col items-center gap-2 rounded-lg border border-bg-border bg-bg-card p-4 text-center"
+          >
+            <div
+              class="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-md border border-bg-border"
+              style={logo ? undefined : `background-color:${color}1a;border-color:${color}33`}
+            >
+              {logo ? (
+                <img src={logo} alt="" loading="lazy" decoding="async" class="h-full w-full object-contain p-2 bg-bg-soft" />
+              ) : (
+                <Icon name="award" class="h-7 w-7" style={`color:${color}`} />
+              )}
+            </div>
+            <span class="line-clamp-2 text-sm font-semibold text-text-title">{c.name}</span>
+            <span class="text-xs text-text-muted">{[c.issuer, c.issue_date].filter(Boolean).join(' · ')}</span>
+          </a>
+        );
+      })}
     </div>
 
     <div id="certs-load-more-container" class="reveal mt-6 hidden justify-center">

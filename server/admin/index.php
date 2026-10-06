@@ -62,34 +62,41 @@ function rows_of(string $sql, array $params = []): array
     }
 }
 
-// --- Selector de proyectos (2026-09-08) ---------------------------------
+// --- Espacios (sustituye al selector de sitios de 2026-09-08) -----------
 //
-// Sin ?app en la URL: en vez de saltar directo al dashboard de
-// eduolihez.com (que es lo que hacia esta pagina antes de que existiera mas
-// de una app), se muestra un selector con metricas generales de cada app
-// registrada -- el nuevo punto de entrada de /admin.
-//
-// Con ?app=<slug> de una app SIN contenido propio (has_content=0, p.ej.
-// nowait: sitio estatico sin CMS): no tiene sentido este dashboard (KPIs de
-// Proyectos/Certificaciones/Blog que esa app no tiene), asi que se redirige
-// a analytics.php?app=<slug>, que ya muestra exactamente lo que SI aplica
-// (visitas/dispositivos/navegador) sin duplicar esa vista aqui.
-$currentAppSlug = (string) ($_GET['app'] ?? '');
+// Sin ?space= explicito esta pagina abre Global (resumen de todas las apps,
+// tabla `apps`). Con ?space=<id> -- o el alias legado ?app=<slug> -- se ve el
+// espacio pedido; una app SIN contenido propio (has_content=0, p.ej. nowait:
+// sitio estatico sin CMS) se redirige a analytics.php, que ya muestra lo que
+// SI aplica (visitas/dispositivos/navegador) sin duplicar esa vista aqui.
+// "Sitios"/"espacios" y no "proyectos" a proposito: "Proyectos" es la seccion
+// de contenido (tabla `projects`), otra cosa.
+// El espacio activo (admin_space(), que acepta ?space= y el alias ?app=)
+// decide la vista: ver index_view() en partials/spaces.php.
+$currentSpace = admin_space();
+$currentAppSlug = (string) admin_app_slug();
+$selectedApp = $currentAppSlug !== ''
+    ? (rows_of('SELECT id, has_content FROM apps WHERE slug = ?', [$currentAppSlug])[0] ?? null)
+    : null;
+$indexView = index_view($currentSpace, $selectedApp);
 
-if ($currentAppSlug === '') {
+if ($indexView['view'] === 'redirect') {
+    redirect($indexView['to']);
+}
+
+if ($indexView['view'] === 'picker') {
     $apps = rows_of('SELECT id, slug, display_name, has_content FROM apps ORDER BY created_at ASC');
     $sparkColors = ['', 'cyan', 'violet', 'warn']; // ciclan si hay mas de 4 apps
 
-    admin_header('Selector de proyectos', 'index.php');
+    admin_header('Resumen global', 'index.php');
     show_flash();
     ?>
-    <h1>¿Qué proyecto quieres ver?</h1>
-    <p class="hint" style="margin-bottom:1.5rem;">Últimos 7 días, comparado con los 7 anteriores. Elige un proyecto para entrar en su panel.</p>
+    <?php page_header('Resumen global', 'Últimos 7 días, comparado con los 7 anteriores. Elige un sitio para entrar en su panel.'); ?>
 
     <?php if (!$apps): ?>
-      <div class="card empty">Todavía no hay proyectos registrados. <a href="apps.php">Registra el primero →</a></div>
+      <div class="card empty">Todavía no hay sitios registrados. <a href="apps.php">Registra el primero →</a></div>
     <?php else: ?>
-      <div class="project-picker">
+      <div class="app-picker">
         <?php foreach ($apps as $i => $app): ?>
           <?php
           $appId = (int) $app['id'];
@@ -136,13 +143,14 @@ if ($currentAppSlug === '') {
               $sparkVals[] = $byDay[date('Y-m-d', strtotime("-$d day"))] ?? 0;
           }
 
+          $appSpace = urlencode(space_for_app_slug((string) $app['slug']));
           $href = $app['has_content']
-              ? 'index.php?app=' . rawurlencode($app['slug'])
-              : 'analytics.php?app=' . rawurlencode($app['slug']);
+              ? 'index.php?space=' . $appSpace
+              : 'analytics.php?space=' . $appSpace;
           $color = $sparkColors[$i % count($sparkColors)];
           $initial = mb_strtoupper(mb_substr($app['display_name'], 0, 1));
           ?>
-          <a class="card project-picker-card" href="<?= e($href) ?>">
+          <a class="card app-picker-card" href="<?= e($href) ?>">
             <div class="toolbar" style="margin-bottom:1rem; align-items:flex-start;">
               <div style="display:flex; align-items:center; gap:.75rem;">
                 <div class="picker-avatar <?= e($color) ?>"><?= e($initial) ?></div>
@@ -178,15 +186,12 @@ if ($currentAppSlug === '') {
     exit;
 }
 
-// --- App sin contenido propio: no hay dashboard aqui, ver comentario arriba.
-$selectedApp = rows_of('SELECT id, has_content FROM apps WHERE slug = ?', [$currentAppSlug])[0] ?? null;
-if ($selectedApp !== null && !$selectedApp['has_content']) {
-    redirect('analytics.php?app=' . rawurlencode($currentAppSlug));
-}
-// $selectedApp === null pasa si la URL trae un ?app= que no existe en la
-// tabla (borrado entre medias, o escrito a mano): 0 nunca hace match con un
-// id real, asi que las secciones de trafico salen todas a cero en vez de
-// mostrar por error los datos de OTRA app.
+// App sin contenido propio: ya redirigida arriba (index_view).
+// Un ?app=/?space= con slug que no existe en `apps` (borrado o escrito a mano)
+// ya no llega aqui: resolve_space lo descarta y cae al espacio de origen
+// (global). $selectedApp === null solo ocurre en 'site' si falta la fila
+// 'eduolihez': 0 nunca hace match con un id real, asi que el trafico sale a
+// cero en vez de mostrar por error los datos de OTRA app.
 $appId = $selectedApp['id'] ?? 0;
 
 // Solo contamos visitas humanas (is_bot = 0) de ESTA app en los KPIs.
@@ -363,7 +368,7 @@ $icoShield  = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fi
 admin_header('Panel', 'index.php');
 show_flash();
 ?>
-<h1>Hola, <?= e(current_admin()) ?> 👋</h1>
+<?php page_header('Hola, ' . current_admin() . ' 👋'); ?>
 
 <?php foreach ($warnings as [$type, $html]): ?>
   <div class="flash <?= $type === 'danger' ? 'err' : 'warn' ?>"><?= $html ?></div>
@@ -469,7 +474,7 @@ show_flash();
 <div class="row3">
   <div>
     <h2>Ultimos mensajes</h2>
-    <div class="card" style="padding:0;">
+    <div class="card p-0">
       <table>
         <tbody>
           <?php if (!$lastMessages): ?>
@@ -487,7 +492,7 @@ show_flash();
                 <?php endif; ?>
                 <div class="faint"><?= e($m['subject'] !== '' ? $m['subject'] : '(sin asunto)') ?></div>
               </td>
-              <td class="faint nowrap" style="text-align:right;"><?= e(ago($m['created_at'])) ?></td>
+              <td class="faint nowrap text-right"><?= e(ago($m['created_at'])) ?></td>
             </tr>
           <?php endforeach; ?>
         </tbody>
@@ -509,7 +514,7 @@ show_flash();
 
   <div>
     <h2>Frescura de contenido</h2>
-    <div class="card" style="padding:0;">
+    <div class="card p-0">
       <table>
         <tbody>
           <tr>
@@ -521,7 +526,7 @@ show_flash();
                 <span class="muted">Sin proyectos</span>
               <?php endif; ?>
             </td>
-            <td class="faint nowrap" style="text-align:right;"><?= e(ago($lastProject['d'] ?? null)) ?></td>
+            <td class="faint nowrap text-right"><?= e(ago($lastProject['d'] ?? null)) ?></td>
           </tr>
           <tr>
             <td>
@@ -532,7 +537,7 @@ show_flash();
                 <span class="muted">Sin certificaciones</span>
               <?php endif; ?>
             </td>
-            <td class="faint nowrap" style="text-align:right;"><?= e(ago($lastCert['d'] ?? null)) ?></td>
+            <td class="faint nowrap text-right"><?= e(ago($lastCert['d'] ?? null)) ?></td>
           </tr>
           <tr>
             <td>
@@ -543,7 +548,7 @@ show_flash();
                 <span class="muted">Sin entradas</span>
               <?php endif; ?>
             </td>
-            <td class="faint nowrap" style="text-align:right;"><?= e(ago($lastPost['d'] ?? null)) ?></td>
+            <td class="faint nowrap text-right"><?= e(ago($lastPost['d'] ?? null)) ?></td>
           </tr>
         </tbody>
       </table>

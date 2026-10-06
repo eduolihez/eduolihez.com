@@ -16,104 +16,120 @@
 // dos veces ni reenvia cabeceras.
 require_once __DIR__ . '/../auth.php';
 
+/**
+ * URL relativa de un asset del panel con cache-busting por fecha de
+ * modificacion (?v=<filemtime>). Si el archivo no existe, devuelve la URL
+ * sin version para no romper la pagina.
+ */
+function asset_url(string $file): string
+{
+    $path = __DIR__ . '/../assets/' . $file;
+    if (!is_file($path)) {
+        return 'assets/' . $file;
+    }
+    return 'assets/' . $file . '?v=' . filemtime($path);
+}
+
+require_once __DIR__ . '/spaces.php';
+require_once __DIR__ . '/icons.php';
+
+/**
+ * Deja constancia en el log del servidor de un fallo que el panel tolera (tabla
+ * ausente, consulta fallida) para que no quede invisible. Solo va al log: el
+ * mensaje no se muestra al usuario.
+ */
+function admin_log_error(string $where, Throwable $e): void
+{
+    error_log('[admin] ' . $where . ': ' . get_class($e) . ': ' . $e->getMessage());
+}
+
+/**
+ * Contexto de espacio de la peticion actual: ['space' => id, 'apps' => filas
+ * slug/display_name]. UNICO sitio donde se resuelve el espacio (lo usan
+ * admin_header y admin_space). Memoizado; la tabla `apps` puede no existir
+ * todavia (migracion sin correr) -> [] sin tumbar el panel.
+ */
+function admin_space_context(): array
+{
+    static $ctx = null;
+    if ($ctx !== null) {
+        return $ctx;
+    }
+    try {
+        $apps = db()->query('SELECT slug, display_name FROM apps ORDER BY created_at ASC')->fetchAll();
+    } catch (Throwable $e) {
+        admin_log_error('admin_space_context (tabla apps)', $e);
+        $apps = [];
+    }
+    $slugs = array_map(static fn(array $a): string => (string) $a['slug'], $apps);
+    $page  = basename((string) ($_SERVER['SCRIPT_NAME'] ?? ''));
+    $ctx = [
+        'space' => resolve_space($_GET, $_SESSION ?? [], $slugs, $page),
+        'apps'  => $apps,
+    ];
+    return $ctx;
+}
+
+/** Espacio activo de la peticion actual (valido antes y despues de admin_header). */
+function admin_space(): string
+{
+    return admin_space_context()['space'];
+}
+
+/** Slug de `apps` del espacio activo, o null en Global. */
+function admin_app_slug(): ?string
+{
+    return space_app_slug(admin_space());
+}
+
 function admin_header(string $title, string $active = ''): void
 {
     $user = function_exists('current_admin') ? current_admin() : '';
 
+    $ctx      = admin_space_context();
+    $space    = $ctx['space'];
+    $appsRows = $ctx['apps'];
+    $_SESSION['admin_space'] = $space;
+
     // Contadores para los "badges" del menu. Cada uno tolera que falte la
     // tabla (BD recien creada, migracion a medias) devolviendo 0 en vez de
-    // tumbar el panel entero -- por eso el conteo pasa por un closure que
-    // atrapa el Throwable de cada query por separado en lugar de una sola
-    // vez alrededor de las cuatro.
+    // tumbar el panel entero, y solo se piden los del espacio visible.
     $countSafe = static function (string $sql): int {
         try {
             return (int) db()->query($sql)->fetchColumn();
         } catch (Throwable $e) {
+            admin_log_error('contador del menu', $e);
             return 0;
         }
     };
-    $unread             = $countSafe('SELECT COUNT(*) FROM messages WHERE is_read = 0 AND is_archived = 0');
-    $publishedProjects  = $countSafe("SELECT COUNT(*) FROM projects WHERE status = 'published'");
-    $visibleCerts       = $countSafe('SELECT COUNT(*) FROM certifications WHERE visible = 1');
-    $visiblePosts       = $countSafe('SELECT COUNT(*) FROM posts WHERE visible = 1');
-
-    // Selector de apps (docs/designs/admin-dashboard.md): que sub-dashboard
-    // se esta viendo. Mismo patron try/catch que $countSafe -- la tabla
-    // puede no existir todavia si la migracion no se ha corrido.
-    try {
-        $appsList = db()->query('SELECT slug, display_name, has_content FROM apps ORDER BY created_at ASC')->fetchAll();
-    } catch (Throwable $e) {
-        $appsList = [];
+    $counts = [];
+    if ($space === SPACE_GLOBAL) {
+        $counts['unread'] = $countSafe('SELECT COUNT(*) FROM messages WHERE is_read = 0 AND is_archived = 0');
+        $counts['apps']   = $countSafe('SELECT COUNT(*) FROM apps');
+    } elseif ($space === SPACE_SITE) {
+        $counts['projects'] = $countSafe("SELECT COUNT(*) FROM projects WHERE status = 'published'");
+        $counts['certs']    = $countSafe('SELECT COUNT(*) FROM certifications WHERE visible = 1');
+        $counts['posts']    = $countSafe('SELECT COUNT(*) FROM posts WHERE visible = 1');
+    } elseif ($space === SPACE_PHISHLAB) {
+        $counts['lab_users'] = $countSafe('SELECT COUNT(*) FROM lab_users');
     }
-    $currentAppSlug = (string) ($_GET['app'] ?? '');
-    $currentAppName = null;
-    $currentAppHasContent = null; // null = ningun app concreto seleccionado ("todas las apps")
-    foreach ($appsList as $ap) {
-        if ($ap['slug'] === $currentAppSlug) {
-            $currentAppName = $ap['display_name'];
-            $currentAppHasContent = (bool) $ap['has_content'];
+
+    $navGroups    = space_nav($space, $counts);
+    $spaceOptions = space_options($appsRows);
+    $spaceLabel   = $space;
+    foreach ($spaceOptions as $opt) {
+        if ($opt['id'] === $space) {
+            $spaceLabel = $opt['label'];
             break;
         }
     }
-    // Selector de proyectos (2026-09-08): secciones de contenido propio
-    // (Proyectos/Certificaciones/Blog/Mensajes) solo tienen sentido para una
-    // app que de verdad los gestiona -- eduolihez.com si, nowait (sitio
-    // estatico sin CMS) no. "Todas las apps" (sin selecionar ninguna) se
-    // trata como el contexto por defecto de siempre, para no cambiar el
-    // comportamiento de nadie que no haya tocado el selector todavia.
-    $showContentNav = $currentAppSlug === '' || $currentAppHasContent === true;
-    $contentOnlyPages = ['projects.php', 'certifications.php', 'posts.php', 'messages.php'];
-    // Query string que mantiene viva la app seleccionada al navegar por el
-    // menu -- sin esto, cada clic del sidebar perdia el ?app= y volvia
-    // silenciosamente a la vista "todas las apps" en la pagina siguiente.
-    $appQs = $currentAppSlug !== '' ? '?app=' . rawurlencode($currentAppSlug) : '';
-
-    // [etiqueta_grupo, url, [titulo, badge, icono, tipo_badge]]. tipo_badge:
-    // 'alert' (verde/llamada a la accion, como Mensajes) o 'count' (gris,
-    // solo informativo). Grupo '' no imprime cabecera (Panel va suelto).
-    $navGroups = [
-        '' => [
-            'index.php' => ['Panel', '', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>', 'count'],
-        ],
-        'Contenido' => [
-            'projects.php'       => ['Proyectos', (string) $publishedProjects, '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>', 'count'],
-            'certifications.php' => ['Certificaciones', (string) $visibleCerts, '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg>', 'count'],
-            'posts.php'          => ['Blog', (string) $visiblePosts, '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 4a2 2 0 012 2v6a2 2 0 01-2 2h-2m-4-6h.01M9 16h.01M9 12h.01M12 12h.01M12 16h.01M16 16h.01M16 12h.01" /></svg>', 'count'],
-        ],
-        'Actividad' => [
-            'messages.php'  => ['Mensajes', $unread > 0 ? (string) $unread : '', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>', 'alert'],
-            'analytics.php' => ['Analítica', '', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>', 'count'],
-        ],
-        'Multi-proyecto' => [
-            // admin.eduolihez.com (docs/designs/admin-dashboard.md): registro
-            // de apps con su propio sub-dashboard y clave de ingesta.
-            'apps.php' => ['Apps', (string) $countSafe('SELECT COUNT(*) FROM apps'), '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>', 'count'],
-            // Cuentas de lab.eduolihez.com (PhishLab completo) -- gate propio
-            // en PHP, ver server/lab/auth.php. Vive aparte de admin_users.
-            'lab-users.php' => ['PhishLab · Usuarios', (string) $countSafe('SELECT COUNT(*) FROM lab_users'), '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>', 'count'],
-        ],
-        'Sistema' => [
-            'integrations.php' => ['Integraciones', '', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 010 5.656l-3 3a4 4 0 01-5.656-5.656l1.5-1.5M10.172 13.828a4 4 0 010-5.656l3-3a4 4 0 015.656 5.656l-1.5 1.5" /></svg>', 'count'],
-            'security.php' => ['Seguridad', '', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>', 'count'],
-            'settings.php' => ['Ajustes', '', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>', 'count'],
-            'backup.php'   => ['Backup', '', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" /></svg>', 'count'],
-        ],
-    ];
-
-    // Oculta las secciones de contenido propio (Proyectos/Certificaciones/
-    // Blog/Mensajes) cuando la app seleccionada no las gestiona (ver
-    // $showContentNav mas arriba). Si un grupo se queda sin items despues de
-    // filtrar, se quita entero para no imprimir una cabecera vacia.
-    if (!$showContentNav) {
-        foreach ($navGroups as $groupLabel => $items) {
-            foreach ($contentOnlyPages as $page) {
-                unset($navGroups[$groupLabel][$page]);
-            }
-            if (!$navGroups[$groupLabel]) {
-                unset($navGroups[$groupLabel]);
-            }
-        }
-    }
+    // Pagina de inicio de cada espacio (destino de las opciones del selector).
+    $spaceHome = static function (string $id): string {
+        $page = $id === SPACE_GLOBAL ? 'index.php'
+            : ($id === SPACE_SITE ? 'projects.php'
+            : ($id === SPACE_PHISHLAB ? 'lab-users.php' : 'analytics.php'));
+        return $page . '?space=' . rawurlencode($id);
+    };
     ?>
 <!doctype html>
 <html lang="es">
@@ -136,708 +152,9 @@ function admin_header(string $title, string $active = ''): void
   JetBrains Mono Variable, subconjunto latino, licencia OFL). Se copian a
   assets/fonts/ para que el panel siga siendo autonomo y sin compilacion.
 */ ?>
-<style>
-  @font-face {
-    font-family: 'Inter';
-    font-style: normal;
-    font-weight: 100 900;
-    font-display: swap;
-    src: url('assets/fonts/inter-latin-wght-normal.woff2') format('woff2-variations');
-  }
-  @font-face {
-    font-family: 'JetBrains Mono';
-    font-style: normal;
-    font-weight: 100 800;
-    font-display: swap;
-    src: url('assets/fonts/jetbrains-mono-latin-wght-normal.woff2') format('woff2-variations');
-  }
-</style>
-<style>
-  /* Tema claro, minimal, tipo Linear/Vercel (2026-09-06): unificado para
-     TODO el panel, barra lateral incluida -- antes solo el contenido de
-     cada pagina llevaba este tema via un bloque ".subdash" aparte, y la
-     barra lateral se quedaba con el tema oscuro original "como chrome fijo
-     de navegacion". Union pedida expresamente: la barra oscura se leia como
-     un descuido, no como una decision. Con los tokens aqui y los componentes
-     de abajo ya usando var(...) en vez de colores sueltos, cambiar estos
-     valores re-pinta el panel entero sin tocar cada pagina. */
-  :root {
-    --bg: #fbfbfa; --soft: #f2f1ee; --card: #ffffff; --border: #e5e4e0;
-    --text: #16151a; --muted: #6b6b74; --faint: #9c9ba3;
-    --accent: #5b5bd6; --accent-hover: #4747c2; --accent-soft: #eeeefc;
-    --danger: #b3261e; --danger-soft: #fbe9e8;
-    --warn: #a15c00; --warn-soft: #fdf1de;
-    --green: #17794f; --green-soft: #e6f6ee;
-    --cyan: #0c8599; --cyan-soft: #e3f5f7;
-    --violet: #7048e8; --violet-soft: #f1ecfd;
-    --shadow: 0 1px 2px rgba(20, 20, 30, 0.04), 0 12px 32px -16px rgba(20, 20, 30, 0.14);
-    --shadow-sm: 0 1px 2px rgba(20, 20, 30, 0.05);
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0; background: var(--bg); color: var(--text);
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    font-size: 14px; line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
-  }
-  
-  /* Scrollbar personalizado */
-  ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { background: var(--bg); }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
-  ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
-
-  a { color: var(--accent); text-decoration: none; transition: color 0.15s ease; }
-  a:hover { color: var(--accent-hover); }
-  /* Foco general para enlaces y botones sueltos (los que no tienen ya un
-     anillo propio, como .menu-item o los campos de formulario mas abajo). */
-  a:focus-visible, button:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-  }
-
-  /* Grid Layout Principal */
-  .admin-layout {
-    display: grid;
-    grid-template-columns: 260px 1fr;
-    min-height: 100vh;
-  }
-
-  /* Sidebar */
-  .sidebar {
-    background: var(--soft);
-    border-right: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    position: sticky;
-    top: 0;
-    padding: 1.5rem;
-    overflow-y: auto;
-    z-index: 100;
-  }
-
-  .sidebar-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 2rem;
-  }
-
-  .brand-block {
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-  }
-
-  .brand {
-    font-family: 'JetBrains Mono', monospace;
-    font-weight: 700;
-    font-size: 1.15rem;
-    letter-spacing: -0.04em;
-    color: var(--text);
-    text-decoration: none;
-  }
-  .brand span { color: var(--accent); }
-
-  /* Selector de apps (docs/designs/admin-dashboard.md): a que sub-dashboard
-     apuntan las paginas de datos (hoy solo Analitica lee ?app=). <details>
-     nativo -- sin JS, se cierra solo al navegar a otra pagina. */
-  .app-switcher { position: relative; }
-  .app-switcher summary {
-    display: flex;
-    align-items: center;
-    gap: 0.35rem;
-    list-style: none;
-    cursor: pointer;
-    user-select: none;
-    font-size: 0.75rem;
-    color: var(--muted);
-    padding: 0.2rem 0.4rem;
-    margin-left: -0.4rem;
-    border-radius: 6px;
-    width: fit-content;
-  }
-  .app-switcher summary::-webkit-details-marker { display: none; }
-  .app-switcher summary:hover { background: var(--soft); color: var(--text); }
-  .app-switcher[open] summary { color: var(--text); }
-  .app-switcher-current { font-weight: 600; }
-  .app-switcher summary svg {
-    width: 12px; height: 12px; flex-shrink: 0;
-    transition: transform 0.15s;
-  }
-  .app-switcher[open] summary svg { transform: rotate(180deg); }
-  .app-switcher-menu {
-    position: absolute;
-    top: calc(100% + 4px);
-    left: -0.4rem;
-    z-index: 200;
-    min-width: 190px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    box-shadow: var(--shadow);
-    padding: 0.35rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.1rem;
-    backdrop-filter: blur(8px);
-  }
-  .app-switcher-menu a {
-    display: block;
-    padding: 0.4rem 0.55rem;
-    border-radius: 6px;
-    font-size: 0.8rem;
-    color: var(--text);
-    text-decoration: none;
-  }
-  .app-switcher-menu a:hover { background: var(--soft); }
-  .app-switcher-menu a.active { color: var(--accent); font-weight: 600; }
-  .app-switcher-manage {
-    margin-top: 0.25rem;
-    padding-top: 0.45rem !important;
-    border-top: 1px solid var(--border);
-    color: var(--faint) !important;
-    font-size: 0.72rem !important;
-  }
-
-  .sidebar-menu {
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
-    flex: 1;
-  }
-
-  /* Cabecera de grupo (Contenido / Actividad / Sistema): mismo patron mono
-     versalita que el "section-kicker" del sitio publico, para que el panel
-     no se sienta un sistema aparte. */
-  .nav-group-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.65rem;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--faint);
-    margin: 1.1rem 0 0.4rem 0.85rem;
-  }
-  .nav-group-label:first-child {
-    margin-top: 0;
-  }
-
-  .menu-item {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.6rem 0.85rem 0.6rem 1.05rem;
-    border-radius: 0.5rem;
-    color: var(--muted);
-    font-weight: 500;
-    font-size: 0.88rem;
-    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-    border: 1px solid transparent;
-  }
-
-  /* Barra de acento a la izquierda en vez de solo el tinte de fondo: se
-     reconoce la seccion activa incluso pasando la vista rapido por el menu. */
-  .menu-item::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0.25rem;
-    bottom: 0.25rem;
-    width: 2px;
-    border-radius: 99px;
-    background: var(--accent);
-    opacity: 0;
-    transition: opacity 0.2s ease;
-  }
-
-  .menu-item:hover {
-    background: var(--soft);
-    color: var(--text);
-  }
-
-  .menu-item.active {
-    background: var(--accent-soft);
-    color: var(--accent);
-    border-color: transparent;
-  }
-  .menu-item.active::before {
-    opacity: 1;
-  }
-
-  .menu-item:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 1px;
-  }
-
-  .menu-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: inherit;
-    flex-shrink: 0;
-  }
-
-  .menu-label {
-    flex-grow: 1;
-  }
-
-  .badge-count {
-    background: var(--accent);
-    color: var(--bg);
-    font-size: 0.7rem;
-    font-weight: 700;
-    border-radius: 99px;
-    padding: 0.05rem 0.4rem;
-    min-width: 18px;
-    text-align: center;
-  }
-
-  /* Contador informativo (cuantos hay), distinto del aviso de "hay algo que
-     mirar" (badge-count, verde): mismo hueco, tono neutro. */
-  .badge-muted {
-    background: var(--border);
-    color: var(--faint);
-    font-size: 0.7rem;
-    font-weight: 700;
-    font-family: 'JetBrains Mono', monospace;
-    border-radius: 99px;
-    padding: 0.05rem 0.45rem;
-    min-width: 18px;
-    text-align: center;
-  }
-  .menu-item.active .badge-muted {
-    color: var(--accent);
-    background: var(--accent-soft);
-  }
-
-  .sidebar-footer {
-    border-top: 1px solid var(--border);
-    padding-top: 1rem;
-    margin-top: 1.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .user-info {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-  }
-
-  .user-info .avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 0.375rem;
-    background: var(--border);
-    color: var(--text);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 0.75rem;
-    font-family: 'JetBrains Mono', monospace;
-  }
-
-  .user-info .details {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .user-info .username {
-    font-weight: 600;
-    font-size: 0.85rem;
-    color: var(--text);
-  }
-
-  .user-info .role {
-    font-size: 0.72rem;
-    color: var(--faint);
-  }
-
-  .sidebar-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-
-  .action-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 0.75rem;
-    border-radius: 0.375rem;
-    font-size: 0.8rem;
-    color: var(--muted);
-    font-weight: 500;
-    transition: all 0.2s;
-    background: none;
-    border: none;
-    cursor: pointer;
-    width: 100%;
-    text-align: left;
-  }
-
-  .action-btn:hover {
-    background: var(--soft);
-    color: var(--text);
-  }
-
-  .action-btn:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 1px;
-  }
-
-  .action-btn.danger-text:hover {
-    color: var(--danger);
-    background: var(--danger-soft);
-  }
-
-  /* Main Content Wrapper */
-  .main-content-wrapper {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    min-width: 0;
-  }
-
-  header.topbar {
-    position: sticky;
-    top: 0;
-    z-index: 90;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1rem 2rem;
-    background: rgba(251, 251, 250, 0.82);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
-  }
-
-  .topbar-left {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  .topbar-title {
-    font-weight: 700;
-    font-size: 1.1rem;
-    color: var(--text);
-  }
-
-  .user-greeting {
-    font-size: 0.85rem;
-    color: var(--faint);
-    font-weight: 500;
-  }
-
-  .sidebar-toggle-btn {
-    background: none;
-    border: none;
-    padding: 0.25rem;
-    color: var(--text);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .mobile-only {
-    display: none;
-  }
-
-  .sidebar-overlay {
-    display: none;
-  }
-
-  main {
-    flex-grow: 1;
-    padding: 2rem;
-    max-width: 1300px;
-    width: 100%;
-    margin: 0 auto;
-  }
-
-  /* Cards premium */
-  .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 0.75rem;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    box-shadow: var(--shadow);
-  }
-
-  /* Card "hundida": para contenido citado/preformateado (p.ej. el cuerpo de
-     un mensaje) dentro de otra card, un tono de fondo distinto en vez de
-     borde extra. */
-  .card.inset { background: var(--bg); box-shadow: none; backdrop-filter: none; }
-
-  /* Caja de fondo neutro para miniaturas/paneles sueltos que no son una
-     .card completa (marcador de imagen sin logo, vista previa de un campo...). */
-  .soft-box { background: var(--soft); }
-
-  h1 { font-size: 1.75rem; font-weight: 700; margin: 0 0 1.5rem; letter-spacing: -0.03em; }
-  h2 { font-size: 1.25rem; font-weight: 700; margin: 1.5rem 0 1rem; letter-spacing: -0.02em; color: var(--text); }
-  h3 { font-size: 0.85rem; font-weight: 600; margin: 0 0 1rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
-
-  .grid { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
-  .grid4 { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
-
-  /* Selector de proyectos (index.php sin ?app=). Ancho maximo por tarjeta a
-     proposito (a diferencia de .grid): con 1-2 apps, dejar que se estiren a
-     todo el ancho disponible se veia desangelado (mucho hueco vacio dentro
-     de la propia tarjeta) -- mejor tarjetas de tamano fijo y que sobre
-     espacio alrededor, no dentro. */
-  .project-picker { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fill, minmax(300px, 360px)); }
-  .project-picker-card {
-    display: block; text-decoration: none; color: inherit; cursor: pointer;
-    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.2s ease, box-shadow 0.2s ease;
-  }
-  .project-picker-card:hover { transform: translateY(-3px); border-color: var(--accent); box-shadow: 0 12px 24px -12px rgb(0 0 0 / 0.18); }
-
-  .picker-avatar {
-    width: 40px; height: 40px; border-radius: 0.6rem; flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 700; font-size: 1.05rem; font-family: 'JetBrains Mono', monospace;
-    background: var(--accent-soft); color: var(--accent);
-  }
-  .picker-avatar.cyan { background: var(--cyan-soft); color: var(--cyan); }
-  .picker-avatar.violet { background: var(--violet-soft); color: var(--violet); }
-  .picker-avatar.warn { background: var(--warn-soft); color: var(--warn); }
-
-  .picker-main-stat { display: flex; align-items: baseline; flex-wrap: wrap; }
-  .picker-main-stat .num { font-family: 'JetBrains Mono', monospace; font-size: 2.25rem; font-weight: 700; color: var(--accent); line-height: 1; }
-  .picker-main-stat .num.cyan { color: var(--cyan); }
-  .picker-main-stat .num.violet { color: var(--violet); }
-  .picker-main-stat .num.warn { color: var(--warn); }
-  .picker-main-stat .lbl { color: var(--muted); font-size: 0.82rem; font-weight: 500; }
-
-  .picker-mini-pills { display: flex; gap: 0.5rem; margin-top: 1rem; }
-  .mini-pill {
-    display: inline-block; padding: 0.2rem 0.6rem; border-radius: 0.375rem;
-    font-size: 0.72rem; font-weight: 600; background: var(--soft); color: var(--muted);
-    border: 1px solid var(--border);
-  }
-  .picker-cta {
-    margin-top: 1.25rem; padding-top: 0.85rem; border-top: 1px solid var(--border);
-    font-size: 0.82rem; font-weight: 600; color: var(--accent);
-  }
-
-  .stat { 
-    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.25s ease;
-    position: relative;
-    overflow: hidden;
-  }
-  .stat::before {
-    content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%;
-    background: var(--accent); opacity: 0; transition: opacity 0.25s;
-  }
-  .stat:hover::before { opacity: 1; }
-  .stat:hover { border-color: rgba(20, 20, 30, 0.16); transform: translateY(-4px); }
-  .stat .num { 
-    font-family: 'JetBrains Mono', monospace; 
-    font-size: 2.25rem; 
-    font-weight: 700; 
-    color: var(--accent); 
-    line-height: 1; 
-    letter-spacing: -0.04em; 
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-  }
-  .stat .num.cyan { color: var(--cyan); }
-  .stat .num.warn { color: var(--warn); }
-  .stat .num.violet { color: var(--violet); }
-  .stat .num.danger { color: var(--danger); }
-  .stat .lbl { color: var(--muted); font-size: 0.82rem; margin-top: 0.75rem; font-weight: 500; line-height: 1.5; }
-  
-  .delta { 
-    font-size: 0.72rem; font-weight: 700; margin-left: 0.5rem; padding: 0.15rem 0.4rem; 
-    border-radius: 0.375rem; vertical-align: middle;
-  }
-  .delta.up { color: var(--green); background: var(--green-soft); }
-  .delta.down { color: var(--danger); background: var(--danger-soft); }
-  .delta.flat { color: var(--faint); background: var(--border); }
-
-  /* Tablas */
-  table { width: 100%; border-collapse: collapse; }
-  th, td { text-align: left; padding: 1rem 0.85rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
-  th { color: var(--faint); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; }
-  tr:last-child td { border-bottom: none; }
-  tr { transition: background-color 0.15s ease; }
-  tr:hover td { background: rgba(20, 20, 30, 0.025); }
-
-  /* Form Controls */
-  label { display: block; margin: 1rem 0 0.4rem; font-weight: 600; font-size: 0.85rem; color: var(--text); }
-  input[type=text], input[type=email], input[type=password], input[type=url],
-  input[type=number], input[type=date], input[type=search], textarea, select {
-    width: 100%; padding: 0.7rem 0.9rem; background: var(--card);
-    border: 1px solid var(--border); border-radius: 0.5rem; color: var(--text);
-    font-size: 0.92rem; font-family: inherit; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  input:focus, textarea:focus, select:focus {
-    outline: none; border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-soft);
-    background: var(--card);
-  }
-  textarea { resize: vertical; min-height: 120px; }
-  
-  .row2 { display: grid; gap: 1.5rem; grid-template-columns: 1fr 1fr; }
-  .row3 { display: grid; gap: 1.5rem; grid-template-columns: repeat(3, 1fr); }
-
-  /* Botones */
-  .btn {
-    display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer;
-    padding: 0.65rem 1.25rem; border-radius: 0.5rem; font-weight: 600; font-size: 0.88rem;
-    border: 1px solid transparent; background: var(--accent); color: var(--bg);
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  .btn:hover { background: var(--accent-hover); box-shadow: var(--shadow); }
-  .btn.ghost { background: transparent; color: var(--text); border-color: var(--border); }
-  .btn.ghost:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
-  .btn.danger { background: transparent; color: var(--danger); border-color: rgba(179, 38, 30, 0.35); }
-  .btn.danger:hover { background: var(--danger-soft); }
-  .btn.sm { padding: 0.4rem 0.85rem; font-size: 0.8rem; border-radius: 0.375rem; }
-  .btn.icon { padding: 0.4rem 0.55rem; font-size: 0.85rem; border-radius: 0.375rem; }
-  .btn[disabled] { opacity: 0.35; pointer-events: none; }
-  .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-
-  /* Badges */
-  .pill { 
-    display: inline-block; padding: 0.15rem 0.5rem; border-radius: 0.375rem; 
-    font-size: 0.72rem; font-weight: 600; border: 1px solid var(--border); 
-    background: var(--soft); color: var(--muted); 
-  }
-  .pill.on { color: var(--green); border-color: transparent; background: var(--green-soft); }
-  .pill.off { color: var(--faint); background: var(--border); }
-  .pill.warn { color: var(--warn); border-color: transparent; background: var(--warn-soft); }
-  .pill.danger { color: var(--danger); border-color: transparent; background: var(--danger-soft); }
-
-  .actions { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
-  .flash { padding: 0.85rem 1.25rem; border-radius: 0.5rem; margin-bottom: 1.5rem; font-size: 0.88rem; font-weight: 500; }
-  .flash.ok { background: var(--green-soft); color: var(--green); border: 1px solid transparent; }
-  .flash.err { background: var(--danger-soft); color: var(--danger); border: 1px solid transparent; }
-  .flash.warn { background: var(--warn-soft); color: var(--warn); border: 1px solid transparent; }
-  .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 1.25rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
-  .hint { color: var(--faint); font-size: 0.78rem; margin-top: 0.3rem; line-height: 1.5; }
-  
-  /* Horizontal bar graphs */
-  .bar-wrap { height: 6px; background: var(--border); border-radius: 99px; overflow: hidden; margin-top: 0.4rem; }
-  .bar { height: 100%; background: var(--cyan); border-radius: 99px; }
-  .bar.green { background: var(--green); }
-  .bar.violet { background: var(--violet); }
-  .barline { margin-bottom: 0.85rem; }
-  .barline .lab { display: flex; justify-content: space-between; font-size: 0.82rem; gap: 1rem; }
-  .barline .lab span:first-child { color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .barline .lab span:last-child { color: var(--faint); white-space: nowrap; font-family: 'JetBrains Mono', monospace; }
-  
-  /* Vertical bar charts */
-  .chart { display: flex; align-items: flex-end; gap: 0.5rem; height: 180px; overflow-x: auto; padding-bottom: 0.25rem; border-bottom: 1px solid var(--border); }
-  .chart .col { flex: 1 0 16px; display: flex; flex-direction: column; align-items: center; gap: 0.35rem; min-width: 16px; }
-  .chart .bar-v { width: 100%; background: var(--accent); border-radius: 4px 4px 0 0; min-height: 4px; transition: height 0.3s ease, background 0.15s; }
-  .chart .bar-v:hover { background: var(--accent-hover); filter: brightness(1.1); cursor: pointer; }
-  .chart .tick { color: var(--faint); font-size: 0.62rem; white-space: nowrap; margin-top: 0.2rem; }
-  .chart .val { color: var(--faint); font-size: 0.68rem; font-family: 'JetBrains Mono', monospace; }
-  
-  .tabs { display: flex; gap: 0.35rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
-  .tabs a { padding: 0.45rem 1rem; border-radius: 0.5rem; font-size: 0.82rem; font-weight: 500; color: var(--muted); border: 1px solid var(--border); transition: all 0.2s; }
-  .tabs a.active { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
-  .tabs a:hover { text-decoration: none; color: var(--text); border-color: var(--muted); }
-  .tabs a:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
-  
-  .checkline { display: flex; align-items: flex-start; gap: 0.75rem; margin: 0 0 1.25rem; font-weight: 400; cursor: pointer; }
-  .checkline input { width: auto; margin-top: 0.25rem; cursor: pointer; }
-  .checkline strong { display: block; font-size: 0.9rem; color: var(--text); }
-  .empty { padding: 3rem; color: var(--muted); text-align: center; font-style: italic; }
-  .scroll-x { overflow-x: auto; border-radius: 0.5rem; border: 1px solid var(--border); background: var(--card); }
-  .nowrap { white-space: nowrap; }
-
-  /* Titulo de seccion con icono: mismo peso visual que h2 pero mas facil de
-     escanear en una pagina con muchas secciones (dashboard). */
-  .h2-icon { display: flex; align-items: center; gap: 0.55rem; }
-  .h2-icon svg { flex-shrink: 0; color: var(--accent); opacity: 0.9; }
-
-  /* Mini grafico de tendencia embebido en una stat card: mismas barras que
-     .chart pero sin ejes ni etiquetas, para no competir con el numero grande. */
-  .spark { display: flex; align-items: flex-end; gap: 2px; height: 26px; margin-top: 0.85rem; }
-  .spark i { flex: 1; display: block; background: var(--accent); opacity: 0.28; border-radius: 2px 2px 0 0; min-height: 2px; font-style: normal; }
-  .spark i:last-child { opacity: 1; }
-  .spark.cyan i { background: var(--cyan); }
-  .spark.violet i { background: var(--violet); }
-  .spark.warn i { background: var(--warn); }
-
-  /* Rejilla de "casillas" de estado (salud del sistema, seguridad): se lee de
-     un vistazo mucho mas rapido que una tabla de filas clave/valor. */
-  .health-grid { display: grid; gap: 0.75rem; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); }
-  .health-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.85rem 1rem; background: var(--soft); border: 1px solid var(--border); border-radius: 0.6rem; }
-  .health-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; background: var(--faint); box-shadow: 0 0 0 3px var(--border); }
-  .health-dot.ok { background: var(--green); box-shadow: 0 0 0 3px var(--green-soft); }
-  .health-dot.warn { background: var(--warn); box-shadow: 0 0 0 3px var(--warn-soft); }
-  .health-dot.danger { background: var(--danger); box-shadow: 0 0 0 3px var(--danger-soft); }
-  .health-body { min-width: 0; }
-  .health-val { font-size: 0.86rem; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .health-lbl { font-size: 0.72rem; color: var(--faint); margin-top: 0.1rem; }
-
-  /* Linea de tiempo para actividad reciente: mas facil de seguir que filas de
-     tabla sueltas, y el color del punto adelanta el tipo de accion. */
-  .timeline-item { display: flex; gap: 0.85rem; padding: 0.8rem 0; border-bottom: 1px solid var(--border); }
-  .timeline-item:last-child { border-bottom: none; padding-bottom: 0; }
-  .timeline-item:first-child { padding-top: 0; }
-  .timeline-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); flex-shrink: 0; margin-top: 0.4rem; }
-  .timeline-dot.green { background: var(--green); }
-  .timeline-dot.cyan { background: var(--cyan); }
-  .timeline-dot.violet { background: var(--violet); }
-  .timeline-dot.danger { background: var(--danger); }
-  .timeline-body { flex: 1; min-width: 0; }
-
-  /* Responsive Sidebar rules */
-  @media (max-width: 900px) {
-    .admin-layout {
-      grid-template-columns: 1fr;
-    }
-    .sidebar {
-      position: fixed;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 270px;
-      transform: translateX(-100%);
-      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 10px 0 25px rgba(20, 20, 30, 0.18);
-    }
-    .sidebar.open {
-      transform: translateX(0);
-    }
-    .mobile-only {
-      display: flex;
-    }
-    .sidebar-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(20, 20, 30, 0.4);
-      backdrop-filter: blur(4px);
-      z-index: 99;
-      display: none;
-      transition: opacity 0.25s;
-    }
-    .sidebar-overlay.open {
-      display: block;
-    }
-    header.topbar {
-      padding: 1rem 1.5rem;
-    }
-    main {
-      padding: 1.5rem;
-    }
-  }
-
-</style>
+<?php /* Sincrono y antes del CSS: fija data-theme sin destello (CSP: script-src 'self'). */ ?>
+<script src="<?= e(asset_url('theme.js')) ?>"></script>
+<link rel="stylesheet" href="<?= e(asset_url('admin.css')) ?>">
 </head>
 <body>
 <div class="admin-layout">
@@ -846,23 +163,19 @@ function admin_header(string $title, string $active = ''): void
   <aside id="admin-sidebar" class="sidebar">
     <div class="sidebar-header">
       <div class="brand-block">
-        <a href="index.php" class="brand">&gt;_ <span>admin</span></a>
-        <?php if ($appsList): ?>
-          <details class="app-switcher">
-            <summary>
-              <span class="app-switcher-current"><?= e($currentAppName ?? 'Todas las apps') ?></span>
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6" /></svg>
-            </summary>
-            <div class="app-switcher-menu">
-              <a href="index.php" class="<?= $currentAppSlug === '' ? 'active' : '' ?>">Selector de proyectos</a>
-              <?php foreach ($appsList as $ap): ?>
-                <a href="index.php?app=<?= e(rawurlencode($ap['slug'])) ?>"
-                   class="<?= $currentAppSlug === $ap['slug'] ? 'active' : '' ?>"><?= e($ap['display_name']) ?></a>
-              <?php endforeach; ?>
-              <a href="apps.php" class="app-switcher-manage">Gestionar apps &rarr;</a>
-            </div>
-          </details>
-        <?php endif; ?>
+        <a href="index.php?space=global" class="brand">&gt;_ <span>admin</span></a>
+        <details class="app-switcher">
+          <summary>
+            <span class="app-switcher-current"><?= e($spaceLabel) ?></span>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6" /></svg>
+          </summary>
+          <div class="app-switcher-menu">
+            <?php foreach ($spaceOptions as $opt): ?>
+              <a href="<?= e($spaceHome($opt['id'])) ?>"
+                 class="<?= $opt['id'] === $space ? 'active' : '' ?>"><?= e($opt['label']) ?></a>
+            <?php endforeach; ?>
+          </div>
+        </details>
       </div>
       <button id="sidebar-close-btn" class="sidebar-toggle-btn mobile-only" aria-label="Cerrar menu">
         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
@@ -870,16 +183,16 @@ function admin_header(string $title, string $active = ''): void
     </div>
     
     <nav class="sidebar-menu">
-      <?php foreach ($navGroups as $groupLabel => $items): ?>
-        <?php if ($groupLabel !== ''): ?>
-          <p class="nav-group-label"><?= e($groupLabel) ?></p>
+      <?php foreach ($navGroups as $group): ?>
+        <?php if ($group['label'] !== ''): ?>
+          <p class="nav-group-label"><?= e($group['label']) ?></p>
         <?php endif; ?>
-        <?php foreach ($items as $file => [$label, $badge, $icon, $badgeType]): ?>
-          <a href="<?= e($file . $appQs) ?>" class="menu-item <?= $active === $file ? 'active' : '' ?>">
-            <span class="menu-icon"><?= $icon ?></span>
-            <span class="menu-label"><?= e($label) ?></span>
-            <?php if ($badge !== ''): ?>
-              <span class="badge-<?= $badgeType === 'alert' ? 'count' : 'muted' ?>"><?= e($badge) ?></span>
+        <?php foreach ($group['items'] as $item): ?>
+          <a href="<?= e($item['href']) ?>" class="menu-item <?= $active === $item['page'] ? 'active' : '' ?>">
+            <span class="menu-icon"><?= nav_icon($item['icon']) ?></span>
+            <span class="menu-label"><?= e($item['label']) ?></span>
+            <?php if ($item['badge'] !== ''): ?>
+              <span class="badge-<?= $item['badge_type'] === 'alert' ? 'count' : 'muted' ?>"><?= e($item['badge']) ?></span>
             <?php endif; ?>
           </a>
         <?php endforeach; ?>
@@ -903,6 +216,11 @@ function admin_header(string $title, string $active = ''): void
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
           Ver web
         </a>
+        <button type="button" id="theme-toggle" class="action-btn" aria-label="Cambiar tema" aria-pressed="false">
+          <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z" /></svg>
+          <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path stroke-linecap="round" stroke-linejoin="round" d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4l1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></svg>
+          Cambiar tema
+        </button>
         <form method="post" action="logout.php" style="display:inline; width:100%;">
           <?= csrf_field() ?>
           <button type="submit" class="action-btn danger-text">
@@ -937,27 +255,7 @@ function admin_footer(): void
   </div>
 </div>
 
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const openBtn = document.getElementById('sidebar-open-btn');
-    const closeBtn = document.getElementById('sidebar-close-btn');
-    const overlay = document.getElementById('sidebar-overlay');
-    const sidebar = document.getElementById('admin-sidebar');
-
-    const toggleSidebar = (state) => {
-      if (sidebar && overlay) {
-        sidebar.classList.toggle('open', state);
-        overlay.classList.toggle('open', state);
-        document.body.style.overflow = state ? 'hidden' : '';
-      }
-    };
-
-    if (openBtn) openBtn.addEventListener('click', () => toggleSidebar(true));
-    if (closeBtn) closeBtn.addEventListener('click', () => toggleSidebar(false));
-    if (overlay) overlay.addEventListener('click', () => toggleSidebar(false));
-  });
-</script>
-<script src="assets/admin.js"></script>
+<script src="<?= e(asset_url('admin.js')) ?>"></script>
 </body>
 </html>
 <?php
@@ -1009,6 +307,23 @@ function delta_badge(int $now, int $before): string
     $cls = $pct > 0 ? 'up' : ($pct < 0 ? 'down' : 'flat');
     $sig = $pct > 0 ? '+' : '';
     return '<span class="delta ' . $cls . '">' . $sig . $pct . '%</span>';
+}
+
+/**
+ * Cabecera comun de pagina: titulo, descripcion opcional y acciones a la derecha.
+ * $title, $description y $titleMeta se escapan; $actionsHtml es HTML de confianza
+ * generado por el llamador (botones, formularios con csrf_field(), etc.).
+ * $titleMeta: texto atenuado junto al titulo, p. ej. "(3 visibles de 5)".
+ */
+function page_header(string $title, string $description = '', string $actionsHtml = '', string $titleMeta = ''): void
+{
+    echo '<div class="page-header"><div class="page-header-text"><h1>' . e($title)
+        . ($titleMeta !== '' ? ' <span class="faint page-title-meta">' . e($titleMeta) . '</span>' : '')
+        . '</h1>'
+        . ($description !== '' ? '<p class="hint">' . e($description) . '</p>' : '')
+        . '</div>'
+        . ($actionsHtml !== '' ? '<div class="page-actions">' . $actionsHtml . '</div>' : '')
+        . '</div>';
 }
 
 /** Titulo de seccion con icono SVG delante (mismo tamano que h2). */

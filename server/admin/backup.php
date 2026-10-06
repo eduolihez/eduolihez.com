@@ -203,7 +203,7 @@ $nMessages = (int) db()->query('SELECT COUNT(*) FROM messages')->fetchColumn();
 admin_header('Backup', 'backup.php');
 show_flash();
 ?>
-<h1>Copia de seguridad</h1>
+<?php page_header('Copia de seguridad'); ?>
 
 <?php if ($errors): ?>
   <div class="flash err"><?= e(implode(' ', $errors)) ?></div>
@@ -228,7 +228,7 @@ show_flash();
     desde <a href="messages.php">Mensajes → Exportar CSV</a>) ni usuarios ni contrasenas.
     Las imagenes tampoco: esas viven en <code>/uploads</code> y se copian por FTP.
   </p>
-  <div class="actions" style="margin-top:1rem;">
+  <div class="actions mt-2">
     <a class="btn" href="?export=json">Descargar backup JSON</a>
     <a class="btn ghost" href="messages.php?export=csv">Exportar mensajes (CSV)</a>
     <a class="btn ghost" href="analytics.php?days=365&amp;export=csv">Exportar visitas (CSV)</a>
@@ -237,7 +237,7 @@ show_flash();
 
 <h2>Restaurar copia</h2>
 <div class="card">
-  <div class="flash warn" style="margin-bottom:1rem;">
+  <div class="flash warn mb-2">
     <strong>Cuidado:</strong> el modo "reemplazar" <u>borra</u> todos los proyectos y
     certificaciones actuales antes de importar. Descarga primero una copia de lo que
     tienes ahora, por si acaso.
@@ -258,7 +258,7 @@ show_flash();
     </select>
     <div class="hint">Los ajustes siempre se sobrescriben con los de la copia.</div>
 
-    <label for="confirm_replace" style="margin-top:1rem;">Confirmacion (solo si eliges "Reemplazar")</label>
+    <label for="confirm_replace" class="mt-2">Confirmacion (solo si eliges "Reemplazar")</label>
     <input type="text" id="confirm_replace" name="confirm_replace" maxlength="20" placeholder="BORRAR" autocomplete="off">
     <div class="hint">Si el modo es "Reemplazar", escribe <code>BORRAR</code> aqui para confirmar. En modo "Anadir" este campo no hace nada.</div>
 

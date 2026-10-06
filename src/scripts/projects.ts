@@ -68,6 +68,9 @@ function badgeMeta(b: string, labels: ProjectLabels): { className: string; text:
 let currentModalCloseHandler: (() => void) | null = null;
 let escapeListenerBound = false;
 
+/** Tarjetas visibles antes de pulsar "Ver todos los proyectos". */
+const INITIAL_VISIBLE_COUNT = 6;
+
 function bindGlobalEscapeHandler(): void {
   if (escapeListenerBound) return;
   escapeListenerBound = true;
@@ -299,6 +302,31 @@ export function initProjects(): void {
 
         items.forEach((p) => grid.appendChild(makeCard(p)));
 
+        const cards = Array.from(grid.querySelectorAll<HTMLElement>('article'));
+        const showMoreWrap = document.getElementById('projects-show-more-wrap');
+        const showMoreBtn = document.getElementById('projects-show-more');
+        let activeFilter = 'all';
+        // Una vez se pulsa "ver todos" o se cambia de filtro, el limite
+        // inicial deja de aplicar para el resto de la sesion en esta pagina.
+        let expanded = cards.length <= INITIAL_VISIBLE_COUNT;
+
+        function applyVisibility(): void {
+          cards.forEach((card, i) => {
+            const badgesAttr = card.getAttribute('data-badges') || '';
+            const badges = badgesAttr ? badgesAttr.split(',') : [];
+            const matchesFilter = activeFilter === 'all' || badges.includes(activeFilter);
+            const withinInitialLimit = expanded || i < INITIAL_VISIBLE_COUNT;
+            card.classList.toggle('hidden', !(matchesFilter && withinInitialLimit));
+          });
+          showMoreWrap?.classList.toggle('hidden', expanded);
+        }
+        applyVisibility();
+
+        showMoreBtn?.addEventListener('click', () => {
+          expanded = true;
+          applyVisibility();
+        });
+
         const filterButtons = document.querySelectorAll<HTMLButtonElement>('.project-filter-btn');
         filterButtons.forEach((btn) => {
           btn.addEventListener('click', () => {
@@ -309,17 +337,11 @@ export function initProjects(): void {
             btn.classList.add('bg-accent', 'text-bg', 'border-accent');
             btn.classList.remove('bg-bg-soft/40', 'text-text-muted', 'border-bg-border/60');
 
-            const filterValue = btn.getAttribute('data-filter');
-            const cards = grid.querySelectorAll('article');
-            cards.forEach((card) => {
-              const badgesAttr = card.getAttribute('data-badges') || '';
-              const badges = badgesAttr ? badgesAttr.split(',') : [];
-              if (filterValue === 'all' || badges.includes(filterValue || '')) {
-                card.classList.remove('hidden');
-              } else {
-                card.classList.add('hidden');
-              }
-            });
+            // Cambiar de filtro tambien revela el resto: limitar a 6 solo
+            // tiene sentido en la vista "todos" sin filtrar.
+            activeFilter = btn.getAttribute('data-filter') || 'all';
+            expanded = true;
+            applyVisibility();
           });
         });
       })

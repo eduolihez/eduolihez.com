@@ -95,10 +95,14 @@ export function initCerts(): void {
     return svg;
   }
 
-  /** Recuadro del logo: imagen real si la hay, si no el sello coloreado. */
+  /**
+   * Recuadro de insignia: la imagen real de Credly si existe (formato
+   * galeria), si no el sello coloreado -- nunca una imagen inventada para
+   * las certificaciones que solo tienen PDF (Trend Micro, LinkedIn...).
+   */
   function logoBox(logoUrl: string | undefined, altText: string, color: string): HTMLDivElement {
     const box = document.createElement('div');
-    box.className = 'flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-md border border-bg-border';
+    box.className = 'flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-md border border-bg-border';
     const logo = safeUrl(logoUrl);
     if (logo) {
       box.classList.add('bg-bg-soft');
@@ -107,12 +111,12 @@ export function initCerts(): void {
       img.alt = altText || '';
       img.loading = 'lazy';
       img.decoding = 'async';
-      img.className = 'h-full w-full object-contain p-1.5';
+      img.className = 'h-full w-full object-contain p-2';
       box.appendChild(img);
     } else {
       box.style.backgroundColor = color + '1a';
       box.style.borderColor = color + '33';
-      box.appendChild(sealIcon(color, 'h-5 w-5'));
+      box.appendChild(sealIcon(color, 'h-7 w-7'));
     }
     return box;
   }
@@ -271,7 +275,7 @@ export function initCerts(): void {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className =
-      'reveal is-visible group flex w-full cursor-pointer items-center gap-3 rounded-lg border border-bg-border bg-bg-card p-4 text-left transition hover:border-accent/40 hover:bg-bg-soft/40 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-accent';
+      'reveal is-visible group flex w-full cursor-pointer flex-col items-center gap-2 rounded-lg border border-bg-border bg-bg-card p-4 text-center transition hover:border-accent/40 hover:bg-bg-soft/40 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-accent';
     btn.setAttribute('aria-label', `${labels.viewIssuer} ${issuer} (${certs.length})`);
 
     let logo = '';
@@ -284,25 +288,16 @@ export function initCerts(): void {
     }
     btn.appendChild(logoBox(logo, issuer, color));
 
-    const info = document.createElement('div');
-    info.className = 'min-w-0 flex-1';
-
     const name = document.createElement('p');
-    name.className = 'truncate text-sm font-semibold text-text';
+    name.className = 'line-clamp-2 text-sm font-semibold text-text';
     name.textContent = issuer;
-    info.appendChild(name);
-
-    const sub = document.createElement('p');
-    sub.className = 'mt-0.5 text-xs text-text-muted';
-    sub.textContent = `${certs.length} ${certs.length === 1 ? labels.credential : labels.credentials}`;
-    info.appendChild(sub);
-    btn.appendChild(info);
+    btn.appendChild(name);
 
     const count = document.createElement('span');
-    count.className = 'shrink-0 rounded-full px-2 py-0.5 font-mono text-sm font-bold tabular-nums';
+    count.className = 'rounded-full px-2 py-0.5 font-mono text-xs font-bold tabular-nums';
     count.style.color = color;
     count.style.backgroundColor = color + '1a';
-    count.textContent = String(certs.length);
+    count.textContent = `${certs.length} ${certs.length === 1 ? labels.credential : labels.credentials}`;
     btn.appendChild(count);
 
     btn.addEventListener('click', () => {
@@ -316,11 +311,12 @@ export function initCerts(): void {
     return btn;
   }
 
-  /** Tarjeta de UNA certificacion. */
+  /** Tarjeta de UNA certificacion, en formato galeria (insignia + texto centrados). */
   function makeCertCard(c: Certification): HTMLElement {
     const href = safeUrl(c.credential_url);
     const wrap = document.createElement(href ? 'a' : 'div') as HTMLAnchorElement | HTMLDivElement;
-    wrap.className = 'reveal is-visible group flex items-center gap-3 rounded-lg border border-bg-border bg-bg-card p-4 transition hover:border-text-faint/40';
+    wrap.className =
+      'reveal is-visible group flex flex-col items-center gap-2 rounded-lg border border-bg-border bg-bg-card p-4 text-center transition hover:border-text-faint/40';
     if (href) {
       (wrap as HTMLAnchorElement).href = href;
       (wrap as HTMLAnchorElement).target = '_blank';
@@ -329,21 +325,19 @@ export function initCerts(): void {
 
     wrap.appendChild(logoBox(c.logo_url, c.issuer || c.name || '', issuerColor((c.issuer || c.name || '?').trim())));
 
-    const info = document.createElement('div');
-    info.className = 'min-w-0 flex-1';
     const name = document.createElement('p');
     name.className = 'line-clamp-2 text-sm font-medium text-text';
     name.textContent = c.name || '';
-    info.appendChild(name);
+    wrap.appendChild(name);
+
     const meta = document.createElement('p');
-    meta.className = 'mt-0.5 truncate text-xs text-text-muted';
+    meta.className = 'text-xs text-text-muted';
     meta.textContent = [c.issuer, c.issue_date].filter(Boolean).join(' · ');
-    info.appendChild(meta);
-    wrap.appendChild(info);
+    wrap.appendChild(meta);
 
     if (href) {
       const a = document.createElement('span');
-      a.className = 'shrink-0 text-text-faint transition group-hover:text-accent';
+      a.className = 'text-text-faint transition group-hover:text-accent';
       a.setAttribute('aria-hidden', 'true');
       a.textContent = '↗';
       wrap.appendChild(a);

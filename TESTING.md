@@ -15,7 +15,8 @@ Cubre el lado **TypeScript/Astro** (`src/`).
 El backend en PHP (`server/`) usa **PHPUnit** (`composer.json` +
 `phpunit.xml`, raíz del repo) — instalación e iniciativa separadas de Vitest,
 sin relación entre ambos runners. Cubre solo código SIN dependencias externas
-(de momento: `server/lib/text.php` y `server/lib/validate.php`) —
+(de momento: `server/lib/text.php`, `server/lib/validate.php` y la lógica
+de espacios del panel, `server/admin/partials/spaces.php` e `icons.php`) —
 `server/tests/bootstrap.php` deja claro por qué no arranca
 `server/lib/http.php` ni `config.php`: eso abriría una conexión real a MySQL
 de producción, que no existe (ni debe existir) en un entorno de test o CI, y
@@ -36,6 +37,33 @@ está todavía en ese workflow — se montó en esta misma sesión sin un entorn
 PHP a mano para verificarla en ejecución real, así que antes de darla por
 buena en CI hay que correr `composer test` una vez en una máquina con PHP
 8.1+ y confirmar que pasa.
+
+### PHP en local sin Composer
+
+```bash
+bash scripts/php-test.sh
+```
+
+Necesita un PHP local y `.superpowers/tools/phpunit.phar`. Si falta el phar,
+el script imprime el comando de descarga:
+
+```bash
+mkdir -p .superpowers/tools && curl -sSfL -o .superpowers/tools/phpunit.phar https://phar.phpunit.de/phpunit-10.5.66.phar
+```
+
+El script fija la versión (PHPUnit 10.5.66) y su SHA-256
+(`42bcac97bbf9fb1aecf5a7d6a1b37123a11e7e295458978f0e268999f6d9e50f`) y se
+niega a ejecutar un phar que no coincida. Al fijarlo se comprobó también la
+firma GPG de `phpunit-10.5.66.phar.asc` (clave de Sebastian Bergmann,
+huella `D840 6D0D 8294 7747 2937 7831 4AA3 9408 6372 C20A`). Para subir de
+versión: descarga la nueva, verifica su firma y actualiza `PHPUNIT_VERSION` y
+`PHPUNIT_SHA256` en `scripts/php-test.sh`.
+
+`composer test` sigue funcionando donde haya Composer. En ambos casos los
+tests de `server/tests/` no deben cargar `auth.php`, `http.php` ni `db.php`
+(ver el comentario de `server/tests/bootstrap.php`). Por eso
+`server/admin/partials/spaces.php` y `icons.php` son puras: sin dependencias
+de esos archivos, se pueden testear (`SpacesTest`).
 
 ## Capas de test
 
@@ -58,7 +86,9 @@ buena en CI hay que correr `composer test` una vez en una máquina con PHP
   de los artículos del blog) y `validate_public_url()` (el esquema de URL
   permitido en los formularios de `/admin`, incluidos los mismos bypass de
   `\`/`//`/tabulador que en `safeUrl()` — misma regla, dos implementaciones
-  independientes que no comparten fuente).
+  independientes que no comparten fuente). También la lógica pura de
+  espacios del panel admin (`server/admin/partials/spaces.php`, en
+  `server/tests/SpacesTest.php`).
 - **Integration / E2E:** no hay todavía. El sitio es principalmente
   contenido estático + un backend PHP que no se puede correr en local sin
   PHP instalado (ver `PRODUCT.md`, sección "Operating Context").

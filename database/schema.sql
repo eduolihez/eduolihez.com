@@ -238,7 +238,9 @@ CREATE TABLE IF NOT EXISTS `projects` (
   `created_at`     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at`     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  -- Cubre exactamente el ORDER BY de /api/projects.php.
+  -- idx_status_order es legado (`sort_order` ya no ordena la vista publica,
+  -- ver /api/projects.php); se deja por si `sort_order` vuelve a usarse.
+  -- idx_status_updated cubre el ORDER BY actual: featured, luego updated_at.
   KEY `idx_status_order` (`status`, `featured`, `sort_order`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -468,6 +470,10 @@ CALL add_column_if_missing('projects', 'store_url', 'VARCHAR(255) NULL');
 
 -- Proyectos: badges (etiquetas).
 CALL add_column_if_missing('projects', 'badges', 'VARCHAR(255) NULL AFTER `stack`');
+
+-- Proyectos: la portada publica ahora ordena por featured + ultima
+-- actualizacion (ver /api/projects.php), no por sort_order.
+CALL add_index_if_missing('projects', 'idx_status_updated', '`status`, `featured`, `updated_at`');
 
 -- Proyectos: anadir Zeora si el sitio ya tenia proyectos.
 --
@@ -713,6 +719,41 @@ UPDATE `projects` SET
   `status` = 'published'
 WHERE `title_es` = 'NoWait' AND `badges` = '["open-source"]' AND `status` = 'draft';
 
+-- Proyectos: anadir Chess Copilot (2026-09-22). Extension MV3 que analiza
+-- partidas de chess.com con Stockfish 16 en WASM enteramente en el cliente.
+-- Repo privado -- badge private-code, sin repo_url -- y sin landing propia
+-- todavia, asi que tampoco lleva demo_url.
+INSERT INTO `projects`
+  (`title_es`, `title_en`, `summary_es`, `summary_en`, `stack`, `badges`,
+   `repo_url`, `demo_url`, `store_url`, `featured`, `sort_order`, `status`)
+SELECT 'Chess Copilot', 'Chess Copilot',
+       'Extension de Chrome que analiza partidas de chess.com con Stockfish 16 en WebAssembly y muestra las mejores jugadas en el panel lateral nativo. Cien por cien local, sin backend ni telemetria; pensada solo para practica y analisis, no para partidas puntuadas.',
+       'Chrome extension that analyzes chess.com games with Stockfish 16 in WebAssembly and shows the best moves in the native side panel. Fully local, no backend or telemetry; built for practice and analysis, not rated games.',
+       '["JavaScript","Stockfish","WebAssembly","Chrome Extension"]', '["private-code"]',
+       NULL, NULL, NULL, 0, 13, 'published'
+WHERE EXISTS (SELECT 1 FROM `projects`)
+  AND NOT EXISTS (SELECT 1 FROM `projects` WHERE `title_es` = 'Chess Copilot');
+
+-- Proyectos: anadir BadaVeu (2026-09-22). Plataforma GovTech PWA de
+-- participacion ciudadana. Repo privado -- badge private-code -- y sin
+-- landing publica todavia.
+INSERT INTO `projects`
+  (`title_es`, `title_en`, `summary_es`, `summary_en`, `stack`, `badges`,
+   `repo_url`, `demo_url`, `store_url`, `featured`, `sort_order`, `status`)
+SELECT 'BadaVeu', 'BadaVeu',
+       'Plataforma GovTech PWA de participacion ciudadana para la gestion de incidencias urbanas en Badalona.',
+       'GovTech PWA for citizen participation and urban incident management in Badalona.',
+       '["TypeScript","PWA"]', '["private-code"]',
+       NULL, NULL, NULL, 0, 14, 'published'
+WHERE EXISTS (SELECT 1 FROM `projects`)
+  AND NOT EXISTS (SELECT 1 FROM `projects` WHERE `title_es` = 'BadaVeu');
+
+-- Zeora ya no esta activo (2026-09-22): se retira de la vista publica sin
+-- borrar la fila, por si se retoma. Guardado por el status anterior para no
+-- pisar una reactivacion manual hecha despues desde /admin.
+UPDATE `projects` SET `status` = 'draft'
+WHERE `title_es` = 'Zéora' AND `status` = 'published';
+
 -- ---------------------------------------------------------------------------
 -- Certificaciones: correcciones y ampliacion con las insignias de Credly
 -- (https://www.credly.com/users/eduolihez), revisadas 2026-08-25.
@@ -793,6 +834,58 @@ WHERE `name` IN (
 -- sin link.
 UPDATE `certifications` SET `credential_url` = 'https://www.credly.com/users/eduolihez'
 WHERE `name` = 'Fortinet NSE' AND `credential_url` IS NULL;
+
+-- Insignias reales de Credly (2026-09-22), no el logo generico del emisor:
+-- para el visualizador en formato galeria, cada credencial verificada en
+-- Credly muestra su propia imagen (revisado contra
+-- credly.com/users/eduolihez/badges). Las certificaciones sin badge de
+-- Credly (Trend Micro, LinkedIn...) no llevan imagen inventada -- se quedan
+-- con el sello de color + inicial, como hasta ahora.
+-- Guardado por `logo_url IS NULL`: si alguien sube un logo distinto a mano
+-- desde /admin, reimportar esto no lo pisa.
+UPDATE `certifications` SET `logo_url` = CASE `name`
+  WHEN 'IT Specialist - Python' THEN 'https://images.credly.com/images/3c4602d8-832e-4a24-b42d-00359ce746f7/ITS-Badges_Python_1200px.png'
+  WHEN 'IC3 Digital Literacy GS6 Level 1' THEN 'https://images.credly.com/images/29a6f7a3-2cf6-426c-969d-e432b44532e0/IC3_Digital_Literacy_Levels_1.png'
+  WHEN 'Microsoft Certified: Azure AI Fundamentals' THEN 'https://images.credly.com/images/4136ced8-75d5-4afb-8677-40b6236e2672/azure-ai-fundamentals-600x600.png'
+  WHEN 'Fortinet Certified Associate Cybersecurity' THEN 'https://images.credly.com/images/20082fc1-94af-4773-9df0-28856b566748/image.png'
+  WHEN 'Fortinet FortiGate 7.6 Operator' THEN 'https://images.credly.com/images/453a3ef3-b400-4840-91b1-2f1f5157e015/blob'
+  WHEN 'Fortinet NSE 3 Certified in Cybersecurity' THEN 'https://images.credly.com/images/7ca06297-1543-4ed2-b9fc-7f0af8635700/blob'
+  WHEN 'Technical Introduction to Cybersecurity 3.0' THEN 'https://images.credly.com/images/eb17d3c5-12f5-4be9-87b5-a6ccff62a22b/blob'
+  WHEN 'Fortinet Certified Fundamentals Cybersecurity' THEN 'https://images.credly.com/images/22a0ece5-ff05-4594-8320-25e55e9ae203/image.png'
+  WHEN 'Fortinet NSE 1 Certified in Cybersecurity' THEN 'https://images.credly.com/images/0dc7965b-8507-4312-9c12-1add6c50fa49/blob'
+  WHEN 'Fortinet NSE 2 Certified in Cybersecurity' THEN 'https://images.credly.com/images/a30952f3-f354-4233-b02a-690ffe95d190/blob'
+  WHEN 'Getting Started in Cybersecurity 3.0' THEN 'https://images.credly.com/images/a27867b1-d64f-4890-b577-89f162015407/blob'
+  WHEN 'Introduction to the Threat Landscape 3.0' THEN 'https://images.credly.com/images/a06a4e98-21bf-49ab-ad70-c61641f26fc8/blob'
+END
+WHERE `name` IN (
+  'IT Specialist - Python', 'IC3 Digital Literacy GS6 Level 1',
+  'Microsoft Certified: Azure AI Fundamentals', 'Fortinet Certified Associate Cybersecurity',
+  'Fortinet FortiGate 7.6 Operator', 'Fortinet NSE 3 Certified in Cybersecurity',
+  'Technical Introduction to Cybersecurity 3.0', 'Fortinet Certified Fundamentals Cybersecurity',
+  'Fortinet NSE 1 Certified in Cybersecurity', 'Fortinet NSE 2 Certified in Cybersecurity',
+  'Getting Started in Cybersecurity 3.0', 'Introduction to the Threat Landscape 3.0'
+) AND `logo_url` IS NULL;
+
+-- Correccion (2026-09-22): "Introduccion a la Ciberseguridad" (PDF propio de
+-- Cisco Networking Academy, 2023) y la insignia de Credly "Introduction to
+-- Cybersecurity" (Cisco, emitida 1 mar 2025) son el mismo curso -- se
+-- actualiza al nombre/fecha de Credly, mas verificable, y se anade la
+-- insignia real. El PDF original se mantiene como `credential_url`: no hay
+-- URL de insignia individual de Credly capturada para este par todavia.
+-- Mismo caso para "Introduction to Modern AI": el nombre ya coincidia, solo
+-- cambian emisor/fecha/imagen. Guardado por el `issuer` anterior exacto.
+UPDATE `certifications` SET
+  `name` = 'Introduction to Cybersecurity',
+  `issuer` = 'Cisco',
+  `issue_date` = '2025',
+  `logo_url` = 'https://images.credly.com/images/af8c6b4e-fc31-47c4-8dcb-eb7a2065dc5b/I2CS__1_.png'
+WHERE `name` = 'Introducción a la Ciberseguridad' AND `issuer` = 'Cisco Networking Academy';
+
+UPDATE `certifications` SET
+  `issuer` = 'Cisco',
+  `issue_date` = '2025',
+  `logo_url` = 'https://images.credly.com/images/e2d12302-10f9-40d4-8ff1-066a7008b61d/blob'
+WHERE `name` = 'Introduction to Modern AI' AND `issuer` = 'Cisco Networking Academy';
 
 -- Blog: etiquetas y fecha de publicacion propia.
 CALL add_column_if_missing('posts', 'tags',         "VARCHAR(255) NULL AFTER `cover_url`");

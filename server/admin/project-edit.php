@@ -162,10 +162,7 @@ if (!empty($errors)) {
     echo '<div class="flash err">' . e(implode(' ', $errors)) . '</div>';
 }
 ?>
-<div class="toolbar">
-  <h1 style="margin:0;"><?= $isEdit ? 'Editar proyecto' : 'Nuevo proyecto' ?></h1>
-  <a class="btn ghost" href="projects.php">&larr; Volver</a>
-</div>
+<?php page_header($isEdit ? 'Editar proyecto' : 'Nuevo proyecto', '', '<a class="btn ghost" href="projects.php">&larr; Volver</a>'); ?>
 
 <form method="post" enctype="multipart/form-data" class="card">
   <?= csrf_field() ?>
@@ -212,7 +209,7 @@ if (!empty($errors)) {
     </div>
   <?php endif; ?>
 
-  <label for="image_url" style="margin-top:1rem;">...o URL de imagen (opcional)</label>
+  <label for="image_url" class="mt-2">...o URL de imagen (opcional)</label>
   <input type="text" id="image_url" name="image_url" maxlength="255" value="<?= e($p['image_url']) ?>" placeholder="/uploads/projects/mi-imagen.jpg">
   <div class="hint">Si subes un archivo arriba, este campo se rellena solo. Tambien puedes pegar una URL externa: debe empezar por <code>https://</code> o por <code>/</code> (ruta interna).</div>
 
@@ -247,13 +244,18 @@ if (!empty($errors)) {
     </div>
   </div>
 
-  <input type="hidden" id="store_url" name="store_url" value="<?= e($p['store_url']) ?>">
+  <label for="store_url">URL de tienda <span class="faint">(Chrome Web Store, AMO... opcional)</span></label>
+  <input type="url" id="store_url" name="store_url" maxlength="255" value="<?= e($p['store_url']) ?>" placeholder="https://chromewebstore.google.com/detail/...">
 
   <div class="row2">
     <div>
-      <label for="sort_order">Orden de aparicion</label>
+      <label for="sort_order">Orden manual <span class="faint">(legado)</span></label>
       <input type="number" id="sort_order" name="sort_order" value="<?= (int) $p['sort_order'] ?>">
-      <div class="hint">Menor numero = aparece antes.</div>
+      <div class="hint">
+        Ya no decide el orden en la web: la portada muestra primero los <strong>destacados</strong>
+        y despues por <strong>ultima actualizacion</strong> (mas reciente primero), automaticamente.
+        Este numero se conserva por si algun dia vuelve a hacer falta un orden curado a mano.
+      </div>
     </div>
     <div>
       <label for="status">Estado</label>
@@ -269,7 +271,7 @@ if (!empty($errors)) {
     Marcar como destacado (aparece primero con etiqueta)
   </label>
 
-  <div style="margin-top:1.5rem;">
+  <div class="mt-3">
     <button type="submit" class="btn"><?= $isEdit ? 'Guardar cambios' : 'Crear proyecto' ?></button>
     <a class="btn ghost" href="projects.php">Cancelar</a>
   </div>

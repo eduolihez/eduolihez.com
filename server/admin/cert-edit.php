@@ -105,10 +105,7 @@ if (!empty($errors)) {
     echo '<div class="flash err">' . e(implode(' ', $errors)) . '</div>';
 }
 ?>
-<div class="toolbar">
-  <h1 style="margin:0;"><?= $isEdit ? 'Editar certificacion' : 'Nueva certificacion' ?></h1>
-  <a class="btn ghost" href="certifications.php">&larr; Volver</a>
-</div>
+<?php page_header($isEdit ? 'Editar certificacion' : 'Nueva certificacion', '', '<a class="btn ghost" href="certifications.php">&larr; Volver</a>'); ?>
 
 <form method="post" enctype="multipart/form-data" class="card">
   <?= csrf_field() ?>
@@ -140,7 +137,7 @@ if (!empty($errors)) {
     </div>
   <?php endif; ?>
 
-  <label for="logo_url" style="margin-top:1rem;">...o URL del logo (opcional)</label>
+  <label for="logo_url" class="mt-2">...o URL del logo (opcional)</label>
   <input type="text" id="logo_url" name="logo_url" maxlength="255" value="<?= e($c['logo_url']) ?>" placeholder="/uploads/certs/logo.png">
   <div class="hint">Si lo dejas vacio se muestra la inicial del emisor. Si pegas una URL externa,
   debe empezar por <code>https://</code> o por <code>/</code> (ruta interna).</div>
@@ -161,7 +158,7 @@ if (!empty($errors)) {
     Visible en la web
   </label>
 
-  <div style="margin-top:1.5rem;">
+  <div class="mt-3">
     <button type="submit" class="btn"><?= $isEdit ? 'Guardar cambios' : 'Crear certificacion' ?></button>
     <a class="btn ghost" href="certifications.php">Cancelar</a>
   </div>

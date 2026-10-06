@@ -199,10 +199,11 @@ if ($indexView['view'] === 'picker') {
 }
 
 // App sin contenido propio: ya redirigida arriba (index_view).
-// $selectedApp === null pasa si la URL trae un ?app= que no existe en la
-// tabla (borrado entre medias, o escrito a mano): 0 nunca hace match con un
-// id real, asi que las secciones de trafico salen todas a cero en vez de
-// mostrar por error los datos de OTRA app.
+// Un ?app=/?space= con slug que no existe en `apps` (borrado o escrito a mano)
+// ya no llega aqui: resolve_space lo descarta y cae al espacio de origen
+// (global). $selectedApp === null solo ocurre en 'site' si falta la fila
+// 'eduolihez': 0 nunca hace match con un id real, asi que el trafico sale a
+// cero en vez de mostrar por error los datos de OTRA app.
 $appId = $selectedApp['id'] ?? 0;
 
 // Solo contamos visitas humanas (is_bot = 0) de ESTA app en los KPIs.

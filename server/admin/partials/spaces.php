@@ -61,7 +61,7 @@ function space_app_slug(string $space): ?string
 function page_spaces(string $page): array
 {
     static $map = [
-        'index.php'          => [SPACE_GLOBAL, SPACE_SITE],
+        'index.php'          => [SPACE_GLOBAL, SPACE_SITE, SPACE_PHISHLAB, '*'],
         'messages.php'       => [SPACE_GLOBAL, SPACE_SITE],
         'analytics.php'      => [SPACE_GLOBAL, SPACE_SITE, SPACE_PHISHLAB, '*'],
         'projects.php'       => [SPACE_SITE],

@@ -232,6 +232,31 @@ final class SpacesTest extends TestCase
         }
     }
 
+    public function testIndexAdmiteEspaciosDeApp(): void
+    {
+        $this->assertSame('app:nowait', resolve_space(['app' => 'nowait'], [], self::APPS, 'index.php'));
+        $this->assertSame('phishlab', resolve_space(['app' => 'phishlab'], [], self::APPS, 'index.php'));
+        $this->assertSame('app:nowait', resolve_space(['space' => 'app:nowait'], [], self::APPS, 'index.php'));
+        $this->assertSame('global', resolve_space(['app' => 'borrada'], [], self::APPS, 'index.php'));
+        $this->assertSame('global', page_spaces('index.php')[0]);
+    }
+
+    public function testIndexFlujoCompletoRedirigeLosEnlacesAntiguos(): void
+    {
+        $nowait = resolve_space(['app' => 'nowait'], [], self::APPS, 'index.php');
+        $this->assertSame(
+            ['view' => 'redirect', 'to' => 'analytics.php?space=app%3Anowait'],
+            index_view($nowait, ['has_content' => 0])
+        );
+        $phish = resolve_space(['app' => 'phishlab'], [], self::APPS, 'index.php');
+        $this->assertSame(
+            ['view' => 'redirect', 'to' => 'analytics.php?space=phishlab'],
+            index_view($phish, ['has_content' => 0])
+        );
+        $conContenido = resolve_space(['space' => 'app:nowait'], [], self::APPS, 'index.php');
+        $this->assertSame('dashboard', index_view($conContenido, ['has_content' => 1])['view']);
+    }
+
     public function testSpaceForAppSlug(): void
     {
         $this->assertSame('site', space_for_app_slug('eduolihez'));

@@ -92,10 +92,7 @@ $visible  = (int) db()->query('SELECT COUNT(*) FROM posts WHERE visible=1')->fet
 admin_header('Blog - Entradas', 'posts.php');
 show_flash();
 ?>
-<div class="toolbar">
-  <h1 style="margin:0;">Artículos del Blog <span class="faint" style="font-size:1rem;">(<?= $visible ?> visibles de <?= $totalAll ?>)</span></h1>
-  <a class="btn" href="post-edit.php">+ Nuevo artículo</a>
-</div>
+<?php page_header('Artículos del Blog', '', '<a class="btn" href="post-edit.php">+ Nuevo artículo</a>', '(' . $visible . ' visibles de ' . $totalAll . ')'); ?>
 
 <form method="get" class="card" style="display:flex; gap:.6rem; align-items:center; padding:.75rem 1rem;">
   <input type="search" name="q" value="<?= e($search) ?>" placeholder="Buscar por título, resumen o contenido..." style="flex:1;">
@@ -103,7 +100,7 @@ show_flash();
   <?php if ($search !== ''): ?><a class="btn ghost sm" href="posts.php">Limpiar</a><?php endif; ?>
 </form>
 
-<div class="card" style="padding:0;">
+<div class="card p-0">
   <div class="scroll-x">
     <table>
       <thead>
@@ -156,7 +153,7 @@ show_flash();
               /blog/<?= e($c['slug']) ?>
             </td>
             <td>
-              <form method="post" style="display:inline;">
+              <form method="post" class="d-inline">
                 <?= csrf_field() ?>
                 <input type="hidden" name="id" value="<?= $c['id'] ?>">
                 <input type="hidden" name="action" value="toggle_visible">
@@ -168,13 +165,13 @@ show_flash();
             <td class="nowrap faint">
               <?= fdate($c['created_at'], 'd/m/Y H:i') ?>
             </td>
-            <td style="text-align:right;">
+            <td class="text-right">
               <div class="actions" style="justify-content:flex-end; gap: 0.35rem;">
                 <a class="btn ghost sm icon" href="post-edit.php?id=<?= $c['id'] ?>" title="Editar">
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                 </a>
                 
-                <form method="post" style="display:inline;" onsubmit="return confirm('¿Seguro que quieres duplicar este artículo?');">
+                <form method="post" class="d-inline" onsubmit="return confirm('¿Seguro que quieres duplicar este artículo?');">
                   <?= csrf_field() ?>
                   <input type="hidden" name="id" value="<?= $c['id'] ?>">
                   <input type="hidden" name="action" value="duplicate">
@@ -183,7 +180,7 @@ show_flash();
                   </button>
                 </form>
 
-                <form method="post" style="display:inline;" onsubmit="return confirm('¿Seguro que quieres eliminar este artículo definitivamente?');">
+                <form method="post" class="d-inline" onsubmit="return confirm('¿Seguro que quieres eliminar este artículo definitivamente?');">
                   <?= csrf_field() ?>
                   <input type="hidden" name="id" value="<?= $c['id'] ?>">
                   <input type="hidden" name="action" value="delete">

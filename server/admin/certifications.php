@@ -108,10 +108,7 @@ $last = count($rows) - 1;
 admin_header('Certificaciones', 'certifications.php');
 show_flash();
 ?>
-<div class="toolbar">
-  <h1 style="margin:0;">Certificaciones <span class="faint" style="font-size:1rem;">(<?= $visible ?> visibles de <?= $totalAll ?>)</span></h1>
-  <a class="btn" href="cert-edit.php">+ Nueva certificacion</a>
-</div>
+<?php page_header('Certificaciones', '', '<a class="btn" href="cert-edit.php">+ Nueva certificacion</a>', '(' . $visible . ' visibles de ' . $totalAll . ')'); ?>
 
 <form method="get" class="card" style="display:flex; gap:.6rem; align-items:center; padding:.75rem 1rem;">
   <input type="search" name="q" value="<?= e($search) ?>" placeholder="Buscar por nombre, emisor o categoria..." style="flex:1;">
@@ -119,7 +116,7 @@ show_flash();
   <?php if ($search !== ''): ?><a class="btn ghost sm" href="certifications.php">Limpiar</a><?php endif; ?>
 </form>
 
-<div class="card" style="padding:0;">
+<div class="card p-0">
   <div class="scroll-x">
     <table>
       <thead>
@@ -130,7 +127,7 @@ show_flash();
           <th>Fecha</th>
           <th>Visible</th>
           <th>Orden</th>
-          <th style="text-align:right;">Acciones</th>
+          <th class="text-right">Acciones</th>
         </tr>
       </thead>
       <tbody>
@@ -161,7 +158,7 @@ show_flash();
             <td class="muted"><?= e($c['issuer']) ?></td>
             <td class="faint"><?= e($c['issue_date']) ?></td>
             <td>
-              <form method="post" style="display:inline;">
+              <form method="post" class="d-inline">
                 <?= csrf_field() ?>
                 <input type="hidden" name="action" value="toggle_visible">
                 <input type="hidden" name="id" value="<?= (int) $c['id'] ?>">
@@ -173,13 +170,13 @@ show_flash();
             <td class="faint">
               <div class="actions" style="gap:.2rem;">
                 <span class="mono"><?= (int) $c['sort_order'] ?></span>
-                <form method="post" style="display:inline;">
+                <form method="post" class="d-inline">
                   <?= csrf_field() ?>
                   <input type="hidden" name="action" value="move_up">
                   <input type="hidden" name="id" value="<?= (int) $c['id'] ?>">
                   <button class="btn icon ghost" type="submit" title="Subir" <?= $i === 0 ? 'disabled' : '' ?>>↑</button>
                 </form>
-                <form method="post" style="display:inline;">
+                <form method="post" class="d-inline">
                   <?= csrf_field() ?>
                   <input type="hidden" name="action" value="move_down">
                   <input type="hidden" name="id" value="<?= (int) $c['id'] ?>">
@@ -188,15 +185,15 @@ show_flash();
               </div>
             </td>
             <td>
-              <div class="actions" style="justify-content:flex-end;">
+              <div class="actions justify-end">
                 <a class="btn ghost sm" href="cert-edit.php?id=<?= (int) $c['id'] ?>">Editar</a>
-                <form method="post" data-confirm="¿Duplicar esta certificacion?" style="display:inline;">
+                <form method="post" data-confirm="¿Duplicar esta certificacion?" class="d-inline">
                   <?= csrf_field() ?>
                   <input type="hidden" name="action" value="duplicate">
                   <input type="hidden" name="id" value="<?= (int) $c['id'] ?>">
                   <button type="submit" class="btn ghost sm">Duplicar</button>
                 </form>
-                <form method="post" data-confirm="¿Eliminar esta certificacion? Se borrara tambien su logo." style="display:inline;">
+                <form method="post" data-confirm="¿Eliminar esta certificacion? Se borrara tambien su logo." class="d-inline">
                   <?= csrf_field() ?>
                   <input type="hidden" name="action" value="delete">
                   <input type="hidden" name="id" value="<?= (int) $c['id'] ?>">

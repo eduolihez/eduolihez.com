@@ -157,10 +157,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
 
 admin_header($isEdit ? 'Editar Artículo' : 'Nuevo Artículo', 'posts.php');
 ?>
-<div class="toolbar">
-  <h1 style="margin:0;"><?= $isEdit ? 'Editar Artículo' : 'Nuevo Artículo del Blog' ?></h1>
-  <a class="btn ghost" href="posts.php">Volver al listado</a>
-</div>
+<?php page_header($isEdit ? 'Editar Artículo' : 'Nuevo Artículo del Blog', '', '<a class="btn ghost" href="posts.php">Volver al listado</a>'); ?>
 
 <?php if ($errors): ?>
   <div class="flash err">

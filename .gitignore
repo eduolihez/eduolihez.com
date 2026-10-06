@@ -162,5 +162,8 @@ CLOUDFLARE.md
 # Visual companion de brainstorming
 .superpowers/
 
+# Paquete de subida del panel (scripts/pack-admin.sh)
+dist-admin/
+
 # Clave de ingesta de PhishLab: local/FTP, nunca al repo (copia telemetry.config.example.json)
 public/projects/phishlab/assets/telemetry.config.json

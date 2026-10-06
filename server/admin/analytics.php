@@ -39,12 +39,25 @@ if ($appSlug !== '') {
         $appStmt->execute([$appSlug]);
         $appRow = $appStmt->fetch();
     } catch (Throwable $e) {
+        admin_log_error('analytics: buscar la app "' . $appSlug . '"', $e);
         $appRow = false;
     }
     if ($appRow) {
         $appId   = (int) $appRow['id'];
         $appName = (string) $appRow['display_name'];
     }
+}
+
+// Espacio de app que no se resuelve en `apps` (fila borrada, tabla ausente o
+// consulta fallida): sin filtro se verian los datos de TODAS las apps bajo el
+// nombre de esta, asi que se avisa y no se pinta nada.
+if ($appSlug !== '' && $appId === null) {
+    admin_header('Analitica', 'analytics.php');
+    page_header('Analitica');
+    echo '<div class="card empty">No se ha podido cargar la app «' . e($appSlug)
+        . '» (no existe en la tabla <code>apps</code> o falló la consulta). Revisa el log del servidor.</div>';
+    admin_footer();
+    exit;
 }
 $appFilterSql = $appId !== null ? " AND app_id = $appId" : '';
 $appQs        = '&space=' . urlencode(admin_space());

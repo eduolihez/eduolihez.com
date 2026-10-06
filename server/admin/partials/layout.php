@@ -34,6 +34,16 @@ require_once __DIR__ . '/spaces.php';
 require_once __DIR__ . '/icons.php';
 
 /**
+ * Deja constancia en el log del servidor de un fallo que el panel tolera (tabla
+ * ausente, consulta fallida) para que no quede invisible. Solo va al log: el
+ * mensaje no se muestra al usuario.
+ */
+function admin_log_error(string $where, Throwable $e): void
+{
+    error_log('[admin] ' . $where . ': ' . get_class($e) . ': ' . $e->getMessage());
+}
+
+/**
  * Contexto de espacio de la peticion actual: ['space' => id, 'apps' => filas
  * slug/display_name]. UNICO sitio donde se resuelve el espacio (lo usan
  * admin_header y admin_space). Memoizado; la tabla `apps` puede no existir
@@ -48,6 +58,7 @@ function admin_space_context(): array
     try {
         $apps = db()->query('SELECT slug, display_name FROM apps ORDER BY created_at ASC')->fetchAll();
     } catch (Throwable $e) {
+        admin_log_error('admin_space_context (tabla apps)', $e);
         $apps = [];
     }
     $slugs = array_map(static fn(array $a): string => (string) $a['slug'], $apps);
@@ -87,6 +98,7 @@ function admin_header(string $title, string $active = ''): void
         try {
             return (int) db()->query($sql)->fetchColumn();
         } catch (Throwable $e) {
+            admin_log_error('contador del menu', $e);
             return 0;
         }
     };

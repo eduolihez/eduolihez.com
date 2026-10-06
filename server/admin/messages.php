@@ -383,7 +383,7 @@ show_flash();
         <tbody>
           <?php if (!$rows): ?>
             <tr><td colspan="5" class="empty">
-              <?= $search !== '' ? 'Ningun mensaje coincide con la busqueda.' : 'No hay mensajes en esta vista.' ?>
+              <?= $search !== '' ? 'Ningún mensaje coincide con la búsqueda.' : 'Aún no hay mensajes en esta vista.' ?>
             </td></tr>
           <?php endif; ?>
           <?php foreach ($rows as $m): ?>

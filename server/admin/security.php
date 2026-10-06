@@ -257,7 +257,7 @@ show_flash();
       <thead><tr><th>Resultado</th><th>Usuario probado</th><th>IP</th><th>Cuando</th></tr></thead>
       <tbody>
         <?php if (!$attempts): ?>
-          <tr><td colspan="4" class="empty">Sin registros.</td></tr>
+          <tr><td colspan="4" class="empty">Aún no hay intentos de acceso registrados.</td></tr>
         <?php endif; ?>
         <?php foreach ($attempts as $a): ?>
           <tr>
@@ -279,7 +279,7 @@ show_flash();
       <thead><tr><th>Accion</th><th>Detalle</th><th>Usuario</th><th>IP</th><th>Cuando</th></tr></thead>
       <tbody>
         <?php if (!$activity): ?>
-          <tr><td colspan="5" class="empty">Aun no hay acciones registradas. Se anotan a partir de ahora.</td></tr>
+          <tr><td colspan="5" class="empty">Aún no hay acciones registradas. Se anotan a partir de ahora.</td></tr>
         <?php endif; ?>
         <?php foreach ($activity as $a): ?>
           <tr>

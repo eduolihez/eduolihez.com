@@ -35,8 +35,12 @@ y el versionado usa cuatro números (`MAJOR.MINOR.PATCH.MICRO`).
   la CSP).
 - `analytics.php` sin parámetros ahora hereda el espacio de la sesión (antes
   mostraba todas las apps).
-- `?app=<slug>` con un slug desconocido cae en Global (antes mostraba un
-  dashboard vacío).
+- `?app=<slug>` con un slug desconocido ya no muestra un dashboard vacío: se
+  usa el espacio de la sesión si la página lo admite y, si no, el espacio de
+  origen de la página (Global en `index.php` y `analytics.php`).
+- `index.php` ignora el espacio recordado en la sesión y abre siempre Global
+  salvo que `?space=`/`?app=` sea explícito (así el enlace de la marca y el
+  aterrizaje tras el login son Global).
 
 ### Deployment / Despliegue
 

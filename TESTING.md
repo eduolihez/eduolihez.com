@@ -65,7 +65,12 @@ huella `D840 6D0D 8294 7747 2937 7831 4AA3 9408 6372 C20A`). Para subir de
 versión: descarga la nueva, verifica su firma y actualiza `PHPUNIT_VERSION` y
 `PHPUNIT_SHA256` en `scripts/php-test.sh`.
 
-`composer test` sigue funcionando donde haya Composer. En ambos casos los
+`composer test` sigue funcionando donde haya Composer. Compromiso conocido: no
+hay `composer.lock` versionado (no está ignorado a propósito, simplemente aún
+no se ha generado), así que el `composer install` de CI resuelve `^10.5` y puede
+ir por delante del 10.5.66 fijado en `php-test.sh`; para fijarlo, ejecuta
+`composer update` una vez donde haya Composer y versiona el `composer.lock`.
+En ambos casos los
 tests de `server/tests/` no deben cargar `auth.php`, `http.php` ni `db.php`
 (ver el comentario de `server/tests/bootstrap.php`). Por eso
 `server/admin/partials/spaces.php` y `icons.php` son puras: sin dependencias

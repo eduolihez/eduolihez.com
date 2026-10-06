@@ -24,8 +24,48 @@ y el versionado usa cuatro números (`MAJOR.MINOR.PATCH.MICRO`).
   testearlas.
 - **Tests**: `SpacesTest` (PHPUnit) y `scripts/php-test.sh` para correr la
   suite PHP en local sin Composer.
+- **Menú de eduolihez.com** con "Resumen" (su dashboard) y "Mensajes" (con
+  insignia de no leídos), antes inalcanzables desde su menú. El selector de
+  espacio lleva ahora a `index.php?space=site`.
+- **Favicon del panel** (`assets/favicon.svg`): se acabó el 404 de
+  `/favicon.ico` en cada carga.
+- **Suite E2E con Playwright** (`e2e/`, 97 pruebas) contra el panel real con
+  MariaDB: login, espacios, todas las páginas en claro/oscuro y a 375 px,
+  tema, cajón móvil, CSP y altas/bajas de proyectos, posts y usuarios de
+  PhishLab. Se niega a correr contra un host que no sea `127.0.0.1`/`localhost`
+  y su semilla aborta si la base de datos no termina en `_test`.
+- **CI en GitHub** (`.github/workflows/admin.yml`): PHPUnit, E2E con MariaDB y
+  el test del empaquetado. No son checks obligatorios (el obligatorio sigue
+  siendo "Vitest").
+- **`NoSecretsTest` y `AdminCspTest`** (PHPUnit): fallan si vuelve al repo una
+  clave `apiKey` de 64 hex, si se versiona `telemetry.config.json` o
+  `server/config.php`, si aparece un `<style>`/manejador `on*=` en línea en el
+  panel o si la CSP pierde `style-src-elem 'self'`.
+- **Empaquetado repetible** (`scripts/pack-admin.sh`): genera desde git (nunca
+  del disco) el paquete de `server/` con la estructura de `public_html/`,
+  completo o solo los cambios entre dos versiones, con `MANIFEST.txt` (SHA-256)
+  y `ELIMINAR.txt`. Excluye `config.php`, `config.example.php`, `tests/` y
+  `admin/setup.php`, y aborta si detecta una clave o una clave privada.
+- **Releases con el panel listo para subir**: cada push a `master` ya crea una
+  Release; ahora lleva además `eduolihez.com-admin-<tag>.zip` (todo `server/`)
+  y `eduolihez.com-admin-cambios-<tag>.zip` (solo lo que cambió desde la versión
+  anterior).
 
 ### Changed
+
+- **Contraste AA** del texto atenuado (`--faint`, y `--muted`/`--cyan` donde
+  hacía falta) en claro y oscuro.
+- **`.faint` y `.muted`** tienen por fin regla CSS: se usaban unas 100 veces
+  en las páginas pero se pintaban como texto normal.
+- **Estados vacíos y títulos coherentes** ("Aún no hay …"; "Analítica" con
+  tilde como el menú).
+- **CSP del panel**: `style-src-elem 'self'` y `style-src-attr 'unsafe-inline'`
+  (más el `style-src` de siempre como respaldo para navegadores antiguos). Los
+  navegadores actuales ya bloquean un `<style>` inyectado; los `style=""`
+  siguen permitidos porque varios son valores dinámicos (anchos de barras). Los
+  `<style>` de `login.php`, `setup.php` y el aviso de migración pasan a
+  `assets/auth.css`.
+- El dashboard de eduolihez.com ya no sale sin ítem activo en el menú.
 
 - El CSS del panel sale de `partials/layout.php` a `assets/admin.css`, con
   versión por `filemtime` para la caché.
@@ -47,6 +87,14 @@ y el versionado usa cuatro números (`MAJOR.MINOR.PATCH.MICRO`).
 - La autogeneración del slug en `post-edit.php` no funcionaba: era un
   `<script>` en línea y la CSP del panel (`script-src 'self'`) lo bloqueaba.
   Pasa a `assets/post-edit.js`; el campo lleva `data-slug-auto` solo al crear.
+- **Borrar o duplicar un artículo no pedía confirmación** (`posts.php`): el
+  `onsubmit="return confirm(…)"` en línea lo bloqueaba la CSP y el formulario
+  se enviaba igual. Pasa a `data-confirm`, como el resto del panel.
+- **"Cambiar contraseña" en PhishLab → Usuarios no hacía nada**: era un
+  `onclick` en línea bloqueado por la CSP. Pasa a `data-toggle-hidden`
+  (también los `onclick="this.select()"` de `apps.php` e `integrations.php`).
+- **Desbordamiento horizontal a 375 px** en `analytics.php`, `index.php`
+  (espacio eduolihez.com), `post-edit.php` y `settings.php`.
 
 ### Security
 
@@ -68,20 +116,23 @@ y el versionado usa cuatro números (`MAJOR.MINOR.PATCH.MICRO`).
 
 ### Deployment / Despliegue
 
-- Archivos nuevos a subir por FTP: `server/admin/assets/admin.css`,
-  `server/admin/assets/theme.js`, `server/admin/assets/post-edit.js`,
-  `server/admin/partials/spaces.php` y `server/admin/partials/icons.php`.
-- Archivos modificados: `server/admin/partials/layout.php`,
-  `server/admin/assets/admin.js`, `server/admin/index.php`,
-  `server/admin/analytics.php`, `server/admin/post-edit.php` y el resto de
-  páginas de `server/admin/`.
+- Lo más cómodo es el zip `eduolihez.com-admin-cambios-<tag>.zip` de la
+  Release (o `bash scripts/pack-admin.sh --mode changes --from <tag-anterior>`):
+  trae solo lo que cambió, con la estructura de `public_html/`.
+- Archivos nuevos en `server/admin/`: `assets/admin.css`, `assets/theme.js`,
+  `assets/post-edit.js`, `assets/auth.css`, `assets/favicon.svg`,
+  `partials/spaces.php` y `partials/icons.php`. Modificados: `auth.php`,
+  `partials/layout.php`, `assets/admin.js`, `login.php` y las páginas del
+  panel.
+- **`setup.php` no se sube nunca** (se borra del hosting tras crear el primer
+  usuario): el paquete lo excluye. Tampoco `config.php`.
+- La CSP del panel cambia en `auth.php`: sube `auth.php` y `assets/auth.css`
+  juntos, porque `login.php` ya no lleva `<style>` en línea.
 - No hay migración de base de datos.
-- La verificación visual en páginas reales (claro, oscuro y móvil, con base
-  de datos real) NO se hizo durante el desarrollo. Hay que hacerla antes o
-  justo después de subir. Sí se hicieron `php -l` sobre todo `server/admin/`,
-  la suite PHPUnit y un recorrido con Playwright (menú por espacio, selector,
-  tema, cajón móvil a 375 px y CSP real) sobre un arnés con el `layout.php`
-  real y páginas de relleno, no sobre las páginas reales.
+- Verificado antes de publicar: `php -l`, PHPUnit, y la suite Playwright
+  contra el panel real con MariaDB (páginas, formularios, tema, móvil y CSP).
+  No se ha probado contra la base de datos de producción ni contra el
+  Cloudflare Worker que reescribe las rutas de `admin.eduolihez.com`.
 
 ## [1.9.0.0] - 2026-09-08
 

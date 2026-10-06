@@ -58,19 +58,24 @@ entrante, la gestión ampliada de PhishLab y nuevas métricas (piezas 2 a 4).
 | App registrada | `app:<slug>` | Resumen y eventos; generado desde la tabla `apps` |
 
 - El espacio viaja en la URL como `?space=<slug>`. Si falta, se usa el último
-  guardado en sesión y, si no hay, `global`.
+  guardado en sesión **siempre que la página pertenezca a ese espacio**; si no,
+  el espacio de origen de la página (para `analytics.php`, `index.php` y
+  `messages.php` es `global`).
 - `?app=<slug>` se mantiene como alias de `?space=app:<slug>`.
 - Cada página tiene un espacio por defecto, para que las URLs actuales sigan
   funcionando.
 - El slug se valida contra una lista blanca (`global`, `site`, `phishlab` y los
-  slugs existentes en `apps`); cualquier otro valor cae a `global`.
+  slugs existentes en `apps`); un valor no válido se ignora y se aplica la regla
+  anterior (sesión o espacio de origen de la página).
+- `site` equivale a la app `eduolihez` y `phishlab` a la app `phishlab` (ambas
+  ya existen en la tabla `apps`); el resto de apps usan `app:<slug>`.
 - Selector desplegable arriba del menú; al cambiar lleva a la página de inicio
   del espacio. Los contadores del menú se calculan solo para el espacio visible.
 - El menú de Global no vuelve a ocultar secciones según contexto.
 
 Funciones puras, sin base de datos:
 
-- `resolve_space(array $get, array $session, array $apps): string`
+- `resolve_space(array $get, array $session, array $appSlugs, string $page): string`
 - `space_nav(string $space, array $counts): array`
 
 ### 2. Sistema visual y tema

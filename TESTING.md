@@ -32,11 +32,17 @@ composer test          # PHP (PHPUnit)
 ```
 
 `npm test` corre en CI en cada push/PR a `master`
-(`.github/workflows/test.yml`, check "Vitest"). La suite de PHPUnit **no**
-está todavía en ese workflow — se montó en esta misma sesión sin un entorno
-PHP a mano para verificarla en ejecución real, así que antes de darla por
-buena en CI hay que correr `composer test` una vez en una máquina con PHP
-8.1+ y confirmar que pasa.
+(`.github/workflows/test.yml`, check "Vitest", obligatorio). PHPUnit y la
+suite E2E corren en otro workflow, `.github/workflows/admin.yml` ("Admin",
+jobs `phpunit` y `e2e`), solo cuando el cambio toca `server/`, `database/`,
+`e2e/` o `scripts/`; no son checks obligatorios.
+
+**Vitest desde un worktree anidado:** si ejecutas `npm test` dentro de un
+worktree de git que vive dentro del propio repo (`.claude/worktrees/…`),
+falla con `Tsconfig not found astro/tsconfigs/strict` (peculiaridad del
+resolver de Vite 8 al encontrar dos `node_modules` encadenados). No es un fallo
+de los tests: en un checkout normal y en CI pasan. Córrelo desde el checkout
+principal.
 
 ### PHP en local sin Composer
 
@@ -89,9 +95,47 @@ de esos archivos, se pueden testear (`SpacesTest`).
   independientes que no comparten fuente). También la lógica pura de
   espacios del panel admin (`server/admin/partials/spaces.php`, en
   `server/tests/SpacesTest.php`).
-- **Integration / E2E:** no hay todavía. El sitio es principalmente
-  contenido estático + un backend PHP que no se puede correr en local sin
-  PHP instalado (ver `PRODUCT.md`, sección "Operating Context").
+- **PHPUnit, secretos** (`server/tests/NoSecretsTest.php`): la clave de
+  ingesta de PhishLab no vuelve al repo (el JSON de ejemplo lleva el
+  placeholder, `telemetry.config.json` y `server/config.php` no están
+  versionados, y ningún archivo versionado de `public/` o `server/` lleva un
+  `"apiKey": "<64 hex>"`). El detector se prueba primero con entradas falsas.
+- **E2E del panel `/admin`** (`e2e/`, Playwright): ver la sección siguiente.
+  El sitio público (Astro) sigue sin E2E.
+
+## E2E del panel /admin
+
+Proyecto aparte en `e2e/` (su propio `package.json`, solo `@playwright/test`;
+no añade nada al `package.json` del sitio). Prueba el panel real (PHP +
+MariaDB) en Chromium: login/logout, espacios y menú, todas las páginas de
+`server/admin/` en claro y oscuro (HTTP 200, sin avisos PHP, sin errores de
+consola ni violaciones de CSP, un `<h1>`, sin desbordamiento a 1280 y 375 px),
+tema, cajón móvil, CSP, y operaciones reales (proyectos, artículos, usuarios
+del lab, mensajes, CSV de analítica, apps).
+
+**Regla de seguridad:** crea y borra datos. `playwright.config.cjs` se niega a
+arrancar si `E2E_BASE_URL` no es `127.0.0.1`/`localhost`, y `e2e/seed/seed.php`
+aborta si la base de datos no termina en `_test`.
+
+En local con XAMPP (BD `eduolihez_test` con `database/schema.sql` importado y
+`server/config.php` apuntando a ella):
+
+```bash
+php -S 127.0.0.1:8081 -t server          # o deja que Playwright lo arranque (E2E_PHP)
+cd e2e && npm ci
+DB_NAME=eduolihez_test DB_USER=root DB_PASS= E2E_USER=e2e E2E_PASSWORD='…12+ caracteres…' php seed/seed.php
+E2E_USER=e2e E2E_PASSWORD='…' E2E_CHROME_PATH="C:/Program Files/Google/Chrome/Application/chrome.exe" npx playwright test
+```
+
+Variables: `DB_HOST`/`DB_PORT`/`DB_NAME`/`DB_USER`/`DB_PASS` (seed),
+`E2E_USER`/`E2E_PASSWORD` (seed y tests), `E2E_BASE_URL` (por defecto
+`http://127.0.0.1:8081`), `E2E_CHROME_PATH` o `E2E_CHANNEL` (navegador; sin
+ellas, el Chromium de Playwright), `E2E_PHP` (PHP del `webServer`). Detalle en
+`e2e/README.md`.
+
+En CI: job `e2e` de `.github/workflows/admin.yml` (MariaDB 10.11 como
+servicio, `schema.sql`, `config.php` generado desde el ejemplo, seed y
+`npx playwright test`; informe y capturas como artefacto 7 días).
 
 ## Convenciones
 

@@ -151,7 +151,7 @@ function admin_header(string $title, string $active = ''): void
   <aside id="admin-sidebar" class="sidebar">
     <div class="sidebar-header">
       <div class="brand-block">
-        <a href="index.php" class="brand">&gt;_ <span>admin</span></a>
+        <a href="index.php?space=global" class="brand">&gt;_ <span>admin</span></a>
         <details class="app-switcher">
           <summary>
             <span class="app-switcher-current"><?= e($spaceLabel) ?></span>
@@ -177,7 +177,7 @@ function admin_header(string $title, string $active = ''): void
         <?php endif; ?>
         <?php foreach ($group['items'] as $item): ?>
           <a href="<?= e($item['href']) ?>" class="menu-item <?= $active === $item['page'] ? 'active' : '' ?>">
-            <span class="menu-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><?= nav_icon($item['icon']) ?></svg></span>
+            <span class="menu-icon"><?= nav_icon($item['icon']) ?></span>
             <span class="menu-label"><?= e($item['label']) ?></span>
             <?php if ($item['badge'] !== ''): ?>
               <span class="badge-<?= $item['badge_type'] === 'alert' ? 'count' : 'muted' ?>"><?= e($item['badge']) ?></span>

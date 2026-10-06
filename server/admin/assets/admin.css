@@ -178,13 +178,6 @@
   }
   .app-switcher-menu a:hover { background: var(--soft); }
   .app-switcher-menu a.active { color: var(--accent); font-weight: 600; }
-  .app-switcher-manage {
-    margin-top: 0.25rem;
-    padding-top: 0.45rem !important;
-    border-top: 1px solid var(--border);
-    color: var(--faint) !important;
-    font-size: 0.72rem !important;
-  }
 
   .sidebar-menu {
     display: flex;

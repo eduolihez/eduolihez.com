@@ -92,13 +92,25 @@ function space_page_allows(string $page, string $space): bool
 }
 
 /**
+ * Si la pagina usa el espacio recordado en sesion. index.php no: sin ?space=
+ * explicito siempre abre Global (enlace de marca, aterrizaje tras el login).
+ */
+function page_remembers_space(string $page): bool
+{
+    return $page !== 'index.php';
+}
+
+/**
  * Resuelve el espacio activo: $get['space'], luego $get['app'] (alias),
  * luego $session['admin_space']; cada uno debe ser string valido y admitido
  * por la pagina. Si ninguno sirve, el espacio de origen de la pagina.
  */
 function resolve_space(array $get, array $session, array $appSlugs, string $page): string
 {
-    $candidates = [$get['space'] ?? null, $get['app'] ?? null, $session['admin_space'] ?? null];
+    $candidates = [$get['space'] ?? null, $get['app'] ?? null];
+    if (page_remembers_space($page)) {
+        $candidates[] = $session['admin_space'] ?? null;
+    }
     foreach ($candidates as $raw) {
         if (!is_string($raw)) {
             continue;

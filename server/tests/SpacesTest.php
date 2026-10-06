@@ -200,6 +200,28 @@ final class SpacesTest extends TestCase
         $this->assertSame('analytics.php?space=app%3Anowait', $this->navItem('app:nowait', 'analytics.php')['href']);
     }
 
+    public function testNavIconDevuelveUnSoloSvgCompleto(): void
+    {
+        foreach (['grid', 'briefcase', 'award', 'edit', 'mail', 'chart', 'activity', 'shield', 'settings', 'database', 'link', 'users'] as $k) {
+            $svg = nav_icon($k);
+            $this->assertSame(1, substr_count($svg, '<svg'), $k);
+            $this->assertStringStartsWith('<svg', $svg, $k);
+            $this->assertStringEndsWith('</svg>', $svg, $k);
+        }
+    }
+
+    public function testIndexIgnoraElEspacioRecordadoEnSesion(): void
+    {
+        foreach (['site', 'phishlab', 'app:nowait'] as $s) {
+            $this->assertSame('global', resolve_space([], ['admin_space' => $s], self::APPS, 'index.php'), $s);
+        }
+        $this->assertSame('site', resolve_space(['space' => 'site'], ['admin_space' => 'phishlab'], self::APPS, 'index.php'));
+        $this->assertSame('app:nowait', resolve_space(['app' => 'nowait'], [], self::APPS, 'index.php'));
+        $this->assertFalse(page_remembers_space('index.php'));
+        $this->assertTrue(page_remembers_space('analytics.php'));
+        $this->assertSame('phishlab', resolve_space([], ['admin_space' => 'phishlab'], self::APPS, 'analytics.php'));
+    }
+
     public function testNavIconDesconocidaDevuelveVacio(): void
     {
         $this->assertSame('', nav_icon('nope'));

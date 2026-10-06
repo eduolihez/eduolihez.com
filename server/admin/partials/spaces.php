@@ -177,6 +177,24 @@ function space_options(array $apps): array
 }
 
 /**
+ * Pagina de inicio de un espacio (destino de su opcion en el selector).
+ * Id desconocido o invalido -> el inicio de Global.
+ */
+function space_home(string $space): string
+{
+    if ($space === SPACE_SITE) {
+        return 'index.php?space=site';
+    }
+    if ($space === SPACE_PHISHLAB) {
+        return 'lab-users.php?space=phishlab';
+    }
+    if (str_starts_with($space, 'app:') && strlen($space) > 4) {
+        return 'analytics.php?space=' . urlencode($space);
+    }
+    return 'index.php?space=global';
+}
+
+/**
  * Menu lateral de un espacio. $counts (claves opcionales): unread, projects,
  * certs, posts, apps, lab_users. Devuelve grupos con items
  * ['page','href','label','icon','badge','badge_type'].
@@ -213,9 +231,15 @@ function space_nav(string $space, array $counts): array
     if ($space === SPACE_SITE) {
         return [
             ['label' => '', 'items' => [
+                $item('index.php', 'Resumen', 'grid'),
+            ]],
+            ['label' => 'Contenido', 'items' => [
                 $item('projects.php', 'Proyectos', 'briefcase', $count('projects')),
                 $item('certifications.php', 'Certificaciones', 'award', $count('certs')),
                 $item('posts.php', 'Blog', 'edit', $count('posts')),
+            ]],
+            ['label' => 'Actividad', 'items' => [
+                $item('messages.php', 'Mensajes', 'mail', $count('unread'), 'alert'),
                 $item('analytics.php', 'Analítica', 'chart'),
             ]],
         ];

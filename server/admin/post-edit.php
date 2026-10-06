@@ -238,7 +238,7 @@ admin_header($isEdit ? 'Editar Artículo' : 'Nuevo Artículo', 'posts.php');
   <textarea id="content" name="content" placeholder="Escribe el cuerpo del artículo..." required style="min-height:350px; font-family: inherit;"><?= e($p['content']) ?></textarea>
 
   <label>Imagen de portada</label>
-  <div class="soft-box" style="display:grid; grid-template-columns: auto 1fr; gap:1.5rem; align-items:center; padding:1rem; border-radius:0.5rem; border:1px solid var(--border);">
+  <div class="soft-box" style="display:grid; grid-template-columns: auto minmax(0, 1fr); gap:1.5rem; align-items:center; padding:1rem; border-radius:0.5rem; border:1px solid var(--border);">
     <div>
       <?php if (!empty($p['cover_url'])): ?>
         <img id="cover-preview" src="<?= e($p['cover_url']) ?>" alt="Portada" style="width:120px; height:80px; object-fit:cover; border-radius:0.375rem; border:1px solid var(--border);">

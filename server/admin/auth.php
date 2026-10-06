@@ -15,10 +15,22 @@ require_once __DIR__ . '/../lib/http.php'; // aporta bootstrap + client_ip()
 
 // --- CSP del panel (todo el JS del admin esta en assets/admin.js, 'self') ---
 // Se envia antes de cualquier salida (auth.php se incluye al principio).
+//
+// Estilos, tres directivas a proposito (CSP3):
+//   - style-src 'self' 'unsafe-inline': solo para navegadores viejos que no
+//     entienden las dos siguientes; ignoran style-src-elem/-attr y caen aqui.
+//   - style-src-elem 'self': las etiquetas style y link rel=stylesheet solo pueden
+//     venir de nuestro dominio. Un bloque style en linea (p.ej. inyectado por XSS)
+//     queda bloqueado; por eso login/setup/aviso de migracion usan
+//     assets/auth.css en vez de bloques style.
+//   - style-src-attr 'unsafe-inline': los atributos style="..." siguen
+//     permitidos porque muchos son valores dinamicos calculados en PHP
+//     (anchos de barras, alturas de sparklines) y no se pueden externalizar.
 if (!headers_sent()) {
     header(
         "Content-Security-Policy: default-src 'self'; script-src 'self'; "
-        . "style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; "
+        . "style-src 'self' 'unsafe-inline'; style-src-elem 'self'; "
+        . "style-src-attr 'unsafe-inline'; img-src 'self' data: https:; "
         . "base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'"
     );
     send_security_headers(true); // nosniff + DENY + noindex
@@ -129,16 +141,7 @@ function migration_notice(array $missing): void
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>Falta actualizar la base de datos</title>
-<style>
- body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0a0e14;color:#e6edf3;
-   font-family:Inter,system-ui,sans-serif;line-height:1.6;padding:1.5rem}
- .box{max-width:640px;background:#141a24;border:1px solid #1f2733;border-radius:.9rem;padding:2rem}
- h1{font-size:1.25rem;margin:0 0 1rem;color:#fbbf24}
- code{background:#0a0e14;padding:.15rem .4rem;border-radius:.3rem;font-size:.9em;color:#4ade80}
- ol{padding-left:1.2rem} li{margin:.35rem 0}
- ul.miss{color:#9aa7b8;font-size:.9rem;background:#0a0e14;border-radius:.5rem;padding:1rem 1rem 1rem 2rem}
- a{color:#4ade80}
-</style></head><body><div class="box">
+<link rel="stylesheet" href="assets/auth.css"></head><body class="notice"><div class="box">
 <h1>⚠ Falta actualizar la base de datos</h1>
 <p>El panel se ha actualizado y necesita unas tablas y columnas nuevas que todavia
 no existen en tu base de datos. Es un paso de un minuto y no se pierde nada.</p>

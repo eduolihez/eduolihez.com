@@ -190,6 +190,38 @@ npm run dev
 6. Abre `tudominio.com/admin/setup.php` para crear tu primera cuenta de administración.
    **Una vez creado el usuario, borra `setup.php` del servidor.**
 
+#### Paquete de subida del panel (`server/`)
+
+`scripts/pack-admin.sh` prepara lo que va a `public_html/` a partir de una referencia
+git (no del disco), así que nunca incluye `config.php`, `config.example.php`,
+`admin/setup.php` ni `tests/`. Solo necesita git y bash.
+
+```bash
+# Todo server/ en el commit actual
+bash scripts/pack-admin.sh --mode full
+
+# Solo lo que cambió desde una referencia (tag o commit); los borrados van a ELIMINAR.txt
+bash scripts/pack-admin.sh --mode changes --from <ref> --zip cambios.zip
+```
+
+La salida (`dist-admin/` por defecto, que debe estar vacía o no existir) contiene
+`public_html/`, `MANIFEST.txt` con los SHA-256 y, si hay ficheros borrados, `ELIMINAR.txt`:
+copia el contenido de `public_html/` sobre el del hosting y borra a mano lo que liste
+`ELIMINAR.txt`. `--help` explica el resto de opciones.
+
+Cada push a `master` crea un tag y una Release en GitHub (`release.yml`) con el zip de
+`dist/` + `server/` y dos zips del panel con esta misma estructura:
+`eduolihez.com-admin-<tag>.zip` (completo) y `eduolihez.com-admin-cambios-<tag>.zip`
+(solo lo que cambió desde el tag anterior; no se genera si no cambió nada en `server/`).
+
+El zip de cambios solo es correcto si el hosting está exactamente en el tag anterior
+(el versionado automático crea un tag por push): si te saltaste versiones, sube el zip
+completo o genera el rango con `bash scripts/pack-admin.sh --mode changes --from <tag desplegado>`.
+Ninguno de los paquetes incluye `admin/setup.php`, que una instalación **nueva** necesita
+(paso «Crea tu usuario de administrador»): en la primera instalación sube
+`server/admin/setup.php` desde la carpeta `server` del zip `eduolihez.com-<tag>.zip` (o del
+repo) y bórralo del hosting después.
+
 ---
 
 ## Más documentación

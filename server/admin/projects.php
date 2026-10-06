@@ -150,7 +150,7 @@ show_flash();
       <tbody>
         <?php if (!$rows): ?>
           <tr><td colspan="7" class="empty">
-            <?= $search !== '' ? 'Ningun proyecto coincide con la busqueda.' : 'Aun no hay proyectos. Crea el primero.' ?>
+            <?= $search !== '' ? 'Ningún proyecto coincide con la búsqueda.' : 'Aún no hay proyectos. Crea el primero.' ?>
           </td></tr>
         <?php endif; ?>
         <?php foreach ($rows as $i => $p): ?>

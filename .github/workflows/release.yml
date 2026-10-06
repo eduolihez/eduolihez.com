@@ -30,8 +30,12 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
+      # fetch-depth 0: pack-admin.sh necesita los tags anteriores para saber
+      # que cambio en server/ desde la version previa.
       - name: Descargar el repositorio
         uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
 
       - name: Configurar Node
         uses: actions/setup-node@v7
@@ -66,6 +70,35 @@ jobs:
           # no hay credenciales en el zip.
           zip -r "eduolihez.com-${{ github.ref_name }}.zip" dist server
 
+      - name: Empaquetar el panel (server/) para subir por FTP
+        id: panel
+        run: |
+          set -euo pipefail
+          # Dos zips que ya llevan la estructura de public_html/ (lo que el
+          # zip de arriba no hace: alli server/ va entero, con config.example
+          # y tests). Salen de git, no del disco, y pack-admin.sh aborta si
+          # algo prohibido (config.php, claves) estuviera trackeado.
+          bash scripts/pack-admin.sh --mode full --to "$GITHUB_REF_NAME" \
+            --out "$RUNNER_TEMP/admin-full" \
+            --zip "eduolihez.com-admin-$GITHUB_REF_NAME.zip"
+
+          # Solo lo que cambio desde la version anterior. Si es la primera
+          # version (no hay tag previo) o no cambio nada en server/, no hay
+          # zip de cambios: se omite en vez de fallar.
+          PREV="$(git describe --tags --abbrev=0 --match 'v*.*.*.*' "$GITHUB_REF_NAME^" 2>/dev/null || true)"
+          CAMBIOS=""
+          if [ -n "$PREV" ]; then
+            bash scripts/pack-admin.sh --mode changes --from "$PREV" --to "$GITHUB_REF_NAME" \
+              --out "$RUNNER_TEMP/admin-cambios" \
+              --zip "eduolihez.com-admin-cambios-$GITHUB_REF_NAME.zip"
+            if [ -f "eduolihez.com-admin-cambios-$GITHUB_REF_NAME.zip" ]; then
+              CAMBIOS="eduolihez.com-admin-cambios-$GITHUB_REF_NAME.zip"
+            fi
+          else
+            echo "::notice::No hay tag anterior: no se genera el zip de cambios del panel."
+          fi
+          echo "cambios_zip=$CAMBIOS" >> "$GITHUB_OUTPUT"
+
       - name: Extraer la seccion del CHANGELOG para este tag
         id: changelog
         run: |
@@ -79,10 +112,32 @@ jobs:
             echo "_Sin entrada en CHANGELOG.md para ${{ github.ref_name }}._" > release-notes.md
           fi
 
+      # Se anade DESPUES de extraer el CHANGELOG (que sobrescribe el fichero con
+      # ">"), para no mezclarse con su logica de awk.
+      - name: Anadir instrucciones de subida del panel a las notas
+        run: |
+          cat >> release-notes.md <<'EOF'
+
+          ### Cómo subir el panel
+
+          - `eduolihez.com-admin-<tag>.zip`: todo `server/` listo para FTP. `eduolihez.com-admin-cambios-<tag>.zip` (si existe): solo lo que cambió desde la versión anterior.
+          - Descomprime y copia el contenido de `public_html/` sobre el `public_html/` del hosting, sobrescribiendo.
+          - Si el zip trae `ELIMINAR.txt`, borra a mano en el hosting los ficheros que lista.
+          - No subas ni sobrescribas `config.php` ni `setup.php`: no van en el paquete.
+          - El zip de cambios solo es correcto si el hosting está exactamente en la versión anterior (se crea un tag por push). Si te saltaste versiones, usa el zip completo o `bash scripts/pack-admin.sh --mode changes --from <tag desplegado>`.
+          - Primera instalación: los paquetes del panel no incluyen `setup.php`, que hace falta para crear el usuario administrador. Súbelo desde la carpeta `server` de `eduolihez.com-<tag>.zip` (`server/admin/setup.php`) y bórralo del hosting después.
+          EOF
+
+      # La lista de "files" es multilinea; las lineas vacias se ignoran, asi que
+      # el zip de cambios (opcional) no rompe fail_on_unmatched_files cuando no
+      # se genero. Los otros dos siempre existen.
       - name: Crear la Release en GitHub
         uses: softprops/action-gh-release@v3
         with:
           name: "${{ github.ref_name }}"
           body_path: release-notes.md
-          files: "eduolihez.com-${{ github.ref_name }}.zip"
+          files: |
+            eduolihez.com-${{ github.ref_name }}.zip
+            eduolihez.com-admin-${{ github.ref_name }}.zip
+            ${{ steps.panel.outputs.cambios_zip }}
           fail_on_unmatched_files: true

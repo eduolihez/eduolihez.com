@@ -171,7 +171,7 @@ show_flash();
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                 </a>
                 
-                <form method="post" class="d-inline" onsubmit="return confirm('¿Seguro que quieres duplicar este artículo?');">
+                <form method="post" class="d-inline" data-confirm="¿Seguro que quieres duplicar este artículo?">
                   <?= csrf_field() ?>
                   <input type="hidden" name="id" value="<?= $c['id'] ?>">
                   <input type="hidden" name="action" value="duplicate">
@@ -180,7 +180,7 @@ show_flash();
                   </button>
                 </form>
 
-                <form method="post" class="d-inline" onsubmit="return confirm('¿Seguro que quieres eliminar este artículo definitivamente?');">
+                <form method="post" class="d-inline" data-confirm="¿Seguro que quieres eliminar este artículo definitivamente?">
                   <?= csrf_field() ?>
                   <input type="hidden" name="id" value="<?= $c['id'] ?>">
                   <input type="hidden" name="action" value="delete">

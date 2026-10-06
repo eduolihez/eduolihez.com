@@ -177,7 +177,7 @@ show_flash();
       </thead>
       <tbody>
         <?php if (!$users): ?>
-          <tr><td colspan="6" class="empty">Aún no hay cuentas de PhishLab lab.</td></tr>
+          <tr><td colspan="6" class="empty">Aún no hay cuentas de lab.eduolihez.com.</td></tr>
         <?php endif; ?>
         <?php foreach ($users as $u): ?>
           <?php $blocked = ($lockedNow[$u['username']] ?? 0) >= LAB_LOGIN_MAX_ATTEMPTS; ?>
@@ -225,7 +225,8 @@ show_flash();
                     <button type="submit" class="btn ghost sm">Desbloquear</button>
                   </form>
                 <?php endif; ?>
-                <button type="button" class="btn ghost sm" onclick="document.getElementById('pw-<?= (int) $u['id'] ?>').hidden = !document.getElementById('pw-<?= (int) $u['id'] ?>').hidden;">
+                <button type="button" class="btn ghost sm" data-toggle-hidden="pw-<?= (int) $u['id'] ?>"
+                        aria-controls="pw-<?= (int) $u['id'] ?>" aria-expanded="false">
                   Cambiar contraseña
                 </button>
                 <form method="post" data-confirm="¿Eliminar a &quot;<?= e($u['username']) ?>&quot;? No se puede deshacer." class="d-inline">

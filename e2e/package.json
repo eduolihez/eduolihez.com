@@ -1,0 +1,15 @@
+{
+  "name": "eduolihez-admin-e2e",
+  "private": true,
+  "description": "Tests end-to-end (Playwright) del panel /admin contra una base de datos de TEST.",
+  "license": "UNLICENSED",
+  "scripts": {
+    "seed": "php seed/seed.php",
+    "test": "playwright test",
+    "test:guard": "node --test db-guard.test.cjs",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0"
+  }
+}

@@ -45,3 +45,22 @@ updates:
         update-types:
           - "minor"
           - "patch"
+
+  # --- npm (e2e/package.json) ----------------------------------------------
+  # La suite E2E del panel tiene su propio package.json (solo
+  # @playwright/test, fijado a una version exacta) para no mezclar sus
+  # dependencias con las del sitio Astro. Sin esta entrada Dependabot no la
+  # miraria: solo vigila los directorios que se le indican.
+  - package-ecosystem: "npm"
+    directory: "/e2e"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    commit-message:
+      prefix: "deps"
+    open-pull-requests-limit: 5
+    groups:
+      e2e-menores:
+        update-types:
+          - "minor"
+          - "patch"

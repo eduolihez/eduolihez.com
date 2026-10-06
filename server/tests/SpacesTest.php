@@ -168,6 +168,46 @@ final class SpacesTest extends TestCase
         $this->assertNotContains('security.php', $pages);
     }
 
+    public function testSpaceNavSiteListaExacta(): void
+    {
+        $this->assertSame(
+            ['index.php', 'projects.php', 'certifications.php', 'posts.php', 'messages.php', 'analytics.php'],
+            $this->navPages('site')
+        );
+    }
+
+    public function testSpaceNavSiteTieneResumenYMensajes(): void
+    {
+        $resumen = $this->navItem('site', 'index.php');
+        $this->assertSame('Resumen', $resumen['label']);
+        $this->assertSame('index.php?space=site', $resumen['href']);
+        $this->assertSame('grid', $resumen['icon']);
+        $this->assertSame('', $resumen['badge']);
+
+        $msgs = $this->navItem('site', 'messages.php', ['unread' => 2]);
+        $this->assertSame('Mensajes', $msgs['label']);
+        $this->assertSame('messages.php?space=site', $msgs['href']);
+        $this->assertSame('mail', $msgs['icon']);
+        $this->assertSame('2', $msgs['badge']);
+        $this->assertSame('alert', $msgs['badge_type']);
+        $this->assertSame('', $this->navItem('site', 'messages.php', ['unread' => 0])['badge']);
+    }
+
+    public function testSpaceHome(): void
+    {
+        $this->assertSame('index.php?space=global', space_home('global'));
+        $this->assertSame('index.php?space=site', space_home('site'));
+        $this->assertSame('lab-users.php?space=phishlab', space_home('phishlab'));
+        $this->assertSame('analytics.php?space=app%3Anowait', space_home('app:nowait'));
+    }
+
+    public function testSpaceHomeInvalidoVuelveAGlobal(): void
+    {
+        foreach (['', 'nope', 'app:', 'eduolihez'] as $bad) {
+            $this->assertSame('index.php?space=global', space_home($bad), $bad);
+        }
+    }
+
     public function testSpaceNavPhishlabYApp(): void
     {
         $this->assertSame(['analytics.php', 'lab-users.php'], $this->navPages('phishlab'));
@@ -202,7 +242,7 @@ final class SpacesTest extends TestCase
 
     public function testNavIconDevuelveUnSoloSvgCompleto(): void
     {
-        foreach (['grid', 'briefcase', 'award', 'edit', 'mail', 'chart', 'activity', 'shield', 'settings', 'database', 'link', 'users'] as $k) {
+        foreach (['grid', 'briefcase', 'award', 'edit', 'mail', 'chart', 'shield', 'settings', 'database', 'link', 'users'] as $k) {
             $svg = nav_icon($k);
             $this->assertSame(1, substr_count($svg, '<svg'), $k);
             $this->assertStringStartsWith('<svg', $svg, $k);
@@ -230,7 +270,7 @@ final class SpacesTest extends TestCase
 
     public function testNavIconTodasLasClaves(): void
     {
-        foreach (['grid', 'briefcase', 'award', 'edit', 'mail', 'chart', 'activity', 'shield', 'settings', 'database', 'link', 'users'] as $k) {
+        foreach (['grid', 'briefcase', 'award', 'edit', 'mail', 'chart', 'shield', 'settings', 'database', 'link', 'users'] as $k) {
             $this->assertStringStartsWith('<svg', nav_icon($k), $k);
         }
     }

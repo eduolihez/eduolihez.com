@@ -22,12 +22,12 @@
      valores re-pinta el panel entero sin tocar cada pagina. */
   :root {
     --bg: #fbfbfa; --soft: #f2f1ee; --card: #ffffff; --border: #e5e4e0;
-    --text: #16151a; --muted: #6b6b74; --faint: #9c9ba3;
+    --text: #16151a; --muted: #5f5f69; --faint: #6b6b75; --faint-ui: #9c9ba3;
     --accent: #5b5bd6; --accent-hover: #4747c2; --accent-soft: #eeeefc;
     --danger: #b3261e; --danger-soft: #fbe9e8;
     --warn: #a15c00; --warn-soft: #fdf1de;
     --green: #17794f; --green-soft: #e6f6ee;
-    --cyan: #0c8599; --cyan-soft: #e3f5f7;
+    --cyan: #0a7284; --cyan-soft: #e3f5f7;
     --violet: #7048e8; --violet-soft: #f1ecfd;
     --shadow: 0 1px 2px rgba(20, 20, 30, 0.04), 0 12px 32px -16px rgba(20, 20, 30, 0.14);
     --shadow-sm: 0 1px 2px rgba(20, 20, 30, 0.05);
@@ -41,7 +41,7 @@
   /* Tema oscuro: theme.js pone data-theme en <html> antes de pintar. */
   [data-theme="dark"] {
     --bg: #0e0f13; --soft: #14151b; --card: #171821; --border: #262833;
-    --text: #e7e7ec; --muted: #8b8c98; --faint: #757683;
+    --text: #e7e7ec; --muted: #a3a4b0; --faint: #8b8c98; --faint-ui: #757683;
     --accent: #8b8bf0; --accent-hover: #a3a3f5; --accent-soft: #23244a;
     --danger: #f0827a; --danger-soft: #3a1a19;
     --warn: #e0a54a; --warn-soft: #3a2b10;
@@ -84,7 +84,7 @@
   /* Grid Layout Principal */
   .admin-layout {
     display: grid;
-    grid-template-columns: 260px 1fr;
+    grid-template-columns: 260px minmax(0, 1fr);
     min-height: 100vh;
   }
 
@@ -178,13 +178,6 @@
   }
   .app-switcher-menu a:hover { background: var(--soft); }
   .app-switcher-menu a.active { color: var(--accent); font-weight: 600; }
-  .app-switcher-manage {
-    margin-top: 0.25rem;
-    padding-top: 0.45rem !important;
-    border-top: 1px solid var(--border);
-    color: var(--faint) !important;
-    font-size: 0.72rem !important;
-  }
 
   .sidebar-menu {
     display: flex;
@@ -291,7 +284,7 @@
      mirar" (badge-count, verde): mismo hueco, tono neutro. */
   .badge-muted {
     background: var(--border);
-    color: var(--faint);
+    color: var(--muted);
     font-size: 0.7rem;
     font-weight: 700;
     font-family: 'JetBrains Mono', monospace;
@@ -561,7 +554,7 @@
   }
   .delta.up { color: var(--green); background: var(--green-soft); }
   .delta.down { color: var(--danger); background: var(--danger-soft); }
-  .delta.flat { color: var(--faint); background: var(--border); }
+  .delta.flat { color: var(--muted); background: var(--border); }
 
   /* Tablas */
   table { width: 100%; border-collapse: collapse; }
@@ -579,6 +572,9 @@
     border: 1px solid var(--border); border-radius: 0.5rem; color: var(--text);
     font-size: 0.92rem; font-family: inherit; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
+  /* El selector de archivo tiene un ancho intrinseco (~300 px) que no encoge:
+     sin tope desbordaba la pagina en movil (portada de post-edit.php). */
+  input[type=file] { max-width: 100%; }
   input:focus, textarea:focus, select:focus {
     outline: none; border-color: var(--accent);
     box-shadow: 0 0 0 3px var(--accent-soft);
@@ -586,8 +582,14 @@
   }
   textarea { resize: vertical; min-height: 120px; }
   
-  .row2 { display: grid; gap: 1.5rem; grid-template-columns: 1fr 1fr; }
-  .row3 { display: grid; gap: 1.5rem; grid-template-columns: repeat(3, 1fr); }
+  /* minmax(0, 1fr) y no 1fr: con 1fr (= minmax(auto, 1fr)) la columna crece
+     hasta el ancho minimo de su contenido -- un grafico .chart de 30 barras,
+     una fila nowrap -- y la pagina entera desborda en movil. */
+  .row2 { display: grid; gap: 1.5rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .row3 { display: grid; gap: 1.5rem; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  @media (max-width: 640px) {
+    .row2, .row3 { grid-template-columns: minmax(0, 1fr); }
+  }
 
   /* Botones */
   .btn {
@@ -613,7 +615,7 @@
     background: var(--soft); color: var(--muted); 
   }
   .pill.on { color: var(--green); border-color: transparent; background: var(--green-soft); }
-  .pill.off { color: var(--faint); background: var(--border); }
+  .pill.off { color: var(--muted); background: var(--border); }
   .pill.warn { color: var(--warn); border-color: transparent; background: var(--warn-soft); }
   .pill.danger { color: var(--danger); border-color: transparent; background: var(--danger-soft); }
 
@@ -633,6 +635,10 @@
   .flash.warn { background: var(--warn-soft); color: var(--warn); border: 1px solid transparent; }
   .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 1.25rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
   .hint { color: var(--faint); font-size: 0.78rem; margin-top: 0.3rem; line-height: 1.5; }
+  /* Texto secundario: las paginas usan class="faint"/"muted" (unas 100 veces) desde el
+     principio, pero no habia ninguna regla, asi que se pintaban como texto normal. */
+  .faint { color: var(--faint); }
+  .muted { color: var(--muted); }
 
   /* Cabecera comun de pagina (page_header en partials/layout.php) */
   .page-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1.25rem; margin-bottom: 1.5rem; }
@@ -672,6 +678,8 @@
   .checkline input { width: auto; margin-top: 0.25rem; cursor: pointer; }
   .checkline strong { display: block; font-size: 0.9rem; color: var(--text); }
   .empty { padding: 3rem; color: var(--muted); text-align: center; font-style: italic; }
+  /* Estado vacío dentro de una .card que ya tiene su propio padding. */
+  .card > .empty { padding: 1rem 0.5rem; }
   .scroll-x { overflow-x: auto; border-radius: 0.5rem; border: 1px solid var(--border); background: var(--card); }
   .nowrap { white-space: nowrap; }
 
@@ -693,7 +701,7 @@
      un vistazo mucho mas rapido que una tabla de filas clave/valor. */
   .health-grid { display: grid; gap: 0.75rem; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); }
   .health-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.85rem 1rem; background: var(--soft); border: 1px solid var(--border); border-radius: 0.6rem; }
-  .health-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; background: var(--faint); box-shadow: 0 0 0 3px var(--border); }
+  .health-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; background: var(--faint-ui); box-shadow: 0 0 0 3px var(--border); }
   .health-dot.ok { background: var(--green); box-shadow: 0 0 0 3px var(--green-soft); }
   .health-dot.warn { background: var(--warn); box-shadow: 0 0 0 3px var(--warn-soft); }
   .health-dot.danger { background: var(--danger); box-shadow: 0 0 0 3px var(--danger-soft); }
@@ -716,7 +724,7 @@
   /* Responsive Sidebar rules */
   @media (max-width: 900px) {
     .admin-layout {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
     }
     .sidebar {
       position: fixed;

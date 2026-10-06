@@ -94,7 +94,7 @@ if ($indexView['view'] === 'picker') {
     <?php page_header('Resumen global', 'Últimos 7 días, comparado con los 7 anteriores. Elige un sitio para entrar en su panel.'); ?>
 
     <?php if (!$apps): ?>
-      <div class="card empty">Todavía no hay sitios registrados. <a href="apps.php">Registra el primero →</a></div>
+      <div class="card empty">Aún no hay sitios registrados. <a href="apps.php">Registra el primero →</a></div>
     <?php else: ?>
       <div class="app-picker">
         <?php foreach ($apps as $i => $app): ?>
@@ -417,7 +417,7 @@ show_flash();
   <div>
     <h2>Canales de trafico <span class="faint" style="font-weight:500;">(30 d)</span></h2>
     <div class="card">
-      <?php if (!$channels): ?><p class="muted">Sin datos de trafico todavia.</p><?php endif; ?>
+      <?php if (!$channels): ?><div class="empty">Sin datos de tráfico todavía.</div><?php endif; ?>
       <?php foreach ($channels as $name => $c): ?>
         <?php bar_row((string) $name, $c, $maxChannel, 'green'); ?>
       <?php endforeach; ?>
@@ -426,7 +426,7 @@ show_flash();
   <div>
     <h2>Dispositivos <span class="faint" style="font-weight:500;">(30 d)</span></h2>
     <div class="card">
-      <?php if (!$deviceRows): ?><p class="muted">Sin datos de trafico todavia.</p><?php endif; ?>
+      <?php if (!$deviceRows): ?><div class="empty">Sin datos de tráfico todavía.</div><?php endif; ?>
       <?php foreach ($deviceRows as $r): ?>
         <?php bar_row($deviceLabels[$r['k']] ?? $r['k'], (int) $r['c'], $maxDevice, 'violet'); ?>
       <?php endforeach; ?>
@@ -478,7 +478,7 @@ show_flash();
       <table>
         <tbody>
           <?php if (!$lastMessages): ?>
-            <tr><td class="empty">Aun no hay mensajes.</td></tr>
+            <tr><td colspan="2" class="empty">Aún no hay mensajes.</td></tr>
           <?php endif; ?>
           <?php foreach ($lastMessages as $m): ?>
             <tr>
@@ -504,7 +504,7 @@ show_flash();
     <h2>Paginas mas vistas <span class="faint" style="font-weight:500;">(30 d)</span></h2>
     <div class="card">
       <?php if (!$topPages): ?>
-        <p class="muted">Aun no hay datos de visitas.</p>
+        <div class="empty">Sin datos de visitas todavía.</div>
       <?php endif; ?>
       <?php foreach ($topPages as $r): ?>
         <?php bar_row($r['path'], (int) $r['c'], (int) $maxPage, 'green'); ?>
@@ -574,7 +574,7 @@ show_flash();
     <?php h2_icon($icoClock, 'Actividad reciente'); ?>
     <div class="card">
       <?php if (!$recentActivity): ?>
-        <p class="empty" style="padding:1.5rem;">Sin actividad registrada todavia.</p>
+        <div class="empty">Aún no hay actividad registrada.</div>
       <?php endif; ?>
       <?php foreach ($recentActivity as $a): ?>
         <div class="timeline-item">

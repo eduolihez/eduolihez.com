@@ -52,8 +52,8 @@ if ($appSlug !== '') {
 // consulta fallida): sin filtro se verian los datos de TODAS las apps bajo el
 // nombre de esta, asi que se avisa y no se pinta nada.
 if ($appSlug !== '' && $appId === null) {
-    admin_header('Analitica', 'analytics.php');
-    page_header('Analitica');
+    admin_header('Analítica', 'analytics.php');
+    page_header('Analítica');
     echo '<div class="card empty">No se ha podido cargar la app «' . e($appSlug)
         . '» (no existe en la tabla <code>apps</code> o falló la consulta). Revisa el log del servidor.</div>';
     admin_footer();
@@ -365,7 +365,7 @@ $langLabels    = ['es' => 'Espanol', 'en' => 'Ingles', 'ca' => 'Catalan', '?' =>
 $viewportLabels = ['xs' => '< 480 px', 'sm' => '480–767 px', 'md' => '768–1023 px',
                     'lg' => '1024–1439 px', 'xl' => '≥ 1440 px', '?' => 'Desconocido'];
 
-admin_header('Analitica', 'analytics.php');
+admin_header('Analítica', 'analytics.php');
 // Sub-dashboard (docs/designs/admin-dashboard.md): estilos compartidos en
 // partials/layout.php (bloque ".subdash"), reutilizados por todas las
 // paginas re-skinadas de la Entrega 2 -- no se duplican aqui.
@@ -379,7 +379,7 @@ admin_header('Analitica', 'analytics.php');
       <?= $withBots ? '✓ Bots incluidos' : 'Incluir bots' ?>
     </a>
     <a class="btn ghost sm" href="?days=<?= $days ?>&amp;export=csv<?= e($appQs) ?>">Exportar CSV</a>
-<?php page_header('Analitica', '', ob_get_clean(), $appName !== null ? '— ' . $appName : ''); ?>
+<?php page_header('Analítica', '', ob_get_clean(), $appName !== null ? '— ' . $appName : ''); ?>
 <?php if ($appSlug !== '' && $appId === null): ?>
   <p class="hint" style="color:var(--warn);">
     No se encontro ninguna app con slug "<?= e($appSlug) ?>" — mostrando datos de todas las apps.
@@ -425,7 +425,7 @@ admin_header('Analitica', 'analytics.php');
 <h2>Visitas por dia</h2>
 <div class="card">
   <?php if (!array_sum(array_column($daily, 'c'))): ?>
-    <p class="muted">Aun no hay datos de visitas en este rango.</p>
+    <div class="empty">Sin datos de visitas en este rango.</div>
   <?php else: ?>
     <div class="chart">
       <?php foreach ($daily as $r): ?>
@@ -472,7 +472,7 @@ admin_header('Analitica', 'analytics.php');
   <div>
     <h2>Canales de trafico</h2>
     <div class="card">
-      <?php if (!$channels): ?><p class="muted">Sin datos.</p><?php endif; ?>
+      <?php if (!$channels): ?><div class="empty">Sin datos.</div><?php endif; ?>
       <?php foreach ($channels as $name => $c): ?>
         <?php bar_row($name, $c, $maxChannel, 'green',
             $inRange > 0 ? round(($c / $inRange) * 100) . '%' : ''); ?>
@@ -484,7 +484,7 @@ admin_header('Analitica', 'analytics.php');
   <div>
     <h2>Idioma de la pagina</h2>
     <div class="card">
-      <?php if (!$langs): ?><p class="muted">Sin datos.</p><?php endif; ?>
+      <?php if (!$langs): ?><div class="empty">Sin datos.</div><?php endif; ?>
       <?php foreach ($langs as $r): ?>
         <?php bar_row($langLabels[$r['k']] ?? $r['k'], (int) $r['c'], $maxLang, 'green',
             $inRange > 0 ? round(((int) $r['c'] / $inRange) * 100) . '%' : ''); ?>
@@ -497,7 +497,7 @@ admin_header('Analitica', 'analytics.php');
   <div>
     <h2>Idioma del navegador</h2>
     <div class="card">
-      <?php if (!$browserLangs): ?><p class="muted">Sin datos.</p><?php endif; ?>
+      <?php if (!$browserLangs): ?><div class="empty">Sin datos.</div><?php endif; ?>
       <?php foreach ($browserLangs as $r): ?>
         <?php bar_row($langLabels[$r['k']] ?? strtoupper((string) $r['k']), (int) $r['c'], $maxBroLang, ''); ?>
       <?php endforeach; ?>
@@ -508,7 +508,7 @@ admin_header('Analitica', 'analytics.php');
   <div>
     <h2>Tamano de pantalla</h2>
     <div class="card">
-      <?php if (!$viewports): ?><p class="muted">Sin datos.</p><?php endif; ?>
+      <?php if (!$viewports): ?><div class="empty">Sin datos.</div><?php endif; ?>
       <?php foreach ($viewports as $r): ?>
         <?php bar_row($viewportLabels[$r['k']] ?? $r['k'], (int) $r['c'], $maxViewport, 'violet'); ?>
       <?php endforeach; ?>
@@ -520,7 +520,7 @@ admin_header('Analitica', 'analytics.php');
   <div>
     <h2>Paginas de entrada</h2>
     <div class="card">
-      <?php if (!$entryPages): ?><p class="muted">Sin datos.</p><?php endif; ?>
+      <?php if (!$entryPages): ?><div class="empty">Sin datos.</div><?php endif; ?>
       <?php foreach ($entryPages as $r): ?>
         <?php bar_row($r['path'], (int) $r['c'], $maxEntry, 'green'); ?>
       <?php endforeach; ?>
@@ -529,7 +529,7 @@ admin_header('Analitica', 'analytics.php');
   <div>
     <h2>Paginas de salida</h2>
     <div class="card">
-      <?php if (!$exitPages): ?><p class="muted">Sin datos.</p><?php endif; ?>
+      <?php if (!$exitPages): ?><div class="empty">Sin datos.</div><?php endif; ?>
       <?php foreach ($exitPages as $r): ?>
         <?php bar_row($r['path'], (int) $r['c'], $maxExit, 'violet'); ?>
       <?php endforeach; ?>
@@ -541,7 +541,7 @@ admin_header('Analitica', 'analytics.php');
   <div>
     <h2>Paginas mas vistas</h2>
     <div class="card">
-      <?php if (!$topPages): ?><p class="muted">Sin datos.</p><?php endif; ?>
+      <?php if (!$topPages): ?><div class="empty">Sin datos.</div><?php endif; ?>
       <?php foreach ($topPages as $r): ?>
         <?php bar_row($r['path'], (int) $r['c'], $maxPage, 'green'); ?>
       <?php endforeach; ?>
@@ -551,8 +551,8 @@ admin_header('Analitica', 'analytics.php');
     <h2>Paises</h2>
     <div class="card">
       <?php if (!$countries): ?>
-        <p class="muted">Sin datos de pais. Requiere que el trafico pase por Cloudflare
-          (cabecera CF-IPCountry).</p>
+        <div class="empty">Sin datos de país. Requiere que el tráfico pase por Cloudflare
+          (cabecera CF-IPCountry).</div>
       <?php endif; ?>
       <?php foreach ($countries as $r): ?>
         <?php bar_row(
@@ -568,7 +568,7 @@ admin_header('Analitica', 'analytics.php');
   <div>
     <h2>Dispositivos</h2>
     <div class="card">
-      <?php if (!$devices): ?><p class="muted">Sin datos.</p><?php endif; ?>
+      <?php if (!$devices): ?><div class="empty">Sin datos.</div><?php endif; ?>
       <?php foreach ($devices as $r): ?>
         <?php bar_row($deviceLabels[$r['k']] ?? $r['k'], (int) $r['c'], $maxDev, '',
             $inRange > 0 ? round(((int) $r['c'] / $inRange) * 100) . '%' : ''); ?>
@@ -578,7 +578,7 @@ admin_header('Analitica', 'analytics.php');
   <div>
     <h2>Navegadores</h2>
     <div class="card">
-      <?php if (!$browsers): ?><p class="muted">Sin datos.</p><?php endif; ?>
+      <?php if (!$browsers): ?><div class="empty">Sin datos.</div><?php endif; ?>
       <?php foreach ($browsers as $r): ?>
         <?php bar_row($r['k'], (int) $r['c'], $maxBro, 'green'); ?>
       <?php endforeach; ?>
@@ -587,7 +587,7 @@ admin_header('Analitica', 'analytics.php');
   <div>
     <h2>Sistemas operativos</h2>
     <div class="card">
-      <?php if (!$systems): ?><p class="muted">Sin datos.</p><?php endif; ?>
+      <?php if (!$systems): ?><div class="empty">Sin datos.</div><?php endif; ?>
       <?php foreach ($systems as $r): ?>
         <?php bar_row($r['k'], (int) $r['c'], $maxSys, 'violet'); ?>
       <?php endforeach; ?>
@@ -602,7 +602,7 @@ admin_header('Analitica', 'analytics.php');
       <thead><tr><th>Origen</th><th>Medio</th><th>Campana</th><th class="text-right">Visitas</th></tr></thead>
       <tbody>
         <?php if (!$utmRows): ?>
-          <tr><td colspan="4" class="empty">Sin datos: ningun enlace de entrada trae parametros utm_*.</td></tr>
+          <tr><td colspan="4" class="empty">Sin datos: ningún enlace de entrada trae parámetros utm_*.</td></tr>
         <?php endif; ?>
         <?php foreach ($utmRows as $r): ?>
           <tr>
@@ -628,7 +628,7 @@ admin_header('Analitica', 'analytics.php');
       <thead><tr><th>Referrer</th><th>Canal</th><th class="text-right">Visitas</th></tr></thead>
       <tbody>
         <?php if (!$topRefs): ?>
-          <tr><td colspan="3" class="empty">Sin datos: todo el trafico llega directo.</td></tr>
+          <tr><td colspan="3" class="empty">Sin datos: todo el tráfico llega directo.</td></tr>
         <?php endif; ?>
         <?php foreach ($topRefs as $r): ?>
           <tr>
@@ -649,7 +649,7 @@ admin_header('Analitica', 'analytics.php');
       <thead><tr><th>User-Agent</th><th class="text-right">Peticiones</th></tr></thead>
       <tbody>
         <?php if (!$topBots): ?>
-          <tr><td colspan="2" class="empty">Ningun bot registrado en este rango.</td></tr>
+          <tr><td colspan="2" class="empty">Sin datos: ningún bot registrado en este rango.</td></tr>
         <?php endif; ?>
         <?php foreach ($topBots as $r): ?>
           <tr>

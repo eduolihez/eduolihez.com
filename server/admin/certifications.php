@@ -133,7 +133,7 @@ show_flash();
       <tbody>
         <?php if (!$rows): ?>
           <tr><td colspan="7" class="empty">
-            <?= $search !== '' ? 'Ninguna certificacion coincide con la busqueda.' : 'Aun no hay certificaciones.' ?>
+            <?= $search !== '' ? 'Ninguna certificación coincide con la búsqueda.' : 'Aún no hay certificaciones.' ?>
           </td></tr>
         <?php endif; ?>
         <?php foreach ($rows as $i => $c): ?>

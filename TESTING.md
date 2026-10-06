@@ -113,9 +113,14 @@ consola ni violaciones de CSP, un `<h1>`, sin desbordamiento a 1280 y 375 px),
 tema, cajón móvil, CSP, y operaciones reales (proyectos, artículos, usuarios
 del lab, mensajes, CSV de analítica, apps).
 
-**Regla de seguridad:** crea y borra datos. `playwright.config.cjs` se niega a
-arrancar si `E2E_BASE_URL` no es `127.0.0.1`/`localhost`, y `e2e/seed/seed.php`
-aborta si la base de datos no termina en `_test`.
+**Regla de seguridad:** crea y borra datos. Tres guardas: (1)
+`playwright.config.cjs` se niega a arrancar si `E2E_BASE_URL` no es
+`127.0.0.1`/`localhost`; (2) `e2e/global-setup.cjs` lee `server/config.php`
+como texto (es la BD que usa el servidor PHP al que hablan los tests) y aborta
+la ejecución si `db.name` no termina en `_test` o si `db.host` no es
+`localhost`/`127.0.0.1` (o si el fichero falta o no se entiende); su lógica
+(`e2e/db-guard.cjs`) se prueba con `cd e2e && npm run test:guard`; (3)
+`e2e/seed/seed.php` aborta si la base de datos del seed no termina en `_test`.
 
 En local con XAMPP (BD `eduolihez_test` con `database/schema.sql` importado y
 `server/config.php` apuntando a ella):

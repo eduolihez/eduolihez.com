@@ -6,6 +6,7 @@
   "scripts": {
     "seed": "php seed/seed.php",
     "test": "playwright test",
+    "test:guard": "node --test db-guard.test.cjs",
     "report": "playwright show-report"
   },
   "devDependencies": {

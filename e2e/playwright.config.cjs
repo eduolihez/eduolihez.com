@@ -4,7 +4,8 @@
  *
  * Estos tests CREAN Y BORRAN datos (proyectos, articulos, usuarios del lab,
  * estados de mensajes). Por eso la configuracion se niega a arrancar si la
- * URL base no apunta a esta maquina: nunca deben tocar el sitio real.
+ * URL base no apunta a esta maquina (y global-setup.cjs exige que server/config.php
+ * apunte a una BD "_test" local): nunca deben tocar el sitio real.
  * La base de datos de test la prepara seed/seed.php (que a su vez exige que
  * el nombre de la BD termine en "_test").
  */
@@ -44,6 +45,8 @@ const AUTH_FILE = path.join(__dirname, '.auth', 'admin.json');
 const PHP = process.env.E2E_PHP || 'php';
 
 module.exports = defineConfig({
+  // Aborta si server/config.php no apunta a una BD de test local (db-guard.cjs).
+  globalSetup: require.resolve('./global-setup.cjs'),
   testDir: './tests',
   testMatch: /.*\.(spec|setup)\.cjs$/,
   outputDir: './test-results',
@@ -52,7 +55,9 @@ module.exports = defineConfig({
   workers: 1,
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 1 : 0,
+  // Sin reintentos: los tests cambian estado (crean/borran datos) y un reintento
+  // tras un fallo a medias partiria de datos sucios.
+  retries: 0,
   timeout: 30_000,
   expect: { timeout: 5_000 },
   reporter: [['list'], ['html', { outputFolder: 'playwright-report', open: 'never' }]],

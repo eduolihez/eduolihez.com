@@ -32,8 +32,10 @@ y el versionado usa cuatro números (`MAJOR.MINOR.PATCH.MICRO`).
 - **Suite E2E con Playwright** (`e2e/`, 97 pruebas) contra el panel real con
   MariaDB: login, espacios, todas las páginas en claro/oscuro y a 375 px,
   tema, cajón móvil, CSP y altas/bajas de proyectos, posts y usuarios de
-  PhishLab. Se niega a correr contra un host que no sea `127.0.0.1`/`localhost`
-  y su semilla aborta si la base de datos no termina en `_test`.
+  PhishLab. Tres guardas de seguridad: se niega a correr contra un host que no
+  sea `127.0.0.1`/`localhost`; un `globalSetup` lee `server/config.php` y
+  aborta si la base de datos del servidor no termina en `_test` o su host no
+  es local; y la semilla aborta si su base de datos no termina en `_test`.
 - **CI en GitHub** (`.github/workflows/admin.yml`): PHPUnit, E2E con MariaDB y
   el test del empaquetado. No son checks obligatorios (el obligatorio sigue
   siendo "Vitest").

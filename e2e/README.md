@@ -11,6 +11,11 @@ Estos tests **crean y borran datos**. Por eso:
 
 - `playwright.config.cjs` no arranca si `E2E_BASE_URL` no apunta a
   `127.0.0.1` o `localhost`.
+- `global-setup.cjs` lee `../server/config.php` como texto (es la BD que usa de
+  verdad el servidor PHP al que hablan los tests, no la del seed) y aborta toda
+  la ejecución si `db.name` no termina en `_test`, si `db.host` no es
+  `localhost`/`127.0.0.1`, o si el fichero falta o no se puede interpretar.
+  La lógica está en `db-guard.cjs` y se prueba con `npm run test:guard`.
 - `seed/seed.php` aborta si `DB_NAME` (y la base de datos a la que se conecta)
   no termina en `_test`.
 

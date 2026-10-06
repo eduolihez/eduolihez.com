@@ -48,8 +48,16 @@ Necesita un PHP local y `.superpowers/tools/phpunit.phar`. Si falta el phar,
 el script imprime el comando de descarga:
 
 ```bash
-mkdir -p .superpowers/tools && curl -sSfL -o .superpowers/tools/phpunit.phar https://phar.phpunit.de/phpunit-10.5.phar
+mkdir -p .superpowers/tools && curl -sSfL -o .superpowers/tools/phpunit.phar https://phar.phpunit.de/phpunit-10.5.66.phar
 ```
+
+El script fija la versión (PHPUnit 10.5.66) y su SHA-256
+(`42bcac97bbf9fb1aecf5a7d6a1b37123a11e7e295458978f0e268999f6d9e50f`) y se
+niega a ejecutar un phar que no coincida. Al fijarlo se comprobó también la
+firma GPG de `phpunit-10.5.66.phar.asc` (clave de Sebastian Bergmann,
+huella `D840 6D0D 8294 7747 2937 7831 4AA3 9408 6372 C20A`). Para subir de
+versión: descarga la nueva, verifica su firma y actualiza `PHPUNIT_VERSION` y
+`PHPUNIT_SHA256` en `scripts/php-test.sh`.
 
 `composer test` sigue funcionando donde haya Composer. En ambos casos los
 tests de `server/tests/` no deben cargar `auth.php`, `http.php` ni `db.php`

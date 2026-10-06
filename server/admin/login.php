@@ -48,6 +48,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>Acceso · Admin</title>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <style>
   @font-face {
     font-family: 'Inter';

@@ -151,6 +151,7 @@ function admin_header(string $title, string $active = ''): void
 <?php /* Sincrono y antes del CSS: fija data-theme sin destello (CSP: script-src 'self'). */ ?>
 <script src="<?= e(asset_url('theme.js')) ?>"></script>
 <link rel="stylesheet" href="<?= e(asset_url('admin.css')) ?>">
+<link rel="icon" type="image/svg+xml" href="<?= e(asset_url('favicon.svg')) ?>">
 </head>
 <body>
 <div class="admin-layout">

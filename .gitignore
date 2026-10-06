@@ -154,3 +154,6 @@ CLOUDFLARE.md
 
 # Visual companion de brainstorming
 .superpowers/
+
+# Clave de ingesta de PhishLab: local/FTP, nunca al repo (copia telemetry.config.example.json)
+public/projects/phishlab/assets/telemetry.config.json

@@ -5,6 +5,53 @@ Todos los cambios notables de este proyecto se documentan en este archivo.
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/),
 y el versionado usa cuatro números (`MAJOR.MINOR.PATCH.MICRO`).
 
+## [Unreleased]
+
+### Added
+
+- **Espacios en el panel admin.** El panel trabaja por espacio: `Global`
+  (por defecto) o una app registrada. Hay un selector de espacio en la
+  cabecera y el menú lateral cambia según el espacio activo. El espacio se
+  elige con `?space=<slug>`; `?app=<slug>` sigue funcionando como alias. La
+  sesión recuerda el espacio solo si la página visitada pertenece a él.
+  `analytics.php` e `index.php` filtran por el espacio activo, e `index.php`
+  en Global pasa a ser el "Resumen global".
+- **Tema claro/oscuro** con interruptor en el panel (`assets/theme.js`). La
+  preferencia se guarda en `localStorage`; sin preferencia guardada se usa
+  `prefers-color-scheme`.
+- **`partials/spaces.php` y `partials/icons.php`**: lógica de espacios e
+  iconos sin dependencias de `auth.php`, `http.php` ni `db.php`, para poder
+  testearlas.
+- **Tests**: `SpacesTest` (PHPUnit) y `scripts/php-test.sh` para correr la
+  suite PHP en local sin Composer.
+
+### Changed
+
+- El CSS del panel sale de `partials/layout.php` a `assets/admin.css`, con
+  versión por `filemtime` para la caché.
+- Las páginas del panel usan un `page_header` común y unas utilidades de
+  CSS en lugar de estilos en línea.
+- El script en línea del cajón móvil pasa a `assets/admin.js` (requisito de
+  la CSP).
+- `analytics.php` sin parámetros ahora hereda el espacio de la sesión (antes
+  mostraba todas las apps).
+- `?app=<slug>` con un slug desconocido cae en Global (antes mostraba un
+  dashboard vacío).
+
+### Deployment / Despliegue
+
+- Archivos nuevos a subir por FTP: `server/admin/assets/admin.css`,
+  `server/admin/assets/theme.js`, `server/admin/partials/spaces.php` y
+  `server/admin/partials/icons.php`.
+- Archivos modificados: `server/admin/partials/layout.php`,
+  `server/admin/assets/admin.js`, `server/admin/index.php`,
+  `server/admin/analytics.php` y el resto de páginas de `server/admin/`.
+- No hay migración de base de datos.
+- La verificación visual en páginas reales (claro, oscuro y móvil, con base
+  de datos real) NO se hizo durante el desarrollo. Hay que hacerla antes o
+  justo después de subir. Sí se hicieron `php -l` sobre todo `server/admin/`
+  y la suite PHPUnit.
+
 ## [1.9.0.0] - 2026-09-08
 
 ### Added

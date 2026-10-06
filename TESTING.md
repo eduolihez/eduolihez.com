@@ -30,6 +30,25 @@ composer install       # PHP: instala PHPUnit (solo la primera vez)
 composer test          # PHP (PHPUnit)
 ```
 
+### PHP en local sin Composer
+
+```bash
+bash scripts/php-test.sh
+```
+
+Necesita un PHP local y `.superpowers/tools/phpunit.phar`. Si falta el phar,
+el script imprime el comando de descarga:
+
+```bash
+mkdir -p .superpowers/tools && curl -sSfL -o .superpowers/tools/phpunit.phar https://phar.phpunit.de/phpunit-10.5.phar
+```
+
+`composer test` sigue funcionando donde haya Composer. En ambos casos los
+tests de `server/tests/` no deben cargar `auth.php`, `http.php` ni `db.php`
+(ver el comentario de `server/tests/bootstrap.php`). Por eso
+`server/admin/partials/spaces.php` y `icons.php` son puras: sin dependencias
+de esos archivos, se pueden testear (`SpacesTest`).
+
 `npm test` corre en CI en cada push/PR a `master`
 (`.github/workflows/test.yml`, check "Vitest"). La suite de PHPUnit **no**
 está todavía en ese workflow — se montó en esta misma sesión sin un entorno

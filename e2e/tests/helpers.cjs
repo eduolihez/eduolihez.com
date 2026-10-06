@@ -1,6 +1,7 @@
 // Utilidades compartidas por los specs del panel.
 const fs = require('node:fs');
 const path = require('node:path');
+const { randomBytes } = require('node:crypto');
 const { expect } = require('@playwright/test');
 
 const AUTH_FILE = path.join(__dirname, '..', '.auth', 'admin.json');
@@ -107,7 +108,9 @@ async function followLink(page, link) {
 
 /** Sufijo unico por ejecucion para no chocar con restos de otra pasada. */
 function stamp() {
-  return `${Date.now().toString(36)}${Math.floor(Math.random() * 1e4)}`;
+  // randomBytes y no Math.random: el sufijo acaba en nombres y contrasenas de
+  // usuarios de prueba, y CodeQL (js/insecure-randomness) marca ese flujo.
+  return `${Date.now().toString(36)}${randomBytes(3).toString('hex')}`;
 }
 
 module.exports = {

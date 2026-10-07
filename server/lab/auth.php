@@ -18,6 +18,7 @@
  */
 
 require_once __DIR__ . '/../lib/http.php'; // aporta bootstrap + client_ip()
+require_once __DIR__ . '/next.php';        // lab_safe_next(): valida el "next" del login
 
 // --- CSP del gate: solo lo imprescindible para el propio PhishLab estatico,
 // mas api.eduolihez.com para su telemetria (assets/js/core/telemetry.js) ---
@@ -206,6 +207,10 @@ function lab_login_user(string $username, string $password): bool
     if (!$user || !(int) $user['active']) {
         // Mismo tratamiento anti-enumeracion que server/admin/auth.php: un
         // usuario inexistente o desactivado tarda lo mismo que uno valido.
+        // Hash FALSO a proposito (no es ningun secreto, no corresponde a ninguna
+        // contrasena): solo sirve para gastar el mismo tiempo que una
+        // verificacion real. Semgrep lo marca como "bcrypt hash detectado"
+        // (falso positivo, descartado en GitHub).
         password_verify($password, '$2y$12$usesomesillystringfooooooooooooooooooooooooooooooooooooo');
         lab_login_record($ip, $username, false);
         return false;

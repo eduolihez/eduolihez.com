@@ -100,6 +100,22 @@ y el versionado usa cuatro números (`MAJOR.MINOR.PATCH.MICRO`).
 
 ### Security
 
+- **Redirección abierta en el login de PhishLab** (`lab-app/login.php`): el
+  parámetro `next` solo rechazaba las rutas que empezaban por `//`, pero un
+  navegador lee `/\evil.com` como `//evil.com`. Tras iniciar sesión se podía
+  mandar al usuario a otro dominio. Ahora `lab_safe_next()`
+  (`server/lab/next.php`) rechaza la barra invertida, los caracteres de
+  control, el espacio y las rutas de más de 1024 caracteres. Probado con el
+  login real: `/destino.php` se respeta y `/\evil.com`, `//evil.com`, un
+  tabulador y una URL absoluta acaban en `index.php`. Para subir:
+  `server/lab/next.php` (nuevo), `server/lab/auth.php` y `lab-app/login.php`
+  (este último sale del build de `dist/`).
+- Dos alertas de Semgrep eran falsos positivos y se descartan en GitHub con su
+  motivo, que también queda en un comentario del código: el hash bcrypt falso
+  de `server/lab/auth.php` (sirve para igualar el tiempo de respuesta entre
+  usuario existente e inexistente) y el `next` ya validado y escapado del
+  formulario de login. No se usa `nosemgrep`: GitHub no auto-descarta los
+  resultados suprimidos de Semgrep y los seguía contando como alertas nuevas.
 - `public/projects/phishlab/assets/telemetry.config.json` dejó de
   versionarse: contenía la clave de ingesta de PhishLab en claro. Queda solo
   en local/FTP (se copia desde `telemetry.config.example.json`) y está en

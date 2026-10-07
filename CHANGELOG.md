@@ -110,10 +110,12 @@ y el versionado usa cuatro números (`MAJOR.MINOR.PATCH.MICRO`).
   tabulador y una URL absoluta acaban en `index.php`. Para subir:
   `server/lab/next.php` (nuevo), `server/lab/auth.php` y `lab-app/login.php`
   (este último sale del build de `dist/`).
-- Dos alertas de Semgrep eran falsos positivos y quedan anotadas con
-  `nosemgrep` y su motivo: el hash bcrypt falso de `server/lab/auth.php` (sirve
-  para igualar el tiempo de respuesta entre usuario existente e inexistente) y
-  el `next` ya validado y escapado del formulario de login.
+- Dos alertas de Semgrep eran falsos positivos y se descartan en GitHub con su
+  motivo, que también queda en un comentario del código: el hash bcrypt falso
+  de `server/lab/auth.php` (sirve para igualar el tiempo de respuesta entre
+  usuario existente e inexistente) y el `next` ya validado y escapado del
+  formulario de login. No se usa `nosemgrep`: GitHub no auto-descarta los
+  resultados suprimidos de Semgrep y los seguía contando como alertas nuevas.
 - `public/projects/phishlab/assets/telemetry.config.json` dejó de
   versionarse: contenía la clave de ingesta de PhishLab en claro. Queda solo
   en local/FTP (se copia desde `telemetry.config.example.json`) y está en

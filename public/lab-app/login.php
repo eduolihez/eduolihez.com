@@ -74,8 +74,8 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     <div class="brand">&gt;_ <span>PhishLab</span></div>
     <?php if ($error): ?><div class="err"><?= lab_e($error) ?></div><?php endif; ?>
     <?= lab_csrf_field() ?>
-    <?php // Falso positivo de Semgrep: $next pasa por lab_safe_next() y se escapa con lab_e() (htmlspecialchars, ENT_QUOTES). ?>
-    <input type="hidden" name="next" value="<?= lab_e($next) /* nosemgrep: php.lang.security.injection.echoed-request.echoed-request */ ?>">
+    <?php // Semgrep (echoed-request) lo marca, pero $next pasa por lab_safe_next() y se escapa con lab_e() (htmlspecialchars, ENT_QUOTES): falso positivo, descartado en GitHub. ?>
+    <input type="hidden" name="next" value="<?= lab_e($next) ?>">
     <label for="username">Usuario</label>
     <input type="text" id="username" name="username" required autofocus>
     <label for="password">Contraseña</label>

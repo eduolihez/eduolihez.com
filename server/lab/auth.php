@@ -209,8 +209,9 @@ function lab_login_user(string $username, string $password): bool
         // usuario inexistente o desactivado tarda lo mismo que uno valido.
         // Hash FALSO a proposito (no es ningun secreto, no corresponde a ninguna
         // contrasena): solo sirve para gastar el mismo tiempo que una
-        // verificacion real. Semgrep lo marca como "bcrypt hash detectado".
-        password_verify($password, '$2y$12$usesomesillystringfooooooooooooooooooooooooooooooooooooo'); // nosemgrep: generic.secrets.security.detected-bcrypt-hash.detected-bcrypt-hash
+        // verificacion real. Semgrep lo marca como "bcrypt hash detectado"
+        // (falso positivo, descartado en GitHub).
+        password_verify($password, '$2y$12$usesomesillystringfooooooooooooooooooooooooooooooooooooo');
         lab_login_record($ip, $username, false);
         return false;
     }

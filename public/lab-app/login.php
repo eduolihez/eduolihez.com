@@ -17,12 +17,11 @@ if (is_lab_logged_in()) {
 $error = '';
 // $next ya viene SIN el prefijo /lab-app (require_lab_login() lo quita antes
 // de mandarlo al navegador, ver server/lab/auth.php) -- validar que empiece
-// por una sola barra (ruta relativa al propio host) y no por "//", que un
-// navegador interpretaria como protocol-relative hacia OTRO dominio.
-$next = (string) ($_GET['next'] ?? $_POST['next'] ?? '');
-if ($next !== '' && (!str_starts_with($next, '/') || str_starts_with($next, '//'))) {
-    $next = ''; // no seguir redirects fuera de este host
-}
+// por una sola barra (ruta relativa al propio host). lab_safe_next() rechaza
+// ademas "/\evil.com" (un navegador convierte "\" en "/" y lo lee como
+// "//evil.com", protocol-relative hacia OTRO dominio), los caracteres de
+// control y el espacio: no se siguen redirects fuera de este host.
+$next = lab_safe_next((string) ($_GET['next'] ?? $_POST['next'] ?? ''));
 
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     lab_csrf_check();
@@ -75,7 +74,8 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     <div class="brand">&gt;_ <span>PhishLab</span></div>
     <?php if ($error): ?><div class="err"><?= lab_e($error) ?></div><?php endif; ?>
     <?= lab_csrf_field() ?>
-    <input type="hidden" name="next" value="<?= lab_e($next) ?>">
+    <?php // Falso positivo de Semgrep: $next pasa por lab_safe_next() y se escapa con lab_e() (htmlspecialchars, ENT_QUOTES). ?>
+    <input type="hidden" name="next" value="<?= lab_e($next) /* nosemgrep: php.lang.security.injection.echoed-request.echoed-request */ ?>">
     <label for="username">Usuario</label>
     <input type="text" id="username" name="username" required autofocus>
     <label for="password">Contraseña</label>

@@ -64,6 +64,19 @@ describe('GET /llms.txt', () => {
     expect(body).toContain(`${SITE.domain}/sitemap-posts.xml`);
   });
 
+  it('presenta el foco Cloud Security e IAM, tambien en ingles', async () => {
+    // El posicionamiento del perfil es Cloud Security + IAM (igual que el
+    // titular de LinkedIn). Si alguien recorta el resumen, una IA volveria a
+    // describirle solo como "analista SOC". El bloque en ingles existe porque
+    // buena parte de las busquedas de reclutadores se hacen en ingles.
+    const response = GET({} as APIContext);
+    const body = await response.text();
+
+    expect(body).toContain('## Summary in English');
+    expect(body).toMatch(/cloud security, identity and access\s+management \(IAM\)/);
+    expect(body).toContain('Cloud Security Foundation');
+  });
+
   it('incluye Blue Team Hub con su dominio externo, no bajo /projects/', async () => {
     // Regresion: a diferencia de los otros 5 proyectos con web propia en
     // este dominio, Blue Team Hub vive en eduolihez.github.io. Si alguien

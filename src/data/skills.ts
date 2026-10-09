@@ -12,6 +12,21 @@ export interface SkillGroup {
 }
 
 export const skillGroups: SkillGroup[] = [
+  // Primero el foco profesional (mismo orden que las "Top skills" de LinkedIn).
+  {
+    category: {
+      es: 'Cloud, Identidad & Correo',
+      en: 'Cloud, Identity & Email',
+      ca: 'Cloud, Identitat & Correu',
+    },
+    items: [
+      'Cloud Security',
+      'Identity & Access Management (IAM)',
+      'Email & Collaboration Security',
+      'Security Awareness (SAT)',
+      'Phishing Simulation',
+    ],
+  },
   {
     category: {
       es: 'Seguridad & Blue Team',
@@ -25,8 +40,9 @@ export const skillGroups: SkillGroup[] = [
       'Threat Intelligence',
       'Trend Micro Vision One',
       'Fortinet (FortiGate/FortiAnalyzer)',
+      'Vulnerability Management',
       'Web Application Security',
-      'Criptografia',
+      'Criptografía',
       'Análisis de Phishing',
     ],
   },

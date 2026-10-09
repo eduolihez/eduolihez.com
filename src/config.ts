@@ -12,7 +12,10 @@ export const SITE = {
   // Nombre y titulares.
   name: 'Eduardo Olivares Hernández',
   shortName: 'Edu Olivares',
-  jobTitle: 'SOC Analyst · Blue Team',
+  // Mismo titular que LinkedIn: Cloud Security e IAM es el foco profesional
+  // y SOC es el trabajo de hoy. Si cambia en un sitio, cambialo en el otro
+  // (Google cruza ambos perfiles via sameAs).
+  jobTitle: 'Cybersecurity Analyst · SOC · Cloud Security & IAM',
 
   /**
    * Ubicacion. Alimenta el SEO local (que te encuentren buscando
@@ -52,6 +55,9 @@ export const SITE = {
    * para saber sobre que te pueden citar. Manten la lista concreta.
    */
   knowsAbout: [
+    'Cloud Security',
+    'Gestión de identidades y accesos (IAM)',
+    'Seguridad del correo y la colaboración (Email & Collaboration Security)',
     'Security Operations Center (SOC)',
     'Blue Team',
     'Detección de amenazas',
@@ -59,12 +65,12 @@ export const SITE = {
     'SIEM y XDR',
     'Trend Micro Vision One',
     'Fortinet FortiGate y FortiAnalyzer',
-    'Análisis de phishing',
+    'Simulación de phishing y concienciación en seguridad (SAT)',
     'Threat Intelligence',
     'Automatización de seguridad con Python',
     'Inteligencia artificial aplicada a ciberseguridad',
     'Active Directory y Windows Server',
-    'Ciberseguridad en Badalona y Barcelona',
+    'Ciberseguridad en Barcelona',
   ],
 
   /** Idiomas que hablas (codigo BCP-47 + nivel legible). */
@@ -85,20 +91,29 @@ export const SITE = {
    * Manten la lista CORTA. Su valor es decir "esto es lo importante"; si crece
    * hasta replicar la tabla entera, deja de responder a esa pregunta.
    */
+  // Las tres primeras son las que respaldan el foco Cloud Security & IAM;
+  // van delante a proposito (es el orden en que las leen Schema.org y llms.txt).
   credentials: [
-    { name: 'Fortinet NSE', issuer: 'Fortinet', year: '2026' },
-    { name: 'Microsoft Certified: Azure AI Fundamentals', issuer: 'Microsoft', year: '2026' },
+    { name: 'Trend Micro Vision One Cloud Security Foundation', issuer: 'Trend Micro', year: '2024' },
+    { name: 'Trend Micro Vision One Identity Security Foundation', issuer: 'Trend Micro', year: '2024' },
+    {
+      name: 'Trend Micro Vision One Email & Collaboration Security Foundation',
+      issuer: 'Trend Micro',
+      year: '2024',
+    },
+    {
+      name: 'Trend Micro Vision One Security Operations (SecOps) Foundation',
+      issuer: 'Trend Micro',
+      year: '2024',
+    },
     {
       name: 'Trend Micro Vision One Platform — Advanced',
       issuer: 'Trend Micro',
       year: '2024',
     },
-    { name: 'TryHackMe Pre-Security', issuer: 'TryHackMe', year: '2023' },
-    {
-      name: 'Fundamentos profesionales en ciberseguridad',
-      issuer: 'Microsoft / LinkedIn',
-      year: '2023',
-    },
+    { name: 'Fortinet NSE 3 Certified in Cybersecurity', issuer: 'Fortinet', year: '2026' },
+    { name: 'Fortinet FortiGate 7.6 Operator', issuer: 'Fortinet', year: '2026' },
+    { name: 'Microsoft Certified: Azure AI Fundamentals', issuer: 'Microsoft', year: '2026' },
     { name: 'First Certificate in English (B2)', issuer: 'Cambridge English', year: '2021' },
   ],
 
@@ -114,8 +129,10 @@ export const SITE = {
 
   // Foto de perfil y CV (colocados en /public, se sirven desde la raiz).
   avatar: '/img/eduardo.webp',
-  // Portada para redes (1200x630). Se genera un placeholder con `npm run icons`
-  // (og-cover.png). Sustituyelo por uno con tu foto/nombre cuando lo tengas.
+  // Portada para redes (1200x630). Las paginas usan la tarjeta generada en el
+  // build por idioma (/og/<lang>.png, ver src/pages/og/[lang].png.ts), con
+  // nombre, puesto y ubicacion. Este placeholder sin texto (`npm run icons`)
+  // queda solo como respaldo.
   ogImage: '/img/og-cover.png',
   cv: {
     es: '/cv/CV-Eduardo-Olivares-ES.pdf',

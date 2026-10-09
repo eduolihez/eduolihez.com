@@ -35,9 +35,10 @@ export const ui = {
     'nav.githubRepo': 'Ver el código en GitHub',
 
     'hero.status': 'Disponible para trabajar',
-    'hero.role': 'SOC Analyst · Blue Team · Detección de Amenazas con IA',
+    // Mismo titular que LinkedIn (sin la ciudad, que va en hero.location).
+    'hero.role': 'Analista de Ciberseguridad · SOC · Cloud Security e IAM · Seguridad de correo y colaboración',
     'hero.tagline':
-      'Analista de seguridad especializado en detección de amenazas, respuesta a incidentes y automatización en Python. Certificado Fortinet NSE.',
+      'Analista de ciberseguridad en Dagram: triaje de alertas en Trend Micro Vision One, automatización de informes con Python y apoyo en gestión de identidades y accesos. Mi foco es la seguridad cloud e IAM.',
     'hero.location': 'Badalona, Barcelona (España)',
     'hero.languages': 'Español · Catalán · Inglés B2',
     'hero.cta.contact': 'Contactar',
@@ -158,9 +159,9 @@ export const ui = {
     'nav.githubRepo': 'View source on GitHub',
 
     'hero.status': 'Open to work',
-    'hero.role': 'SOC Analyst · Blue Team · AI-Driven Threat Detection',
+    'hero.role': 'Cybersecurity Analyst · SOC · Cloud Security & IAM · Email & Collaboration Security',
     'hero.tagline':
-      'Security analyst focused on threat detection, incident response and Python automation. Fortinet NSE certified.',
+      'Cybersecurity analyst at Dagram: alert triage in Trend Micro Vision One, Python report automation and identity and access management support. My focus is cloud security and IAM.',
     'hero.location': 'Badalona, Barcelona (Spain)',
     'hero.languages': 'Spanish · Catalan · English B2',
     'hero.cta.contact': 'Get in touch',
@@ -279,9 +280,9 @@ export const ui = {
     'nav.githubRepo': 'Veure el codi a GitHub',
 
     'hero.status': 'Disponible per treballar',
-    'hero.role': "SOC Analyst · Blue Team · Detecció d'Amenaces amb IA",
+    'hero.role': 'Analista de Ciberseguretat · SOC · Cloud Security i IAM · Seguretat del correu i la col·laboració',
     'hero.tagline':
-      "Analista de seguretat especialitzat en detecció d'amenaces, resposta a incidents i automatització en Python. Certificat Fortinet NSE.",
+      "Analista de ciberseguretat a Dagram: triatge d'alertes a Trend Micro Vision One, automatització d'informes amb Python i suport en gestió d'identitats i accessos. El meu focus és la seguretat cloud i IAM.",
     'hero.location': 'Badalona, Barcelona (Espanya)',
     'hero.languages': 'Espanyol · Català · Anglès B2',
     'hero.cta.contact': 'Contactar',

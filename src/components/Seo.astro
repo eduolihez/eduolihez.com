@@ -104,7 +104,11 @@ const {
 } = Astro.props;
 
 const canonical = new URL(path, SITE.domain).href;
-const ogImageUrl = new URL(SITE.ogImage, SITE.domain).href;
+// Tarjeta con nombre, puesto y ubicacion, generada por idioma en el build
+// (src/pages/og/[lang].png.ts). SITE.ogImage es el placeholder antiguo sin
+// texto y ya no se usa como og:image.
+const ogImageUrl = new URL(`/og/${lang}.png`, SITE.domain).href;
+const shareImageUrl = article?.image ?? ogImageUrl;
 const avatarUrl = new URL(SITE.avatar, SITE.domain).href;
 const loc = SITE.location;
 
@@ -115,27 +119,48 @@ const altLocales = (Object.keys(localeMap) as Array<keyof typeof localeMap>)
   .map((l) => localeMap[l]);
 
 // --- Textos localizados que solo se usan en los datos estructurados ---------
+// Primera frase = la que citan los asistentes de IA cuando resumen el perfil:
+// puesto, ciudad y foco, en ese orden. Mismo enfoque que el titular de LinkedIn.
 const bio: Record<Lang, string> = {
-  es: `Analista SOC y perfil Blue Team en ${loc.city} (${loc.region}). Especializado en deteccion de amenazas, respuesta a incidentes, plataformas XDR/SIEM y automatizacion de seguridad con Python. Certificado Fortinet NSE, Microsoft y Trend Micro.`,
-  en: `SOC analyst and Blue Team professional based in ${loc.city} (${loc.region}, Spain). Specialised in threat detection, incident response, XDR/SIEM platforms and Python security automation. Fortinet NSE, Microsoft and Trend Micro certified.`,
-  ca: `Analista SOC i perfil Blue Team a ${loc.city} (${loc.region}). Especialitzat en deteccio d'amenaces, resposta a incidents, plataformes XDR/SIEM i automatitzacio de seguretat amb Python. Certificat Fortinet NSE, Microsoft i Trend Micro.`,
+  es: `Analista de ciberseguridad en ${loc.region} (vive en ${loc.city}), especializado en seguridad cloud, gestión de identidades y accesos (IAM) y seguridad del correo y la colaboración. En ${SITE.worksFor.name} hace triaje de alertas en Trend Micro Vision One, automatiza informes de seguridad con Python y da soporte de IAM. Certificado por Trend Micro (Cloud, Identity y Email & Collaboration Security), Fortinet y Microsoft.`,
+  en: `Cybersecurity analyst in ${loc.region}, Spain (based in ${loc.city}), focused on cloud security, identity and access management (IAM) and email and collaboration security. At ${SITE.worksFor.name} he triages alerts in Trend Micro Vision One, automates security reporting with Python and supports IAM work. Certified by Trend Micro (Cloud, Identity and Email & Collaboration Security), Fortinet and Microsoft.`,
+  ca: `Analista de ciberseguretat a ${loc.region} (viu a ${loc.city}), especialitzat en seguretat cloud, gestió d'identitats i accessos (IAM) i seguretat del correu i la col·laboració. A ${SITE.worksFor.name} fa triatge d'alertes a Trend Micro Vision One, automatitza informes de seguretat amb Python i dona suport d'IAM. Certificat per Trend Micro (Cloud, Identity i Email & Collaboration Security), Fortinet i Microsoft.`,
 };
 
 const siteNameByLang: Record<Lang, string> = {
-  es: `${SITE.name} — Analista SOC en ${loc.city}, ${loc.region}`,
-  en: `${SITE.name} — SOC Analyst in ${loc.city}, ${loc.region}`,
-  ca: `${SITE.name} — Analista SOC a ${loc.city}, ${loc.region}`,
+  es: `${SITE.name} — Analista de Ciberseguridad Cloud e IAM en ${loc.region}`,
+  en: `${SITE.name} — Cloud Security & IAM Analyst in ${loc.region}`,
+  ca: `${SITE.name} — Analista de Ciberseguretat Cloud i IAM a ${loc.region}`,
+};
+
+// Texto alternativo de la tarjeta para compartir. Antes llevaba un "en"
+// castellano fijo, asi que en /en/ salia "... Analyst en Badalona".
+const shareAltByLang: Record<Lang, string> = {
+  es: `${SITE.name}, analista de ciberseguridad (Cloud Security e IAM) en ${loc.region}`,
+  en: `${SITE.name}, cybersecurity analyst (Cloud Security & IAM) in ${loc.region}`,
+  ca: `${SITE.name}, analista de ciberseguretat (Cloud Security i IAM) a ${loc.region}`,
 };
 
 // Palabras clave: siguen sin usarse para posicionar, pero algunos agregadores
 // y herramientas de IA las leen. Cuestan cero y no hacen dano.
 const keywords = [
+  'analista de ciberseguridad',
+  `analista de ciberseguridad ${loc.region}`,
+  'Cybersecurity Analyst',
+  `Cybersecurity Analyst ${loc.region}`,
+  'Cloud Security',
+  'seguridad cloud',
+  `Cloud Security ${loc.region}`,
+  'IAM',
+  'gestión de identidades y accesos',
+  'Identity and Access Management',
+  'Email Security',
+  'seguridad del correo',
   'SOC Analyst',
   'analista SOC',
-  `analista SOC ${loc.city}`,
-  `ciberseguridad ${loc.city}`,
+  `analista SOC ${loc.region}`,
   `ciberseguridad ${loc.region}`,
-  `SOC Analyst ${loc.region}`,
+  `ciberseguridad ${loc.city}`,
   'Blue Team',
   'deteccion de amenazas',
   'respuesta a incidentes',
@@ -216,15 +241,16 @@ const person = {
   worksFor: { '@type': 'Organization', name: SITE.worksFor.name },
   hasOccupation: {
     '@type': 'Occupation',
-    name: 'Security Operations Center Analyst',
+    name: 'Cybersecurity Analyst (SOC, Cloud Security & IAM)',
     occupationalCategory: '15-1212.00', // O*NET: Information Security Analysts
+    // Donde trabaja (Dagram, Barcelona), no donde vive (address/homeLocation).
     occupationLocation: {
       '@type': 'City',
-      name: loc.city,
+      name: loc.region,
       address: {
         '@type': 'PostalAddress',
-        addressLocality: loc.city,
-        addressRegion: loc.region,
+        addressLocality: loc.region,
+        addressRegion: 'Cataluña',
         addressCountry: loc.country,
       },
     },
@@ -392,15 +418,12 @@ const graph = {
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:url" content={canonical} />
-<meta property="og:image" content={article?.image ?? ogImageUrl} />
-<meta property="og:image:secure_url" content={article?.image ?? ogImageUrl} />
+<meta property="og:image" content={shareImageUrl} />
+<meta property="og:image:secure_url" content={shareImageUrl} />
 <meta property="og:image:type" content="image/png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
-<meta
-  property="og:image:alt"
-  content={`${SITE.name} — ${SITE.jobTitle} en ${SITE.location.city}, ${SITE.location.region}`}
-/>
+<meta property="og:image:alt" content={article ? article.headline : shareAltByLang[lang]} />
 <meta property="og:locale" content={locale} />
 {altLocales.map((l) => <meta property="og:locale:alternate" content={l} />)}
 {
@@ -423,11 +446,8 @@ const graph = {
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content={title} />
 <meta name="twitter:description" content={description} />
-<meta name="twitter:image" content={ogImageUrl} />
-<meta
-  name="twitter:image:alt"
-  content={`${SITE.name} — ${SITE.jobTitle}`}
-/>
+<meta name="twitter:image" content={shareImageUrl} />
+<meta name="twitter:image:alt" content={article ? article.headline : shareAltByLang[lang]} />
 
 <!-- Enlace al resumen para IAs (ChatGPT, Claude, Perplexity...) -->
 <link rel="alternate" type="text/plain" href={new URL('/llms.txt', SITE.domain).href} title="llms.txt" />

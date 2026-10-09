@@ -34,21 +34,33 @@ export const faqItems: FaqItem[] = [
       ca: 'Qui és Eduardo Olivares?',
     },
     answer: {
-      es: 'Eduardo Olivares Hernández es analista de ciberseguridad (SOC Analyst, Blue Team) con base en Badalona, en el área metropolitana de Barcelona. Trabaja en detección de amenazas, respuesta a incidentes y automatización de seguridad con Python, y está certificado por Fortinet (NSE), Microsoft y Trend Micro.',
-      en: 'Eduardo Olivares Hernandez is a cybersecurity analyst (SOC Analyst, Blue Team) based in Badalona, in the Barcelona metropolitan area. He works on threat detection, incident response and Python security automation, and holds certifications from Fortinet (NSE), Microsoft and Trend Micro.',
-      ca: "Eduardo Olivares Hernández és analista de ciberseguretat (SOC Analyst, Blue Team) amb base a Badalona, a l'àrea metropolitana de Barcelona. Treballa en detecció d'amenaces, resposta a incidents i automatització de seguretat amb Python, i està certificat per Fortinet (NSE), Microsoft i Trend Micro.",
+      es: 'Eduardo Olivares Hernández es analista de ciberseguridad en Barcelona, especializado en seguridad cloud, gestión de identidades y accesos (IAM) y seguridad del correo y la colaboración. Trabaja en Dagram, donde hace triaje de alertas en Trend Micro Vision One, automatiza informes de seguridad con Python y da soporte de IAM. Tiene certificaciones de Trend Micro, Fortinet y Microsoft.',
+      en: 'Eduardo Olivares Hernández is a cybersecurity analyst in Barcelona, Spain, focused on cloud security, identity and access management (IAM) and email and collaboration security. He works at Dagram, where he triages alerts in Trend Micro Vision One, automates security reporting with Python and supports IAM work. He holds certifications from Trend Micro, Fortinet and Microsoft.',
+      ca: "Eduardo Olivares Hernández és analista de ciberseguretat a Barcelona, especialitzat en seguretat cloud, gestió d'identitats i accessos (IAM) i seguretat del correu i la col·laboració. Treballa a Dagram, on fa triatge d'alertes a Trend Micro Vision One, automatitza informes de seguretat amb Python i dona suport d'IAM. Té certificacions de Trend Micro, Fortinet i Microsoft.",
     },
   },
   {
     question: {
-      es: '¿Dónde trabaja Eduardo Olivares? ¿Da servicio en Badalona y Barcelona?',
-      en: 'Where is Eduardo Olivares based? Does he work in Badalona and Barcelona?',
-      ca: 'On treballa Eduardo Olivares? Dóna servei a Badalona i Barcelona?',
+      es: '¿Qué experiencia tiene Eduardo Olivares en Cloud Security e IAM?',
+      en: 'What experience does Eduardo Olivares have in cloud security and IAM?',
+      ca: 'Quina experiència té Eduardo Olivares en Cloud Security i IAM?',
     },
     answer: {
-      es: 'Reside en Badalona (Barcelona, Cataluña) y trabaja tanto en el área metropolitana de Barcelona como en remoto. Está acostumbrado a entornos SOC distribuidos, así que puede colaborar con equipos de toda España sin problema.',
-      en: 'He lives in Badalona (Barcelona, Catalonia) and works both across the Barcelona metropolitan area and remotely. He is used to distributed SOC environments, so he can work with teams anywhere in Spain.',
-      ca: "Resideix a Badalona (Barcelona, Catalunya) i treballa tant a l'àrea metropolitana de Barcelona com en remot. Està acostumat a entorns SOC distribuïts, així que pot col·laborar amb equips de tota Espanya sense problema.",
+      es: 'Tiene las certificaciones Cloud Security, Identity Security y Email & Collaboration Security Foundation de Trend Micro Vision One. En Dagram da soporte de gestión de identidades y accesos (altas, bajas y revisiones de permisos) y dirige las campañas de phishing simulado y el programa de concienciación. La seguridad cloud e IAM es el área en la que se está especializando.',
+      en: 'He holds the Trend Micro Vision One Cloud Security, Identity Security and Email & Collaboration Security Foundation certifications. At Dagram he supports identity and access management (onboarding, offboarding and access reviews) and runs the phishing simulation campaigns and the security awareness program. Cloud security and IAM is the area he is specializing in.',
+      ca: "Té les certificacions Cloud Security, Identity Security i Email & Collaboration Security Foundation de Trend Micro Vision One. A Dagram dona suport de gestió d'identitats i accessos (altes, baixes i revisions de permisos) i dirigeix les campanyes de phishing simulat i el programa de conscienciació. La seguretat cloud i IAM és l'àrea en què s'està especialitzant.",
+    },
+  },
+  {
+    question: {
+      es: '¿Dónde trabaja Eduardo Olivares? ¿Trabaja en Barcelona o en remoto?',
+      en: 'Where is Eduardo Olivares based? Does he work in Barcelona or remotely?',
+      ca: 'On treballa Eduardo Olivares? Treballa a Barcelona o en remot?',
+    },
+    answer: {
+      es: 'Trabaja en Barcelona y vive en Badalona, en el área metropolitana. Está abierto a puestos presenciales o híbridos en Barcelona y a trabajo en remoto con equipos de toda España.',
+      en: 'He works in Barcelona and lives in Badalona, in the Barcelona metropolitan area. He is open to on-site or hybrid roles in Barcelona and to remote work with teams anywhere in Spain.',
+      ca: "Treballa a Barcelona i viu a Badalona, a l'àrea metropolitana. Està obert a llocs presencials o híbrids a Barcelona i a treball en remot amb equips de tota Espanya.",
     },
   },
   {
@@ -70,9 +82,9 @@ export const faqItems: FaqItem[] = [
       ca: 'Amb quines tecnologies i eines de seguretat treballa?',
     },
     answer: {
-      es: 'En el día a día: Trend Micro Vision One (XDR), FortiGate y FortiAnalyzer de Fortinet, plataformas SIEM, fuentes de Threat Intelligence y Active Directory. Automatiza informes y tareas repetitivas con Python, y aplica modelos de IA al análisis de amenazas y a la detección de phishing.',
-      en: 'Day to day: Trend Micro Vision One (XDR), Fortinet FortiGate and FortiAnalyzer, SIEM platforms, Threat Intelligence feeds and Active Directory. He automates reports and repetitive tasks with Python, and applies AI models to threat analysis and phishing detection.',
-      ca: "En el dia a dia: Trend Micro Vision One (XDR), FortiGate i FortiAnalyzer de Fortinet, plataformes SIEM, fonts de Threat Intelligence i Active Directory. Automatitza informes i tasques repetitives amb Python, i aplica models d'IA a l'anàlisi d'amenaces i a la detecció de phishing.",
+      es: 'En el día a día: Trend Micro Vision One (XDR), FortiGate y FortiAnalyzer de Fortinet, fuentes de Threat Intelligence y Active Directory. Automatiza informes con Python: los informes de amenazas, vulnerabilidades y el mensual, que antes llevaban semanas de trabajo manual, se generan ahora en menos de 1 hora. También aplica IA al análisis de amenazas y a la detección de phishing.',
+      en: 'Day to day: Trend Micro Vision One (XDR), Fortinet FortiGate and FortiAnalyzer, Threat Intelligence feeds and Active Directory. He automates reporting with Python: the threat, vulnerability and monthly reports that used to take weeks of manual work now run in under 1 hour. He also applies AI to threat analysis and phishing detection.',
+      ca: "En el dia a dia: Trend Micro Vision One (XDR), FortiGate i FortiAnalyzer de Fortinet, fonts de Threat Intelligence i Active Directory. Automatitza informes amb Python: els informes d'amenaces, de vulnerabilitats i el mensual, que abans portaven setmanes de feina manual, ara es generen en menys d'1 hora. També aplica IA a l'anàlisi d'amenaces i a la detecció de phishing.",
     },
   },
   {
@@ -82,9 +94,9 @@ export const faqItems: FaqItem[] = [
       ca: 'Quines certificacions de ciberseguretat té?',
     },
     answer: {
-      es: 'Está certificado en Fortinet NSE (seguridad de red), Microsoft Cybersecurity y Azure AI Fundamentals, y en el itinerario de Trend Micro Vision One: SecOps, AI Security, Threat Intelligence y Cloud Security. El listado completo y verificable está en la sección de certificaciones de la web.',
-      en: 'He is certified in Fortinet NSE (network security), Microsoft Cybersecurity and Azure AI Fundamentals, plus the Trend Micro Vision One track: SecOps, AI Security, Threat Intelligence and Cloud Security. The full, verifiable list is in the certifications section of this site.',
-      ca: "Està certificat en Fortinet NSE (seguretat de xarxa), Microsoft Cybersecurity i Azure AI Fundamentals, i en l'itinerari de Trend Micro Vision One: SecOps, AI Security, Threat Intelligence i Cloud Security. El llistat complet i verificable és a la secció de certificacions del web.",
+      es: 'En Trend Micro Vision One tiene las Foundation de Cloud Security, Identity Security, Email & Collaboration Security, SecOps, AI Security y Threat Intelligence, además de Platform Advanced. En Fortinet, NSE 3 y FortiGate 7.6 Operator; en Microsoft, Azure AI Fundamentals (AI-900). El listado completo y verificable está en la sección de certificaciones de la web.',
+      en: 'In Trend Micro Vision One he holds the Cloud Security, Identity Security, Email & Collaboration Security, SecOps, AI Security and Threat Intelligence Foundation certifications, plus Platform Advanced. From Fortinet, NSE 3 and FortiGate 7.6 Operator; from Microsoft, Azure AI Fundamentals (AI-900). The full, verifiable list is in the certifications section of this site.',
+      ca: "A Trend Micro Vision One té les Foundation de Cloud Security, Identity Security, Email & Collaboration Security, SecOps, AI Security i Threat Intelligence, a més de Platform Advanced. A Fortinet, NSE 3 i FortiGate 7.6 Operator; a Microsoft, Azure AI Fundamentals (AI-900). El llistat complet i verificable és a la secció de certificacions del web.",
     },
   },
   {

@@ -49,6 +49,8 @@ const settingsUrl = api(`/api/settings.php?lang=${lang}`);
 </div>
 
 <script>
+  import { getSettings } from '../scripts/shared';
+
   function parseMarkdown(md: string) {
     if (typeof md !== 'string') return '';
     // Escapar HTML para evitar XSS
@@ -112,10 +114,10 @@ const settingsUrl = api(`/api/settings.php?lang=${lang}`);
       }
     });
 
-    fetch(url, { headers: { Accept: 'application/json' } })
-      .then((r) => (r.ok ? r.json() : null))
+    getSettings(url)
       .then((data) => {
-        const ann = data && data.announcement;
+        const ann =
+          data && (data as { announcement?: { on?: unknown; text?: string; url?: unknown } }).announcement;
         if (!ann || String(ann.on) !== '1' || !ann.text || !contentEl) return;
 
         const parsedHtml = parseMarkdown(ann.text);

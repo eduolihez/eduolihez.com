@@ -107,3 +107,34 @@ export function fetchWithRetry(
 
   return run(retries, delay);
 }
+
+const settingsCache = new Map<string, Promise<unknown>>();
+
+/**
+ * Ajustes publicos (/api/settings.php) compartidos por toda la pagina.
+ * ---------------------------------------------------------------------------
+ * Hero (disponibilidad), Announcement (banner) y Contact (formulario on/off)
+ * leen el mismo JSON. Antes cada uno hacia su propio fetch: 3 peticiones a la
+ * vez que, sumadas a proyectos, certificaciones, posts y la visita, abrian
+ * 6-7 conexiones MySQL simultaneas. El hosting compartido rechaza conexiones
+ * a partir de ~4 y la API devolvia 500 "No se pudo conectar a la base de
+ * datos" en una de cada pocas visitas (reproducido en produccion).
+ *
+ * Ahora la primera llamada lanza la peticion y las demas reciben la misma
+ * promesa. Un fallo se borra de la cache para que el siguiente que pregunte
+ * reintente en vez de heredar el error.
+ */
+export function getSettings(url: string): Promise<unknown> {
+  let pending = settingsCache.get(url);
+  if (!pending) {
+    pending = fetchWithRetry(url, { headers: { Accept: 'application/json' } }, 2, 400);
+    pending.catch(() => settingsCache.delete(url));
+    settingsCache.set(url, pending);
+  }
+  return pending;
+}
+
+/** Solo para tests: vacia la cache de getSettings(). */
+export function resetSettingsCache(): void {
+  settingsCache.clear();
+}

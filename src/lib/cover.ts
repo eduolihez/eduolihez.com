@@ -152,3 +152,75 @@ export function buildCoverSvg({ title, kicker, meta, tags }: CoverData): string 
   <text x="${WIDTH - PAD}" y="${HEIGHT - 40}" font-family="'JetBrains Mono','Courier New',monospace" font-size="16" fill="${COLORS.accent}" text-anchor="end">&gt;_ eduolihez.com</text>
 </svg>`;
 }
+
+export interface ProfileCoverData {
+  name: string;
+  role: string;
+  location: string;
+  /** Especialidades en chips. Se pintan como maximo 4. */
+  tags: string[];
+}
+
+/**
+ * Tarjeta Open Graph de la PORTADA (y del resto de paginas sin imagen propia).
+ * ---------------------------------------------------------------------------
+ * Antes og:image era un placeholder sin texto (solo el glifo ">_"), asi que al
+ * pegar eduolihez.com en LinkedIn o WhatsApp la tarjeta no decia ni quien ni
+ * que. Esta lleva nombre, puesto, especialidades y ubicacion -- lo que alguien
+ * necesita para decidir si hace clic -- con el mismo sistema visual que las
+ * portadas del blog (buildCoverSvg) para que ambas se reconozcan como del
+ * mismo sitio.
+ */
+export function buildProfileCoverSvg({ name, role, location, tags }: ProfileCoverData): string {
+  const contentWidth = WIDTH - PAD * 2;
+  const nameFontSize = 68;
+  const roleFontSize = 34;
+  // Si el corte cae justo antes de un " · ", el punto medio pasa al final de
+  // la linea anterior: una linea que empieza por "·" se lee como un error.
+  const roleLines = wrapText(role, roleFontSize, contentWidth, 2).map((line, i, all) => {
+    let out = line;
+    if (i > 0 && out.startsWith('· ')) out = out.slice(2);
+    if (all[i + 1]?.startsWith('· ')) out = `${out} ·`;
+    return out;
+  });
+  const roleLineHeight = roleFontSize * 1.3;
+
+  const roleTspans = roleLines
+    .map(
+      (line, i) =>
+        `<tspan data-role-line="1" x="${PAD}" y="${330 + i * roleLineHeight}">${escapeXml(line)}</tspan>`,
+    )
+    .join('');
+
+  let chipX = PAD;
+  const chipY = HEIGHT - 170;
+  const chipHeight = 40;
+  const chips = tags
+    .slice(0, 4)
+    .map((tag) => {
+      const label = escapeXml(tag);
+      // Ancho a partir del texto SIN escapar: "&amp;" ocupa un caracter en pantalla.
+      const chipWidth = tag.length * 10.4 + 32;
+      const chip = `<g data-chip="1"><rect x="${chipX}" y="${chipY}" width="${chipWidth}" height="${chipHeight}" rx="4" fill="none" stroke="${COLORS.accent}" stroke-opacity="0.45" stroke-width="1"/><text x="${chipX + chipWidth / 2}" y="${chipY + chipHeight / 2 + 6}" font-family="'JetBrains Mono','Courier New',monospace" font-size="18" fill="${COLORS.textTitle}" text-anchor="middle">${label}</text></g>`;
+      chipX += chipWidth + 14;
+      return chip;
+    })
+    .join('');
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${WIDTH}" height="${HEIGHT}" viewBox="0 0 ${WIDTH} ${HEIGHT}">
+  <rect width="${WIDTH}" height="${HEIGHT}" fill="${COLORS.bg}"/>
+  <rect x="0.5" y="0.5" width="${WIDTH - 1}" height="${HEIGHT - 1}" fill="none" stroke="${COLORS.border}" stroke-width="1"/>
+  <rect x="0" y="0" width="8" height="${HEIGHT}" fill="${COLORS.accent}"/>
+
+  <text x="${PAD}" y="112" font-family="'JetBrains Mono','Courier New',monospace" font-size="20" font-weight="600" letter-spacing="4" fill="${COLORS.accent}">&gt;_ EDUOLIHEZ.COM</text>
+  <line x1="${PAD}" y1="140" x2="${WIDTH - PAD}" y2="140" stroke="${COLORS.border}" stroke-width="1"/>
+
+  <text x="${PAD}" y="240" font-family="Inter,'Segoe UI',Arial,sans-serif" font-size="${nameFontSize}" font-weight="700" letter-spacing="-1.5" fill="${COLORS.textTitle}">${escapeXml(name)}</text>
+  <text font-family="Inter,'Segoe UI',Arial,sans-serif" font-size="${roleFontSize}" font-weight="500" fill="${COLORS.textMuted}">${roleTspans}</text>
+
+  ${chips}
+
+  <text x="${PAD}" y="${HEIGHT - 52}" font-family="'JetBrains Mono','Courier New',monospace" font-size="20" fill="${COLORS.textMuted}">${escapeXml(location)}</text>
+  <text x="${WIDTH - PAD}" y="${HEIGHT - 52}" font-family="'JetBrains Mono','Courier New',monospace" font-size="20" fill="${COLORS.accent}" text-anchor="end">eduolihez.com</text>
+</svg>`;
+}

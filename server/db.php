@@ -5,6 +5,7 @@
  *
  * Uso:  $pdo = db();
  */
+require_once __DIR__ . '/lib/db_retry.php';
 
 /** Carga la configuracion desde config.php (o config.example.php si falta). */
 function config(): array
@@ -44,14 +45,17 @@ function db(): PDO
     );
 
     try {
-        $pdo = new PDO($dsn, $cfg['user'], $cfg['pass'], [
+        // Con reintento corto: el hosting rechaza conexiones simultaneas a
+        // partir de ~4 y la portada pide varias cosas a la vez (ver
+        // lib/db_retry.php). Credenciales malas no se reintentan.
+        $pdo = db_connect_with_retry(static fn () => new PDO($dsn, $cfg['user'], $cfg['pass'], [
             // Lanza excepciones en vez de errores silenciosos.
             PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
             // Devuelve arrays asociativos por defecto.
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             // Usa prepared statements reales (mas seguro).
             PDO::ATTR_EMULATE_PREPARES   => false,
-        ]);
+        ]));
         // Sincronizar zona horaria de MySQL con la de PHP
         $offset = date('P');
         $pdo->exec("SET time_zone = '$offset'");

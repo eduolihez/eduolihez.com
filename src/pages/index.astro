@@ -11,12 +11,13 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import PortfolioSections from '../components/PortfolioSections.astro';
 
 const lang = 'es';
-const title = 'Eduardo Olivares | Analista SOC en Badalona, Barcelona';
+// Cloud Security e IAM delante (el foco profesional, igual que en LinkedIn) y
+// Barcelona en vez de Badalona: es la ciudad que busca un reclutador. Badalona
+// sigue en la direccion y en el bloque Person de Schema.org.
+const title = 'Eduardo Olivares | Analista de Ciberseguridad Cloud e IAM en Barcelona';
 const description =
   // 160 caracteres es donde Google corta: lo que sobra no se llega a leer.
-  // Se recorta la lista de certificaciones, que es lo menos decisivo para
-  // que alguien haga clic desde el resultado de busqueda.
-  'Analista SOC y Blue Team en Badalona (Barcelona). Detección de amenazas, respuesta a incidentes, XDR/SIEM y automatización de seguridad con Python.';
+  'Analista de ciberseguridad en Barcelona: SOC, Cloud Security, IAM y seguridad del correo. Trend Micro Vision One, Fortinet y automatización con Python.';
 
 /** Las tres portadas SI son traducciones entre si: hreflang explicito.
  *  Ya no se hereda por defecto para no ponerselo a paginas sin traducir. */

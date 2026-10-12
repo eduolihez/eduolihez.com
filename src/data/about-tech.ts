@@ -442,9 +442,9 @@ export const techSections: TechSection[] = [
           ca: 'SEO local amb senyals coherents',
         },
         detail: {
-          es: 'Badalona y Barcelona aparecen en el titulo, en la descripción, en las etiquetas geo y dentro del bloque Person con address, homeLocation y areaServed. La señal importa cuando es la misma en todos los sitios, no cuando se repite en uno.',
-          en: 'Badalona and Barcelona appear in the title, the description, the geo tags and inside the Person block via address, homeLocation and areaServed. The signal counts when it is consistent everywhere, not when it is repeated in one place.',
-          ca: "Badalona i Barcelona apareixen al títol, a la descripció, a les etiquetes geo i dins del bloc Person amb address, homeLocation i areaServed. El senyal importa quan és el mateix a tot arreu, no quan es repeteix en un sol lloc.",
+          es: 'Barcelona va en el título y la descripción, que es lo que busca un reclutador. Badalona, donde vivo, va en las etiquetas geo y en el bloque Person (address y homeLocation), y el lugar de trabajo en occupationLocation. La señal importa cuando es la misma en todos los sitios, incluido LinkedIn, no cuando se repite en uno.',
+          en: 'Barcelona goes in the title and description, since that is what a recruiter searches for. Badalona, where I live, goes in the geo tags and the Person block (address and homeLocation), and the workplace in occupationLocation. The signal counts when it is consistent everywhere, LinkedIn included, not when it is repeated in one place.',
+          ca: "Barcelona va al títol i a la descripció, que és el que busca un reclutador. Badalona, on visc, va a les etiquetes geo i al bloc Person (address i homeLocation), i el lloc de feina a occupationLocation. El senyal importa quan és el mateix a tot arreu, LinkedIn inclòs, no quan es repeteix en un sol lloc.",
         },
         source: 'src/config.ts',
       },

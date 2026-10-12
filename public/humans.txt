@@ -1,7 +1,7 @@
 /* EQUIPO */
     Desarrollo y diseno: Eduardo Olivares Hernandez
-    Puesto: SOC Analyst · Blue Team
-    Ubicacion: Badalona, Barcelona, Espana
+    Puesto: Cybersecurity Analyst · SOC · Cloud Security & IAM
+    Ubicacion: Barcelona (Badalona), Espana
     Contacto: eduardo [at] eduolihez.com
     LinkedIn: https://www.linkedin.com/in/eduolihez/
     GitHub: https://github.com/eduolihez

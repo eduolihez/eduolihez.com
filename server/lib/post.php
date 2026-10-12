@@ -23,11 +23,13 @@
  */
 const POST_CATEGORIES = [
     'blue-team-soc'    => 'Blue Team & SOC',
+    'cloud-iam'        => 'Cloud Security e IAM',
     'vulnerabilidades' => 'Vulnerabilidades',
     'automatizacion'   => 'Automatización',
     'ia-aplicada'      => 'IA aplicada a seguridad',
     'herramientas'     => 'Herramientas y proyectos',
     'carrera-personal' => 'Carrera y trayectoria',
+    'normativa'        => 'Normativa y cumplimiento',
 ];
 
 /** Etiqueta legible de una categoria, o null si no es una clave conocida (incluye NULL/''). */

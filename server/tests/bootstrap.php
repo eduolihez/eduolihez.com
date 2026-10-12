@@ -21,6 +21,7 @@
  */
 require_once __DIR__ . '/../lib/text.php';
 require_once __DIR__ . '/../lib/validate.php';
+require_once __DIR__ . '/../lib/db_retry.php'; // pura: reintento de conexion con $connect/$sleep inyectables
 require_once __DIR__ . '/../lab/next.php'; // pura: solo lab_safe_next(), sin sesion ni cabeceras
 // Partials del panel admin SIN dependencias (puros: sin auth.php/db.php/sesion).
 // layout.php NO va aqui: requiere auth.php y mataria el proceso de PHPUnit.

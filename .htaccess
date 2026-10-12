@@ -280,8 +280,11 @@ Options -Indexes
   # generico de arriba lo alcanzaba igual porque el rewrite a /llms-blog.txt es
   # interno (sin redireccion), asi que Apache aplicaba la cabecera al archivo
   # .php real, anulando en silencio el proposito del archivo.
+  # "always" es obligatorio: la cabecera se puso con "Header always set", que
+  # vive en otra tabla de Apache. Un "Header unset" sin "always" no la toca, y
+  # produccion seguia sirviendo /llms-blog.txt con noindex (comprobado con curl).
   <Files "llms-blog.php">
-    Header unset X-Robots-Tag
+    Header always unset X-Robots-Tag
   </Files>
 
   # -------------------------------------------------------------------------

@@ -1433,7 +1433,7 @@ WHERE `slug` = 'clasificar-phishing-en-el-navegador-sin-mandar-la-url'
 -- ---------------------------------------------------------------------------
 -- Blog: categoria de cada articulo existente (2026-09-06).
 --
--- Las 5 categorias son las mismas que POST_CATEGORIES en
+-- Las categorias son las mismas que POST_CATEGORIES en
 -- server/lib/post.php -- si se anade una aqui, hay que anadirla alli tambien
 -- (y viceversa) o el filtro del listado la mostraria con la clave en bruto
 -- en vez de la etiqueta legible.
@@ -1454,6 +1454,450 @@ UPDATE `posts` SET `category` = 'herramientas'     WHERE `slug` = 'blue-team-hub
 UPDATE `posts` SET `category` = 'herramientas'     WHERE `slug` = 'revocar-un-token-sin-derribar-la-sesion-entera';
 UPDATE `posts` SET `category` = 'carrera-personal' WHERE `slug` = 'lo-que-da-tiempo-a-aprender-en-24-horas-de-hackathon';
 UPDATE `posts` SET `category` = 'ia-aplicada'      WHERE `slug` = 'el-desacuerdo-entre-clasificadores-pierde-contra-algo-mas-simple';
+
+-- ---------------------------------------------------------------------------
+-- Blog: diez articulos nuevos (2026-10-12). Cubren el foco del perfil que el
+-- blog no tocaba todavia (Cloud Security, IAM y seguridad del correo) mas
+-- SOC y normativa. Mismo patron idempotente que los bloques de arriba: solo
+-- entran si su slug no existe, asi que reimportar no los duplica.
+--
+-- Pensados tambien para GEO (respuestas de asistentes de IA): cada uno abre
+-- con una respuesta directa en el primer parrafo, usa H2 con la pregunta que
+-- se busca y cierra con preguntas frecuentes en H3, que es el formato que
+-- mejor se cita literalmente.
+--
+-- Las categorias `cloud-iam` y `normativa` son nuevas: tienen que existir en
+-- POST_CATEGORIES (server/lib/post.php) o el listado las muestra sin etiqueta.
+-- ---------------------------------------------------------------------------
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'MFA resistente a phishing: por qué el SMS ya no basta',
+  'mfa-resistente-a-phishing-por-que-el-sms-ya-no-basta',
+  'El MFA por SMS o push se salta con phishing en tiempo real y fatiga de MFA. Qué métodos resisten de verdad el phishing y cómo migrar sin bloquear a nadie.',
+  '<p>Un segundo factor por SMS es mejor que no tener ninguno, pero ya no frena a un atacante con un mínimo de preparación. El MFA resistente a phishing es el que no se puede reenviar a una web falsa: la credencial está ligada criptográficamente al dominio legítimo, así que aunque el usuario pique, lo que entrega no sirve en otro sitio. Hoy eso significa llaves FIDO2, passkeys y Windows Hello for Business, o certificados con smart card.</p>
+<h2>Cómo se salta un MFA "normal"</h2>
+<p>Hay tres técnicas habituales, y ninguna necesita romper criptografía:</p>
+<ul>
+  <li>Phishing en tiempo real (AiTM): un proxy inverso se coloca entre la víctima y el login real. El usuario escribe usuario, contraseña y código, el proxy los reenvía al servicio de verdad y se queda con la cookie de sesión. Kits como Evilginx o EvilProxy lo dejan al alcance de cualquiera.</li>
+  <li>Fatiga de MFA: el atacante ya tiene la contraseña y lanza notificaciones push una tras otra hasta que alguien pulsa "Aprobar" para que paren. En el incidente de Uber de 2022 el atacante combinó eso con un mensaje por WhatsApp haciéndose pasar por el soporte interno.</li>
+  <li>SIM swapping: con el número de teléfono portado a otra SIM, los códigos por SMS llegan directamente al atacante.</li>
+</ul>
+<p>Los tres funcionan porque el factor (un código de seis dígitos, un botón de aprobar) no sabe en qué web se está usando.</p>
+<h2>Qué métodos son resistentes a phishing</h2>
+<p>CISA publicó en 2022 una guía específica sobre esto, <a href="https://www.cisa.gov/sites/default/files/publications/fact-sheet-implementing-phishing-resistant-mfa-508c.pdf">Implementing Phishing-Resistant MFA</a>, y su clasificación sigue siendo una buena referencia:</p>
+<table>
+  <thead><tr><th>Método</th><th>¿Resistente a phishing?</th></tr></thead>
+  <tbody>
+    <tr><td>Código por SMS o llamada</td><td>No</td></tr>
+    <tr><td>Código TOTP (app autenticadora)</td><td>No</td></tr>
+    <tr><td>Push sin number matching</td><td>No</td></tr>
+    <tr><td>Push con number matching</td><td>Mejor, pero no</td></tr>
+    <tr><td>Llave FIDO2 / passkey</td><td>Sí</td></tr>
+    <tr><td>Windows Hello for Business</td><td>Sí</td></tr>
+    <tr><td>Certificado (PKI / smart card)</td><td>Sí</td></tr>
+  </tbody>
+</table>
+<p>El number matching (el usuario teclea en el móvil el número que ve en pantalla) acaba casi del todo con la fatiga de MFA, y Microsoft lo activó para todos los inquilinos de Authenticator en 2023. Pero un proxy AiTM puede mostrar ese número igual que muestra la página de login, así que no protege contra el phishing en tiempo real.</p>
+<h2>Por qué FIDO2 y las passkeys sí aguantan</h2>
+<p>Una passkey es un par de claves. La privada nunca sale del dispositivo, y al registrarla queda asociada al dominio exacto del servicio. Cuando el navegador recibe una petición de autenticación de <code>login.micr0soft-secure.com</code>, la passkey de <code>login.microsoftonline.com</code> simplemente no responde. No hay código que copiar ni botón que pulsar por cansancio: el usuario no tiene forma de entregar algo que valga en el dominio falso.</p>
+<h2>Cómo migrar sin bloquear a nadie</h2>
+<p>El error típico es querer activarlo para todo el mundo el mismo día. El orden que funciona:</p>
+<ol>
+  <li><strong>Cuentas privilegiadas primero.</strong> Administradores globales, de Exchange, de seguridad. Son pocas, el riesgo es máximo y la gente que las usa entiende por qué se cambia.</li>
+  <li><strong>Cuentas de emergencia (break-glass) con llave FIDO2 física</strong>, guardada fuera del flujo diario.</li>
+  <li><strong>Usuarios con más exposición</strong>: finanzas, recursos humanos, dirección. Son los objetivos habituales de <a href="/blog/post/business-email-compromise-senales-en-microsoft-365/">fraude BEC</a>.</li>
+  <li><strong>El resto, por fases</strong>, dejando un método de respaldo temporal y quitándolo cuando el registro de passkeys pase de un umbral que tengas medido.</li>
+</ol>
+<p>En Microsoft Entra ID esto se controla con las <em>authentication strengths</em> dentro de <a href="/blog/post/acceso-condicional-microsoft-365-politicas-base/">acceso condicional</a>: puedes exigir "MFA resistente a phishing" solo para ciertos roles o aplicaciones sin tocar al resto.</p>
+<h2>Preguntas frecuentes</h2>
+<h3>¿Una app autenticadora con código es segura?</h3>
+<p>Es más segura que el SMS porque no depende del número de teléfono, pero el código se puede introducir en una web falsa igual que una contraseña. No es resistente a phishing.</p>
+<h3>¿Las passkeys sincronizadas en la nube cuentan?</h3>
+<p>Sí resisten el phishing, porque siguen ligadas al dominio. La diferencia con una llave física es dónde vive la clave privada: en una passkey sincronizada depende de la seguridad de la cuenta de Apple, Google o del gestor de contraseñas. Para cuentas de administración prefiero llave física.</p>
+<h3>¿El MFA resistente a phishing evita el robo de cookies de sesión?</h3>
+<p>Evita el AiTM, que es la forma más común de robarlas. Si un infostealer ya está en el equipo y se lleva la cookie después del login, el MFA no interviene; para eso hacen falta controles de dispositivo y protección de tokens.</p>',
+  'mfa,passkeys,fido2,iam,phishing,entra-id', 'cloud-iam', 'es', 1, '2026-09-14 09:00:00', '2026-09-14 09:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'mfa-resistente-a-phishing-por-que-el-sms-ya-no-basta');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'SPF, DKIM y DMARC: cómo pasar de p=none a p=reject',
+  'spf-dkim-dmarc-de-p-none-a-p-reject',
+  'Qué hacen SPF, DKIM y DMARC, por qué tantos dominios se quedan en p=none y cómo llegar a p=reject por fases sin perder correo legítimo.',
+  '<p>SPF dice qué servidores pueden enviar correo en nombre de tu dominio, DKIM firma cada mensaje para demostrar que no se ha modificado, y DMARC le dice al receptor qué hacer cuando un correo falla esas comprobaciones y a quién mandar el informe. Por separado ninguno impide que alguien suplante tu dominio en el campo <code>From</code> que ve el usuario. DMARC con <code>p=reject</code> sí.</p>
+<p>Y aun así, muchísimos dominios llevan años con DMARC publicado en <code>p=none</code>. Es el equivalente a tener una alarma que solo apunta en una libreta quién ha entrado.</p>
+<h2>Qué comprueba cada registro</h2>
+<h3>SPF</h3>
+<p>Un registro TXT en el dominio con la lista de IPs y servicios autorizados:</p>
+<pre><code>v=spf1 include:spf.protection.outlook.com include:_spf.google.com -all</code></pre>
+<p>Dos detalles que rompen más SPF de los que deberían: el límite de <strong>10 consultas DNS</strong> (cada <code>include</code> cuenta, y los anidados también) y que SPF valida el remitente del sobre (<code>Return-Path</code>), no el <code>From</code> visible.</p>
+<h3>DKIM</h3>
+<p>El servidor emisor firma cabeceras y cuerpo con una clave privada, y publica la pública en DNS bajo un selector (<code>selector1._domainkey.tudominio.com</code>). Sobrevive a reenvíos mejor que SPF, que es justo por lo que DMARC acepta cualquiera de los dos.</p>
+<h3>DMARC</h3>
+<p>DMARC exige <em>alineación</em>: que el dominio que pasa SPF o DKIM coincida con el del <code>From</code>. Ahí está la protección real contra la suplantación.</p>
+<pre><code>v=DMARC1; p=none; rua=mailto:dmarc@tudominio.com; fo=1</code></pre>
+<h2>Por qué ya no es opcional</h2>
+<p>Desde febrero de 2024, Google y Yahoo exigen SPF, DKIM y DMARC a quien envíe más de 5.000 correos al día a sus usuarios, y Microsoft anunció requisitos equivalentes para Outlook.com en 2025. Para un dominio corporativo pequeño el volumen no llega a esos umbrales, pero la dirección es clara: el correo sin autenticar cada vez llega peor.</p>
+<h2>El proceso por fases hasta p=reject</h2>
+<ol>
+  <li><strong>Inventario.</strong> Publica <code>p=none</code> con <code>rua</code> y deja que lleguen informes agregados al menos dos o tres semanas. Te van a aparecer remitentes que nadie recordaba: el CRM, la herramienta de facturas, el formulario de la web, el escáner de la oficina.</li>
+  <li><strong>Arreglar cada remitente legítimo.</strong> Para cada uno, configurar DKIM con tu dominio (mejor que añadirlo a SPF, que tiene el límite de 10 consultas).</li>
+  <li><strong><code>p=quarantine</code> con <code>pct</code> bajo.</strong> Empieza con <code>pct=10</code> o <code>25</code>, revisa informes, sube.</li>
+  <li><strong><code>p=reject</code></strong> cuando los informes lleven un tiempo limpios. Aquí también conviene <code>sp=reject</code> para los subdominios, que es por donde entra la suplantación cuando el dominio principal ya está protegido.</li>
+</ol>
+<p>Los informes agregados son XML y leerlos a mano es una tortura. Para revisar un mensaje concreto, el <a href="/blog/post/blue-team-hub-por-que-quite-el-cristal-esmerilado/">analizador de cabeceras de Blue Team Hub</a> muestra el resultado de SPF, DKIM y DMARC y los saltos del correo sin enviar nada a ningún servidor.</p>
+<h2>Lo que DMARC no hace</h2>
+<p>DMARC protege tu dominio exacto. No impide que alguien registre <code>tudominio-pagos.com</code> o use un nombre visible engañoso con una cuenta de Gmail. Contra eso hacen falta filtros del lado receptor y formación. Tampoco sirve si el atacante entra en un buzón real de tu organización, que es el escenario del <a href="/blog/post/business-email-compromise-senales-en-microsoft-365/">BEC con cuenta comprometida</a>.</p>
+<h2>Preguntas frecuentes</h2>
+<h3>¿Puedo poner p=reject directamente?</h3>
+<p>Puedes, pero si hay un servicio legítimo que envía en tu nombre y no está alineado, sus correos se rechazarán sin aviso. Las semanas en <code>p=none</code> sirven precisamente para descubrirlos.</p>
+<h3>¿Qué diferencia hay entre ~all y -all en SPF?</h3>
+<p><code>~all</code> (softfail) marca como sospechoso lo que no está en la lista; <code>-all</code> (fail) lo marca como no autorizado. Con DMARC en <code>reject</code>, la política que manda es la de DMARC, así que la diferencia importa menos de lo que parece.</p>
+<h3>¿Hace falta DMARC en un dominio que no envía correo?</h3>
+<p>Sí, y es el caso más fácil: <code>v=spf1 -all</code> y <code>v=DMARC1; p=reject</code>. Los dominios aparcados sin protección son los favoritos para campañas de suplantación.</p>',
+  'spf,dkim,dmarc,email-security,dns,phishing', 'blue-team-soc', 'es', 1, '2026-09-17 09:00:00', '2026-09-17 09:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'spf-dkim-dmarc-de-p-none-a-p-reject');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'Mínimo privilegio en Microsoft Entra ID, en la práctica',
+  'minimo-privilegio-en-microsoft-entra-id',
+  'Demasiados administradores globales y roles permanentes. Cómo aplicar el mínimo privilegio en Microsoft Entra ID con roles específicos, PIM y cuentas break-glass.',
+  '<p>El principio de mínimo privilegio dice que cada cuenta tiene solo los permisos que necesita, durante el tiempo que los necesita. En Microsoft Entra ID (el antiguo Azure AD) eso se traduce en tres cosas concretas: usar roles específicos en vez de Administrador global, que los roles privilegiados sean temporales con PIM y tener cuentas de emergencia que funcionen cuando todo lo demás falla.</p>
+<p>Es lo mismo que <a href="/blog/post/active-directory-los-primeros-diez-cambios-en-cualquier-dominio-nuevo/">revisaba en Active Directory con Domain Admins</a>, pero en la nube el radio de impacto es mayor: un administrador global controla el correo, los ficheros de SharePoint y OneDrive, las identidades y, con un clic, las suscripciones de Azure.</p>
+<h2>Cuántos administradores globales son demasiados</h2>
+<p>Microsoft recomienda <a href="https://learn.microsoft.com/es-es/entra/identity/role-based-access-control/best-practices">menos de cinco administradores globales</a> por inquilino. Lo habitual es lo contrario: el técnico que montó el inquilino, el proveedor que hizo la migración, el director que lo pidió "por si acaso" y alguna cuenta de servicio que nadie sabe para qué es.</p>
+<p>Para sacarlos rápido, desde PowerShell con Microsoft Graph:</p>
+<pre><code>Connect-MgGraph -Scopes RoleManagement.Read.Directory
+$rol = Get-MgDirectoryRole -Filter "displayName eq ''Global Administrator''"
+Get-MgDirectoryRoleMember -DirectoryRoleId $rol.Id</code></pre>
+<h2>Roles específicos en lugar de Administrador global</h2>
+<p>Casi nadie necesita Administrador global para su trabajo diario. Las tareas habituales tienen su rol:</p>
+<table>
+  <thead><tr><th>Tarea</th><th>Rol suficiente</th></tr></thead>
+  <tbody>
+    <tr><td>Resetear contraseñas</td><td>Helpdesk Administrator</td></tr>
+    <tr><td>Crear usuarios y grupos</td><td>User Administrator</td></tr>
+    <tr><td>Gestionar buzones</td><td>Exchange Administrator</td></tr>
+    <tr><td>Revisar alertas</td><td>Security Reader / Operator</td></tr>
+    <tr><td>Licencias</td><td>License Administrator</td></tr>
+    <tr><td>Políticas de acceso condicional</td><td>Conditional Access Administrator</td></tr>
+  </tbody>
+</table>
+<p>Un detalle que se pasa por alto: los permisos que tiene un usuario para <em>consentir aplicaciones</em>. Si cualquiera puede dar permisos de lectura de correo a una app OAuth, el mínimo privilegio en roles se queda corto. Conviene restringir el consentimiento a editores verificados o a un flujo de aprobación.</p>
+<h2>PIM: privilegio solo cuando hace falta</h2>
+<p>Privileged Identity Management convierte los roles en <em>elegibles</em> en vez de <em>activos</em>. La persona no es administradora hasta que lo pide, justifica el motivo, pasa MFA y, si se configura, alguien lo aprueba. Al cabo de unas horas el rol caduca solo.</p>
+<p>Para el SOC, la ventaja es que una cuenta comprometida sin rol activo no puede hacer casi nada, y cada activación queda registrada con su justificación. Una activación de Administrador global a las tres de la mañana es una alerta muy fácil de escribir.</p>
+<p>PIM requiere licencia Entra ID P2 (o Entra ID Governance). Si no la hay, al menos separa la cuenta de administración de la cuenta diaria con la que se lee el correo y se navega.</p>
+<h2>Cuentas de emergencia (break-glass)</h2>
+<p>Dos cuentas cloud-only, sin buzón, con Administrador global permanente, excluidas de las políticas de acceso condicional que podrían dejarte fuera, y protegidas con llave FIDO2 física. Microsoft recomienda dos, con credenciales separadas.</p>
+<p>Lo que casi nadie hace: <strong>probarlas</strong> cada pocos meses y tener una alerta que salte cada vez que una de ellas inicia sesión. Si se usan y nadie se entera, son la puerta trasera perfecta.</p>
+<h2>Preguntas frecuentes</h2>
+<h3>¿Qué es el principio de mínimo privilegio?</h3>
+<p>Conceder a cada usuario, aplicación o servicio solo los permisos imprescindibles para su función y durante el tiempo justo. Reduce lo que puede hacer un atacante con una cuenta robada.</p>
+<h3>¿PIM sustituye al MFA?</h3>
+<p>No, lo complementa. PIM puede exigir MFA en cada activación, y lo ideal es que sea <a href="/blog/post/mfa-resistente-a-phishing-por-que-el-sms-ya-no-basta/">MFA resistente a phishing</a>.</p>
+<h3>¿Cada cuánto revisar los roles asignados?</h3>
+<p>Como mínimo trimestralmente, y siempre que alguien cambie de puesto o se vaya. Es el mismo problema que el <a href="/blog/post/joiner-mover-leaver-cuentas-huerfanas/">ciclo joiner-mover-leaver</a>, aplicado a privilegios.</p>',
+  'entra-id,iam,minimo-privilegio,pim,azure,microsoft-365', 'cloud-iam', 'es', 1, '2026-09-21 09:00:00', '2026-09-21 09:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'minimo-privilegio-en-microsoft-entra-id');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'XDR, SIEM y EDR: en qué se diferencian en un SOC real',
+  'xdr-vs-siem-vs-edr-diferencias-en-un-soc',
+  'EDR vigila el endpoint, SIEM centraliza logs de cualquier fuente y XDR correlaciona varias capas de serie. Qué aporta cada uno al trabajo diario de un SOC.',
+  '<p>Un EDR vigila lo que pasa dentro de cada equipo y puede aislarlo. Un SIEM recoge logs de cualquier fuente, los guarda y permite correlacionarlos y buscar en ellos. Un XDR junta la telemetría de varias capas (endpoint, correo, identidad, red, cloud) normalmente de un mismo fabricante, y la correlaciona por ti en un único incidente. No son sustitutos exactos: se solapan, y la mayoría de SOCs acaban usando dos de los tres.</p>
+<p>Trabajo a diario con Trend Micro Vision One, que es un XDR, así que lo que sigue sale de esa perspectiva.</p>
+<h2>EDR: el detalle del endpoint</h2>
+<p>El EDR registra procesos, conexiones de red, cambios en el registro y ficheros, y detecta comportamiento sospechoso en el propio equipo. Su fuerza es la profundidad: puedes ver el árbol de procesos completo de un <code>winword.exe</code> que lanzó <code>powershell.exe</code> con un comando codificado, y aislar el equipo de la red con un botón.</p>
+<p>Su límite es que solo ve endpoints. Un inicio de sesión desde una IP rara en Microsoft 365 o una regla de reenvío creada en un buzón no pasan por ahí.</p>
+<h2>SIEM: todo en un sitio, a tu manera</h2>
+<p>Un SIEM (Splunk, Microsoft Sentinel, QRadar, Elastic, Wazuh) ingesta logs de lo que quieras: firewalls, controladores de dominio, proxies, aplicaciones propias, cloud. Lo que aporta:</p>
+<ul>
+  <li>Retención larga y búsqueda sobre todo ese histórico.</li>
+  <li>Reglas de correlación propias, escritas para tu entorno.</li>
+  <li>Cumplimiento normativo: muchas auditorías piden logs centralizados durante un tiempo concreto.</li>
+</ul>
+<p>A cambio, da trabajo: normalizar fuentes, escribir y afinar reglas, pagar por volumen ingestado. Un SIEM recién instalado y sin afinar genera ruido, no detección.</p>
+<h2>XDR: correlación ya hecha</h2>
+<p>El XDR parte de que el fabricante controla los sensores de varias capas y por tanto puede correlacionarlos de serie. En la práctica, en vez de tres alertas sueltas (correo sospechoso entregado, macro ejecutada, conexión a un dominio nuevo) recibes un único incidente con la secuencia completa y el usuario afectado.</p>
+<p>Para el <a href="/blog/post/triaje-de-alertas-en-un-soc-en-que-orden-mirar/">triaje de alertas</a> eso cambia mucho el tiempo por incidente. La contrapartida es que la visibilidad es mejor dentro del ecosistema del fabricante y más pobre fuera de él.</p>
+<h2>Tabla comparativa</h2>
+<table>
+  <thead><tr><th></th><th>EDR</th><th>SIEM</th><th>XDR</th></tr></thead>
+  <tbody>
+    <tr><td>Fuentes</td><td>Endpoints</td><td>Cualquiera</td><td>Varias capas, mismo fabricante</td></tr>
+    <tr><td>Correlación</td><td>En el equipo</td><td>Reglas propias</td><td>De serie</td></tr>
+    <tr><td>Respuesta</td><td>Aislar, matar proceso</td><td>Vía SOAR</td><td>Integrada</td></tr>
+    <tr><td>Retención</td><td>Corta</td><td>Larga</td><td>Media</td></tr>
+    <tr><td>Esfuerzo de ajuste</td><td>Bajo</td><td>Alto</td><td>Medio</td></tr>
+  </tbody>
+</table>
+<h2>Cuál necesita una empresa mediana</h2>
+<p>Si hay que elegir uno, para una organización sin equipo para mantener reglas de correlación, un XDR (o un EDR con servicio gestionado) da más detección por hora de trabajo. El SIEM llega cuando hace falta retención por normativa, cuando hay fuentes que el XDR no cubre (OT, aplicaciones propias) o cuando el equipo quiere escribir su propia detección. Lo habitual es acabar con XDR y SIEM a la vez, con el XDR enviando sus incidentes al SIEM.</p>
+<h2>Preguntas frecuentes</h2>
+<h3>¿El XDR sustituye al SIEM?</h3>
+<p>En algunas organizaciones pequeñas, sí. En cuanto hay requisitos de retención de logs o fuentes de terceros, no: se complementan.</p>
+<h3>¿Qué es un SOAR?</h3>
+<p>Una plataforma de orquestación y respuesta automatizada que ejecuta playbooks sobre alertas: enriquecer un IOC, abrir un ticket, bloquear un usuario. Muchos SIEM y XDR ya incluyen parte de esa función.</p>
+<h3>¿Y MDR?</h3>
+<p>Managed Detection and Response no es un producto sino un servicio: un equipo externo vigila y responde usando EDR o XDR. Es la opción cuando no hay SOC propio 24x7.</p>',
+  'xdr,siem,edr,soc,vision-one,deteccion', 'blue-team-soc', 'es', 1, '2026-09-24 09:00:00', '2026-09-24 09:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'xdr-vs-siem-vs-edr-diferencias-en-un-soc');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'Errores de configuración en cloud que más se repiten',
+  'errores-de-configuracion-cloud-mas-comunes',
+  'Casi todas las brechas en cloud vienen de la configuración del cliente: buckets públicos, claves eternas, puertos abiertos y logs apagados. Qué revisar primero.',
+  '<p>La mayoría de brechas en cloud no explotan un fallo de AWS, Azure o Google Cloud. Explotan algo que el cliente configuró mal. Es lo que dice el <strong>modelo de responsabilidad compartida</strong>: el proveedor responde de la seguridad <em>de</em> la nube (centros de datos, hipervisor, red física) y tú de la seguridad <em>en</em> la nube (identidades, datos, configuración de cada servicio). Gartner llegó a predecir que hasta 2025 el 99 % de los fallos de seguridad en cloud serían responsabilidad del cliente.</p>
+<p>Esta es la lista corta que miraría primero en una cuenta cloud desconocida, ordenada por el daño que hace cada fallo.</p>
+<h2>1. Almacenamiento expuesto a internet</h2>
+<p>Buckets de S3, contenedores de Azure Blob o buckets de GCS con acceso público. Es el clásico de las filtraciones de datos. AWS activa <em>Block Public Access</em> por defecto en los buckets nuevos desde abril de 2023, pero los antiguos siguen como estaban y cualquiera con permisos puede desactivarlo.</p>
+<p>Qué mirar: Block Public Access a nivel de <strong>cuenta</strong>, no solo de bucket, y una alerta si alguien lo cambia.</p>
+<h2>2. Claves de acceso de larga duración</h2>
+<p>Access keys de IAM creadas hace años, asignadas a un usuario que ya no existe en la empresa, con permisos de administrador y pegadas en algún script. Es la credencial ideal para un atacante: no caduca y no tiene MFA.</p>
+<p>Qué mirar: claves con más de 90 días, claves sin uso reciente, y si se pueden sustituir por roles con credenciales temporales. Cuando una de esas claves acaba en un repositorio, el problema es el que cuento en <a href="/blog/post/secretos-en-repositorios-como-se-filtran-y-como-evitarlo/">cómo se filtran los secretos en Git</a>.</p>
+<h2>3. Roles con permisos de más</h2>
+<p>Políticas con <code>"Action": "*"</code> o <code>"Resource": "*"</code> porque "así funcionaba". La brecha de Capital One de 2019 combinó un SSRF en una aplicación web con el servicio de metadatos de la instancia (IMDSv1) y un rol con acceso a demasiados buckets. Sin ese rol sobredimensionado, el SSRF se habría quedado en poca cosa.</p>
+<p>Qué mirar: exigir IMDSv2 en las instancias, y usar las herramientas del propio proveedor (IAM Access Analyzer en AWS, por ejemplo) para ver qué permisos no se usan nunca.</p>
+<h2>4. Puertos de administración abiertos a 0.0.0.0/0</h2>
+<p>SSH (22) y RDP (3389) abiertos a todo internet en un security group o un NSG. Los escáneres los encuentran en minutos. La alternativa es un bastión, acceso a través del propio proveedor (Session Manager, Azure Bastion, IAP) o al menos restringir por IP de origen.</p>
+<h2>5. Logs apagados o sin retención</h2>
+<p>CloudTrail desactivado en alguna región, Azure Activity Log sin exportar, logs de acceso de almacenamiento sin habilitar. No impide el ataque, pero cuando llega el incidente no hay forma de saber qué pasó. Sin logs, la investigación se queda en suposiciones.</p>
+<h2>6. Identidad débil en la consola</h2>
+<p>La cuenta raíz de AWS sin MFA, o con access keys propias. Usuarios de consola sin MFA. Es la versión cloud del mismo problema de siempre, y se arregla con <a href="/blog/post/mfa-resistente-a-phishing-por-que-el-sms-ya-no-basta/">MFA resistente a phishing</a> y <a href="/blog/post/minimo-privilegio-en-microsoft-entra-id/">mínimo privilegio</a>.</p>
+<h2>Revisarlo una vez no sirve: CSPM</h2>
+<p>Todo lo anterior se puede revisar a mano, pero la configuración cambia cada día. Las herramientas de CSPM (Cloud Security Posture Management) comprueban la configuración de forma continua contra marcos como los CIS Benchmarks y avisan cuando algo se desvía. Los proveedores tienen la suya (AWS Security Hub, Microsoft Defender for Cloud) y plataformas como Trend Micro Vision One también lo cubren. Para empezar sin coste, <a href="https://github.com/prowler-cloud/prowler">Prowler</a> es de código abierto y muy completo.</p>
+<h2>Preguntas frecuentes</h2>
+<h3>¿Qué es el modelo de responsabilidad compartida?</h3>
+<p>El reparto de quién protege qué en la nube. El proveedor protege la infraestructura; el cliente, todo lo que configura encima. Cuanto más gestionado es el servicio (SaaS frente a IaaS), más parte asume el proveedor, pero las identidades y los datos siempre son tuyos.</p>
+<h3>¿Qué es CSPM?</h3>
+<p>Una categoría de herramientas que evalúan de forma continua la configuración de tus cuentas cloud contra buenas prácticas y normativas, y detectan desviaciones como un bucket que se ha vuelto público.</p>
+<h3>¿Por dónde empiezo si solo tengo una tarde?</h3>
+<p>MFA en la cuenta raíz y en todos los administradores, Block Public Access a nivel de cuenta y CloudTrail (o el equivalente) activo en todas las regiones.</p>',
+  'cloud-security,aws,azure,cspm,misconfiguration,iam', 'cloud-iam', 'es', 1, '2026-09-28 09:00:00', '2026-09-28 09:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'errores-de-configuracion-cloud-mas-comunes');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'Secretos en repositorios: cómo se filtran y cómo evitarlo',
+  'secretos-en-repositorios-como-se-filtran-y-como-evitarlo',
+  'Una clave de API subida a GitHub se explota en minutos y borrarla del commit no basta. Cómo se filtran, cómo frenarlos antes del push y qué hacer después.',
+  '<p>Un secreto (clave de API, token, contraseña de base de datos) subido a un repositorio público hay que darlo por comprometido desde el primer segundo. Hay bots que leen el flujo de commits públicos de GitHub en tiempo real buscando patrones de claves. Y borrar la línea en el commit siguiente no arregla nada: la clave sigue en el historial. Lo único que funciona es revocarla y rotarla.</p>
+<p>GitGuardian, en su informe <em>State of Secrets Sprawl</em> de 2025, contó más de 23 millones de secretos nuevos expuestos en commits públicos de GitHub durante 2024. Y no es solo cosa de proyectos personales: muchos salen de repositorios de empresas.</p>
+<h2>Por dónde se escapan</h2>
+<ul>
+  <li>El <code>.env</code> que no estaba en <code>.gitignore</code>, o que se añadió al <code>.gitignore</code> después de haberlo commiteado una vez.</li>
+  <li>La clave "temporal" en el código para probar algo rápido, que se queda.</li>
+  <li>Ficheros de configuración de ejemplo con valores reales en vez de marcadores.</li>
+  <li>Logs y salidas de CI que imprimen variables de entorno.</li>
+  <li>Un repositorio privado que se hace público años después, con todo su historial.</li>
+</ul>
+<h2>Detectarlos antes del push</h2>
+<p>El mejor momento para encontrar un secreto es antes de que salga de tu máquina. Un hook de pre-commit con <a href="https://github.com/gitleaks/gitleaks">gitleaks</a> revisa cada commit y lo bloquea si encuentra algo:</p>
+<pre><code># .pre-commit-config.yaml
+repos:
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.18.4
+    hooks:
+      - id: gitleaks</code></pre>
+<p>En el propio GitHub, <em>push protection</em> del secret scanning rechaza el push si detecta un patrón de un proveedor conocido, y está activo por defecto en los repositorios públicos desde 2024. En este mismo portfolio hay un test de PHPUnit (<code>NoSecretsTest</code>) que recorre los ficheros versionados y falla si encuentra una clave de API. Un hook local se puede saltar con <code>--no-verify</code>; un test que corre en CI, no.</p>
+<h2>Revisar el historial que ya existe</h2>
+<p>Para repositorios con años de historia, gitleaks y <a href="https://github.com/trufflesecurity/trufflehog">TruffleHog</a> escanean todos los commits. TruffleHog además puede verificar si una clave encontrada sigue siendo válida, lo que ayuda a priorizar.</p>
+<pre><code>gitleaks detect --source . --log-opts="--all"</code></pre>
+<h2>Si ya se ha filtrado</h2>
+<ol>
+  <li><strong>Revocar y rotar primero.</strong> Antes que limpiar el historial. Cada minuto cuenta.</li>
+  <li><strong>Revisar los logs del servicio</strong> afectado para ver si alguien la ha usado desde que se subió. En una clave de AWS, CloudTrail filtrando por ese access key ID.</li>
+  <li><strong>Limpiar el historial</strong> con <code>git filter-repo</code> si el repositorio es tuyo, sabiendo que cualquier fork o clon anterior conserva la clave. Por eso el paso 1 va primero.</li>
+  <li><strong>Buscar la causa</strong> para que no se repita: ¿faltaba el <code>.gitignore</code>? ¿no había hook?</li>
+</ol>
+<h2>La solución de fondo: que no haya secretos que filtrar</h2>
+<p>Cuantos menos secretos estáticos existan, menos hay que proteger. Un gestor de secretos (AWS Secrets Manager, Azure Key Vault, HashiCorp Vault) en lugar de ficheros, y en CI/CD federación OIDC en vez de claves: GitHub Actions puede pedir credenciales temporales a AWS o Azure sin guardar ninguna clave en el repositorio. Y la opción más segura sigue siendo no necesitar credenciales: <a href="/blog/post/vigilar-el-catalogo-kev-de-cisa-sin-servidor/">kev-digest</a> solo lee un catálogo público, así que corre en Actions sin ningún secreto de terceros que proteger.</p>
+<h2>Preguntas frecuentes</h2>
+<h3>¿Basta con hacer el repositorio privado?</h3>
+<p>No. Cualquiera con acceso al repositorio, o cualquier integración con permisos de lectura, ve el secreto. Y si alguien lo clonó mientras era público, ya lo tiene.</p>
+<h3>¿Borrar el commit elimina la clave?</h3>
+<p>No de forma fiable. El commit puede seguir accesible por su hash, en forks, en cachés y en clones. Hay que revocar la clave siempre.</p>
+<h3>¿Qué herramienta uso para empezar?</h3>
+<p>gitleaks como hook de pre-commit y en CI, más push protection en GitHub. Las dos son gratuitas.</p>',
+  'secretos,git,github,devsecops,gitleaks,credenciales', 'vulnerabilidades', 'es', 1, '2026-10-01 09:00:00', '2026-10-01 09:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'secretos-en-repositorios-como-se-filtran-y-como-evitarlo');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'Business Email Compromise: las señales en Microsoft 365',
+  'business-email-compromise-senales-en-microsoft-365',
+  'Un BEC casi nunca trae malware: trae un login raro, una regla de bandeja oculta y un cambio de cuenta bancaria. Qué buscar en los logs de Microsoft 365.',
+  '<p>El Business Email Compromise (BEC) es un fraude en el que el atacante se hace pasar por alguien de confianza, o directamente usa su buzón comprometido, para conseguir un pago o datos. No suele llevar adjuntos maliciosos ni enlaces a malware, así que los filtros clásicos lo dejan pasar. Según el informe IC3 del FBI, en 2024 el BEC causó pérdidas declaradas de casi 2.800 millones de dólares solo en Estados Unidos, muy por encima del ransomware.</p>
+<p>Cuando el BEC sale de una cuenta real comprometida, deja rastro en los logs de Microsoft 365. Estas son las señales que conviene buscar.</p>
+<h2>1. El inicio de sesión</h2>
+<p>Casi siempre empieza con credenciales robadas por phishing, y cada vez más con un proxy AiTM que también roba la cookie de sesión y salta el MFA tradicional. En los logs de inicio de sesión de Entra ID:</p>
+<ul>
+  <li>IP de un proveedor de hosting o VPN comercial, no de un ISP residencial ni de la oficina.</li>
+  <li>País o ciudad que no encaja con el usuario, o "viaje imposible" respecto al inicio de sesión anterior.</li>
+  <li>Un user agent distinto al habitual del usuario, a veces de librerías como <code>python-requests</code> o <code>axios</code>.</li>
+  <li>Un inicio de sesión correcto justo después de que el usuario hiciera clic en un enlace de un correo.</li>
+</ul>
+<h2>2. Las reglas de bandeja de entrada</h2>
+<p>Es la señal más fiable y la que menos falsos positivos da, porque lo primero que hace el atacante es esconderse: una regla que mueve a "RSS" o "Archivo" y marca como leído cualquier correo que contenga "factura", "pago", "transferencia" o el nombre del proveedor que quiere suplantar. Así la víctima no ve las respuestas.</p>
+<p>En el registro de auditoría unificado, las operaciones <code>New-InboxRule</code>, <code>Set-InboxRule</code> y <code>UpdateInboxRules</code>. Desconfía de reglas con nombres de un solo carácter (".", "..", "a") o que mueven a carpetas que nadie usa.</p>
+<h2>3. Reenvíos externos</h2>
+<p>Un <code>Set-Mailbox</code> con <code>ForwardingSmtpAddress</code> a una dirección externa, o una regla que reenvía copia de todo. Lo ideal es bloquear el reenvío automático externo en la política antispam saliente y crear excepciones solo cuando haya un motivo.</p>
+<h2>4. Aplicaciones OAuth con permisos de correo</h2>
+<p>Una variante más persistente: el atacante consigue que el usuario consienta una aplicación con permisos como <code>Mail.Read</code> o <code>Mail.Send</code>. Aunque se cambie la contraseña, la app sigue teniendo acceso. Revisa los consentimientos recientes en Entra ID y restringe quién puede darlos, como cuento en el artículo de <a href="/blog/post/minimo-privilegio-en-microsoft-entra-id/">mínimo privilegio en Entra ID</a>.</p>
+<h2>5. El propio fraude</h2>
+<p>El correo final: "hemos cambiado de banco, a partir de ahora los pagos a esta cuenta", con un hilo real de conversación detrás y a veces desde un dominio casi idéntico al del proveedor. Aquí la defensa ya no es técnica: cualquier cambio de datos bancarios se verifica por un canal distinto (una llamada al número que ya tenías, no al del correo).</p>
+<h2>Respuesta en el orden correcto</h2>
+<ol>
+  <li>Revocar sesiones del usuario (<code>Revoke-MgUserSignInSession</code>), no solo cambiar la contraseña: la cookie robada sigue valiendo.</li>
+  <li>Restablecer contraseña y revisar los métodos de MFA registrados, por si el atacante añadió el suyo.</li>
+  <li>Eliminar reglas de bandeja y reenvíos maliciosos.</li>
+  <li>Revisar y revocar consentimientos OAuth sospechosos.</li>
+  <li>Buscar en el registro de auditoría qué correos se leyeron y enviaron durante el acceso, y avisar a los destinatarios.</li>
+</ol>
+<p>Para que no se repita, lo que más reduce el riesgo es el <a href="/blog/post/mfa-resistente-a-phishing-por-que-el-sms-ya-no-basta/">MFA resistente a phishing</a> en los usuarios de finanzas y dirección, junto a <a href="/blog/post/spf-dkim-dmarc-de-p-none-a-p-reject/">DMARC en p=reject</a> para que nadie pueda suplantar tu dominio desde fuera.</p>
+<h2>Preguntas frecuentes</h2>
+<h3>¿Qué es el BEC?</h3>
+<p>Business Email Compromise: fraude por correo en el que el atacante suplanta a un directivo, un empleado o un proveedor, o usa su cuenta comprometida, para conseguir transferencias, cambios de cuenta bancaria o información sensible.</p>
+<h3>¿Cambiar la contraseña basta para echar al atacante?</h3>
+<p>No. Hay que revocar las sesiones activas, revisar los métodos de MFA, las reglas de bandeja y las aplicaciones con consentimiento. Si no, el atacante conserva el acceso.</p>
+<h3>¿Cómo distingo un BEC de un phishing normal?</h3>
+<p>El phishing busca credenciales o instalar malware de forma masiva. El BEC es dirigido, suele ir sin enlaces ni adjuntos y busca dinero directamente, apoyándose en una relación de confianza real.</p>',
+  'bec,microsoft-365,email-security,respuesta-a-incidentes,fraude,soc', 'blue-team-soc', 'es', 1, '2026-10-05 09:00:00', '2026-10-05 09:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'business-email-compromise-senales-en-microsoft-365');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'Acceso condicional en Microsoft 365: las políticas base',
+  'acceso-condicional-microsoft-365-politicas-base',
+  'Seis políticas de acceso condicional de Entra ID que cubren casi todo el riesgo de identidad en Microsoft 365, y cómo activarlas sin dejar a nadie fuera.',
+  '<p>El acceso condicional de Microsoft Entra ID es un motor de reglas del tipo "si se cumple esto, exige aquello": si el usuario es administrador, exige MFA resistente a phishing; si la autenticación usa un protocolo heredado, bloquéala; si el riesgo de inicio de sesión es alto, pide MFA. Requiere licencia Entra ID P1, incluida en Microsoft 365 Business Premium y E3. Sin ella, la alternativa son los <em>security defaults</em>, que activan un MFA básico para todos pero sin ningún ajuste.</p>
+<p>Con seis políticas se cubre la mayor parte de los ataques de identidad habituales. No lo cubren todo, pero son el punto de partida razonable en cualquier inquilino.</p>
+<h2>Antes de crear ninguna</h2>
+<ul>
+  <li><strong>Excluye las cuentas de emergencia</strong> de todas las políticas. Si una política mal configurada te deja fuera, son la forma de volver a entrar. Lo explico en <a href="/blog/post/minimo-privilegio-en-microsoft-entra-id/">mínimo privilegio en Entra ID</a>.</li>
+  <li><strong>Crea cada política en modo "solo informe"</strong> (report-only). Durante una o dos semanas registra qué habría bloqueado sin bloquear nada. Revisas el impacto y luego la activas.</li>
+</ul>
+<h2>Las seis políticas base</h2>
+<h3>1. Bloquear la autenticación heredada</h3>
+<p>Protocolos como POP, IMAP, SMTP AUTH o ActiveSync con autenticación básica no admiten MFA, así que son la vía favorita del password spraying. Microsoft desactivó la autenticación básica en Exchange Online en 2022, pero bloquearla en acceso condicional cierra los huecos que queden.</p>
+<h3>2. MFA resistente a phishing para administradores</h3>
+<p>Para todos los roles privilegiados, con la <em>authentication strength</em> "Phishing-resistant MFA". Por qué no vale cualquier MFA lo cuento en <a href="/blog/post/mfa-resistente-a-phishing-por-que-el-sms-ya-no-basta/">MFA resistente a phishing</a>.</p>
+<h3>3. MFA para todos los usuarios</h3>
+<p>En todas las aplicaciones en la nube. Las excepciones, las mínimas, documentadas y revisadas.</p>
+<h3>4. MFA para el registro de métodos de seguridad</h3>
+<p>Si un atacante entra con la contraseña de un usuario que aún no tenía MFA, lo primero que intentará es registrar su propio teléfono. Esta política exige estar en una ubicación de confianza o con un MFA ya existente para registrar métodos nuevos.</p>
+<h3>5. Bloquear países donde no operas</h3>
+<p>No para por sí sola a un atacante (una VPN lo salta), pero elimina mucho ruido de intentos automatizados. Conviene combinarla con un grupo de excepción para viajes, con fecha de caducidad.</p>
+<h3>6. Políticas basadas en riesgo</h3>
+<p>Con Entra ID P2, Identity Protection calcula el riesgo del inicio de sesión (IP anónima, credenciales filtradas, viaje imposible) y del usuario. Exige MFA con riesgo de inicio de sesión medio o alto, y cambio de contraseña seguro con riesgo de usuario alto.</p>
+<h2>El siguiente paso: el dispositivo</h2>
+<p>Con las seis anteriores en marcha, la mejora más grande es exigir dispositivo gestionado (compliant en Intune o unido a Entra) para acceder a datos sensibles. Así, aunque alguien robe una sesión, no puede usarla desde un equipo que no controlas. Es el paso que más protege contra el robo de tokens que acompaña a casi todo <a href="/blog/post/business-email-compromise-senales-en-microsoft-365/">BEC</a> actual.</p>
+<h2>Cómo detectar si alguien las salta</h2>
+<p>En los logs de inicio de sesión, cada evento indica qué políticas se aplicaron y con qué resultado. Busca inicios de sesión correctos con resultado "notApplied" en usuarios que deberían estar cubiertos: suele ser una exclusión olvidada. Y alerta de cualquier cambio en las propias políticas; modificar una política de acceso condicional es una de las primeras cosas que hace un atacante con privilegios.</p>
+<h2>Preguntas frecuentes</h2>
+<h3>¿Qué es el acceso condicional?</h3>
+<p>La función de Microsoft Entra ID que decide si permite, bloquea o exige requisitos adicionales (MFA, dispositivo gestionado) en cada inicio de sesión según el usuario, la aplicación, la ubicación, el dispositivo y el riesgo.</p>
+<h3>¿Security defaults o acceso condicional?</h3>
+<p>Security defaults si no tienes licencia P1: es gratis y mucho mejor que nada. Acceso condicional en cuanto tengas P1, porque permite excepciones controladas y métodos de MFA fuertes. No se pueden usar las dos a la vez.</p>
+<h3>¿Cuánto tiempo dejar una política en modo solo informe?</h3>
+<p>Lo suficiente para que pasen por ella los patrones normales de uso: al menos una semana completa, mejor dos si hay usuarios que viajan o trabajan por turnos.</p>',
+  'acceso-condicional,entra-id,microsoft-365,iam,mfa,zero-trust', 'cloud-iam', 'es', 1, '2026-10-07 09:00:00', '2026-10-07 09:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'acceso-condicional-microsoft-365-politicas-base');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'Cuentas huérfanas: el fallo del ciclo joiner-mover-leaver',
+  'joiner-mover-leaver-cuentas-huerfanas',
+  'Cuentas activas de gente que se fue y permisos que se acumulan al cambiar de puesto. Qué es el ciclo joiner-mover-leaver, dónde falla y cómo revisarlo.',
+  '<p>El ciclo joiner-mover-leaver (JML) es el proceso de gestión de identidades que cubre tres momentos: cuando alguien entra en la organización (joiner), cuando cambia de puesto (mover) y cuando se va (leaver). Las cuentas huérfanas, activas pero sin una persona detrás que las necesite, aparecen casi siempre por un fallo en el tercero. Y la acumulación de permisos, por un fallo en el segundo.</p>
+<p>Desde <a href="/blog/post/de-soporte-tecnico-a-soc-lo-que-cambio-no-fue-el-puesto/">soporte técnico</a> se ve muy claro que el alta es la parte que siempre funciona: la persona nueva llega, necesita entrar y alguien se queja si no puede. La baja no la reclama nadie.</p>
+<h2>Joiner: el alta</h2>
+<p>El riesgo en el alta es dar demasiado desde el primer día, normalmente copiando los permisos de "alguien que hace lo mismo". Ese alguien lleva cinco años acumulando accesos. Lo correcto es asignar por rol: grupos que representan un puesto, con sus permisos definidos, en vez de permisos individuales copiados.</p>
+<p>La contraseña inicial también importa: generada, de un solo uso y con registro de MFA obligatorio en el primer inicio de sesión. Una contraseña inicial estándar del tipo "Empresa2026!" es una de las primeras cosas que prueba un atacante con password spraying.</p>
+<h2>Mover: el cambio de puesto</h2>
+<p>Es la fase que menos se gestiona y la que produce la <em>acumulación de privilegios</em>: alguien pasa de finanzas a comercial y se lleva los accesos nuevos sin perder los antiguos. Tras tres cambios de puesto, esa cuenta tiene acceso a medio negocio, y es justo la que interesa comprometer.</p>
+<p>La regla sana: un cambio de puesto es una baja de los permisos del puesto anterior más un alta en el nuevo, con un periodo de transición fijado si hace falta, no una suma.</p>
+<h2>Leaver: la baja</h2>
+<p>Una cuenta de alguien que se ha ido es peligrosa por dos motivos: nadie va a notar si alguien la usa, y su contraseña puede estar en alguna filtración antigua. Lo que debería pasar el último día, o antes si la salida no es amistosa:</p>
+<ol>
+  <li>Deshabilitar la cuenta y <strong>revocar las sesiones activas</strong>. Deshabilitar sin revocar deja vivos los tokens ya emitidos durante un tiempo.</li>
+  <li>Quitar los métodos de MFA y los dispositivos registrados.</li>
+  <li>Convertir el buzón en compartido o delegarlo si hace falta, en vez de mantener la cuenta activa "para ver el correo".</li>
+  <li>Revisar lo que no pasa por el directorio: cuentas locales en aplicaciones SaaS sin SSO, claves de API que creó, accesos a proveedores, <a href="/blog/post/secretos-en-repositorios-como-se-filtran-y-como-evitarlo/">secretos que conocía</a>.</li>
+  <li>Eliminar la cuenta tras el periodo de retención definido.</li>
+</ol>
+<p>El punto 4 es el que falla más. El SSO ayuda mucho aquí: si todas las aplicaciones autentican contra Entra ID o el directorio corporativo, deshabilitar una cuenta corta el acceso en todas.</p>
+<h2>Cómo encontrar las cuentas huérfanas que ya existen</h2>
+<p>En Active Directory, cuentas habilitadas sin inicio de sesión en 90 días:</p>
+<pre><code>Search-ADAccount -AccountInactive -TimeSpan 90.00:00:00 -UsersOnly |
+  Where-Object { $_.Enabled } |
+  Select-Object Name, SamAccountName, LastLogonDate</code></pre>
+<p>Y el cruce más útil: exportar la lista de usuarios activos del directorio y compararla con la de empleados actuales de recursos humanos. Lo que esté en la primera y no en la segunda necesita una explicación. Si la explicación es "es una cuenta de servicio", que tenga un responsable con nombre y apellidos.</p>
+<h2>Revisiones de acceso periódicas</h2>
+<p>Las revisiones de acceso (access reviews) piden a cada responsable que confirme, cada cierto tiempo, que su equipo sigue necesitando los accesos que tiene. Entra ID Governance las automatiza y puede retirar el acceso si nadie responde. Sin esa herramienta, una hoja de cálculo trimestral con los grupos sensibles ya es una mejora enorme. Para los roles de administración, lo mismo aplica con más frecuencia, como cuento en <a href="/blog/post/minimo-privilegio-en-microsoft-entra-id/">mínimo privilegio en Entra ID</a>.</p>
+<h2>Preguntas frecuentes</h2>
+<h3>¿Qué es una cuenta huérfana?</h3>
+<p>Una cuenta activa que ya no corresponde a ninguna persona o servicio que la necesite, normalmente porque su usuario dejó la organización o el servicio se retiró sin dar de baja la identidad.</p>
+<h3>¿Qué significa joiner-mover-leaver?</h3>
+<p>Es el ciclo de vida de una identidad en una organización: alta al incorporarse, ajuste de permisos al cambiar de puesto y baja al marcharse. Es la base de cualquier proceso de IAM.</p>
+<h3>¿Deshabilitar o eliminar la cuenta al irse alguien?</h3>
+<p>Deshabilitar el primer día y eliminar después de un periodo de retención definido, para poder recuperar datos o investigar si hace falta.</p>',
+  'iam,joiner-mover-leaver,active-directory,entra-id,gobierno-de-identidades', 'cloud-iam', 'es', 1, '2026-10-09 09:00:00', '2026-10-09 09:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'joiner-mover-leaver-cuentas-huerfanas');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'NIS2 en España: qué se sabe en octubre de 2026',
+  'nis2-en-espana-estado-octubre-2026',
+  'NIS2 debía estar transpuesta en octubre de 2024 y España sigue sin ley en el BOE. Qué está en vigor hoy, qué exigirá a las empresas y qué hacer ya.',
+  '<p>La directiva europea NIS2 (Directiva (UE) 2022/2555) amplía las obligaciones de ciberseguridad a muchos más sectores y empresas que la NIS original, y endurece las sanciones. Los Estados miembros tenían que transponerla antes del 17 de octubre de 2024. A fecha de este artículo, octubre de 2026, España no ha publicado en el BOE la ley que la transpone, la futura Ley de Coordinación y Gobernanza de la Ciberseguridad.</p>
+<h2>Dónde está la ley española</h2>
+<ul>
+  <li><strong>14 de enero de 2025:</strong> el Consejo de Ministros aprueba el anteproyecto y lo tramita por la vía de urgencia.</li>
+  <li><strong>Mayo de 2025:</strong> la Comisión Europea envía a España un dictamen motivado por no haber notificado la transposición.</li>
+  <li><strong>Julio de 2026:</strong> la Comisión lleva a España ante el Tribunal de Justicia de la UE por el mismo motivo.</li>
+</ul>
+<p>Mientras tanto siguen en vigor el Real Decreto-ley 12/2018 y su reglamento, el Real Decreto 43/2021, que transponen la NIS anterior y solo obligan a operadores de servicios esenciales y proveedores de servicios digitales. Si trabajas con la Administración, también aplica el Esquema Nacional de Seguridad (ENS).</p>
+<p>Conviene comprobar el estado en el <a href="https://www.boe.es/">BOE</a> antes de tomar decisiones: este artículo describe la situación en una fecha concreta.</p>
+<h2>A quién afectará NIS2</h2>
+<p>La directiva distingue entre <strong>entidades esenciales</strong> e <strong>importantes</strong>, según el sector y el tamaño. Como regla general entran las medianas y grandes empresas (a partir de 50 empleados o 10 millones de euros de facturación) de sectores como energía, transporte, banca, sanidad, agua, infraestructura digital, gestión de servicios TIC, administración pública, servicios postales, gestión de residuos, química, alimentación, fabricación de ciertos productos y proveedores digitales. Algunas entidades entran sea cual sea su tamaño, como los proveedores de DNS o de servicios de confianza.</p>
+<p>Lo que más se pasa por alto: aunque tu empresa no entre, si eres proveedor de una que sí, te van a llegar requisitos por contrato. NIS2 obliga a las entidades a gestionar la seguridad de su cadena de suministro.</p>
+<h2>Qué exige</h2>
+<p>El artículo 21 de la directiva enumera las medidas mínimas de gestión de riesgos. Las que más trabajo dan en la práctica:</p>
+<ul>
+  <li>Análisis de riesgos y políticas de seguridad de los sistemas de información.</li>
+  <li>Gestión de incidentes, continuidad de negocio y copias de seguridad.</li>
+  <li>Seguridad de la cadena de suministro.</li>
+  <li>Gestión de vulnerabilidades, incluida su divulgación.</li>
+  <li>Autenticación multifactor, control de accesos y gestión de activos.</li>
+  <li>Cifrado, formación y ciberhigiene básica.</li>
+</ul>
+<p>Y la parte con plazos: ante un incidente significativo, una <strong>alerta temprana en 24 horas</strong>, una notificación en <strong>72 horas</strong> y un informe final en <strong>un mes</strong>. La directiva hace además responsables a los órganos de dirección: tienen que aprobar las medidas y formarse.</p>
+<h2>Sanciones</h2>
+<p>Para entidades esenciales, hasta 10 millones de euros o el 2 % de la facturación mundial anual, lo que sea mayor. Para entidades importantes, hasta 7 millones o el 1,4 %. La cuantía concreta en España dependerá de la ley final.</p>
+<h2>Qué conviene hacer sin esperar a la ley</h2>
+<p>Casi todo lo que pide el artículo 21 es buena práctica que conviene tener igualmente, y la ley no va a cambiar la directiva en lo esencial:</p>
+<ol>
+  <li>Confirmar si tu organización, o tus clientes, entran en el ámbito por sector y tamaño.</li>
+  <li>Tener un procedimiento de gestión de incidentes que permita cumplir el plazo de 24 horas: quién decide qué es significativo y quién notifica.</li>
+  <li>Inventario de activos y de proveedores críticos.</li>
+  <li>MFA y <a href="/blog/post/minimo-privilegio-en-microsoft-entra-id/">mínimo privilegio</a> en las cuentas con acceso a sistemas importantes. Es el punto que con menos esfuerzo más riesgo quita.</li>
+  <li>Un proceso de <a href="/blog/post/priorizar-cves-sin-fiarse-solo-del-cvss/">gestión de vulnerabilidades</a> que priorice por explotación real y no solo por CVSS.</li>
+</ol>
+<h2>Preguntas frecuentes</h2>
+<h3>¿NIS2 ya es obligatoria en España?</h3>
+<p>La directiva está en vigor a nivel europeo, pero obliga a los Estados, no directamente a las empresas. En España las obligaciones concretas llegarán con la ley de transposición, que en octubre de 2026 aún no está publicada en el BOE. Hoy se aplica el Real Decreto-ley 12/2018.</p>
+<h3>¿Mi pyme está afectada por NIS2?</h3>
+<p>Las pequeñas empresas (menos de 50 empleados y menos de 10 millones de facturación) quedan fuera en general, salvo excepciones por actividad. Pero pueden recibir requisitos si son proveedoras de una entidad obligada.</p>
+<h3>¿Qué diferencia hay entre NIS2 y el ENS?</h3>
+<p>El ENS es la norma española de seguridad para el sector público y sus proveedores. NIS2 es una directiva europea para sectores críticos públicos y privados. Se solapan en muchas medidas, y estar certificado en ENS adelanta buena parte del trabajo.</p>',
+  'nis2,normativa,cumplimiento,espana,gestion-de-riesgo,incidentes', 'normativa', 'es', 1, '2026-10-12 09:00:00', '2026-10-12 09:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'nis2-en-espana-estado-octubre-2026');
 
 -- Ajustes del sitio. INSERT IGNORE: si ya existen, NO se tocan tus valores.
 INSERT IGNORE INTO `settings` (`key`, `value`) VALUES

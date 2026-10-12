@@ -18,7 +18,7 @@ import { SITE } from '../../config';
 const lang = 'es';
 const title = 'Proyectos publicados | Eduardo Olivares';
 const description =
-  'Herramientas de seguridad, extensiones de navegador y desarrollos web de Eduardo Olivares: Blue Team Hub, Password Centinel, PromptMaster, FollowGuard, Fluence y Zéora.';
+  'Herramientas de seguridad, extensiones de navegador y desarrollos web de Eduardo Olivares: Blue Team Hub, PhishLab, Password Centinel, PromptMaster, FollowGuard, Fluence y Zéora.';
 
 const projects = [
   {
@@ -28,6 +28,16 @@ const projects = [
     summary:
       'IOC Defanger, analizador de cabeceras de correo, generador de reglas YARA, playbooks interactivos y más. 100% cliente: ningún dato sale del navegador.',
     stack: ['Astro', 'JavaScript', 'GitHub Pages'],
+    badges: ['open-source'],
+    lang: 'Español',
+  },
+  {
+    name: 'PhishLab',
+    href: '/projects/phishlab/',
+    tagline: 'Plantillas para simulaciones de phishing autorizadas',
+    summary:
+      'Biblioteca de plantillas de correo y landing para campañas de concienciación contratadas, con exportación para GoPhish y checklist de autorización en cada paquete.',
+    stack: ['JavaScript', 'Node.js', 'GoPhish'],
     badges: ['open-source'],
     lang: 'Español',
   },

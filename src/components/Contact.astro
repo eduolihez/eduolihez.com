@@ -200,6 +200,8 @@ const messages = {
 </section>
 
 <script>
+  import { getSettings } from '../scripts/shared';
+
   function initContact() {
     const form = document.getElementById('contact-form');
     if (!form || form.dataset.bound) return;
@@ -222,10 +224,9 @@ const messages = {
     // spam). Si esta apagado, bloqueamos el envio y mostramos las vias
     // alternativas, que siguen visibles a la izquierda de la seccion.
     let formEnabled = true;
-    fetch(form.dataset.settings || '', { headers: { Accept: 'application/json' } })
-      .then((r) => (r.ok ? r.json() : null))
+    getSettings(form.dataset.settings || '')
       .then((data) => {
-        if (data && String(data.contact_enabled) === '0') {
+        if (data && String((data as { contact_enabled?: unknown }).contact_enabled) === '0') {
           formEnabled = false;
           btn.setAttribute('disabled', 'true');
           btn.classList.add('opacity-50', 'cursor-not-allowed');

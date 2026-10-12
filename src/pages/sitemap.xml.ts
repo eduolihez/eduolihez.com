@@ -159,6 +159,9 @@ const singleLangPages: { path: string; lastmod: string }[] = [
     path: '/projects/followguard/',
     lastmod: gitLastMod(['public/projects/followguard/index.html']),
   },
+  // Demo publica (marcas ficticias, sin exportacion): indexable a proposito,
+  // es el proyecto que mejor respalda el trabajo de seguridad del correo.
+  { path: '/projects/phishlab/', lastmod: gitLastMod(['public/projects/phishlab/index.html']) },
   { path: '/projects/zeora/', lastmod: gitLastMod(['public/projects/zeora/index.html']) },
 ];
 

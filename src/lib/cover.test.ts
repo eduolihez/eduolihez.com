@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { wrapText, buildCoverSvg } from './cover';
+import { wrapText, buildCoverSvg, buildProfileCoverSvg } from './cover';
 
 describe('wrapText()', () => {
   it('deja un titulo corto en una sola linea', () => {
@@ -56,5 +56,59 @@ describe('buildCoverSvg()', () => {
 
   it('no revienta con cero etiquetas', () => {
     expect(() => buildCoverSvg({ ...base, tags: [] })).not.toThrow();
+  });
+});
+
+describe('buildProfileCoverSvg()', () => {
+  const base = {
+    name: 'Eduardo Olivares Hernández',
+    role: 'Analista de Ciberseguridad · SOC · Cloud Security e IAM',
+    location: 'Barcelona, España',
+    tags: ['Cloud Security', 'IAM', 'Email & Collaboration', 'SOC'],
+  };
+
+  it('genera un SVG 1200x630 con nombre, puesto y ubicacion', () => {
+    const svg = buildProfileCoverSvg(base);
+    expect(svg).toMatch(/^<svg xmlns="http:\/\/www\.w3\.org\/2000\/svg" width="1200" height="630"/);
+    expect(svg.trim().endsWith('</svg>')).toBe(true);
+    expect(svg).toContain('Eduardo Olivares Hernández');
+    expect(svg).toContain('Barcelona, España');
+    expect(svg).toContain('Cloud Security e IAM');
+  });
+
+  it('escapa el ampersand de las etiquetas para no romper el XML', () => {
+    const svg = buildProfileCoverSvg(base);
+    expect(svg).toContain('Email &amp; Collaboration');
+    expect(svg).not.toContain('Email & Collaboration');
+  });
+
+  it('pinta como maximo 4 chips de especialidad', () => {
+    const svg = buildProfileCoverSvg({ ...base, tags: ['a', 'b', 'c', 'd', 'e', 'f'] });
+    const chipCount = (svg.match(/data-chip="1"/g) || []).length;
+    expect(chipCount).toBe(4);
+  });
+
+  it('reparte un puesto largo en como maximo 2 lineas', () => {
+    const svg = buildProfileCoverSvg({ ...base, role: Array(40).fill('palabra').join(' ') });
+    const roleLines = (svg.match(/data-role-line="1"/g) || []).length;
+    expect(roleLines).toBeGreaterThan(0);
+    expect(roleLines).toBeLessThanOrEqual(2);
+  });
+
+  it('no empieza una linea del puesto con el separador "·"', () => {
+    // Regresion: con el puesto en espanol, wrapText cortaba justo antes del
+    // " · " y la segunda linea arrancaba con un punto medio suelto.
+    const svg = buildProfileCoverSvg({
+      ...base,
+      role: 'Analista de Ciberseguridad · SOC · Cloud Security e IAM · Seguridad de correo y colaboración',
+    });
+    const lines = [...svg.matchAll(/data-role-line="1"[^>]*>([^<]*)</g)].map((m) => m[1]);
+    expect(lines.length).toBe(2);
+    expect(lines[1].startsWith('·')).toBe(false);
+    expect(lines[0].endsWith('·')).toBe(true);
+  });
+
+  it('no revienta sin etiquetas', () => {
+    expect(() => buildProfileCoverSvg({ ...base, tags: [] })).not.toThrow();
   });
 });

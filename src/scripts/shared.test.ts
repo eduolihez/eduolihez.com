@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { safeUrl, setStatusPanel, fetchWithRetry } from './shared';
+import { safeUrl, setStatusPanel, fetchWithRetry, getSettings, resetSettingsCache } from './shared';
 
 describe('safeUrl()', () => {
   it('permite http(s), rutas relativas y mailto', () => {
@@ -158,5 +158,66 @@ describe('fetchWithRetry()', () => {
     expect(result).toBeInstanceOf(Error);
     expect((result as Error).message).toBe('network down');
     expect(fetchMock).toHaveBeenCalledTimes(3); // 1 + 2 reintentos
+  });
+});
+
+describe('getSettings()', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.useRealTimers();
+    resetSettingsCache();
+  });
+
+  it('comparte UNA sola peticion entre todos los componentes de la pagina', async () => {
+    // Regresion: Hero, Announcement y Contact pedian /api/settings.php cada
+    // uno por su cuenta. Con proyectos, certificaciones, posts y la visita,
+    // eran 6-7 conexiones MySQL a la vez, y el hosting compartido empieza a
+    // rechazar conexiones a partir de ~4 (500 "No se pudo conectar a la base
+    // de datos", reproducido en produccion).
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve({ open_to_work: '1' }) });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const [a, b, c] = await Promise.all([
+      getSettings('/api/settings.php?lang=es'),
+      getSettings('/api/settings.php?lang=es'),
+      getSettings('/api/settings.php?lang=es'),
+    ]);
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(a).toEqual({ open_to_work: '1' });
+    expect(b).toBe(a);
+    expect(c).toBe(a);
+  });
+
+  it('reintenta un 500 puntual antes de rendirse', async () => {
+    vi.useFakeTimers();
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce({ ok: false, status: 500 })
+      .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ contact_enabled: '1' }) });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const promise = getSettings('/api/settings.php?lang=es');
+    await vi.runAllTimersAsync();
+
+    await expect(promise).resolves.toEqual({ contact_enabled: '1' });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('no deja cacheado un fallo: la siguiente llamada vuelve a pedirlo', async () => {
+    vi.useFakeTimers();
+    const fetchMock = vi.fn().mockResolvedValue({ ok: false, status: 500 });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const first = getSettings('/api/settings.php?lang=es').catch((e) => e);
+    await vi.runAllTimersAsync();
+    expect(await first).toBeInstanceOf(Error);
+    const callsAfterFirst = fetchMock.mock.calls.length;
+
+    const second = getSettings('/api/settings.php?lang=es').catch((e) => e);
+    await vi.runAllTimersAsync();
+    await second;
+
+    expect(fetchMock.mock.calls.length).toBeGreaterThan(callsAfterFirst);
   });
 });

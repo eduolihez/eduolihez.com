@@ -15,7 +15,9 @@ interface Props {
 const { lang } = Astro.props;
 const t = useTranslations(lang);
 const cvHref = SITE.cv[lang] ?? SITE.cv.es;
-const settingsUrl = api('/api/settings.php');
+// Misma URL (con lang) que Announcement y Contact: getSettings() comparte una
+// sola peticion por URL, y con URLs distintas volverian a ser dos.
+const settingsUrl = api(`/api/settings.php?lang=${lang}`);
 ---
 
 <section id="perfil" class="relative overflow-hidden">
@@ -151,6 +153,8 @@ const settingsUrl = api('/api/settings.php');
 </section>
 
 <script>
+  import { getSettings } from '../scripts/shared';
+
   // Controla el frame de disponibilidad del avatar en función de open_to_work (desde panel)
   function initAvailability() {
     const container = document.getElementById('avatar-container');
@@ -163,10 +167,9 @@ const settingsUrl = api('/api/settings.php');
     const badge = document.getElementById('avatar-badge');
     const img = document.getElementById('avatar-img');
 
-    fetch(url, { headers: { Accept: 'application/json' } })
-      .then((r) => (r.ok ? r.json() : null))
+    getSettings(url)
       .then((data) => {
-        if (data && String(data.open_to_work) === '0') {
+        if (data && String((data as { open_to_work?: unknown }).open_to_work) === '0') {
           if (glow) glow.classList.add('hidden');
           if (pulse) pulse.classList.add('hidden');
           if (badge) badge.classList.add('hidden');

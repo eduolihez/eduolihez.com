@@ -65,23 +65,42 @@ function syncPressed(): void {
     .forEach((btn) => btn.setAttribute('aria-pressed', String(dark)));
 }
 
+// Una sola instancia viva: reiniciar (astro:page-load) suelta los listeners de
+// la anterior, si no el boton alternaria dos veces por clic.
+let teardown: AbortController | null = null;
+
 export function initThemeToggle(): void {
+  teardown?.abort();
+  teardown = null;
+
   const buttons = document.querySelectorAll<HTMLElement>('[data-theme-toggle]');
   if (buttons.length === 0) return;
 
+  const controller = new AbortController();
+  teardown = controller;
+  const { signal } = controller;
+
   syncPressed();
   buttons.forEach((btn) =>
-    btn.addEventListener('click', () => {
-      toggleTheme();
-      syncPressed();
-    }),
+    btn.addEventListener(
+      'click',
+      () => {
+        toggleTheme();
+        syncPressed();
+      },
+      { signal },
+    ),
   );
 
   // Si se sigue al sistema y este cambia, el boton y la barra se actualizan.
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-    if (getStoredTheme() === 'system') {
-      applyTheme('system');
-      syncPressed();
-    }
-  });
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener(
+    'change',
+    () => {
+      if (getStoredTheme() === 'system') {
+        applyTheme('system');
+        syncPressed();
+      }
+    },
+    { signal },
+  );
 }

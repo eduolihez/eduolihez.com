@@ -65,14 +65,32 @@ export function filterCommands(commands: PaletteCommand[], query: string): Palet
     .map((r) => r.cmd);
 }
 
+const SAFE_PROTOCOLS = new Set(['http:', 'https:', 'mailto:']);
+
+/** Defensa en profundidad: un href con otro esquema (javascript:, data:) se descarta. */
+function isSafeHref(href: string): boolean {
+  try {
+    return SAFE_PROTOCOLS.has(new URL(href, window.location.href).protocol);
+  } catch {
+    return false;
+  }
+}
+
 function parseCommands(raw: string | undefined): PaletteCommand[] {
   if (!raw) return [];
   try {
     const parsed: unknown = JSON.parse(raw);
-    return Array.isArray(parsed) ? (parsed as PaletteCommand[]) : [];
+    if (!Array.isArray(parsed)) return [];
+    return (parsed as PaletteCommand[]).filter((cmd) => !cmd.href || isSafeHref(cmd.href));
   } catch {
     return [];
   }
+}
+
+/** Campo de texto ajeno a la paleta: ahi Ctrl+K es del editor, no nuestro. */
+function isEditableElsewhere(target: EventTarget | null, palette: HTMLElement): boolean {
+  if (!(target instanceof HTMLElement) || palette.contains(target)) return false;
+  return target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName);
 }
 
 // Una sola instancia viva: reiniciar (astro:page-load) suelta los listeners
@@ -98,7 +116,7 @@ export function initPalette(): void {
   let selected = 0;
   let opener: HTMLElement | null = null;
 
-  function setSelected(next: number): void {
+  function setSelected(next: number, scroll = true): void {
     const items = list!.querySelectorAll<HTMLElement>('[role="option"]');
     if (items.length === 0) {
       input!.removeAttribute('aria-activedescendant');
@@ -107,7 +125,7 @@ export function initPalette(): void {
     selected = (next + items.length) % items.length;
     items.forEach((el, i) => el.setAttribute('aria-selected', String(i === selected)));
     input!.setAttribute('aria-activedescendant', items[selected].id);
-    items[selected].scrollIntoView({ block: 'nearest' });
+    if (scroll) items[selected].scrollIntoView({ block: 'nearest' });
   }
 
   function render(query: string): void {
@@ -153,7 +171,7 @@ export function initPalette(): void {
       }
       el.addEventListener('click', () => run(cmd));
       el.addEventListener('mousemove', () => {
-        if (selected !== i) setSelected(i);
+        if (selected !== i) setSelected(i, false);
       });
       li.append(el);
       list!.append(li);
@@ -163,11 +181,29 @@ export function initPalette(): void {
 
   function run(cmd: PaletteCommand): void {
     if (cmd.action) setTheme(ACTION_THEME[cmd.action]);
-    close(!cmd.href);
+    // Un enlace de la misma pestana recarga la pagina; los externos y mailto: no,
+    // y ahi el foco se perderia en <body>.
+    close(!cmd.href || cmd.external === true || cmd.href.startsWith('mailto:'));
+  }
+
+  // aria-modal no basta en todos los lectores: el resto de la pagina queda inert
+  // mientras la paleta esta abierta (sin foco, sin clics, fuera del arbol de accesibilidad).
+  const inerted: Element[] = [];
+  function setPageInert(on: boolean): void {
+    if (on) {
+      [...document.body.children].forEach((el) => {
+        if (el === root || el.tagName === 'SCRIPT' || el.hasAttribute('inert')) return;
+        el.setAttribute('inert', '');
+        inerted.push(el);
+      });
+    } else {
+      inerted.splice(0).forEach((el) => el.removeAttribute('inert'));
+    }
   }
 
   function open(): void {
     opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    setPageInert(true);
     root!.hidden = false;
     document.body.style.overflow = 'hidden';
     input!.value = '';
@@ -177,6 +213,7 @@ export function initPalette(): void {
 
   function close(restoreFocus = true): void {
     root!.hidden = true;
+    setPageInert(false);
     document.body.style.overflow = '';
     if (restoreFocus) opener?.focus();
   }
@@ -204,6 +241,7 @@ export function initPalette(): void {
     'keydown',
     (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        if (isEditableElsewhere(e.target, root)) return;
         e.preventDefault();
         if (root.hidden) open();
         else close();

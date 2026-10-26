@@ -224,3 +224,69 @@ describe('initPalette — robustness', () => {
     expect(options().length).toBe(0);
   });
 });
+
+describe('initPalette — modal behaviour', () => {
+  it('makes the rest of the page inert while open and restores it on close', () => {
+    document.body.innerHTML = '<main id="page">contenido</main>';
+    mountPaletteAppend();
+    initPalette();
+    press('k', { ctrlKey: true });
+    expect(document.getElementById('page')!.hasAttribute('inert')).toBe(true);
+    expect(root().hasAttribute('inert')).toBe(false);
+    press('Escape');
+    expect(document.getElementById('page')!.hasAttribute('inert')).toBe(false);
+  });
+
+  it('returns focus to the opener after running an external link command', () => {
+    document.body.innerHTML = '';
+    mountPalette([{ id: 'gh', label: 'GitHub', group: 'Enlaces', href: 'https://github.com/x', external: true }]);
+    initPalette();
+    const opener = document.querySelector<HTMLButtonElement>('[data-palette-open]')!;
+    opener.focus();
+    opener.click();
+    press('Enter');
+    expect(root().hidden).toBe(true);
+    expect(document.activeElement).toBe(opener);
+  });
+
+  it('ignores Ctrl+K typed inside another text field', () => {
+    document.body.insertAdjacentHTML('beforeend', '<textarea id="ed"></textarea>');
+    const ta = document.getElementById('ed')!;
+    ta.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true, bubbles: true }));
+    expect(root().hidden).toBe(true);
+  });
+
+  it('still closes with Ctrl+K from the palette input itself', () => {
+    press('k', { ctrlKey: true });
+    input().dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true, bubbles: true }));
+    expect(root().hidden).toBe(true);
+  });
+});
+
+function mountPaletteAppend(): void {
+  document.body.insertAdjacentHTML(
+    'beforeend',
+    `<button type="button" data-palette-open>Abrir</button>
+    <div data-palette hidden role="dialog" aria-modal="true" aria-label="Paleta"
+         data-commands='${JSON.stringify(COMMANDS)}' data-empty="Sin resultados">
+      <input data-palette-input role="combobox" aria-expanded="true" aria-controls="pl" />
+      <ul id="pl" data-palette-list role="listbox"></ul>
+      <p data-palette-empty hidden></p>
+    </div>`,
+  );
+}
+
+describe('initPalette — unsafe URLs', () => {
+  it('drops commands whose href uses a non-http(s)/mailto scheme', () => {
+    document.body.innerHTML = '';
+    mountPalette([
+      { id: 'bad', label: 'Malo', group: 'g', href: 'javascript:alert(1)' },
+      { id: 'data', label: 'Datos', group: 'g', href: 'data:text/html,x' },
+      { id: 'ok', label: 'Bueno', group: 'g', href: '/ok/' },
+      { id: 'mail', label: 'Correo', group: 'g', href: 'mailto:a@b.c' },
+    ]);
+    initPalette();
+    press('k', { ctrlKey: true });
+    expect(options().map((o) => o.textContent)).toEqual(['Bueno', 'Correo']);
+  });
+});

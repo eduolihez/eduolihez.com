@@ -9,7 +9,7 @@
 (function () {
   'use strict';
   try {
-    var saved = localStorage.getItem('theme');
+    var saved = localStorage.getItem('theme') || localStorage.getItem('admin-theme');
     if (saved === 'light' || saved === 'dark') {
       document.documentElement.dataset.theme = saved;
     }

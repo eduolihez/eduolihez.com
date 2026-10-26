@@ -153,6 +153,15 @@ describe('initThemeToggle', () => {
     expect(btn.getAttribute('aria-pressed')).toBe('false');
   });
 
+  it('is idempotent: re-initialising does not double the click handler', () => {
+    document.body.innerHTML = '<button data-theme-toggle aria-pressed="false"></button>';
+    mockSystemDark(false);
+    initThemeToggle();
+    initThemeToggle();
+    document.querySelector<HTMLButtonElement>('[data-theme-toggle]')!.click();
+    expect(document.documentElement.dataset.theme).toBe('dark');
+  });
+
   it('does nothing when there is no toggle in the page', () => {
     expect(() => initThemeToggle()).not.toThrow();
   });

@@ -328,7 +328,8 @@ const trail = [
   ...(path === homePath ? [] : [{ name: breadcrumbName ?? title, path }]),
 ];
 
-const breadcrumb = {
+// Con un solo elemento (portadas) no hay jerarquia que describir: se omite.
+const breadcrumb = trail.length < 2 ? undefined : {
   '@type': 'BreadcrumbList',
   '@id': `${canonical}#breadcrumb`,
   itemListElement: trail.map((crumb, i) => ({
@@ -363,7 +364,7 @@ const graph = {
     person,
     website,
     profilePage,
-    breadcrumb,
+    ...(breadcrumb ? [breadcrumb] : []),
     ...(withFaq ? [faqPage] : []),
     ...(blogPosting ? [blogPosting] : []),
   ],

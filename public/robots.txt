@@ -33,22 +33,32 @@ Allow: /
 Disallow: /admin/
 Disallow: /api/
 Disallow: /projects/zeora/templates/
+Disallow: /uploads/*.php$
+Disallow: /projects/promptmaster/uninstall.html
 
 User-agent: Googlebot-Image
 Allow: /
 Disallow: /admin/
 Disallow: /api/
+Disallow: /uploads/*.php$
+Disallow: /projects/promptmaster/uninstall.html
+Disallow: /projects/zeora/templates/
 
 User-agent: Bingbot
 Allow: /
 Disallow: /admin/
 Disallow: /api/
 Disallow: /projects/zeora/templates/
+Disallow: /uploads/*.php$
+Disallow: /projects/promptmaster/uninstall.html
 
 User-agent: DuckDuckBot
 Allow: /
 Disallow: /admin/
 Disallow: /api/
+Disallow: /uploads/*.php$
+Disallow: /projects/promptmaster/uninstall.html
+Disallow: /projects/zeora/templates/
 
 # --- Rastreadores de IA: PERMITIDOS a proposito -----------------------------
 # Cada uno de estos alimenta un asistente distinto. Si los bloqueas, esa IA
@@ -61,49 +71,76 @@ User-agent: GPTBot
 Allow: /
 Disallow: /admin/
 Disallow: /api/
+Disallow: /uploads/*.php$
+Disallow: /projects/promptmaster/uninstall.html
+Disallow: /projects/zeora/templates/
 
 User-agent: OAI-SearchBot
 Allow: /
 Disallow: /admin/
 Disallow: /api/
+Disallow: /uploads/*.php$
+Disallow: /projects/promptmaster/uninstall.html
+Disallow: /projects/zeora/templates/
 
 User-agent: ChatGPT-User
 Allow: /
 Disallow: /admin/
 Disallow: /api/
+Disallow: /uploads/*.php$
+Disallow: /projects/promptmaster/uninstall.html
+Disallow: /projects/zeora/templates/
 
 # Anthropic — Claude
 User-agent: ClaudeBot
 Allow: /
 Disallow: /admin/
 Disallow: /api/
+Disallow: /uploads/*.php$
+Disallow: /projects/promptmaster/uninstall.html
+Disallow: /projects/zeora/templates/
 
 User-agent: Claude-Web
 Allow: /
 Disallow: /admin/
 Disallow: /api/
+Disallow: /uploads/*.php$
+Disallow: /projects/promptmaster/uninstall.html
+Disallow: /projects/zeora/templates/
 
 User-agent: anthropic-ai
 Allow: /
 Disallow: /admin/
 Disallow: /api/
+Disallow: /uploads/*.php$
+Disallow: /projects/promptmaster/uninstall.html
+Disallow: /projects/zeora/templates/
 
 # Perplexity
 User-agent: PerplexityBot
 Allow: /
 Disallow: /admin/
 Disallow: /api/
+Disallow: /uploads/*.php$
+Disallow: /projects/promptmaster/uninstall.html
+Disallow: /projects/zeora/templates/
 
 User-agent: Perplexity-User
 Allow: /
 Disallow: /admin/
 Disallow: /api/
+Disallow: /uploads/*.php$
+Disallow: /projects/promptmaster/uninstall.html
+Disallow: /projects/zeora/templates/
 
 # Google — Gemini y AI Overviews
 User-agent: Google-Extended
 Allow: /
 Disallow: /admin/
 Disallow: /api/
+Disallow: /uploads/*.php$
+Disallow: /projects/promptmaster/uninstall.html
+Disallow: /projects/zeora/templates/
 
 # Microsoft Copilot
 # No lleva grupo propio a proposito: Copilot rastrea con Bingbot, que ya tiene
@@ -118,29 +155,44 @@ User-agent: Applebot
 Allow: /
 Disallow: /admin/
 Disallow: /api/
+Disallow: /uploads/*.php$
+Disallow: /projects/promptmaster/uninstall.html
+Disallow: /projects/zeora/templates/
 
 User-agent: Applebot-Extended
 Allow: /
 Disallow: /admin/
 Disallow: /api/
+Disallow: /uploads/*.php$
+Disallow: /projects/promptmaster/uninstall.html
+Disallow: /projects/zeora/templates/
 
 # Common Crawl (base de datos que usan muchos modelos)
 User-agent: CCBot
 Allow: /
 Disallow: /admin/
 Disallow: /api/
+Disallow: /uploads/*.php$
+Disallow: /projects/promptmaster/uninstall.html
+Disallow: /projects/zeora/templates/
 
 # Meta AI
 User-agent: meta-externalagent
 Allow: /
 Disallow: /admin/
 Disallow: /api/
+Disallow: /uploads/*.php$
+Disallow: /projects/promptmaster/uninstall.html
+Disallow: /projects/zeora/templates/
 
 # Mistral
 User-agent: MistralAI-User
 Allow: /
 Disallow: /admin/
 Disallow: /api/
+Disallow: /uploads/*.php$
+Disallow: /projects/promptmaster/uninstall.html
+Disallow: /projects/zeora/templates/
 
 # Anthropic separo sus rastreadores: ClaudeBot indexa, Claude-User es una
 # peticion que nace de una pregunta del usuario, y Claude-SearchBot alimenta
@@ -149,85 +201,130 @@ User-agent: Claude-User
 Allow: /
 Disallow: /admin/
 Disallow: /api/
+Disallow: /uploads/*.php$
+Disallow: /projects/promptmaster/uninstall.html
+Disallow: /projects/zeora/templates/
 
 User-agent: Claude-SearchBot
 Allow: /
 Disallow: /admin/
 Disallow: /api/
+Disallow: /uploads/*.php$
+Disallow: /projects/promptmaster/uninstall.html
+Disallow: /projects/zeora/templates/
 
 # ByteDance (TikTok / Doubao)
 User-agent: Bytespider
 Allow: /
 Disallow: /admin/
 Disallow: /api/
+Disallow: /uploads/*.php$
+Disallow: /projects/promptmaster/uninstall.html
+Disallow: /projects/zeora/templates/
 
 # Amazon (Alexa / Rufus)
 User-agent: Amazonbot
 Allow: /
 Disallow: /admin/
 Disallow: /api/
+Disallow: /uploads/*.php$
+Disallow: /projects/promptmaster/uninstall.html
+Disallow: /projects/zeora/templates/
 
 # Meta: el fetcher que resuelve enlaces citados, distinto del rastreador
 User-agent: meta-externalfetcher
 Allow: /
 Disallow: /admin/
 Disallow: /api/
+Disallow: /uploads/*.php$
+Disallow: /projects/promptmaster/uninstall.html
+Disallow: /projects/zeora/templates/
 
 # DuckDuckGo AI
 User-agent: DuckAssistBot
 Allow: /
 Disallow: /admin/
 Disallow: /api/
+Disallow: /uploads/*.php$
+Disallow: /projects/promptmaster/uninstall.html
+Disallow: /projects/zeora/templates/
 
 # Google Vertex AI (agentes empresariales)
 User-agent: Google-CloudVertexBot
 Allow: /
 Disallow: /admin/
 Disallow: /api/
+Disallow: /uploads/*.php$
+Disallow: /projects/promptmaster/uninstall.html
+Disallow: /projects/zeora/templates/
 
 # Allen Institute for AI (datasets abiertos de investigacion)
 User-agent: AI2Bot
 Allow: /
 Disallow: /admin/
 Disallow: /api/
+Disallow: /uploads/*.php$
+Disallow: /projects/promptmaster/uninstall.html
+Disallow: /projects/zeora/templates/
 
 # Cohere
 User-agent: cohere-ai
 Allow: /
 Disallow: /admin/
 Disallow: /api/
+Disallow: /uploads/*.php$
+Disallow: /projects/promptmaster/uninstall.html
+Disallow: /projects/zeora/templates/
 
 # You.com
 User-agent: YouBot
 Allow: /
 Disallow: /admin/
 Disallow: /api/
+Disallow: /uploads/*.php$
+Disallow: /projects/promptmaster/uninstall.html
+Disallow: /projects/zeora/templates/
 
 # --- Redes sociales (para que las tarjetas de enlace se generen bien) -------
 User-agent: LinkedInBot
 Allow: /
 Disallow: /admin/
 Disallow: /api/
+Disallow: /uploads/*.php$
+Disallow: /projects/promptmaster/uninstall.html
+Disallow: /projects/zeora/templates/
 
 User-agent: Twitterbot
 Allow: /
 Disallow: /admin/
 Disallow: /api/
+Disallow: /uploads/*.php$
+Disallow: /projects/promptmaster/uninstall.html
+Disallow: /projects/zeora/templates/
 
 User-agent: facebookexternalhit
 Allow: /
 Disallow: /admin/
 Disallow: /api/
+Disallow: /uploads/*.php$
+Disallow: /projects/promptmaster/uninstall.html
+Disallow: /projects/zeora/templates/
 
 User-agent: WhatsApp
 Allow: /
 Disallow: /admin/
 Disallow: /api/
+Disallow: /uploads/*.php$
+Disallow: /projects/promptmaster/uninstall.html
+Disallow: /projects/zeora/templates/
 
 User-agent: TelegramBot
 Allow: /
 Disallow: /admin/
 Disallow: /api/
+Disallow: /uploads/*.php$
+Disallow: /projects/promptmaster/uninstall.html
+Disallow: /projects/zeora/templates/
 
 # --- Rastreadores agresivos de SEO comercial --------------------------------
 # No aportan visitas, solo consumen ancho de banda del hosting compartido.

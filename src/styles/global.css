@@ -155,6 +155,17 @@
     -webkit-text-size-adjust: 100%;
   }
 
+  /* Titulares en mono: identidad de la web (cuerpo y tarjetas siguen en Inter). */
+  h1,
+  h2 {
+    font-family: var(--font-mono);
+  }
+  /* El cuerpo de un articulo se lee mejor en sans. */
+  .prose h2,
+  .prose h3 {
+    font-family: var(--font-sans);
+  }
+
   body {
     @apply bg-bg text-text font-sans antialiased;
     text-rendering: optimizeLegibility;

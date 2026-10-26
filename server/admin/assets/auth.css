@@ -24,7 +24,7 @@
   --bg: #f5f6f3; --surface: #ffffff; --border: #e0e3de; --border-strong: #c6ccc4;
   /* --muted / --faint: mismos valores AA que admin.css (>= 4.5:1). */
   --text: #131820; --muted: #49535f; --faint: #5b6674;
-  --accent: #057a6b; --accent-hover: #045f54; --accent-soft: #dcf1ed; --on-accent: #ffffff;
+  --accent: #047266; --accent-hover: #035c52; --accent-soft: #dcf1ed; --on-accent: #ffffff;
   --danger: #b3261e; --danger-soft: #fbe9e8;
   --green: #17794f; --green-soft: #e6f6ee;
   color-scheme: light;

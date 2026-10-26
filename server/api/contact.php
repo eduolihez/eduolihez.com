@@ -12,48 +12,10 @@
 require_once __DIR__ . '/../lib/http.php';
 require_once __DIR__ . '/../lib/site.php';
 require_once __DIR__ . '/../lib/mail_template.php';
+require_once __DIR__ . '/../lib/turnstile.php';
 
 apply_cors();
 require_method('POST');
-
-/**
- * Verifica un token de Cloudflare Turnstile contra su API.
- * Usa cURL si esta disponible; si no, file_get_contents. Devuelve bool.
- */
-function turnstile_verify(string $secret, string $token, string $ip): bool
-{
-    $url = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
-    $data = ['secret' => $secret, 'response' => $token, 'remoteip' => $ip];
-
-    $body = null;
-    if (function_exists('curl_init')) {
-        $ch = curl_init($url);
-        curl_setopt_array($ch, [
-            CURLOPT_POST           => true,
-            CURLOPT_POSTFIELDS     => http_build_query($data),
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT        => 8,
-        ]);
-        $body = curl_exec($ch);
-        curl_close($ch);
-    } elseif (ini_get('allow_url_fopen')) {
-        $ctx = stream_context_create([
-            'http' => [
-                'method'  => 'POST',
-                'header'  => 'Content-Type: application/x-www-form-urlencoded',
-                'content' => http_build_query($data),
-                'timeout' => 8,
-            ],
-        ]);
-        $body = @file_get_contents($url, false, $ctx);
-    }
-
-    if (!$body) {
-        return false;
-    }
-    $json = json_decode($body, true);
-    return is_array($json) && !empty($json['success']);
-}
 
 $cfg   = config();
 $input = read_json_body();
@@ -107,8 +69,14 @@ $ip = client_ip();
 $ts = $cfg['turnstile'] ?? [];
 if (!empty($ts['secret_key'])) {
     $token = (string) ($input['turnstileToken'] ?? '');
-    if ($token === '' || !turnstile_verify($ts['secret_key'], $token, $ip)) {
-        json(['error' => 'Verificacion anti-bot fallida. Recarga e intentalo de nuevo.'], 403);
+    $check = $token === '' ? ['ok' => false, 'codes' => ['missing-input-response']] : turnstile_verify($ts['secret_key'], $token, $ip);
+    if (!$check['ok']) {
+        // "detail" son codigos de Cloudflare (p. ej. invalid-input-secret): no son
+        // sensibles y dicen si el fallo es la clave, el token o el hosting.
+        json([
+            'error'  => 'Verificacion anti-bot fallida. Recarga e intentalo de nuevo.',
+            'detail' => implode(',', $check['codes']),
+        ], 403);
     }
 }
 

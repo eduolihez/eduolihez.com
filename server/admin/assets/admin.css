@@ -21,13 +21,13 @@
      de abajo ya usando var(...) en vez de colores sueltos, cambiar estos
      valores re-pinta el panel entero sin tocar cada pagina. */
   :root {
-    --bg: #fbfbfa; --soft: #f2f1ee; --card: #ffffff; --border: #e5e4e0;
-    --text: #16151a; --muted: #5f5f69; --faint: #6b6b75; --faint-ui: #9c9ba3;
-    --accent: #5b5bd6; --accent-hover: #4747c2; --accent-soft: #eeeefc;
+    --bg: #f5f6f3; --soft: #eceee9; --card: #ffffff; --border: #e0e3de;
+    --text: #131820; --muted: #49535f; --faint: #5b6674; --faint-ui: #8a94a0;
+    --accent: #057a6b; --accent-hover: #045f54; --accent-soft: #dcf1ed;
     --danger: #b3261e; --danger-soft: #fbe9e8;
     --warn: #a15c00; --warn-soft: #fdf1de;
     --green: #17794f; --green-soft: #e6f6ee;
-    --cyan: #0a7284; --cyan-soft: #e3f5f7;
+    --cyan: #0e7490; --cyan-soft: #e3f5f7;
     --violet: #7048e8; --violet-soft: #f1ecfd;
     --shadow: 0 1px 2px rgba(20, 20, 30, 0.04), 0 12px 32px -16px rgba(20, 20, 30, 0.14);
     --shadow-sm: 0 1px 2px rgba(20, 20, 30, 0.05);
@@ -40,9 +40,9 @@
   }
   /* Tema oscuro: theme.js pone data-theme en <html> antes de pintar. */
   [data-theme="dark"] {
-    --bg: #0e0f13; --soft: #14151b; --card: #171821; --border: #262833;
-    --text: #e7e7ec; --muted: #a3a4b0; --faint: #8b8c98; --faint-ui: #757683;
-    --accent: #8b8bf0; --accent-hover: #a3a3f5; --accent-soft: #23244a;
+    --bg: #0a0e14; --soft: #0f141c; --card: #141a24; --border: #1f2733;
+    --text: #e6edf3; --muted: #9aa7b8; --faint: #8e99ad; --faint-ui: #78849a;
+    --accent: #2dd4bf; --accent-hover: #5eead4; --accent-soft: #0e3a35;
     --danger: #f0827a; --danger-soft: #3a1a19;
     --warn: #e0a54a; --warn-soft: #3a2b10;
     --green: #4cc38a; --green-soft: #12301f;
@@ -56,6 +56,27 @@
     --row-hover: rgba(231, 231, 236, 0.04);
     --scrim: rgba(0, 0, 0, 0.6);
     color-scheme: dark;
+  }
+  /* Sistema oscuro sin eleccion guardada (theme.js no fija data-theme). */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        --bg: #0a0e14; --soft: #0f141c; --card: #141a24; --border: #1f2733;
+        --text: #e6edf3; --muted: #9aa7b8; --faint: #8e99ad; --faint-ui: #78849a;
+        --accent: #2dd4bf; --accent-hover: #5eead4; --accent-soft: #0e3a35;
+        --danger: #f0827a; --danger-soft: #3a1a19;
+        --warn: #e0a54a; --warn-soft: #3a2b10;
+        --green: #4cc38a; --green-soft: #12301f;
+        --cyan: #4cc2d6; --cyan-soft: #10303a;
+        --violet: #a98bf5; --violet-soft: #2a1f4d;
+        --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 12px 32px -16px rgba(0, 0, 0, 0.6);
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+        --shadow-lift: 0 12px 24px -12px rgb(0 0 0 / 0.6);
+        --shadow-drawer: 10px 0 25px rgba(0, 0, 0, 0.5);
+        --border-strong: rgba(231, 231, 236, 0.22);
+        --row-hover: rgba(231, 231, 236, 0.04);
+        --scrim: rgba(0, 0, 0, 0.6);
+        color-scheme: dark;
+      }
   }
   * { box-sizing: border-box; }
   body {
@@ -380,6 +401,10 @@
   #theme-toggle .icon-sun { display: none; }
   [data-theme="dark"] #theme-toggle .icon-sun { display: block; }
   [data-theme="dark"] #theme-toggle .icon-moon { display: none; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) #theme-toggle .icon-sun { display: block; }
+    :root:not([data-theme="light"]) #theme-toggle .icon-moon { display: none; }
+  }
 
   .action-btn.danger-text:hover {
     color: var(--danger);
@@ -771,3 +796,59 @@
   .mt-2 { margin-top: 1rem !important; }
   .mt-3 { margin-top: 1.5rem !important; }
   .mb-2 { margin-bottom: 1rem !important; }
+
+
+  /* --- Rediseno v2: mismo lenguaje que la web publica ---------------------
+     Titulares y marca en mono, acento verde azulado y paleta de comandos. */
+  h1, h2, .brand, .topbar-title, .nav-group-label { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace; }
+  h1 { font-weight: 700; letter-spacing: -0.02em; }
+  .brand { letter-spacing: -0.02em; }
+  .topbar-kbd {
+    display: inline-flex; align-items: center; gap: 0.35rem; cursor: pointer;
+    padding: 0.35rem 0.6rem; border: 1px solid var(--border); border-radius: 6px;
+    background: var(--card); color: var(--muted);
+    font: 500 0.75rem "JetBrains Mono", ui-monospace, monospace;
+  }
+  .topbar-kbd:hover { border-color: var(--faint-ui); color: var(--text); }
+  .topbar-kbd b { color: var(--accent); font-weight: 600; }
+
+  .palette-backdrop {
+    position: fixed; inset: 0; z-index: 300; display: flex; align-items: flex-start;
+    justify-content: center; padding: 12vh 1rem 1rem; background: var(--scrim);
+    backdrop-filter: blur(4px);
+  }
+  .palette-backdrop[hidden] { display: none; }
+  .palette-panel {
+    width: 100%; max-width: 36rem; overflow: hidden; border: 1px solid var(--border);
+    border-radius: 12px; background: var(--card); box-shadow: var(--shadow);
+  }
+  .palette-input {
+    width: 100%; border: 0; border-bottom: 1px solid var(--border); background: transparent;
+    padding: 0.9rem 1rem; font: 0.875rem "JetBrains Mono", ui-monospace, monospace; color: var(--text);
+  }
+  .palette-input::placeholder { color: var(--faint); }
+  .palette-input:focus-visible { outline: none; box-shadow: inset 0 -2px 0 var(--accent); }
+  .palette-list { max-height: min(24rem, 55vh); overflow-y: auto; padding: 0.35rem; margin: 0; list-style: none; }
+  .palette-group {
+    padding: 0.6rem 0.65rem 0.25rem; font: 0.6875rem "JetBrains Mono", ui-monospace, monospace;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--faint);
+  }
+  .palette-option {
+    display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 1rem;
+    border: 0; border-radius: 8px; background: transparent; padding: 0.55rem 0.65rem;
+    text-align: left; font: inherit; font-size: 0.875rem; color: var(--muted); cursor: pointer;
+  }
+  .palette-option[aria-selected="true"] { background: var(--accent-soft); color: var(--text); }
+  .palette-hint { font: 0.6875rem "JetBrains Mono", ui-monospace, monospace; color: var(--faint); }
+  .palette-empty { padding: 1.25rem 1rem; text-align: center; color: var(--muted); margin: 0; }
+  .palette-footer {
+    margin: 0; border-top: 1px solid var(--border); padding: 0.5rem 1rem;
+    font: 0.6875rem "JetBrains Mono", ui-monospace, monospace; color: var(--faint);
+  }
+
+  /* El panel da estilo a todos los <input>; el de la paleta es plano y sin caja. */
+  .palette-panel .palette-input {
+    border: 0; border-bottom: 1px solid var(--border); border-radius: 0;
+    background: transparent; box-shadow: none; width: 100%;
+  }
+  .palette-panel .palette-input:focus { box-shadow: inset 0 -2px 0 var(--accent); }

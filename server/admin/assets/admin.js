@@ -17,9 +17,6 @@
  *   [data-toggle-hidden="id"] en un <button> -> muestra/oculta el elemento
  *                        con ese id (atributo hidden) y actualiza aria-expanded.
  *   [data-select-on-click] -> selecciona el texto del campo al hacer clic.
- *   #theme-toggle       -> alterna data-theme (light/dark) en <html>, lo guarda
- *                        en localStorage ('admin-theme') y actualiza aria-pressed.
- *                        El tema inicial lo fija theme.js desde el <head>.
  *   #sidebar-open-btn / #sidebar-close-btn / #sidebar-overlay -> abren y
  *                        cierran el cajon lateral movil (clase .open en
  *                        #admin-sidebar y en el overlay).
@@ -53,33 +50,8 @@
     initSidebarDrawer();
   }
 
-  // --- Interruptor de tema -----------------------------------------------
-  // Si localStorage esta bloqueado el tema cambia igual, solo que no persiste.
-  function initThemeToggle() {
-    var btn = document.getElementById('theme-toggle');
-    if (!btn) return;
-    var root = document.documentElement;
-    function sync() {
-      btn.setAttribute('aria-pressed', root.dataset.theme === 'dark' ? 'true' : 'false');
-    }
-    sync();
-    btn.addEventListener('click', function () {
-      var next = root.dataset.theme === 'dark' ? 'light' : 'dark';
-      root.dataset.theme = next;
-      try {
-        localStorage.setItem('admin-theme', next);
-      } catch (err) {
-        // silencioso: el tema vale para esta pagina aunque no se guarde.
-      }
-      sync();
-    });
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initThemeToggle);
-  } else {
-    initThemeToggle();
-  }
+  // El interruptor de tema (#theme-toggle[data-theme-toggle]) y la paleta de
+  // comandos los gestiona assets/palette.js (generado desde src/scripts/).
 
   // --- Copiar al portapapeles ------------------------------------------------
   // Texto a copiar: el valor de un <input>/<textarea>, o el textContent de

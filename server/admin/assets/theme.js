@@ -1,27 +1,19 @@
 /**
  * theme.js - fija el tema (claro/oscuro) del panel antes del primer pintado.
  * Se carga de forma sincrona en el <head>, antes del CSS, para evitar el
- * destello. Prioridad: valor guardado en localStorage ('admin-theme', solo
- * 'light' o 'dark') y, si no hay, la preferencia del sistema. El interruptor
- * vive en admin.js.
+ * destello. Solo escribe data-theme si hay una eleccion guardada en
+ * localStorage ('theme': 'light' | 'dark'); sin eleccion el CSS sigue a
+ * prefers-color-scheme (admin.css). El interruptor y la paleta de comandos
+ * (assets/palette.js, generado desde src/scripts/) guardan la eleccion.
  */
 (function () {
   'use strict';
-  var theme = null;
   try {
-    var saved = localStorage.getItem('admin-theme');
-    if (saved === 'light' || saved === 'dark') theme = saved;
-  } catch (err) {
-    // localStorage bloqueado: se usa la preferencia del sistema.
-  }
-  if (!theme) {
-    var dark = false;
-    try {
-      dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    } catch (err) {
-      // sin matchMedia: tema claro.
+    var saved = localStorage.getItem('theme');
+    if (saved === 'light' || saved === 'dark') {
+      document.documentElement.dataset.theme = saved;
     }
-    theme = dark ? 'dark' : 'light';
+  } catch (err) {
+    // localStorage bloqueado: se sigue al sistema.
   }
-  document.documentElement.dataset.theme = theme;
 })();

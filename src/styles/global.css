@@ -217,7 +217,7 @@
     @apply mb-3 font-mono text-xs font-medium uppercase tracking-[0.2em] text-accent;
   }
   .section-title {
-    @apply text-2xl font-semibold tracking-tight text-text sm:text-3xl;
+    @apply font-mono text-2xl font-bold tracking-tight text-text-title sm:text-3xl;
   }
   .section-subtitle {
     @apply mt-3 max-w-2xl text-[15px] leading-relaxed text-text-muted;
@@ -313,6 +313,22 @@
     @apply mt-2 items-center gap-1.5 rounded-md border border-bg-border px-2.5 py-1
            text-xs font-medium text-text-muted transition-colors
            hover:border-text-faint hover:text-text;
+  }
+}
+
+/* Franja de stack: dos copias de la lista en una pista que se desplaza media
+   anchura (el bucle es continuo). Se detiene al pasar el raton. */
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 48s linear infinite;
+}
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
   }
 }
 

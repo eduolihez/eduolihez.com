@@ -7,7 +7,8 @@
   "license": "MIT",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "node scripts/build-admin-palette.mjs && astro build",
+    "admin:palette": "node scripts/build-admin-palette.mjs",
     "preview": "astro preview",
     "icons": "node scripts/gen-icons.mjs",
     "css:promptmaster": "tailwindcss -i scripts/promptmaster-tailwind/input.css -o public/projects/promptmaster/tailwind.css --minify",

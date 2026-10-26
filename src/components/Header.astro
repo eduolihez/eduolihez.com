@@ -26,10 +26,10 @@ const nav = [
   // que la pagina real es /blog/. Sin la barra, Apache responde un 301 a
   // /blog/ en cada clic (un salto de mas) y el enlace interno deja de
   // coincidir con la canonica que declara la propia pagina.
-  // Solo en espanol: el blog no tiene contenido en EN/CA todavia (ver
-  // BlogPreview.astro), asi que un enlace a un listado vacio en esos idiomas
+  // Solo en espanol y catalan: el blog no tiene contenido en ingles todavia
+  // (ver BlogPreview.astro), asi que un enlace a un listado vacio en ese idioma
   // solo genera contenido fino y confunde al visitante.
-  ...(lang === 'es' ? [{ href: `${base}blog/`, label: t('nav.blog') }] : []),
+  ...(lang === 'es' || lang === 'ca' ? [{ href: `${base}blog/`, label: t('nav.blog') }] : []),
   { href: `${base}#faq`, label: t('nav.faq') },
   { href: `${base}#contacto`, label: t('nav.contact') },
 ];
@@ -62,9 +62,10 @@ const flagSvgs = {
   >
     <a
       href={base}
-      class="font-mono text-sm font-semibold text-text transition hover:text-accent"
+      class="mr-4 shrink-0 font-mono text-sm font-semibold tracking-tight text-text-title"
+      aria-label={`${SITE.shortName} — ${t('nav.about')}`}
     >
-      <span class="text-accent">&gt;_</span> eduolihez
+      EO <span class="text-accent">//</span> <span class="font-medium text-text-muted">security</span>
     </a>
 
     {/* lg (1024px), no md (768px): a 768px el logo + 7 enlaces + icono de
@@ -77,7 +78,7 @@ const flagSvgs = {
           <li>
             <a
               href={item.href}
-              class="rounded-md px-3 py-2 text-sm text-text-muted transition hover:text-text"
+              class="rounded-md px-2.5 py-2 text-sm text-text-muted transition hover:text-text"
             >
               {item.label}
             </a>
@@ -86,14 +87,38 @@ const flagSvgs = {
       }
     </ul>
 
-    <div class="flex items-center gap-1">
+    <div class="flex items-center gap-1.5">
+      <!-- Paleta de comandos (Ctrl/Cmd+K) -->
+      <button
+        type="button"
+        data-palette-open
+        class="hidden items-center gap-1.5 rounded-md border border-bg-border bg-bg-card px-2.5 py-1.5 font-mono text-xs text-text-muted transition hover:border-bg-border-hover hover:text-text sm:inline-flex"
+        aria-label={t('palette.open')}
+        aria-keyshortcuts="Control+K Meta+K"
+      >
+        <span aria-hidden="true" class="text-accent">⌘</span><span aria-hidden="true">K</span>
+      </button>
+
+      <!-- Tema claro/oscuro: por defecto sigue al sistema; al pulsar se guarda. -->
+      <button
+        type="button"
+        data-theme-toggle
+        aria-pressed="false"
+        class="inline-flex items-center justify-center rounded-md border border-bg-border bg-bg-card p-2 text-text-muted transition hover:border-bg-border-hover hover:text-text"
+        aria-label={t('theme.toggle')}
+        title={t('theme.toggle')}
+      >
+        <Icon name="moon" class="theme-icon-moon h-4 w-4" />
+        <Icon name="sun" class="theme-icon-sun h-4 w-4" />
+      </button>
+
       <!-- Repositorio de esta web: la demostracion vive en el sitio, la
            prueba en el codigo (ver PRODUCT.md, seccion Positioning). -->
       <a
         href={SITE.githubRepo}
         target="_blank"
         rel="noopener noreferrer"
-        class="hidden sm:inline-flex items-center justify-center rounded-md p-2 text-text-muted transition hover:text-accent"
+        class="hidden items-center justify-center rounded-md p-2 text-text-muted transition hover:text-accent lg:inline-flex"
         aria-label={t('nav.githubRepo')}
         title={t('nav.githubRepo')}
       >

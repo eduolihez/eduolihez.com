@@ -22,6 +22,7 @@
  * Es lo que Google recomienda y evita que se contradigan entre si.
  */
 import { SITE } from '../config';
+import { buildSoftwareNodes } from '../lib/softwareSchema';
 import type { Lang } from '../i18n/ui';
 import { experiences } from '../data/experience';
 import { skillGroups } from '../data/skills';
@@ -49,7 +50,7 @@ interface Props {
    *
    * Toda pagina traducida DEBE pasar su propio mapa.
    */
-  alternates?: Record<Lang, string>;
+  alternates?: Partial<Record<Lang, string>>;
   /**
    * Migas de pan de la pagina, de la raiz hacia dentro y SIN incluir la
    * pagina actual (se anade sola al final).
@@ -271,7 +272,7 @@ const person = {
     dateCreated: c.year,
   })),
   award: SITE.awards.map((a) => a.name),
-  sameAs: [SITE.social.linkedin, SITE.social.github],
+  sameAs: [SITE.social.linkedin, SITE.social.github, 'https://eduolihez.github.io/'],
 };
 
 const website = {
@@ -328,7 +329,8 @@ const trail = [
   ...(path === homePath ? [] : [{ name: breadcrumbName ?? title, path }]),
 ];
 
-const breadcrumb = {
+// Con un solo elemento (portadas) no hay jerarquia que describir: se omite.
+const breadcrumb = trail.length < 2 ? undefined : {
   '@type': 'BreadcrumbList',
   '@id': `${canonical}#breadcrumb`,
   itemListElement: trail.map((crumb, i) => ({
@@ -363,7 +365,10 @@ const graph = {
     person,
     website,
     profilePage,
-    breadcrumb,
+    ...(breadcrumb ? [breadcrumb] : []),
+    // Software publicado, solo en las portadas: ahi vive la lista de proyectos
+    // y asi el grafo no se repite en cada pagina.
+    ...(path === homePath ? buildSoftwareNodes(lang, SITE.domain, personId) : []),
     ...(withFaq ? [faqPage] : []),
     ...(blogPosting ? [blogPosting] : []),
   ],
@@ -402,12 +407,12 @@ const graph = {
 {
   alternates && (
     <>
-      <link rel="alternate" hreflang="es-ES" href={new URL(alternates.es, SITE.domain).href} />
-      <link rel="alternate" hreflang="es" href={new URL(alternates.es, SITE.domain).href} />
-      <link rel="alternate" hreflang="en" href={new URL(alternates.en, SITE.domain).href} />
-      <link rel="alternate" hreflang="ca-ES" href={new URL(alternates.ca, SITE.domain).href} />
-      <link rel="alternate" hreflang="ca" href={new URL(alternates.ca, SITE.domain).href} />
-      <link rel="alternate" hreflang="x-default" href={new URL(alternates.es, SITE.domain).href} />
+      {alternates.es && <link rel="alternate" hreflang="es-ES" href={new URL(alternates.es, SITE.domain).href} />}
+      {alternates.es && <link rel="alternate" hreflang="es" href={new URL(alternates.es, SITE.domain).href} />}
+      {alternates.en && <link rel="alternate" hreflang="en" href={new URL(alternates.en, SITE.domain).href} />}
+      {alternates.ca && <link rel="alternate" hreflang="ca-ES" href={new URL(alternates.ca, SITE.domain).href} />}
+      {alternates.ca && <link rel="alternate" hreflang="ca" href={new URL(alternates.ca, SITE.domain).href} />}
+      <link rel="alternate" hreflang="x-default" href={new URL(alternates.es ?? alternates.ca ?? "/", SITE.domain).href} />
     </>
   )
 }

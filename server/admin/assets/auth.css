@@ -21,13 +21,27 @@
   src: url('fonts/jetbrains-mono-latin-wght-normal.woff2') format('woff2-variations');
 }
 :root {
-  --bg: #fbfbfa; --surface: #ffffff; --border: #ececea; --border-strong: #dbdad6;
+  --bg: #f5f6f3; --surface: #ffffff; --border: #e0e3de; --border-strong: #c6ccc4;
   /* --muted / --faint: mismos valores AA que admin.css (>= 4.5:1). */
-  --text: #16151a; --muted: #5f5f69; --faint: #6b6b75;
-  --accent: #5b5bd6; --accent-soft: #eeeefc;
+  --text: #131820; --muted: #49535f; --faint: #5b6674;
+  --accent: #047266; --accent-hover: #035c52; --accent-soft: #dcf1ed; --on-accent: #ffffff;
   --danger: #b3261e; --danger-soft: #fbe9e8;
   --green: #17794f; --green-soft: #e6f6ee;
+  color-scheme: light;
 }
+/* Sistema oscuro: estas pantallas no cargan theme.js, asi que siguen siempre
+   a prefers-color-scheme (mismos valores que admin.css). */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0a0e14; --surface: #141a24; --border: #1f2733; --border-strong: #2b3543;
+    --text: #e6edf3; --muted: #9aa7b8; --faint: #8e99ad;
+    --accent: #2dd4bf; --accent-hover: #5eead4; --accent-soft: #0e3a35; --on-accent: #04120f;
+    --danger: #f87171; --danger-soft: #3a1a19;
+    --green: #4cc38a; --green-soft: #12301f;
+    color-scheme: dark;
+  }
+}
+.login h1, .setup h1 { font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: -0.02em; }
 .login, .login *, .setup, .setup * { box-sizing: border-box; }
 
 /* ---------- login y setup: tarjeta centrada ---------- */
@@ -75,7 +89,7 @@ body.setup { font-family: 'Inter', system-ui, sans-serif; }
   font-family: inherit;
 }
 .login button { font-size: .95rem; transition: background .15s; }
-.login button:hover, .setup button:hover { background: #000; }
+.login button:hover, .setup button:hover { background: var(--accent); color: var(--on-accent); }
 .login .err, .setup .err {
   background: var(--danger-soft); color: var(--danger); border: 1px solid transparent;
   padding: .6rem .8rem; border-radius: .5rem; font-size: .88rem; margin-bottom: 1rem;

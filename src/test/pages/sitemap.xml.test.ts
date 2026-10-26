@@ -25,12 +25,17 @@ describe('GET /sitemap.xml', () => {
     expect(body).toContain('hreflang="x-default"');
   });
 
-  it('NO declara hreflang para /blog/ (un solo idioma, en/ca redirigen a la home)', async () => {
+  it('declara /blog/ y /ca/blog/ como par es/ca (sin en: /en/blog/ redirige a la home)', async () => {
     const body = await GET({} as APIContext).text();
-    const blogEntry = body.slice(body.indexOf('<loc>https://eduolihez.com/blog/</loc>'), body.indexOf('<loc>https://eduolihez.com/blog/</loc>') + 200);
-    expect(blogEntry).not.toContain('hreflang');
+    const start = body.indexOf('<loc>https://eduolihez.com/blog/</loc>');
+    expect(start).toBeGreaterThan(-1);
+    const blogEntry = body.slice(start, start + 400);
+    expect(blogEntry).toContain('hreflang="es" href="https://eduolihez.com/blog/"');
+    expect(blogEntry).toContain('hreflang="ca" href="https://eduolihez.com/ca/blog/"');
+    expect(blogEntry).toContain('hreflang="x-default" href="https://eduolihez.com/blog/"');
+    expect(blogEntry).not.toContain('hreflang="en"');
+    expect(body).toContain('<loc>https://eduolihez.com/ca/blog/</loc>');
     expect(body).not.toContain('https://eduolihez.com/en/blog/');
-    expect(body).not.toContain('https://eduolihez.com/ca/blog/');
   });
 
   it('no emite priority ni changefreq (deprecados, Google los ignora)', async () => {

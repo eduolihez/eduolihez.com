@@ -1,0 +1,126 @@
+/* ==========================================================================
+   Tokens de diseno. Una sola fuente de verdad para el tema claro y el oscuro.
+
+   Resolucion del tema (por orden):
+     1. <html data-theme="light|dark">  -> eleccion explicita (public/theme-init.js
+        la fija antes del primer pintado; src/scripts/theme.ts la cambia).
+     2. Sin atributo                    -> prefers-color-scheme del sistema.
+   Por defecto manda el sistema; el boton solo guarda una eleccion si se pulsa.
+
+   Los valores de texto estan calculados para WCAG AA (>= 4.5:1) sobre --bg y
+   sobre --bg-card; los acentos de texto son mas oscuros en claro que los
+   decorativos de la referencia, que no llegaban a 3:1 sobre papel.
+   Se publican como utilidades de Tailwind en global.css (@theme inline).
+   ========================================================================== */
+
+:root {
+  /* --- Claro: papel + tinta, acento verde azulado ------------------------ */
+  --bg: #f5f6f3;
+  --bg-soft: #eceee9;
+  --bg-card: #ffffff;
+  --bg-border: #e0e3de;
+  --bg-border-hover: #c6ccc4;
+
+  --text: #131820;
+  --text-title: #0a0e14;
+  --text-muted: #49535f;
+  --text-faint: #5b6674;
+
+  --accent: #047266;
+  --accent-hover: #035c52;
+  --accent-soft: #dcf1ed;
+  --on-accent: #ffffff;
+
+  --cyan: #0e7490;
+  --violet: #6d44d8;
+
+  --danger: #b3261e;
+  --warn: #8f5608;
+  --oss: #0d7a54;
+  --wip: #8f5608;
+  --closed: #1b5cc0;
+
+  --scrim: rgb(19 24 32 / 0.55);
+  --grid-line: rgb(19 24 32 / 0.055);
+  --glow: rgb(5 122 107 / 0.16);
+  --shadow-card: 0 1px 2px rgb(19 24 32 / 0.05), 0 14px 34px -16px rgb(19 24 32 / 0.18);
+  --selection: rgb(5 122 107 / 0.18);
+
+  color-scheme: light;
+}
+
+/* --- Oscuro: consola en penumbra (se conserva el negro azulado) ---------- */
+:root[data-theme='dark'] {
+  --bg: #0a0e14;
+  --bg-soft: #0f141c;
+  --bg-card: #141a24;
+  --bg-border: #1f2733;
+  --bg-border-hover: #2b3543;
+
+  --text: #e6edf3;
+  --text-title: #f0f3f6;
+  --text-muted: #9aa7b8;
+  --text-faint: #8e99ad;
+
+  --accent: #2dd4bf;
+  --accent-hover: #5eead4;
+  --accent-soft: #0e3a35;
+  --on-accent: #04120f;
+
+  --cyan: #22d3ee;
+  --violet: #a78bfa;
+
+  --danger: #f87171;
+  --warn: #f59e0b;
+  --oss: #10b981;
+  --wip: #f59e0b;
+  --closed: #60a5fa;
+
+  --scrim: rgb(3 5 8 / 0.72);
+  --grid-line: rgb(230 237 243 / 0.045);
+  --glow: rgb(45 212 191 / 0.14);
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.4), 0 14px 34px -16px rgb(0 0 0 / 0.65);
+  --selection: rgb(45 212 191 / 0.25);
+
+  color-scheme: dark;
+}
+
+/* Mismos valores oscuros cuando el sistema es oscuro y no hay eleccion
+   explicita. Se repite el bloque (CSS no permite reutilizarlo entre un
+   selector de atributo y una media query sin un preprocesador). */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #0a0e14;
+    --bg-soft: #0f141c;
+    --bg-card: #141a24;
+    --bg-border: #1f2733;
+    --bg-border-hover: #2b3543;
+
+    --text: #e6edf3;
+    --text-title: #f0f3f6;
+    --text-muted: #9aa7b8;
+    --text-faint: #8e99ad;
+
+    --accent: #2dd4bf;
+    --accent-hover: #5eead4;
+    --accent-soft: #0e3a35;
+    --on-accent: #04120f;
+
+    --cyan: #22d3ee;
+    --violet: #a78bfa;
+
+    --danger: #f87171;
+    --warn: #f59e0b;
+    --oss: #10b981;
+    --wip: #f59e0b;
+    --closed: #60a5fa;
+
+    --scrim: rgb(3 5 8 / 0.72);
+    --grid-line: rgb(230 237 243 / 0.045);
+    --glow: rgb(45 212 191 / 0.14);
+    --shadow-card: 0 1px 2px rgb(0 0 0 / 0.4), 0 14px 34px -16px rgb(0 0 0 / 0.65);
+    --selection: rgb(45 212 191 / 0.25);
+
+    color-scheme: dark;
+  }
+}

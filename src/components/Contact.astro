@@ -28,6 +28,7 @@ const messages = {
   required: t('contact.required'),
   invalidEmail: t('contact.invalidEmail'),
   disabled: t('contact.disabled'),
+  captcha: t('contact.captcha'),
 };
 ---
 
@@ -200,7 +201,7 @@ const messages = {
 </section>
 
 <script>
-  import { getSettings } from '../scripts/shared';
+  import { getSettings, captchaPending } from '../scripts/shared';
 
   function initContact() {
     const form = document.getElementById('contact-form');
@@ -266,6 +267,13 @@ const messages = {
       }
       if (!isEmail(data.email)) {
         return setFeedback(messages.invalidEmail, false);
+      }
+
+      // Captcha de Cloudflare: si hay widget y aun no esta resuelto, no se
+      // envia nada (el servidor tambien lo exige, esto solo evita el viaje).
+      const widgetPresent = !!form.querySelector('.cf-turnstile');
+      if (captchaPending(widgetPresent, String(data['cf-turnstile-response'] || ''))) {
+        return setFeedback(messages.captcha, false);
       }
 
       btn.setAttribute('disabled', 'true');

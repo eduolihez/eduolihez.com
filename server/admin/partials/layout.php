@@ -133,6 +133,7 @@ function admin_header(string $title, string $active = ''): void
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="light dark">
 <title><?= e($title) ?> · Admin</title>
 <?php /*
   Las fuentes se sirven desde el propio dominio.
@@ -154,13 +155,55 @@ function admin_header(string $title, string $active = ''): void
 <link rel="icon" type="image/svg+xml" href="<?= e(asset_url('favicon.svg')) ?>">
 </head>
 <body>
+<?php
+  // Paleta de comandos (Ctrl/Cmd+K): mismas rutas que el menu lateral mas
+  // acciones. Los comandos van como JSON en un atributo; palette.js los pinta
+  // con textContent, nunca como HTML.
+  $paletteCommands = [];
+  foreach ($navGroups as $group) {
+      foreach ($group['items'] as $item) {
+          $paletteCommands[] = [
+              'id'    => 'nav-' . $item['page'],
+              'group' => $group['label'] !== '' ? $group['label'] : 'Ir a',
+              'label' => $item['label'],
+              'href'  => $item['href'],
+          ];
+      }
+  }
+  foreach ($spaceOptions as $opt) {
+      $paletteCommands[] = [
+          'id'       => 'space-' . $opt['id'],
+          'group'    => 'Espacio',
+          'label'    => $opt['label'],
+          'href'     => space_home($opt['id']),
+          'keywords' => 'cambiar espacio app',
+      ];
+  }
+  $paletteCommands[] = ['id' => 'site', 'group' => 'Acciones', 'label' => 'Ver web', 'href' => 'https://eduolihez.com/', 'external' => true];
+  $paletteCommands[] = ['id' => 'theme-light', 'group' => 'Acciones', 'label' => 'Tema claro', 'action' => 'theme-light', 'keywords' => 'claro light'];
+  $paletteCommands[] = ['id' => 'theme-dark', 'group' => 'Acciones', 'label' => 'Tema oscuro', 'action' => 'theme-dark', 'keywords' => 'oscuro dark noche'];
+  $paletteCommands[] = ['id' => 'theme-system', 'group' => 'Acciones', 'label' => 'Tema del sistema', 'action' => 'theme-system', 'keywords' => 'automatico system'];
+  $paletteJson = json_encode($paletteCommands, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+?>
+<div data-palette hidden class="palette-backdrop" role="dialog" aria-modal="true"
+     aria-label="Paleta de comandos" data-commands="<?= e((string) $paletteJson) ?>" data-empty="Sin resultados">
+  <div class="palette-panel">
+    <input data-palette-input type="text" role="combobox" aria-expanded="true"
+           aria-controls="palette-list" aria-autocomplete="list" autocomplete="off"
+           spellcheck="false" class="palette-input"
+           placeholder="Buscar sección o acción…" aria-label="Buscar sección o acción">
+    <ul id="palette-list" data-palette-list role="listbox" aria-label="Paleta de comandos" class="palette-list"></ul>
+    <p data-palette-empty hidden class="palette-empty" role="status"></p>
+    <p class="palette-footer" aria-hidden="true">↑↓ moverse · Enter abrir · Esc cerrar</p>
+  </div>
+</div>
 <div class="admin-layout">
   <div id="sidebar-overlay" class="sidebar-overlay"></div>
   
   <aside id="admin-sidebar" class="sidebar">
     <div class="sidebar-header">
       <div class="brand-block">
-        <a href="index.php?space=global" class="brand">&gt;_ <span>admin</span></a>
+        <a href="index.php?space=global" class="brand">EO <span>//</span> admin</a>
         <details class="app-switcher">
           <summary>
             <span class="app-switcher-current"><?= e($spaceLabel) ?></span>
@@ -213,7 +256,7 @@ function admin_header(string $title, string $active = ''): void
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
           Ver web
         </a>
-        <button type="button" id="theme-toggle" class="action-btn" aria-label="Cambiar tema" aria-pressed="false">
+        <button type="button" id="theme-toggle" data-theme-toggle class="action-btn" aria-label="Cambiar tema" aria-pressed="false">
           <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z" /></svg>
           <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path stroke-linecap="round" stroke-linejoin="round" d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4l1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></svg>
           Cambiar tema
@@ -238,7 +281,7 @@ function admin_header(string $title, string $active = ''): void
         <span class="topbar-title"><?= e($title) ?></span>
       </div>
       <div class="topbar-right">
-        <span class="user-greeting">Consola de Control</span>
+        <button type="button" data-palette-open class="topbar-kbd" aria-label="Abrir paleta de comandos" aria-keyshortcuts="Control+K Meta+K"><b aria-hidden="true">⌘</b><span aria-hidden="true">K</span></button>
       </div>
     </header>
     <main>
@@ -253,6 +296,7 @@ function admin_footer(): void
 </div>
 
 <script src="<?= e(asset_url('admin.js')) ?>"></script>
+<script src="<?= e(asset_url('palette.js')) ?>"></script>
 </body>
 </html>
 <?php

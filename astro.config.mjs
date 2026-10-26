@@ -43,14 +43,17 @@ export default defineConfig({
         // https://static.cloudflareinsights.com: beacon de Cloudflare Web
         // Analytics (envia sus datos por fetch/sendBeacon a ese mismo host).
         // Ver CLOUDFLARE.md, seccion "Web Analytics".
-        "connect-src 'self' https://formspree.io https://static.cloudflareinsights.com",
+        "connect-src 'self' https://formspree.io https://static.cloudflareinsights.com https://challenges.cloudflare.com",
+        // Turnstile (captcha del formulario) pinta su widget en un iframe.
+        "frame-src https://challenges.cloudflare.com",
         "form-action 'self' https://formspree.io",
         "base-uri 'self'",
         "object-src 'none'",
       ],
       scriptDirective: {
-        // Permite cargar el script del beacon de Cloudflare Web Analytics.
-        resources: ["'self'", 'https://static.cloudflareinsights.com'],
+        // Permite cargar el beacon de Cloudflare Web Analytics y el script de
+        // Turnstile (captcha del formulario, ver CLOUDFLARE.md seccion 4).
+        resources: ["'self'", 'https://static.cloudflareinsights.com', 'https://challenges.cloudflare.com'],
       },
       styleDirective: {
         // Tailwind/estilos: permitimos estilos en linea (no ejecutan codigo).

@@ -8,12 +8,15 @@ import type { Localized } from '../i18n/utils';
 
 export interface SkillGroup {
   category: Localized;
+  /** Nombre de icono de src/components/Icon.astro. */
+  icon: string;
   items: string[];
 }
 
 export const skillGroups: SkillGroup[] = [
   // Primero el foco profesional (mismo orden que las "Top skills" de LinkedIn).
   {
+    icon: 'cloud',
     category: {
       es: 'Cloud, Identidad & Correo',
       en: 'Cloud, Identity & Email',
@@ -28,6 +31,7 @@ export const skillGroups: SkillGroup[] = [
     ],
   },
   {
+    icon: 'shield',
     category: {
       es: 'Seguridad & Blue Team',
       en: 'Security & Blue Team',
@@ -47,6 +51,7 @@ export const skillGroups: SkillGroup[] = [
     ],
   },
   {
+    icon: 'code',
     category: {
       es: 'Lenguajes & Desarrollo',
       en: 'Languages & Development',
@@ -55,6 +60,7 @@ export const skillGroups: SkillGroup[] = [
     items: ['Python', 'JavaScript', 'TypeScript', 'Rust', 'SQL', 'Bash'],
   },
   {
+    icon: 'robot',
     category: {
       es: 'IA & Datos',
       en: 'AI & Data',
@@ -63,6 +69,7 @@ export const skillGroups: SkillGroup[] = [
     items: ['Machine Learning', 'Prompt Engineering', 'ONNX', 'Azure AI'],
   },
   {
+    icon: 'server',
     category: {
       es: 'Sistemas & Redes',
       en: 'Systems & Networking',
@@ -71,6 +78,7 @@ export const skillGroups: SkillGroup[] = [
     items: ['Active Directory', 'Windows Server', 'Linux', 'Redes', 'Firewalls'],
   },
   {
+    icon: 'globe',
     category: {
       es: 'Web & Herramientas',
       en: 'Web & Tooling',

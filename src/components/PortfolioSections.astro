@@ -5,6 +5,7 @@
  */
 import type { Lang } from '../i18n/ui';
 import Hero from './Hero.astro';
+import StackStrip from './StackStrip.astro';
 import Experience from './Experience.astro';
 import Skills from './Skills.astro';
 import Projects from './Projects.astro';
@@ -20,6 +21,7 @@ const { lang } = Astro.props;
 ---
 
 <Hero lang={lang} />
+<StackStrip />
 <Experience lang={lang} />
 <Skills lang={lang} />
 <Projects lang={lang} />

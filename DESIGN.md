@@ -1,6 +1,6 @@
 ---
 name: eduolihez.com
-description: Consola de guardia en penumbra — verde señal escaso sobre negro azulado, mono para metadatos, superficie plana por capas tonales.
+description: Rediseño v2 — papel y tinta con acento verde azulado (claro, oscuro o sistema), titulares en mono, cuadrícula de fondo, paleta de comandos Ctrl/Cmd+K. Web pública y /admin comparten tokens.
 colors:
   signal-green: "#4ade80"
   signal-green-hover: "#22c55e"
@@ -151,6 +151,79 @@ components:
 ---
 
 # Design System: eduolihez.com
+
+## Rediseño v2 (vigente)
+
+> **Esta sección prevalece.** El resto del documento describe la identidad anterior
+> ("La Consola de Guardia", solo oscura, verde `#4ade80`) y se conserva como historia y
+> como referencia de las reglas que siguen vigentes (estados, un solo rojo, mono como
+> metadato, accesibilidad). Donde haya conflicto, manda lo de aquí.
+
+**Inspiración:** edouardgouilliard.com (papel y tinta, mono en titulares, cuadrícula
+tenue, ⌘K, línea de estado). Se adapta, no se copia: el hero es un diagrama del flujo de
+triaje de un SOC, no una topología del homelab, y **no hay datos en vivo inventados**.
+
+### Tema: sistema por defecto, alternable
+
+- Sin elección guardada, el sitio sigue a `prefers-color-scheme`.
+- El botón (y la paleta) guardan `light`/`dark` en `localStorage['theme']`; "Tema del
+  sistema" lo borra. `public/theme-init.js` lo aplica antes del primer pintado (script
+  externo, compatible con la CSP). Lógica y tests en `src/scripts/theme.ts`.
+- Resolución: `<html data-theme>` explícito → si no, media query. Los valores viven en
+  `src/styles/tokens.css` (web) y en `server/admin/assets/admin.css` (admin); **mismos
+  valores** en ambos.
+
+### Paleta (todos los pares de texto ≥ 4.5:1, comprobado)
+
+| Token | Claro | Oscuro |
+|---|---|---|
+| `bg` / `bg-soft` / `bg-card` | `#f5f6f3` / `#eceee9` / `#ffffff` | `#0a0e14` / `#0f141c` / `#141a24` |
+| `bg-border` | `#e0e3de` | `#1f2733` |
+| `text` / `text-title` | `#131820` / `#0a0e14` | `#e6edf3` / `#f0f3f6` |
+| `text-muted` / `text-faint` | `#49535f` / `#5b6674` | `#9aa7b8` / `#8e99ad` |
+| `accent` / hover / soft | `#047266` / `#035c52` / `#dcf1ed` | `#2dd4bf` / `#5eead4` / `#0e3a35` |
+| `danger` · `warn` | `#b3261e` · `#8f5608` | `#f87171` · `#f59e0b` |
+| `oss` · `wip` · `closed` | `#0d7a54` · `#8f5608` · `#1b5cc0` | `#10b981` · `#f59e0b` · `#60a5fa` |
+
+El acento de texto en claro es más oscuro que el verde azulado decorativo de la
+referencia (`#0aa593`, ~2.9:1 sobre papel): no llegaba a AA. El significado no cambia:
+el acento sigue siendo "vivo, disponible, accionable"; un fallo usa `danger`, nunca el acento.
+
+### Tipografía
+
+- **Titulares h1/h2 y marca en JetBrains Mono** (700, tracking ceñido). Cuerpo y tarjetas
+  en Inter. El cuerpo de los artículos del blog (`.prose`) sigue en Inter.
+- **Línea de apertura del hero en serif cursiva** (`--font-serif`, pila del sistema, sin
+  descarga) con la parte final en acento. Límite: dos familias web (Inter y JetBrains Mono).
+
+### Elementos nuevos
+
+- **Cuadrícula de fondo** (`.hero-grid`) con máscara radial y resplandor del acento.
+- **Paleta de comandos** Ctrl/Cmd+K (`Palette.astro`, `palette.ts`): patrón combobox +
+  listbox, filtrado sin acentos, foco devuelto al cerrar. En el admin se reutiliza el mismo
+  módulo, empaquetado a `server/admin/assets/palette.js` con `npm run admin:palette`
+  (también se ejecuta en `npm run build`).
+- **Franja de stack** (`StackStrip`): tecnologías reales de `src/data/skills.ts`. El HTML
+  lleva una copia; la segunda la clona `marquee.ts`.
+- **Marca:** `EO // security` en la web y `EO // admin` en el panel.
+- **Flujo de triaje** (tarjeta del hero): lista vertical de cuatro etapas (Logs → XDR →
+  Triaje → Respuesta) con icono, subtítulo real de tu experiencia y un pulso de señal
+  (`.flow-pulse`, solo `transform`) que baja por la línea. Es un diagrama del proceso:
+  nada de él pretende ser un dato en vivo.
+- **Iconos** (`Icon.astro`): los de trazo (`sun`, `moon`, `terminal`, `arrowRight`,
+  `cloud`, `server`, `globe`, `logs`, `user`) comparten el envoltorio `stroke()`; el
+  resto son rellenos. Las categorías de habilidades llevan icono (`icon` en `skills.ts`).
+- **Footer compacto:** marca + contacto a la izquierda, proyectos publicados a la derecha
+  (enlaces estáticos: sostienen el rastreo de `/projects/` y `/apps/`) y una barra final con
+  copyright, "Sobre esta web", ⌘K y volver arriba. Se eliminó la columna de navegación
+  (duplicaba cabecera y paleta), los badges repetidos y el texto "Diseñado por…".
+
+### Reglas que se mantienen
+
+Mono solo para metadato y titulares (no prosa), un único rojo, el verde/acento no significa
+fallo, respeto de `prefers-reduced-motion`, WCAG AA y sin CDN de fuentes.
+
+---
 
 ## Overview
 

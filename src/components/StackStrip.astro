@@ -1,0 +1,45 @@
+---
+/**
+ * <StackStrip /> - Franja con las tecnologias reales de tu perfil (salen de
+ * src/data/skills.ts, no de una lista aparte). Se desplaza despacio; se para al
+ * pasar el raton y con prefers-reduced-motion.
+ *
+ * El HTML lleva UNA sola copia de la lista (lo que leen buscadores y lectores
+ * de pantalla). La segunda, necesaria para que el bucle sea continuo, la
+ * clona el script de abajo, asi no hay contenido duplicado en el marcado.
+ */
+import { skillGroups } from '../data/skills';
+
+const MAX_ITEMS = 16;
+const MAX_LABEL_LENGTH = 26;
+
+const items = skillGroups
+  .flatMap((group) => group.items)
+  .filter((item) => item.length <= MAX_LABEL_LENGTH)
+  .slice(0, MAX_ITEMS);
+---
+
+<div class="no-print border-y border-bg-border bg-bg-card/60">
+  <div class="container-page flex items-center gap-5 overflow-hidden py-3.5">
+    <span class="shrink-0 font-mono text-[11px] uppercase tracking-[0.18em] text-text-faint">stack</span>
+    <div class="marquee min-w-0 flex-1 overflow-hidden">
+      <ul class="marquee-track font-mono text-xs text-text-muted" data-marquee>
+        {
+          items.map((item) => (
+            <li class="flex shrink-0 items-center gap-2 pr-7">
+              <span class="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden="true" />
+              {item}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { cloneMarquee } from '../scripts/marquee';
+
+  cloneMarquee();
+  document.addEventListener('astro:page-load', cloneMarquee);
+</script>

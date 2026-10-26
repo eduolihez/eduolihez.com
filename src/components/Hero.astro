@@ -1,8 +1,11 @@
 ---
 /**
- * <Hero /> - Perfil. Minimalista: sin adornos pesados, foco en el mensaje.
- * El badge "Disponible" se oculta solo si en el panel pones open_to_work=0
- * (lo comprueba availability.ts via /api/settings.php, sin recompilar).
+ * <Hero /> - Perfil. Cuadricula de fondo, titular en mono con una linea
+ * serif cursiva, bloque tipo terminal y, a la derecha, una tarjeta con la
+ * foto y el flujo de triaje (diagrama, no datos en vivo).
+ *
+ * "Disponible" se oculta solo si en el panel pones open_to_work=0 (lo
+ * comprueba el script de abajo via /api/settings.php, sin recompilar).
  */
 import { useTranslations } from '../i18n/utils';
 import type { Lang } from '../i18n/ui';
@@ -18,39 +21,51 @@ const cvHref = SITE.cv[lang] ?? SITE.cv.es;
 // Misma URL (con lang) que Announcement y Contact: getSettings() comparte una
 // sola peticion por URL, y con URLs distintas volverian a ser dos.
 const settingsUrl = api(`/api/settings.php?lang=${lang}`);
+
+// Etapas del flujo de triaje. Los textos salen de tu experiencia real (ver
+// src/data/experience.ts); es un diagrama del proceso, no datos en vivo.
+const flow = [
+  { icon: 'logs', title: t('hero.flow.logs'), sub: t('hero.flow.logs.sub') },
+  { icon: 'shield', title: t('hero.flow.xdr'), sub: t('hero.flow.xdr.sub') },
+  { icon: 'search', title: t('hero.flow.triage'), sub: t('hero.flow.triage.sub') },
+  { icon: 'bolt', title: t('hero.flow.response'), sub: t('hero.flow.response.sub') },
+];
 ---
 
-<section id="perfil" class="relative overflow-hidden">
+<section id="perfil" class="relative overflow-hidden" data-settings={settingsUrl}>
+  <div class="hero-grid pointer-events-none absolute inset-0" aria-hidden="true"></div>
   <div class="hero-fade pointer-events-none absolute inset-0" aria-hidden="true"></div>
 
   <div
-    class="container-page relative grid gap-10 py-20 pt-28 sm:pt-32 lg:grid-cols-[1fr_auto] lg:items-center lg:gap-14"
+    class="container-page relative grid gap-12 pb-16 pt-28 sm:pt-32 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] lg:items-center lg:gap-14"
   >
-    <div class="max-w-2xl">
-      <h1 class="text-3xl font-semibold tracking-tight text-text sm:text-5xl">
+    <div>
+      <p class="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs uppercase tracking-[0.18em] text-text-muted">
+        <span id="hero-status" class="inline-flex items-center gap-2 text-accent">
+          <span class="h-2 w-2 animate-pulse-dot rounded-full bg-accent" aria-hidden="true"></span>
+          {t('hero.status')}
+        </span>
+      </p>
+
+      <h1
+        class="mt-5 font-mono text-[clamp(2rem,4.6vw,3.25rem)] font-bold leading-[1.05] tracking-tight text-text-title"
+      >
         {SITE.name}
       </h1>
 
-      <p class="mt-4 font-mono text-sm text-accent sm:text-base">{t('hero.role')}</p>
+      <p class="mt-5 font-serif text-2xl italic leading-snug text-text sm:text-3xl">
+        {t('hero.lead')} <span class="text-accent">{t('hero.lead.em')}</span>
+      </p>
 
-      <p class="mt-5 max-w-xl text-base leading-relaxed text-text-muted">
+      <p class="mt-5 font-mono text-sm leading-relaxed text-accent">{t('hero.role')}</p>
+
+      <p class="mt-4 max-w-xl text-base leading-relaxed text-text-muted">
         {t('hero.tagline')}
       </p>
 
-      <div class="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-text-faint">
-        <span class="inline-flex items-center gap-2">
-          <Icon name="location" class="h-4 w-4 text-text-faint" />
-          {t('hero.location')}
-        </span>
-        <span class="inline-flex items-center gap-2">
-          <Icon name="languages" class="h-4 w-4 text-text-faint" />
-          {t('hero.languages')}
-        </span>
-      </div>
-
       <div class="mt-8 flex flex-wrap gap-3">
         <a href="#contacto" class="btn-primary">{t('hero.cta.contact')}</a>
-        <button id="cv-download-btn" class="btn-ghost">
+        <button id="cv-download-btn" type="button" class="btn-ghost">
           <Icon name="download" class="h-4 w-4" />
           {t('hero.cta.cv')}
         </button>
@@ -63,44 +78,80 @@ const settingsUrl = api(`/api/settings.php?lang=${lang}`);
           <Icon name="linkedin" class="h-4 w-4" />
           {t('hero.cta.linkedin')}
         </a>
+        <button type="button" data-palette-open class="btn-ghost hidden font-mono sm:inline-flex">
+          <span class="text-accent" aria-hidden="true">⌘K</span>
+          {t('hero.cta.palette')}
+        </button>
+      </div>
+
+      <!-- Bloque tipo terminal: texto estatico y verificable, sin metricas inventadas. -->
+      <div class="mt-9 space-y-1 font-mono text-xs leading-relaxed text-text-muted">
+        <p><span class="text-accent" aria-hidden="true">$</span> whoami</p>
+        <p><span class="text-accent" aria-hidden="true">→</span> {SITE.jobTitle}</p>
+        <p><span class="text-accent" aria-hidden="true">$</span> stack</p>
+        <p><span class="text-accent" aria-hidden="true">→</span> Trend Micro Vision One · Fortinet · Python · IAM</p>
+        <p><span class="text-accent" aria-hidden="true">$</span> pwd</p>
+        <p><span class="text-accent" aria-hidden="true">→</span> {t('hero.location')} · {t('hero.languages')}</p>
       </div>
     </div>
 
-    <!-- Foto con Frame de Disponibilidad -->
-    <div class="order-first lg:order-last">
+    <!-- Tarjeta: foto + diagrama del flujo de triaje -->
+    <div class="relative">
       <div
-        id="avatar-container"
-        data-settings={settingsUrl}
-        class="relative mx-auto w-40 sm:w-48 lg:w-56"
+        class="rounded-2xl border border-bg-border bg-bg-card p-5"
+        style="box-shadow: var(--shadow-card)"
       >
-        <!-- Glowing outline frame -->
-        <div
-          id="avatar-glow-ring"
-          class="absolute -inset-1 rounded-xl bg-accent opacity-20 blur-xs transition-opacity duration-300 hidden"
-        ></div>
-        <div
-          id="avatar-pulse-ring"
-          class="absolute -inset-1.5 rounded-[14px] border-2 border-accent/40 animate-pulse-dot transition-all duration-300 hidden"
-        ></div>
-        
-        <img
-          id="avatar-img"
-          src={SITE.avatar}
-          alt={`Foto de ${SITE.name}`}
-          width="224"
-          height="224"
-          loading="eager"
-          fetchpriority="high"
-          decoding="async"
-          class="relative aspect-square w-full rounded-xl border border-bg-border object-cover transition-all duration-300 animate-fade-up"
-        />
+        <div class="flex items-center gap-4">
+          <img
+            id="avatar-img"
+            src={SITE.avatar}
+            alt={`${t('hero.photoAlt')} ${SITE.name}`}
+            width="64"
+            height="64"
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+            class="h-16 w-16 rounded-xl border border-bg-border object-cover"
+          />
+          <div class="min-w-0">
+            <p class="truncate font-semibold text-text-title">{SITE.shortName}</p>
+            <p class="font-mono text-xs text-text-faint">SOC · Cloud Security · IAM</p>
+          </div>
+        </div>
 
-        <!-- Overlapping status badge -->
-        <div
-          id="avatar-badge"
-          class="absolute -bottom-2.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-accent px-3 py-1 font-mono text-[10px] font-semibold uppercase tracking-wider text-bg shadow-[0_0_15px_rgba(74,222,128,0.4)] hidden transition-all duration-300"
-        >
-          {t('hero.status')}
+        <p class="mt-6 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-text-faint">
+          <span class="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden="true"></span>
+          {t('hero.flow.label')}
+        </p>
+
+        <div class="relative mt-4">
+          <!-- Linea que une las etapas y pulso de señal que la recorre -->
+          <span class="absolute bottom-5 left-[17px] top-5 w-0.5 overflow-hidden rounded-full bg-bg-border" aria-hidden="true">
+            <span class="flow-pulse block h-full w-full bg-gradient-to-b from-transparent via-accent to-transparent"></span>
+          </span>
+          <ol class="relative space-y-5" aria-label={t('hero.flow.label')}>
+          {
+            flow.map((step, i) => (
+              <li class="relative flex items-center gap-3.5">
+                <span
+                  class={`grid h-9 w-9 shrink-0 place-items-center rounded-lg border ${
+                    i === flow.length - 1
+                      ? 'border-accent/50 bg-accent-soft text-accent'
+                      : 'border-bg-border bg-bg-card text-text-muted'
+                  }`}
+                >
+                  <Icon name={step.icon} class="h-[18px] w-[18px]" />
+                </span>
+                <span class="min-w-0">
+                  <span class="block font-mono text-[13px] font-semibold leading-tight text-text-title">
+                    <span class="text-text-faint" aria-hidden="true">0{i + 1}</span> {step.title}
+                  </span>
+                  <span class="mt-0.5 block text-xs leading-snug text-text-muted">{step.sub}</span>
+                </span>
+              </li>
+            ))
+          }
+          </ol>
         </div>
       </div>
     </div>
@@ -114,7 +165,7 @@ const settingsUrl = api(`/api/settings.php?lang=${lang}`);
           <path fill="currentColor" d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12Z"></path>
         </svg>
       </button>
-      
+
       <div class="flex flex-col items-center text-center mt-4 font-mono">
         <span class="relative flex h-12 w-12 items-center justify-center rounded-full bg-accent/10 text-accent mb-4 border border-accent/20">
           <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent/5 opacity-75"></span>
@@ -123,13 +174,13 @@ const settingsUrl = api(`/api/settings.php?lang=${lang}`);
             <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z"/>
           </svg>
         </span>
-        
+
         <h2 class="text-lg font-bold text-text uppercase tracking-wider" id="cv-modal-title">{t('cv.modal.title')}</h2>
-        
+
         <p class="mt-4 text-sm text-text-muted leading-relaxed" id="cv-modal-body">
           {t('cv.modal.body')}
         </p>
-        
+
         <div class="mt-6 rounded-sm border border-bg-border bg-bg-soft/50 p-3 text-xs text-text-faint w-full">
           <span>Status: OPTIMIZING_CV // Severity: INFO</span>
         </div>
@@ -155,48 +206,20 @@ const settingsUrl = api(`/api/settings.php?lang=${lang}`);
 <script>
   import { getSettings } from '../scripts/shared';
 
-  // Controla el frame de disponibilidad del avatar en función de open_to_work (desde panel)
+  // Oculta "Disponible" si en el panel open_to_work=0. Si la API falla se
+  // deja visible (mismo comportamiento que antes: disponible por defecto).
   function initAvailability() {
-    const container = document.getElementById('avatar-container');
-    if (!container) return;
-    const url = container.getAttribute('data-settings');
-    if (!url) return;
-
-    const glow = document.getElementById('avatar-glow-ring');
-    const pulse = document.getElementById('avatar-pulse-ring');
-    const badge = document.getElementById('avatar-badge');
-    const img = document.getElementById('avatar-img');
+    const section = document.getElementById('perfil');
+    const status = document.getElementById('hero-status');
+    const url = section?.getAttribute('data-settings');
+    if (!status || !url) return;
 
     getSettings(url)
       .then((data) => {
-        if (data && String((data as { open_to_work?: unknown }).open_to_work) === '0') {
-          if (glow) glow.classList.add('hidden');
-          if (pulse) pulse.classList.add('hidden');
-          if (badge) badge.classList.add('hidden');
-          if (img) {
-            img.classList.remove('border-accent/40');
-            img.classList.add('border-bg-border');
-          }
-        } else {
-          if (glow) glow.classList.remove('hidden');
-          if (pulse) pulse.classList.remove('hidden');
-          if (badge) badge.classList.remove('hidden');
-          if (img) {
-            img.classList.remove('border-bg-border');
-            img.classList.add('border-accent/40');
-          }
-        }
+        const closed = data && String((data as { open_to_work?: unknown }).open_to_work) === '0';
+        status.classList.toggle('hidden', Boolean(closed));
       })
-      .catch(() => {
-        // Fallback: mostrar disponible por defecto
-        if (glow) glow.classList.remove('hidden');
-        if (pulse) pulse.classList.remove('hidden');
-        if (badge) badge.classList.remove('hidden');
-        if (img) {
-          img.classList.remove('border-bg-border');
-          img.classList.add('border-accent/40');
-        }
-      });
+      .catch(() => status.classList.remove('hidden'));
   }
 
   // Lógica del modal de CV en actualización

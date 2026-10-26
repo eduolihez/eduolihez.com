@@ -20,6 +20,7 @@ import monoWoff2 from '@fontsource-variable/jetbrains-mono/files/jetbrains-mono-
 import Seo from '../components/Seo.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import Palette from '../components/Palette.astro';
 import Announcement from '../components/Announcement.astro';
 import type { Lang } from '../i18n/ui';
 import { useTranslations } from '../i18n/utils';
@@ -35,7 +36,7 @@ interface Props {
   /** Marcar la pagina como no indexable (paginas de error, utilidades). */
   noindex?: boolean;
   /** Equivalente de esta pagina en cada idioma (hreflang). Ver <Seo />. */
-  alternates?: Record<Lang, string>;
+  alternates?: Partial<Record<Lang, string>>;
   /** Migas de pan intermedias (sin raiz ni pagina actual). Ver <Seo />. */
   breadcrumbs?: { name: string; path: string }[];
   /** Nombre corto de esta pagina para la ultima miga. Ver <Seo />. */
@@ -73,11 +74,17 @@ const t = useTranslations(lang);
 ---
 
 <!doctype html>
-<html lang={lang} class="dark scroll-smooth">
+<html lang={lang} class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#0a0e14" />
+    <meta name="theme-color" content="#f5f6f3" />
+    <meta name="color-scheme" content="light dark" />
+
+    {/* Fija el tema elegido antes del primer pintado. Externo y sincrono: la CSP
+        solo admite scripts de este origen. Sin eleccion guardada no hace nada y
+        el CSS sigue al sistema. */}
+    <script is:inline src="/theme-init.js"></script>
 
     {/* crossorigin es obligatorio en la precarga de fuentes, incluso siendo
         del mismo origen: sin el, el navegador descarga el archivo dos veces. */}
@@ -138,6 +145,13 @@ const t = useTranslations(lang);
     </main>
 
     <Footer lang={lang} />
+
+    {/* Fuera de <Header>: su backdrop-filter crearia un bloque contenedor y la
+        paleta (position: fixed) quedaria atrapada dentro de la cabecera. */}
+    <Palette lang={lang} />
+
+    <!-- Tema claro/oscuro/sistema -->
+    <script src="../scripts/theme-boot.ts"></script>
 
     <!-- Reveal on scroll (aparicion suave de secciones) -->
     <script src="../scripts/reveal.ts"></script>

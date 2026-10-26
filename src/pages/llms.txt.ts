@@ -20,6 +20,8 @@ import { SITE } from '../config';
 import { experiences } from '../data/experience';
 import { skillGroups } from '../data/skills';
 import { faqItems } from '../data/faq';
+import { softwareEntries } from '../data/software';
+import { resolveUrl } from '../lib/softwareSchema';
 
 export const prerender = true;
 
@@ -47,6 +49,13 @@ export const GET: APIRoute = () => {
     .map((item) => `### ${item.question.es}\n${item.answer.es}`)
     .join('\n\n');
 
+  // Indice de enlaces en el formato de llmstxt.org ("- [Titulo](URL): texto").
+  // Va antes que la prosa para que un modelo con poco contexto encuentre
+  // primero a donde ir.
+  const softwareIndex = softwareEntries
+    .map((e) => `- [${e.name}](${resolveUrl(e, SITE.domain)}): ${e.description.es}`)
+    .join('\n');
+
   const languagesBlock = SITE.languages
     .map((l) => `${l.name} (${l.level})`)
     .join(', ');
@@ -61,6 +70,23 @@ export const GET: APIRoute = () => {
 Este archivo resume, en texto plano y sin marcado, la informacion publica de
 ${SITE.domain}. Esta pensado para que los modelos de lenguaje y los asistentes de
 busqueda puedan responder con precision sobre este perfil profesional.
+
+## Indice
+
+Paginas principales:
+
+- [Portada (Espanol)](${SITE.domain}/): perfil profesional, experiencia, habilidades, certificaciones y contacto.
+- [English](${SITE.domain}/en/): profile summary in English.
+- [Catala](${SITE.domain}/ca/): resum del perfil en catala.
+- [Sobre esta web](${SITE.domain}/sobre-esta-web/): decisiones tecnicas y de seguridad de este sitio.
+- [Proyectos](${SITE.domain}/projects/): indice de los proyectos publicados.
+- [Blog](${SITE.domain}/blog/): notas tecnicas de ciberseguridad.
+- [Blog en texto plano](${SITE.domain}/llms-blog.txt): texto integro de los articulos.
+- [Mapa del sitio](${SITE.domain}/sitemap.xml): todas las URLs indexables.
+
+Software publicado:
+
+${softwareIndex}
 
 ## Summary in English
 

@@ -124,6 +124,16 @@ const translatedGroups: { paths: Record<'es' | 'en' | 'ca', string>; lastmod: st
 ];
 
 /**
+ * Indice del blog: existe en espanol y en catalan (en ingles /en/blog/ sigue
+ * redirigiendo a la home, asi que no se declara). Los articulos de ambos
+ * idiomas se listan en sitemap-posts.xml.
+ */
+const blogIndexGroup = {
+  paths: { es: '/blog/', ca: '/ca/blog/' },
+  lastmod: gitLastMod(['src/pages/blog/index.astro', 'src/pages/ca/blog/index.astro', 'src/scripts/blog.ts']),
+};
+
+/**
  * Paginas de un solo idioma: proyectos (HTML estatico bajo public/projects/)
  * y el indice del blog (ES, ver comentario de cabecera).
  *
@@ -134,10 +144,6 @@ const translatedGroups: { paths: Record<'es' | 'en' | 'ca', string>; lastmod: st
  * desde el .htaccess.
  */
 const singleLangPages: { path: string; lastmod: string }[] = [
-  {
-    path: '/blog/',
-    lastmod: gitLastMod(['src/pages/blog/index.astro', 'src/scripts/blog.ts']),
-  },
   {
     path: '/projects/',
     lastmod: gitLastMod(['src/pages/projects/index.astro']),
@@ -195,13 +201,22 @@ export const GET: APIRoute = () => {
     return (['es', 'en'] as const).map((l) => entry(url(group.paths[l]), group.lastmod, alternates));
   });
 
+  // --- 2b. Indice del blog (ES + CA, sin EN) ------------------------------
+  const blogAlternates = (['es', 'ca'] as const)
+    .map((l) => `    <xhtml:link rel="alternate" hreflang="${l}" href="${url(blogIndexGroup.paths[l])}"/>`)
+    .concat(`    <xhtml:link rel="alternate" hreflang="x-default" href="${url(blogIndexGroup.paths.es)}"/>`)
+    .join('\n');
+  const blogIndex = (['es', 'ca'] as const).map((l) =>
+    entry(url(blogIndexGroup.paths[l]), blogIndexGroup.lastmod, blogAlternates)
+  );
+
   // --- 3. Paginas de un solo idioma -------------------------------------------
   const singleLang = singleLangPages.map((p) => entry(url(p.path), p.lastmod));
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
-${[...translated, ...appPages, ...singleLang].join('\n')}
+${[...translated, ...appPages, ...blogIndex, ...singleLang].join('\n')}
 </urlset>
 `;
 

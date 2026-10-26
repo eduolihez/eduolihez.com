@@ -88,4 +88,20 @@ describe('GET /llms.txt', () => {
     expect(body).toContain('https://eduolihez.github.io/');
     expect(body).not.toContain(`${SITE.domain}/projects/blue-team-hub`);
   });
+
+  it('abre con un indice de enlaces en el formato de llmstxt.org', async () => {
+    const response = GET({} as APIContext);
+    const body = await response.text();
+
+    // Debe aparecer antes que las secciones largas de prosa.
+    const index = body.indexOf('## Indice');
+    expect(index).toBeGreaterThan(-1);
+    expect(index).toBeLessThan(body.indexOf('## Identidad'));
+
+    // Formato "- [Titulo](URL): descripcion" para las portadas y los proyectos.
+    expect(body).toContain(`- [English](${SITE.domain}/en/):`);
+    expect(body).toContain(`- [Catala](${SITE.domain}/ca/):`);
+    expect(body).toMatch(/- \[Blue Team Hub\]\(https:\/\/eduolihez\.github\.io\/\): .+/);
+    expect(body).toMatch(/- \[NoWait\]\(https:\/\/eduolihez\.com\/apps\/nowait\/\): .+/);
+  });
 });

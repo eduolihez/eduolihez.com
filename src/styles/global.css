@@ -16,68 +16,60 @@
    PromptMaster, que tiene su propia hoja compilada aparte (npm run
    css:promptmaster) y meteria clases ajenas en el CSS del sitio. */
 @import 'tailwindcss' source(none);
+@import './tokens.css';
 @source '../**/*.{astro,html,js,jsx,ts,tsx,md,mdx}';
 
-/* El sitio es oscuro por defecto (clase "dark" en <html>). Equivale al
-   `darkMode: 'class'` de la configuracion antigua. */
-@custom-variant dark (&:where(.dark, .dark *));
+/* Variante `dark:` ligada al tema efectivo: data-theme=dark explicito, o sistema
+   oscuro sin eleccion. (Hoy ningun componente la usa; los colores salen de
+   variables, asi que cambian solos.) */
+@custom-variant dark {
+  &:where([data-theme='dark'], [data-theme='dark'] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme='light']), :root:not([data-theme='light']) *) {
+      @slot;
+    }
+  }
+}
+
+/* Colores: utilidades (bg-bg, text-accent...) que apuntan a las variables de
+   tokens.css. `inline` evita copiar el valor y mantiene el cambio de tema. */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-soft: var(--bg-soft);
+  --color-bg-card: var(--bg-card);
+  --color-bg-border: var(--bg-border);
+  --color-bg-border-hover: var(--bg-border-hover);
+  --color-text: var(--text);
+  --color-text-title: var(--text-title);
+  --color-text-muted: var(--text-muted);
+  --color-text-faint: var(--text-faint);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
+  --color-on-accent: var(--on-accent);
+  --color-accent-cyan: var(--cyan);
+  --color-cyan: var(--cyan);
+  --color-violet: var(--violet);
+  --color-danger: var(--danger);
+  --color-warn: var(--warn);
+  --color-oss: var(--oss);
+  --color-wip: var(--wip);
+  --color-closed: var(--closed);
+}
 
 @theme {
-  /* --- Paleta ---------------------------------------------------------
-     Oscura y minimalista, orientada a ciberseguridad: acento verde/cian
-     "terminal" sobre fondo casi negro. */
-  --color-bg: #0a0e14; /* fondo principal */
-  --color-bg-soft: #0f141c; /* fondo de secciones alternas */
-  --color-bg-card: #141a24; /* tarjetas */
-  --color-bg-border: #1f2733; /* bordes sutiles */
-  --color-bg-border-hover: #2b3543; /* borde al pasar el raton por una tarjeta */
-
-  --color-accent: #4ade80; /* verde principal (CTA, enlaces) */
-  --color-accent-hover: #22c55e;
-  --color-accent-soft: #134e2a; /* fondo tenue para badges */
-  --color-accent-cyan: #22d3ee; /* acento secundario */
-
-  /* --- Estado ----------------------------------------------------------
-     El verde significa "vivo, disponible, accionable" (ver DESIGN.md, la
-     regla de la senal escasa), asi que NO puede significar tambien "ha
-     fallado". Antes cada pagina de error y cada formulario improvisaba su
-     propio rojo -- red-300, red-400, red-500, red-600, rose-900 -- cinco
-     valores para un unico significado. Estos dos son los unicos. */
-  --color-danger: #f87171; /* fallo, alerta, destructivo */
-  --color-warn: #f59e0b; /* aviso; tambien el badge "En Desarrollo" */
-
-  /* --- Estado de proyecto ----------------------------------------------
-     DESIGN.md ya documentaba estos tres, pero el codigo los escribia como
-     literales de Tailwind (bg-emerald-500, text-blue-400...). Coincidian
-     hoy; si el token cambiaba, la interfaz no. Ahora son tokens de verdad. */
-  --color-oss: #10b981; /* Open Source */
-  --color-wip: #f59e0b; /* En Desarrollo */
-  --color-closed: #60a5fa; /* Codigo Privado */
-
-  /* Acentos sueltos para diferenciar bloques en "Sobre esta web".
-     Tailwind trae las escalas `cyan-500`/`violet-500`, pero no un valor sin
-     numero: `text-cyan` y `text-violet` no existirian sin estas dos lineas. */
-  --color-cyan: #22d3ee;
-  --color-violet: #a78bfa;
-
-  --color-text: #e6edf3; /* texto principal */
-  --color-text-title: #f0f3f6; /* titulares (un punto por encima del cuerpo) */
-  --color-text-muted: #9aa7b8; /* texto secundario */
-  /* Texto terciario / metadatos.
-     Era #6b7688 y no llegaba al minimo de WCAG AA (4.21 sobre el fondo
-     principal, 3.80 sobre las tarjetas). Se subio a #78849a, calculado para
-     pasar por poco sobre bg-card en teoria -- pero Lighthouse midio 3.34:1
-     de verdad sobre el texto del pie (probablemente por el fondo
-     semitransparente de algunos bloques, bg-card/40 entre otros, que rebaja
-     el contraste real por debajo del calculo contra un fondo solido).
-     #8e99ad da margen de sobra incluso si el fondo efectivo es mas claro de
-     lo esperado (6.1 sobre bg-card solido, ~6.7 sobre el fondo principal) y
-     sigue claramente por debajo de --color-text-muted. */
-  --color-text-faint: #8e99ad;
+  /* El verde ya no es "el" color de la marca: el acento es verde azulado y su
+     significado sigue siendo "vivo, disponible, accionable". Los fallos usan
+     --color-danger, nunca el acento. */
 
   /* --- Tipografia ----------------------------------------------------- */
   --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  /* Solo para el acento cursivo de titulares: pila del sistema, sin descarga
+     (el limite es dos familias web: Inter y JetBrains Mono). */
+  --font-serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, 'Times New Roman', serif;
 
   /* Ancho maximo del contenido (~1152px) -> clase `max-w-content`. */
   --container-content: 72rem;
@@ -163,6 +155,17 @@
     -webkit-text-size-adjust: 100%;
   }
 
+  /* Titulares en mono: identidad de la web (cuerpo y tarjetas siguen en Inter). */
+  h1,
+  h2 {
+    font-family: var(--font-mono);
+  }
+  /* El cuerpo de un articulo se lee mejor en sans. */
+  .prose h2,
+  .prose h3 {
+    font-family: var(--font-sans);
+  }
+
   body {
     @apply bg-bg text-text font-sans antialiased;
     text-rendering: optimizeLegibility;
@@ -209,7 +212,7 @@
   }
 
   ::selection {
-    background: rgb(74 222 128 / 0.22);
+    background: var(--selection);
     color: var(--color-text);
   }
 }
@@ -225,7 +228,7 @@
     @apply mb-3 font-mono text-xs font-medium uppercase tracking-[0.2em] text-accent;
   }
   .section-title {
-    @apply text-2xl font-semibold tracking-tight text-text sm:text-3xl;
+    @apply font-mono text-2xl font-bold tracking-tight text-text-title sm:text-3xl;
   }
   .section-subtitle {
     @apply mt-3 max-w-2xl text-[15px] leading-relaxed text-text-muted;
@@ -234,7 +237,7 @@
   /* Boton primario. */
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2 rounded-md bg-accent px-4 py-2.5
-           text-sm font-medium text-bg transition-colors hover:bg-accent-hover
+           text-sm font-medium text-on-accent transition-colors hover:bg-accent-hover
            focus-visible:ring-2 focus-visible:ring-accent;
   }
 
@@ -324,6 +327,135 @@
   }
 }
 
+/* Franja de stack: dos copias de la lista en una pista que se desplaza media
+   anchura (el bucle es continuo). Se detiene al pasar el raton. */
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 48s linear infinite;
+}
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Icono del interruptor de tema: muestra la accion (en claro, la luna). */
+.theme-icon-sun {
+  display: none;
+}
+:root[data-theme='dark'] .theme-icon-sun {
+  display: block;
+}
+:root[data-theme='dark'] .theme-icon-moon {
+  display: none;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .theme-icon-sun {
+    display: block;
+  }
+  :root:not([data-theme='light']) .theme-icon-moon {
+    display: none;
+  }
+}
+
+/* --- Paleta de comandos (Ctrl/Cmd+K) --------------------------------------- */
+.palette-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 110;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 12vh 1rem 1rem;
+  background: var(--scrim);
+  backdrop-filter: blur(4px);
+}
+.palette-backdrop[hidden] {
+  display: none;
+}
+.palette-panel {
+  width: 100%;
+  max-width: 36rem;
+  overflow: hidden;
+  border: 1px solid var(--color-bg-border);
+  border-radius: 0.75rem;
+  background: var(--color-bg-card);
+  box-shadow: var(--shadow-card);
+}
+.palette-input {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid var(--color-bg-border);
+  background: transparent;
+  padding: 0.9rem 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  color: var(--color-text);
+}
+.palette-input::placeholder {
+  color: var(--color-text-faint);
+}
+.palette-input:focus-visible {
+  outline: none;
+  box-shadow: inset 0 -2px 0 var(--color-accent);
+}
+.palette-list {
+  max-height: min(24rem, 55vh);
+  overflow-y: auto;
+  padding: 0.35rem;
+}
+.palette-group {
+  padding: 0.6rem 0.65rem 0.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-faint);
+}
+.palette-option {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-radius: 0.5rem;
+  padding: 0.55rem 0.65rem;
+  text-align: left;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+.palette-option[aria-selected="true"] {
+  background: var(--color-accent-soft);
+  color: var(--color-text-title);
+}
+.palette-hint {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--color-text-faint);
+}
+.palette-empty {
+  padding: 1.25rem 1rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+.palette-footer {
+  border-top: 1px solid var(--color-bg-border);
+  padding: 0.5rem 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--color-text-faint);
+}
+@media (max-width: 480px) {
+  .palette-footer {
+    display: none;
+  }
+}
+
 @layer utilities {
   /* Reveal on scroll — CON GATE .js-reveal (B1):
      el ocultado SOLO se aplica si el JS de reveal se ejecuta (anade .js-reveal
@@ -346,11 +478,35 @@
     }
   }
 
+  /* Cuadricula de fondo del hero: lineas finas que se desvanecen hacia los
+     bordes (mascara), sobre un resplandor del acento. Solo decoracion. */
+  .hero-grid {
+    background-image:
+      linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+    background-size: 44px 44px;
+    -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, #000 40%, transparent 100%);
+    mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, #000 40%, transparent 100%);
+  }
+
+  /* Pulso de señal que baja por la linea del flujo de triaje (solo transform). */
+  .flow-pulse {
+    animation: flow-pulse 2.8s linear infinite;
+  }
+  @keyframes flow-pulse {
+    from {
+      transform: translateY(-100%);
+    }
+    to {
+      transform: translateY(100%);
+    }
+  }
+
   /* Degradado sutil superior del hero (sustituye a la rejilla marcada). */
   .hero-fade {
     background: radial-gradient(
       60% 50% at 50% 0%,
-      rgb(74 222 128 / 0.06),
+      var(--glow),
       transparent 70%
     );
   }
@@ -365,7 +521,7 @@
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  background: rgb(3 5 8 / 0.7);
+  background: var(--scrim);
   backdrop-filter: blur(4px);
   opacity: 0;
   transition: opacity 0.2s ease;

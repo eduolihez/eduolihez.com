@@ -1921,6 +1921,1416 @@ INSERT IGNORE INTO `settings` (`key`, `value`) VALUES
   ('announcement_url',  '');    -- enlace opcional del banner
 
 
+-- ---------------------------------------------------------------------------
+-- Blog: SEO local y catalan (2026-10-26).
+--
+--  1. Seis articulos nuevos en espanol, pensados para busquedas reales
+--     ("que hace un analista SOC", "ciberseguridad pymes Barcelona", "he hecho
+--     clic en un phishing", "ransomware 24 horas", "certificaciones SOC",
+--     "auditar permisos Microsoft 365").
+--  2. La version catalana de TODOS los articulos (los 23 existentes + los 6
+--     nuevos = 29). Mismas fechas de publicacion que el original y slugs
+--     propios en catalan. El mapa ES <-> CA que usa el hreflang de los
+--     articulos vive en src/lib/postTranslations.ts: si anades o cambias un
+--     slug aqui, actualiza ese fichero tambien (hay un test que lo vigila).
+--
+-- Mismo patron idempotente que los bloques de arriba: solo entran si su slug
+-- no existe, asi que reimportar este archivo nunca los duplica.
+-- ---------------------------------------------------------------------------
+
+-- Articulos nuevos (es)
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'Qué hace un analista SOC: un día de trabajo real y cómo empezar',
+  'que-hace-un-analista-soc-un-dia-de-trabajo-real',
+  'Qué hace un analista SOC en su día a día: revisar alertas, investigar, contener y documentar. Niveles N1 a N3, herramientas, habilidades y cómo entrar sin experiencia.',
+  '<p>Un analista SOC (Security Operations Center) vigila los sistemas de una organización para detectar, investigar y contener incidentes de seguridad. En la práctica, su día consiste en revisar alertas, decidir cuáles son reales, investigar las que lo son y escalar o contener lo que haga falta. No es un puesto de "hackear": es un puesto de analizar, comparar y decidir con rapidez y con poca información.</p>
+<h2>Cómo es un día normal</h2>
+<ol>
+  <li><strong>Traspaso.</strong> Se empieza leyendo qué dejó abierto el turno anterior: incidentes en curso, alertas pendientes de respuesta, cambios en la infraestructura.</li>
+  <li><strong>Cola de alertas.</strong> Se abre la consola (en mi caso Trend Micro Vision One) y se ordena lo que ha saltado. El orden importa más que la velocidad: lo explico en <a href="/blog/post/triaje-de-alertas-en-un-soc-en-que-orden-mirar/">triaje de alertas en un SOC</a>.</li>
+  <li><strong>Investigación.</strong> Para cada alerta real: qué activo y qué usuario, qué pasó antes y después, si el indicador aparece en fuentes de inteligencia, si esto ya se vio antes.</li>
+  <li><strong>Contención y escalado.</strong> Aislar un equipo, deshabilitar una cuenta, bloquear un dominio, o pasar el caso al nivel siguiente con todo el contexto ya reunido.</li>
+  <li><strong>Documentación.</strong> Cada decisión queda escrita en el ticket. Es la parte menos vistosa y la que más ahorra al día siguiente.</li>
+  <li><strong>Mejora.</strong> Afinar reglas que generan ruido, revisar falsos positivos recurrentes y <a href="/blog/post/automatizar-el-informe-semanal-del-soc-con-python/">automatizar informes</a> que se repiten.</li>
+</ol>
+<h2>Los niveles de un SOC</h2>
+<table>
+  <thead><tr><th>Nivel</th><th>Qué hace</th></tr></thead>
+  <tbody>
+    <tr><td>N1</td><td>Triaje: revisa alertas, descarta falsos positivos, escala lo relevante.</td></tr>
+    <tr><td>N2</td><td>Investigación y respuesta: analiza incidentes, contiene, coordina con otros equipos.</td></tr>
+    <tr><td>N3</td><td>Caza de amenazas, análisis forense y de malware, ingeniería de detección.</td></tr>
+  </tbody>
+</table>
+<p>Los nombres y los límites cambian de una empresa a otra, y en un SOC pequeño una misma persona hace de las tres cosas.</p>
+<h2>Con qué herramientas se trabaja</h2>
+<ul>
+  <li><strong>EDR / XDR</strong> para ver el endpoint, el correo y la identidad. Qué aporta cada uno está en <a href="/blog/post/xdr-vs-siem-vs-edr-diferencias-en-un-soc/">XDR, SIEM y EDR</a>.</li>
+  <li><strong>SIEM</strong> para centralizar logs y buscar en ellos.</li>
+  <li><strong>Gestor de tickets</strong> para registrar cada caso.</li>
+  <li><strong>Fuentes de inteligencia</strong> (VirusTotal, AbuseIPDB, el catálogo KEV de CISA) para saber si un indicador es conocido.</li>
+  <li><strong>Consola de correo y de identidad</strong> (Microsoft 365, Entra ID) para investigar <a href="/blog/post/business-email-compromise-senales-en-microsoft-365/">fraudes de correo</a> y cuentas comprometidas.</li>
+</ul>
+<h2>Qué hay que saber para empezar</h2>
+<ul>
+  <li>Redes básicas: TCP/IP, DNS, HTTP, qué es normal en un tráfico.</li>
+  <li>Windows y Active Directory: cómo se autentica un usuario y qué rastro deja.</li>
+  <li>Leer logs sin asustarse, y saber qué preguntar a una línea rara.</li>
+  <li>Algo de scripting (Python o PowerShell) para no repetir a mano lo que se puede automatizar.</li>
+  <li>Escribir claro: un buen resumen de incidente vale tanto como una buena detección.</li>
+</ul>
+<p>Mucha gente llega desde soporte técnico o administración de sistemas, y es una buena ruta: entender la infraestructura real pesa más que cualquier curso. Lo cuento en <a href="/blog/post/de-soporte-tecnico-a-soc-lo-que-cambio-no-fue-el-puesto/">de soporte técnico a SOC</a>, y qué certificaciones ayudan en <a href="/blog/post/certificaciones-para-empezar-como-analista-soc/">certificaciones para empezar como analista SOC</a>.</p>
+<h2>Preguntas frecuentes</h2>
+<h3>¿Qué hace un analista SOC?</h3>
+<p>Monitoriza alertas de seguridad, decide cuáles son incidentes reales, los investiga y los contiene o escala. Además documenta cada caso y ayuda a afinar las reglas de detección para reducir el ruido.</p>
+<h3>¿Cuál es la diferencia entre un analista SOC y un pentester?</h3>
+<p>El analista SOC defiende: detecta y responde a ataques reales sobre los sistemas de la organización. El pentester ataca de forma autorizada para encontrar debilidades antes que los atacantes. Son perfiles complementarios.</p>
+<h3>¿Se puede entrar en un SOC sin experiencia previa?</h3>
+<p>Sí, en puestos de nivel 1, sobre todo con base en sistemas o redes, alguna certificación y práctica en laboratorios. Los SOC suelen valorar más la curiosidad y la capacidad de explicar un razonamiento que el título.</p>
+<h3>¿Hay que trabajar de noche?</h3>
+<p>Depende del SOC. Los que dan servicio 24x7 trabajan por turnos; otros cubren solo horario de oficina y dejan la noche a un servicio externo (MDR).</p>',
+  'soc,analista-soc,blue-team,carrera,xdr', 'blue-team-soc', 'es', 1, '2026-10-14 09:00:00', '2026-10-14 09:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'que-hace-un-analista-soc-un-dia-de-trabajo-real');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'Ciberseguridad para pymes en Barcelona y Badalona: 10 medidas para aplicar este mes',
+  'ciberseguridad-para-pymes-en-barcelona-diez-medidas',
+  'Diez medidas de ciberseguridad para una pyme con herramientas que ya pagas: MFA, copias de seguridad, bajas de cuentas, DMARC y un procedimiento contra el fraude.',
+  '<p>Una pyme no necesita un presupuesto de gran empresa para protegerse de lo que de verdad le pasa: correos de phishing, cuentas robadas, ransomware y fraudes de cambio de cuenta bancaria. Estas diez medidas cubren la mayor parte del riesgo habitual de una pequeña empresa en Barcelona, Badalona o cualquier otro sitio, casi todas se hacen con herramientas que ya pagas (Microsoft 365 o Google Workspace) y se pueden aplicar en un mes.</p>
+<h2>Las diez medidas, por orden</h2>
+<ol>
+  <li><strong>MFA en todas las cuentas de correo y de administración.</strong> Es la medida que más riesgo quita por menos esfuerzo. Mejor si es <a href="/blog/post/mfa-resistente-a-phishing-por-que-el-sms-ya-no-basta/">resistente a phishing</a> al menos para administradores y finanzas.</li>
+  <li><strong>Copias de seguridad que no estén a mano del atacante.</strong> Una copia en el mismo servidor o en una unidad de red siempre conectada se cifra con el resto. La regla 3-2-1: tres copias, dos soportes, una fuera. Y probar a restaurar de verdad, al menos una vez.</li>
+  <li><strong>Actualizar sistemas y aplicaciones.</strong> Activa las actualizaciones automáticas y presta atención especial a todo lo que esté expuesto a internet (VPN, firewall, servidor de correo). Para decidir qué urge, <a href="/blog/post/priorizar-cves-sin-fiarse-solo-del-cvss/">no mires solo el CVSS</a>.</li>
+  <li><strong>Un usuario para cada persona, y sin permisos de administrador en el día a día.</strong> Quien lee correo no debería ser administrador del dominio. Detalle en <a href="/blog/post/minimo-privilegio-en-microsoft-entra-id/">mínimo privilegio</a>.</li>
+  <li><strong>Dar de baja las cuentas de quien se va, el mismo día.</strong> Es el fallo más repetido: <a href="/blog/post/joiner-mover-leaver-cuentas-huerfanas/">cuentas huérfanas</a> que nadie revisa.</li>
+  <li><strong>Proteger el dominio de correo con SPF, DKIM y DMARC.</strong> Evita que alguien envíe correos en nombre de tu empresa. Cómo llegar a <a href="/blog/post/spf-dkim-dmarc-de-p-none-a-p-reject/">p=reject</a> sin perder correo legítimo.</li>
+  <li><strong>Un procedimiento para cambios de cuenta bancaria.</strong> Cualquier cambio de IBAN se confirma por teléfono, al número que ya tenías. Es la defensa contra el <a href="/blog/post/business-email-compromise-senales-en-microsoft-365/">fraude BEC</a>.</li>
+  <li><strong>Antivirus con EDR en todos los equipos</strong> y el firewall con la configuración revisada, no la de fábrica.</li>
+  <li><strong>Formación breve y repetida.</strong> Quince minutos al trimestre con ejemplos reales de phishing sirven más que una charla anual. Y una norma clara: dudar y preguntar no es molestar.</li>
+  <li><strong>Saber a quién llamar si pasa algo.</strong> Un contacto técnico, una persona con autoridad para tomar decisiones y el teléfono de ayuda de INCIBE (017). Mejor tenerlo escrito antes de necesitarlo.</li>
+</ol>
+<h2>Si solo tienes una tarde</h2>
+<p>MFA en el correo, una copia de seguridad desconectada y la baja de las cuentas que ya no se usan. Con esas tres, el riesgo cae mucho.</p>
+<h2>Normativa: qué te afecta</h2>
+<p>Si tratas datos personales, el RGPD te obliga a notificar a la AEPD una brecha en un plazo máximo de 72 horas desde que la conoces, salvo que sea improbable que suponga riesgo para las personas. Si eres proveedor de una empresa grande o de un sector regulado, es probable que te lleguen requisitos por contrato; mira <a href="/blog/post/nis2-en-espana-estado-octubre-2026/">cómo está NIS2 en España</a>.</p>
+<h2>Recursos públicos</h2>
+<p>INCIBE ofrece información y una línea de ayuda gratuita (017) para empresas y ciudadanos, y en Cataluña la Agència de Ciberseguretat de Catalunya publica avisos y guías. Son un buen punto de partida antes de contratar nada.</p>
+<h2>Preguntas frecuentes</h2>
+<h3>¿Por dónde empieza la ciberseguridad de una pyme?</h3>
+<p>Por el correo y las cuentas: MFA, bajas de usuarios y copias de seguridad fuera del alcance del atacante. Es donde se producen la mayoría de incidentes reales.</p>
+<h3>¿Una pyme es objetivo de ataques?</h3>
+<p>Sí. Los ataques masivos (phishing, ransomware) no eligen por tamaño, sino por lo fácil que sea entrar. Las pymes suelen tener menos defensas y por eso salen rentables.</p>
+<h3>¿Necesito un SOC propio?</h3>
+<p>Normalmente no. Una pyme puede contratar un servicio gestionado (MDR) que vigile alertas 24x7. Lo que sí necesita es tener las bases cubiertas y saber quién responde cuando salta una alerta.</p>',
+  'pymes,barcelona,badalona,ciberseguridad,mfa,backup', 'blue-team-soc', 'es', 1, '2026-10-16 09:00:00', '2026-10-16 09:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'ciberseguridad-para-pymes-en-barcelona-diez-medidas');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'He hecho clic en un phishing: qué hacer ahora mismo',
+  'he-hecho-clic-en-un-phishing-que-hacer-ahora',
+  'Qué hacer en los primeros minutos tras hacer clic en un phishing, según lo que pasó: solo clic, contraseña introducida, fichero abierto o datos bancarios. Y qué evitar.',
+  '<p>Si has hecho clic en un enlace de phishing, lo que hagas en los primeros minutos importa más que lo que ocurra después. Lo esencial: no hace falta entrar en pánico, pero sí actuar ya. Desconecta el equipo de la red si has descargado o abierto algo, cambia la contraseña de la cuenta afectada desde otro dispositivo, avisa a quien gestione la seguridad en tu empresa y no borres el correo, porque sirve como evidencia.</p>
+<h2>Qué hacer según lo que ocurrió</h2>
+<h3>Hice clic, pero no escribí nada</h3>
+<p>Cierra la pestaña. Si el navegador descargó un fichero, no lo abras y bórralo. Pasa un análisis con el antivirus. En muchos casos no ha pasado nada, pero avisa igualmente: otras personas pueden haber recibido el mismo correo.</p>
+<h3>Escribí mi contraseña en la página falsa</h3>
+<ol>
+  <li>Cambia la contraseña ya, <strong>desde otro dispositivo</strong> si dudas del equipo.</li>
+  <li>Cierra todas las sesiones abiertas de esa cuenta (en Microsoft 365: "Cerrar sesión en todas partes", o que el administrador revoque las sesiones). Cambiar la contraseña sin cerrar sesiones puede dejar al atacante dentro si ya tiene una sesión activa.</li>
+  <li>Si usas esa contraseña en otros servicios, cámbiala también allí.</li>
+  <li>Revisa los métodos de MFA registrados: el atacante puede haber añadido el suyo.</li>
+  <li>Revisa reglas de bandeja de entrada y reenvíos: son lo primero que crean para esconderse. Qué buscar, en <a href="/blog/post/business-email-compromise-senales-en-microsoft-365/">señales de BEC en Microsoft 365</a>.</li>
+</ol>
+<h3>Descargué y abrí un fichero o instalé algo</h3>
+<ol>
+  <li><strong>Desconecta el equipo de la red</strong> (cable y Wi-Fi). No lo apagues si puedes evitarlo: apagarlo borra información útil para la investigación.</li>
+  <li>Avisa al responsable de seguridad o a tu proveedor informático, y no sigas usando ese equipo.</li>
+  <li>Cambia las contraseñas desde otro dispositivo, empezando por correo y banca.</li>
+</ol>
+<h3>Introduje datos de una tarjeta o bancarios</h3>
+<p>Llama a tu banco ya, bloquea la tarjeta y pide que revisen los movimientos. Si hay un cargo no reconocido, denuncia ante la Policía o los Mossos d''Esquadra.</p>
+<h2>Qué NO hacer</h2>
+<ul>
+  <li>No borres el correo ni lo reenvíes a compañeros: se reenvía como adjunto al equipo de seguridad.</li>
+  <li>No te quedes callado por vergüenza. Un aviso rápido evita que otros caigan, y cualquier SOC prefiere veinte avisos falsos a un incidente tardío.</li>
+  <li>No respondas al atacante.</li>
+</ul>
+<h2>Qué mira el equipo de seguridad después</h2>
+<p>Revisa si el enlace se abrió desde más usuarios, si hubo un inicio de sesión sospechoso tras el clic, si se crearon reglas de bandeja o consentimientos OAuth, y si el equipo ejecutó algo raro. Con un EDR o XDR se ve la cadena completa; es lo que explico en <a href="/blog/post/xdr-vs-siem-vs-edr-diferencias-en-un-soc/">XDR, SIEM y EDR</a>.</p>
+<p>Para que el próximo clic sea menos peligroso: <a href="/blog/post/mfa-resistente-a-phishing-por-que-el-sms-ya-no-basta/">MFA resistente a phishing</a>, que no cae aunque el usuario introduzca todo en la web falsa.</p>
+<h2>Preguntas frecuentes</h2>
+<h3>¿Qué pasa si hago clic en un enlace de phishing?</h3>
+<p>Depende de lo que haga la página: puede pedirte credenciales, descargar un fichero malicioso o solo registrar que el correo es real. Hacer clic sin más rara vez compromete el equipo, pero conviene avisar.</p>
+<h3>¿Me pueden robar la cuenta aunque tenga MFA?</h3>
+<p>Sí, con phishing en tiempo real que roba también la sesión. Por eso conviene cerrar sesiones y revisar los métodos de MFA, y usar métodos resistentes a phishing.</p>
+<h3>¿A quién aviso?</h3>
+<p>En una empresa, al equipo de seguridad o de informática. Si eres particular y hay fraude económico, a tu banco y a la policía. INCIBE tiene una línea gratuita de ayuda: 017.</p>',
+  'phishing,respuesta-a-incidentes,guia-rapida,mfa,microsoft-365', 'blue-team-soc', 'es', 1, '2026-10-19 09:00:00', '2026-10-19 09:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'he-hecho-clic-en-un-phishing-que-hacer-ahora');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'Ransomware: qué hacer en las primeras 24 horas',
+  'ransomware-que-hacer-en-las-primeras-24-horas',
+  'Orden de actuación ante un ransomware: aislar, cortar el acceso, proteger las copias, preservar evidencias, notificar a la AEPD en 72 horas y recuperar desde copias limpias.',
+  '<p>Ante un ransomware, las primeras 24 horas deciden cuánto daño se produce. El orden de actuación: aislar los equipos afectados para frenar la propagación, activar el plan de respuesta y avisar a las personas que toman decisiones, preservar evidencias, evaluar el alcance, y solo después pensar en recuperar. Y casi nunca pagar: no garantiza recuperar los datos y las autoridades lo desaconsejan.</p>
+<h2>Primera hora: contener</h2>
+<ol>
+  <li><strong>Aísla, no apagues.</strong> Desconecta de la red (cable, Wi-Fi, VPN) los equipos con síntomas: ficheros con extensiones raras, notas de rescate, equipos lentos. Apagarlos puede destruir información en memoria útil para la investigación; si el aislamiento no es posible, entonces sí, apagar es mejor que dejar que siga cifrando.</li>
+  <li><strong>Corta el acceso del atacante.</strong> Deshabilita las cuentas comprometidas (empezando por las privilegiadas), revoca sesiones y bloquea accesos remotos (RDP, VPN) sospechosos. Si el atacante tiene credenciales de administrador de dominio, asume que toda la red está comprometida.</li>
+  <li><strong>Protege las copias de seguridad.</strong> Desconecta las copias del resto de la red antes de que el ransomware las cifre o las borre. Los atacantes las buscan expresamente.</li>
+  <li><strong>Reúne al equipo de crisis.</strong> Técnicos, dirección, quien lleve comunicación y asesoría legal. Una persona decide, otra documenta cada acción con hora.</li>
+</ol>
+<h2>Primeras horas: entender</h2>
+<ul>
+  <li><strong>Preserva evidencias.</strong> Notas de rescate, listas de ficheros afectados, logs del firewall y del controlador de dominio, muestras del ejecutable. No reinstales equipos todavía.</li>
+  <li><strong>Averigua el vector de entrada</strong> antes de restaurar: un acceso remoto expuesto, una cuenta robada por phishing, una vulnerabilidad sin parchear. Si no se cierra, el atacante vuelve.</li>
+  <li><strong>Evalúa qué datos se han exfiltrado.</strong> Hoy lo habitual es la doble extorsión: cifran y además roban datos para amenazar con publicarlos.</li>
+</ul>
+<h2>Avisos y obligaciones</h2>
+<ul>
+  <li>Si hay datos personales afectados, el RGPD obliga a notificar la brecha a la AEPD en un máximo de 72 horas desde que la conoces, salvo que sea improbable que suponga un riesgo para las personas.</li>
+  <li>Si tu empresa entra en el ámbito de NIS2 o de la normativa sectorial, hay plazos de notificación específicos (consulta <a href="/blog/post/nis2-en-espana-estado-octubre-2026/">dónde está NIS2 en España</a>).</li>
+  <li>Denuncia a la Policía Nacional, la Guardia Civil o los Mossos d''Esquadra, e informa a INCIBE-CERT. También avisa a tu aseguradora si tienes ciberseguro: algunas pólizas exigen avisar en plazo.</li>
+</ul>
+<h2>Recuperación</h2>
+<ol>
+  <li>Restaura desde copias <strong>limpias</strong>, comprobando que la copia es anterior a la intrusión.</li>
+  <li>Reconstruye los sistemas críticos desde imagen limpia en lugar de limpiar a mano el que estaba comprometido.</li>
+  <li>Cambia todas las credenciales, especialmente las de cuentas de servicio y administración, y revisa <a href="/blog/post/joiner-mover-leaver-cuentas-huerfanas/">cuentas huérfanas</a> y accesos que no deberían existir.</li>
+  <li>Reconecta por fases, con monitorización reforzada.</li>
+</ol>
+<h2>¿Pagar el rescate?</h2>
+<p>Las autoridades lo desaconsejan: no hay garantía de recibir una clave que funcione, financia a los atacantes y te marca como pagador. Es una decisión de la dirección con asesoramiento legal y, si se contempla, con una empresa especializada. Tener copias fuera de línea es lo que evita llegar a plantearse la pregunta.</p>
+<h2>Lo que evita llegar aquí</h2>
+<ul>
+  <li><a href="/blog/post/mfa-resistente-a-phishing-por-que-el-sms-ya-no-basta/">MFA</a> en todos los accesos remotos y cuentas de administración.</li>
+  <li>Copias de seguridad desconectadas y probadas.</li>
+  <li><a href="/blog/post/errores-de-configuracion-cloud-mas-comunes/">Sin puertos de administración expuestos a internet</a> y con parches al día.</li>
+  <li>Un EDR o <a href="/blog/post/xdr-vs-siem-vs-edr-diferencias-en-un-soc/">XDR</a> vigilado, con alguien que responda a la alerta.</li>
+</ul>
+<h2>Preguntas frecuentes</h2>
+<h3>¿Qué es el ransomware?</h3>
+<p>Un malware que cifra los ficheros de una organización y exige un pago a cambio de la clave para recuperarlos. Cada vez más, también roba los datos antes de cifrar para presionar con su publicación.</p>
+<h3>¿Se pueden recuperar los ficheros sin pagar?</h3>
+<p>A veces. Con copias limpias, sí. En algunos casos existen descifradores gratuitos para ciertas familias; el proyecto No More Ransom reúne los disponibles.</p>
+<h3>¿Hay que apagar el ordenador infectado?</h3>
+<p>Lo preferible es aislarlo de la red sin apagarlo, para conservar evidencias. Si no puedes aislarlo y sigue cifrando, apágalo.</p>',
+  'ransomware,respuesta-a-incidentes,backup,rgpd,incidentes', 'blue-team-soc', 'es', 1, '2026-10-21 09:00:00', '2026-10-21 09:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'ransomware-que-hacer-en-las-primeras-24-horas');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'Certificaciones para empezar como analista SOC: cuáles valen la pena',
+  'certificaciones-para-empezar-como-analista-soc',
+  'Security+, SC-200, CySA+ y BTL1: qué aporta cada certificación para un primer puesto en un SOC, cuáles dejar para después y qué pesa más que cualquier título.',
+  '<p>Para empezar como analista SOC no hay una certificación obligatoria, pero algunas ayudan a pasar el primer filtro y a ordenar lo que hay que aprender. Las más habituales en ofertas de nivel 1 son CompTIA Security+, Microsoft SC-200, CompTIA CySA+ y Blue Team Level 1 (BTL1). Pesan mucho menos que demostrar que sabes investigar una alerta, así que lo ideal es combinar una certificación con práctica real en laboratorios.</p>
+<h2>Las certificaciones más útiles para empezar</h2>
+<table>
+  <thead><tr><th>Certificación</th><th>Para quién</th><th>Qué aporta</th></tr></thead>
+  <tbody>
+    <tr><td>CompTIA Security+</td><td>Punto de partida general</td><td>Base amplia: amenazas, controles, riesgo, criptografía. Muy reconocida en ofertas.</td></tr>
+    <tr><td>Microsoft SC-200 (Security Operations Analyst)</td><td>Entornos Microsoft</td><td>Defender XDR, Sentinel y KQL: muy práctica si el SOC usa Microsoft.</td></tr>
+    <tr><td>CompTIA CySA+</td><td>Ya con base de seguridad</td><td>Análisis de amenazas, logs y respuesta a incidentes, orientada a SOC.</td></tr>
+    <tr><td>Blue Team Level 1 (BTL1)</td><td>Quien quiere práctica</td><td>Examen práctico de 24 horas sobre phishing, DFIR, inteligencia y SIEM.</td></tr>
+    <tr><td>Certificaciones de fabricante (Trend Micro, Fortinet, Splunk...)</td><td>Según la herramienta del SOC</td><td>Demuestran manejo de la plataforma concreta que usarás.</td></tr>
+  </tbody>
+</table>
+<p>Las certificaciones de fabricante pesan según el puesto: si el SOC trabaja con esa herramienta, son de las que más se notan.</p>
+<h2>Las que dejaría para más adelante</h2>
+<p>Las certificaciones de alto nivel (GIAC como GCIH o GCFA, o similares) son caras y se valoran más cuando ya hay experiencia. Merecen la pena cuando tu empresa las financia o cuando ya sabes en qué especialidad quieres crecer: respuesta a incidentes, forense o inteligencia.</p>
+<h2>Lo que pesa más que cualquier título</h2>
+<ul>
+  <li><strong>Práctica en laboratorios.</strong> Plataformas como TryHackMe, LetsDefend o Blue Team Labs Online permiten simular alertas reales de un SOC. Un perfil con casos resueltos vale más que una lista de cursos.</li>
+  <li><strong>Algo propio que enseñar.</strong> Un script que automatice una tarea, un análisis publicado, una herramienta pequeña. Por ejemplo, <a href="/blog/post/automatizar-el-informe-semanal-del-soc-con-python/">automatizar un informe</a> o <a href="/blog/post/vigilar-el-catalogo-kev-de-cisa-sin-servidor/">vigilar el catálogo KEV</a> demuestran criterio, no solo teoría.</li>
+  <li><strong>Base de sistemas y redes.</strong> Muchos buenos analistas vienen de soporte o administración: <a href="/blog/post/de-soporte-tecnico-a-soc-lo-que-cambio-no-fue-el-puesto/">ese camino funciona</a>.</li>
+  <li><strong>Saber explicar.</strong> En una entrevista, contar cómo investigarías una alerta paso a paso pesa más que recitar siglas. Si no sabes cómo funciona un día de trabajo, empieza por <a href="/blog/post/que-hace-un-analista-soc-un-dia-de-trabajo-real/">qué hace un analista SOC</a>.</li>
+</ul>
+<h2>Una ruta razonable</h2>
+<ol>
+  <li>Base de redes, Windows y Linux, y Active Directory.</li>
+  <li>Security+ si necesitas el sello; si ya tienes base, ve directo a SC-200 o BTL1.</li>
+  <li>Prácticas en laboratorios mientras estudias, y documenta lo que haces.</li>
+  <li>Certificación de la herramienta concreta del SOC al que aspiras.</li>
+  <li>Una especialidad (IAM, cloud, respuesta a incidentes) cuando ya tengas experiencia.</li>
+</ol>
+<h2>Preguntas frecuentes</h2>
+<h3>¿Qué certificación pide más un SOC de nivel 1?</h3>
+<p>Security+ es la que más aparece como requisito general; SC-200 y las de fabricante pesan cuando el SOC usa esas herramientas.</p>
+<h3>¿Hace falta carrera universitaria?</h3>
+<p>No siempre. Muchos SOC valoran experiencia, certificaciones y práctica por encima del título, aunque algunos puestos lo piden.</p>
+<h3>¿Cuánto cuestan?</h3>
+<p>Varían mucho y cambian cada año: conviene consultar el precio actual en la web del organismo. Algunas empresas financian la formación, y los exámenes de fabricante a veces son gratuitos o están incluidos en programas de partners.</p>',
+  'certificaciones,soc,carrera,security-plus,sc-200', 'carrera-personal', 'es', 1, '2026-10-23 09:00:00', '2026-10-23 09:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'certificaciones-para-empezar-como-analista-soc');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'Auditar los permisos de Microsoft 365 en una tarde',
+  'auditar-permisos-de-microsoft-365-en-una-tarde',
+  'Auditoría básica de permisos de Microsoft 365 en unas horas: administradores, MFA, cuentas sin uso, consentimientos OAuth y reenvíos, con PowerShell de solo lectura.',
+  '<p>Se puede hacer una auditoría básica de permisos de Microsoft 365 en una tarde si se limita a lo que más riesgo concentra: administradores, invitados externos, cuentas sin MFA o sin uso, aplicaciones con consentimiento y reenvíos de correo. No sustituye a una auditoría completa, pero encuentra los fallos que usan los atacantes y que casi siempre se acumulan sin que nadie los mire.</p>
+<p>Necesitas un rol de lectura (Global Reader o Security Reader) y el módulo de PowerShell de Microsoft Graph. Todo lo que sigue es de solo lectura.</p>
+<h2>1. Administradores (30 minutos)</h2>
+<p>Lista quién tiene roles privilegiados y por qué. Más de cinco administradores globales ya es una señal de alerta, y cada uno debería poder justificarse. El detalle de qué roles usar en su lugar está en <a href="/blog/post/minimo-privilegio-en-microsoft-entra-id/">mínimo privilegio en Entra ID</a>.</p>
+<pre><code>Connect-MgGraph -Scopes "RoleManagement.Read.Directory","User.Read.All"
+Get-MgDirectoryRole -All | ForEach-Object {
+  $rol = $_.DisplayName
+  Get-MgDirectoryRoleMember -DirectoryRoleId $_.Id |
+    ForEach-Object { [pscustomobject]@{ Rol = $rol; Usuario = $_.AdditionalProperties.userPrincipalName } }
+}</code></pre>
+<h2>2. MFA (30 minutos)</h2>
+<p>El informe de registro de métodos de autenticación muestra quién no tiene MFA y quién usa métodos débiles.</p>
+<pre><code>Connect-MgGraph -Scopes "AuditLog.Read.All"
+Get-MgReportAuthenticationMethodUserRegistrationDetail -All |
+  Where-Object { -not $_.IsMfaRegistered } |
+  Select-Object UserPrincipalName, IsAdmin</code></pre>
+<p>Primero los administradores sin MFA, después finanzas y dirección. Para qué métodos exigir, mira <a href="/blog/post/mfa-resistente-a-phishing-por-que-el-sms-ya-no-basta/">MFA resistente a phishing</a>.</p>
+<h2>3. Cuentas sin uso e invitados (30 minutos)</h2>
+<pre><code>Connect-MgGraph -Scopes "User.Read.All","AuditLog.Read.All"
+Get-MgUser -All -Property DisplayName,UserPrincipalName,UserType,SignInActivity,AccountEnabled |
+  Where-Object { $_.AccountEnabled -and $_.SignInActivity.LastSignInDateTime -lt (Get-Date).AddDays(-90) } |
+  Select-Object UserPrincipalName, UserType, @{n=''UltimoAcceso'';e={$_.SignInActivity.LastSignInDateTime}}</code></pre>
+<p>Cuenta habilitada sin acceso en 90 días: pregunta a su responsable. Los invitados externos (<code>UserType = Guest</code>) merecen revisión aparte: ¿siguen colaborando? ¿a qué equipos tienen acceso? Este mismo problema, en versión de ciclo de vida, es el de <a href="/blog/post/joiner-mover-leaver-cuentas-huerfanas/">las cuentas huérfanas</a>. Ten en cuenta que <code>SignInActivity</code> requiere licencia Entra ID P1.</p>
+<h2>4. Aplicaciones con consentimiento (30 minutos)</h2>
+<p>Las aplicaciones OAuth con permisos como <code>Mail.Read</code> o <code>Files.Read.All</code> siguen teniendo acceso aunque cambies la contraseña.</p>
+<pre><code>Connect-MgGraph -Scopes "Directory.Read.All"
+Get-MgOauth2PermissionGrant -All |
+  Select-Object ClientId, ConsentType, Scope</code></pre>
+<p>Busca aplicaciones desconocidas con permisos amplios y consentimiento de usuario. Revoca lo que nadie reconozca y restringe quién puede dar consentimiento.</p>
+<h2>5. Reenvíos de correo (20 minutos)</h2>
+<pre><code>Connect-ExchangeOnline
+Get-Mailbox -ResultSize Unlimited |
+  Where-Object { $_.ForwardingSmtpAddress -or $_.ForwardingAddress } |
+  Select-Object UserPrincipalName, ForwardingSmtpAddress, ForwardingAddress</code></pre>
+<p>Un reenvío a una dirección externa que nadie recuerda crear es una de las señales de <a href="/blog/post/business-email-compromise-senales-en-microsoft-365/">BEC</a>. Revisa también las reglas de bandeja que reenvían o mueven correo.</p>
+<h2>6. Políticas de acceso (20 minutos)</h2>
+<p>Comprueba que existen las políticas base y que ninguna cuenta está excluida sin motivo. Lista y orden en <a href="/blog/post/acceso-condicional-microsoft-365-politicas-base/">acceso condicional: las políticas base</a>. Mira también la puntuación de seguridad (Secure Score) en el portal de Defender, que sirve como lista de tareas priorizada.</p>
+<h2>Qué hacer con lo que encuentres</h2>
+<ol>
+  <li>Anota cada hallazgo con responsable y fecha, en una hoja.</li>
+  <li>Arregla primero lo que sea de riesgo alto y esfuerzo bajo: MFA a administradores, bajas de cuentas, reenvíos desconocidos.</li>
+  <li>Repite cada trimestre. La utilidad de una auditoría está en la comparación entre fechas.</li>
+</ol>
+<h2>Preguntas frecuentes</h2>
+<h3>¿Cada cuánto conviene revisar los permisos?</h3>
+<p>Como mínimo cada trimestre, y siempre tras cambios grandes (fusiones, salidas de personal clave, migraciones).</p>
+<h3>¿Necesito licencias especiales?</h3>
+<p>Para lo básico no. La actividad de inicio de sesión requiere Entra ID P1, y las revisiones de acceso automáticas, Entra ID Governance.</p>
+<h3>¿Es seguro ejecutar estos comandos?</h3>
+<p>Son de solo lectura y no modifican nada, pero pruébalos primero con una cuenta de lectura y revisa el alcance de los permisos que concedes a Graph.</p>',
+  'microsoft-365,entra-id,auditoria,powershell,iam', 'cloud-iam', 'es', 1, '2026-10-25 09:00:00', '2026-10-25 09:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'auditar-permisos-de-microsoft-365-en-una-tarde');
+
+-- Version catalana de todos los articulos (ca)
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'NIS2 a Espanya: què se sap a l''octubre de 2026',
+  'nis2-a-espanya-estat-octubre-2026',
+  'NIS2 s''havia de transposar l''octubre de 2024 i Espanya continua sense llei al BOE. Què és en vigor avui, què exigirà a les empreses i què fer ja.',
+  '<p>La directiva europea NIS2 (Directiva (UE) 2022/2555) amplia les obligacions de ciberseguretat a molts més sectors i empreses que la NIS original, i endureix les sancions. Els estats membres l''havien de transposar abans del 17 d''octubre de 2024. En la data d''aquest article, octubre de 2026, Espanya no ha publicat al BOE la llei que la transposa, la futura Ley de Coordinación y Gobernanza de la Ciberseguridad.</p>
+<h2>On és la llei espanyola</h2>
+<ul>
+  <li><strong>14 de gener de 2025:</strong> el Consell de Ministres aprova l''avantprojecte i el tramita per la via d''urgència.</li>
+  <li><strong>Maig de 2025:</strong> la Comissió Europea envia a Espanya un dictamen motivat per no haver notificat la transposició.</li>
+  <li><strong>Juliol de 2026:</strong> la Comissió porta Espanya davant el Tribunal de Justícia de la UE pel mateix motiu.</li>
+</ul>
+<p>Mentrestant continuen en vigor el Real Decreto-ley 12/2018 i el seu reglament, el Real Decreto 43/2021, que transposen la NIS anterior i només obliguen operadors de serveis essencials i proveïdors de serveis digitals. Si treballes amb l''Administració, també s''aplica l''Esquema Nacional de Seguridad (ENS).</p>
+<p>Convé comprovar l''estat al <a href="https://www.boe.es/">BOE</a> abans de prendre decisions: aquest article descriu la situació en una data concreta.</p>
+<h2>A qui afectarà NIS2</h2>
+<p>La directiva distingeix entre <strong>entitats essencials</strong> i <strong>importants</strong>, segons el sector i la mida. Com a regla general hi entren les mitjanes i grans empreses (a partir de 50 empleats o 10 milions d''euros de facturació) de sectors com energia, transport, banca, sanitat, aigua, infraestructura digital, gestió de serveis TIC, administració pública, serveis postals, gestió de residus, química, alimentació, fabricació de certs productes i proveïdors digitals. Algunes entitats hi entren sigui quina sigui la seva mida, com els proveïdors de DNS o de serveis de confiança.</p>
+<p>El que més es passa per alt: encara que la teva empresa no hi entri, si ets proveïdor d''una que sí, et arribaran requisits per contracte. NIS2 obliga les entitats a gestionar la seguretat de la seva cadena de subministrament.</p>
+<h2>Què exigeix</h2>
+<p>L''article 21 de la directiva enumera les mesures mínimes de gestió de riscos. Les que donen més feina a la pràctica:</p>
+<ul>
+  <li>Anàlisi de riscos i polítiques de seguretat dels sistemes d''informació.</li>
+  <li>Gestió d''incidents, continuïtat de negoci i còpies de seguretat.</li>
+  <li>Seguretat de la cadena de subministrament.</li>
+  <li>Gestió de vulnerabilitats, inclosa la seva divulgació.</li>
+  <li>Autenticació multifactor, control d''accessos i gestió d''actius.</li>
+  <li>Xifratge, formació i ciberhigiene bàsica.</li>
+</ul>
+<p>I la part amb terminis: davant d''un incident significatiu, una <strong>alerta primerenca en 24 hores</strong>, una notificació en <strong>72 hores</strong> i un informe final en <strong>un mes</strong>. La directiva fa a més responsables els òrgans de direcció: han d''aprovar les mesures i formar-se.</p>
+<h2>Sancions</h2>
+<p>Per a entitats essencials, fins a 10 milions d''euros o el 2 % de la facturació mundial anual, el que sigui més gran. Per a entitats importants, fins a 7 milions o l''1,4 %. La quantia concreta a Espanya dependrà de la llei final.</p>
+<h2>Què convé fer sense esperar la llei</h2>
+<p>Quasi tot el que demana l''article 21 és bona pràctica que convé tenir igualment, i la llei no canviarà la directiva en l''essencial:</p>
+<ol>
+  <li>Confirmar si la teva organització, o els teus clients, entren en l''àmbit per sector i mida.</li>
+  <li>Tenir un procediment de gestió d''incidents que permeti complir el termini de 24 hores: qui decideix què és significatiu i qui notifica.</li>
+  <li>Inventari d''actius i de proveïdors crítics.</li>
+  <li>MFA i <a href="/ca/blog/post/minim-privilegi-a-microsoft-entra-id/">mínim privilegi</a> en els comptes amb accés a sistemes importants. És el punt que amb menys esforç treu més risc.</li>
+  <li>Un procés de <a href="/ca/blog/post/prioritzar-cve-sense-refiar-se-nomes-del-cvss/">gestió de vulnerabilitats</a> que prioritzi per explotació real i no només per CVSS.</li>
+</ol>
+<h2>Preguntes freqüents</h2>
+<h3>NIS2 ja és obligatòria a Espanya?</h3>
+<p>La directiva és en vigor a nivell europeu, però obliga els estats, no directament les empreses. A Espanya les obligacions concretes arribaran amb la llei de transposició, que l''octubre de 2026 encara no és publicada al BOE. Avui s''aplica el Real Decreto-ley 12/2018.</p>
+<h3>La meva pime està afectada per NIS2?</h3>
+<p>Les petites empreses (menys de 50 empleats i menys de 10 milions de facturació) en general en queden fora, tret d''excepcions per activitat. Però poden rebre requisits si són proveïdores d''una entitat obligada.</p>
+<h3>Quina diferència hi ha entre NIS2 i l''ENS?</h3>
+<p>L''ENS és la norma espanyola de seguretat per al sector públic i els seus proveïdors. NIS2 és una directiva europea per a sectors crítics públics i privats. Es solapen en moltes mesures, i estar certificat en ENS avança bona part de la feina.</p>',
+  'nis2,normativa,cumplimiento,espana,gestion-de-riesgo,incidentes', 'normativa', 'ca', 1, '2026-10-12 09:00:00', '2026-10-12 09:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'nis2-a-espanya-estat-octubre-2026');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'Comptes òrfenes: la fallada del cicle joiner-mover-leaver',
+  'joiner-mover-leaver-comptes-orfes',
+  'Comptes actives de gent que ja ha marxat i permisos que s''acumulen en canviar de lloc. Què és el cicle joiner-mover-leaver, on falla i com revisar-lo.',
+  '<p>El cicle joiner-mover-leaver (JML) és el procés de gestió d''identitats que cobreix tres moments: quan algú entra a l''organització (joiner), quan canvia de lloc (mover) i quan se''n va (leaver). Les comptes òrfenes, actives però sense cap persona al darrere que les necessiti, apareixen quasi sempre per una fallada en el tercer. I l''acumulació de permisos, per una fallada en el segon.</p>
+<p>Des del <a href="/ca/blog/post/de-suport-tecnic-a-soc-el-que-va-canviar-no-va-ser-el-lloc/">suport tècnic</a> es veu molt clar que l''alta és la part que sempre funciona: la persona nova arriba, necessita entrar i algú es queixa si no pot. La baixa no la reclama ningú.</p>
+<h2>Joiner: l''alta</h2>
+<p>El risc en l''alta és donar massa des del primer dia, normalment copiant els permisos d''«algú que fa el mateix». Aquest algú porta cinc anys acumulant accessos. El correcte és assignar per rol: grups que representen un lloc de treball, amb els seus permisos definits, en lloc de permisos individuals copiats.</p>
+<p>La contrasenya inicial també importa: generada, d''un sol ús i amb registre d''MFA obligatori en el primer inici de sessió. Una contrasenya inicial estàndard del tipus «Empresa2026!» és una de les primeres coses que prova un atacant amb password spraying.</p>
+<h2>Mover: el canvi de lloc</h2>
+<p>És la fase que menys es gestiona i la que produeix l''<em>acumulació de privilegis</em>: algú passa de finances a comercial i s''emporta els accessos nous sense perdre els antics. Després de tres canvis de lloc, aquesta compte té accés a mig negoci, i és justament la que interessa comprometre.</p>
+<p>La regla sana: un canvi de lloc és una baixa dels permisos del lloc anterior més una alta al nou, amb un període de transició fixat si cal, no una suma.</p>
+<h2>Leaver: la baixa</h2>
+<p>Una compte d''algú que ha marxat és perillosa per dos motius: ningú notarà si algú la fa servir, i la seva contrasenya pot estar en alguna filtració antiga. El que hauria de passar l''últim dia, o abans si la sortida no és amistosa:</p>
+<ol>
+  <li>Deshabilitar la compte i <strong>revocar les sessions actives</strong>. Deshabilitar sense revocar deixa vius durant un temps els tokens ja emesos.</li>
+  <li>Treure els mètodes d''MFA i els dispositius registrats.</li>
+  <li>Convertir la bústia en compartida o delegar-la si cal, en lloc de mantenir la compte activa «per veure el correu».</li>
+  <li>Revisar el que no passa pel directori: comptes locals en aplicacions SaaS sense SSO, claus d''API que va crear, accessos a proveïdors, <a href="/ca/blog/post/secrets-en-repositoris-com-es-filtren-i-com-evitar-ho/">secrets que coneixia</a>.</li>
+  <li>Eliminar la compte passat el període de retenció definit.</li>
+</ol>
+<p>El punt 4 és el que falla més. L''SSO ajuda molt aquí: si totes les aplicacions autentiquen contra Entra ID o el directori corporatiu, deshabilitar una compte talla l''accés a totes.</p>
+<h2>Com trobar les comptes òrfenes que ja existeixen</h2>
+<p>A Active Directory, comptes habilitades sense inici de sessió en 90 dies:</p>
+<pre><code>Search-ADAccount -AccountInactive -TimeSpan 90.00:00:00 -UsersOnly |
+  Where-Object { $_.Enabled } |
+  Select-Object Name, SamAccountName, LastLogonDate</code></pre>
+<p>I el creuament més útil: exportar la llista d''usuaris actius del directori i comparar-la amb la d''empleats actuals de recursos humans. El que sigui a la primera i no a la segona necessita una explicació. Si l''explicació és «és una compte de servei», que tingui un responsable amb nom i cognoms.</p>
+<h2>Revisions d''accés periòdiques</h2>
+<p>Les revisions d''accés (access reviews) demanen a cada responsable que confirmi, cada cert temps, que el seu equip continua necessitant els accessos que té. Entra ID Governance les automatitza i pot retirar l''accés si ningú respon. Sense aquesta eina, un full de càlcul trimestral amb els grups sensibles ja és una millora enorme. Per als rols d''administració, el mateix s''aplica amb més freqüència, com explico a <a href="/ca/blog/post/minim-privilegi-a-microsoft-entra-id/">mínim privilegi a Entra ID</a>.</p>
+<h2>Preguntes freqüents</h2>
+<h3>Què és una compte òrfena?</h3>
+<p>Una compte activa que ja no correspon a cap persona o servei que la necessiti, normalment perquè el seu usuari va deixar l''organització o el servei es va retirar sense donar de baixa la identitat.</p>
+<h3>Què significa joiner-mover-leaver?</h3>
+<p>És el cicle de vida d''una identitat en una organització: alta en incorporar-se, ajust de permisos en canviar de lloc i baixa en marxar. És la base de qualsevol procés d''IAM.</p>
+<h3>Deshabilitar o eliminar la compte quan algú se''n va?</h3>
+<p>Deshabilitar el primer dia i eliminar després d''un període de retenció definit, per poder recuperar dades o investigar si cal.</p>',
+  'iam,joiner-mover-leaver,active-directory,entra-id,gobierno-de-identidades', 'cloud-iam', 'ca', 1, '2026-10-09 09:00:00', '2026-10-09 09:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'joiner-mover-leaver-comptes-orfes');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'Accés condicional a Microsoft 365: les polítiques base',
+  'acces-condicional-microsoft-365-politiques-base',
+  'Sis polítiques d''accés condicional d''Entra ID que cobreixen quasi tot el risc d''identitat a Microsoft 365, i com activar-les sense deixar ningú fora.',
+  '<p>L''accés condicional de Microsoft Entra ID és un motor de regles del tipus «si es compleix això, exigeix allò»: si l''usuari és administrador, exigeix MFA resistent al phishing; si l''autenticació fa servir un protocol heretat, bloqueja-la; si el risc de l''inici de sessió és alt, demana MFA. Requereix llicència Entra ID P1, inclosa a Microsoft 365 Business Premium i E3. Sense ella, l''alternativa són els <em>security defaults</em>, que activen un MFA bàsic per a tothom però sense cap ajust.</p>
+<p>Amb sis polítiques es cobreix la major part dels atacs d''identitat habituals. No ho cobreixen tot, però són el punt de partida raonable en qualsevol inquilí.</p>
+<h2>Abans de crear-ne cap</h2>
+<ul>
+  <li><strong>Exclou els comptes d''emergència</strong> de totes les polítiques. Si una política mal configurada et deixa fora, són la manera de tornar a entrar. Ho explico a <a href="/ca/blog/post/minim-privilegi-a-microsoft-entra-id/">mínim privilegi a Entra ID</a>.</li>
+  <li><strong>Crea cada política en mode «només informe»</strong> (report-only). Durant una o dues setmanes registra què hauria bloquejat sense bloquejar res. Revises l''impacte i després l''actives.</li>
+</ul>
+<h2>Les sis polítiques base</h2>
+<h3>1. Bloquejar l''autenticació heretada</h3>
+<p>Protocols com POP, IMAP, SMTP AUTH o ActiveSync amb autenticació bàsica no admeten MFA, així que són la via preferida del password spraying. Microsoft va desactivar l''autenticació bàsica a Exchange Online el 2022, però bloquejar-la a l''accés condicional tanca els buits que quedin.</p>
+<h3>2. MFA resistent al phishing per a administradors</h3>
+<p>Per a tots els rols privilegiats, amb l''<em>authentication strength</em> «Phishing-resistant MFA». Per què no val qualsevol MFA ho explico a <a href="/ca/blog/post/mfa-resistent-al-phishing-per-que-sms-ja-no-basta/">MFA resistent al phishing</a>.</p>
+<h3>3. MFA per a tots els usuaris</h3>
+<p>En totes les aplicacions al núvol. Les excepcions, les mínimes, documentades i revisades.</p>
+<h3>4. MFA per al registre de mètodes de seguretat</h3>
+<p>Si un atacant entra amb la contrasenya d''un usuari que encara no tenia MFA, el primer que provarà és registrar el seu propi telèfon. Aquesta política exigeix estar en una ubicació de confiança o tenir ja un MFA per registrar mètodes nous.</p>
+<h3>5. Bloquejar països on no operes</h3>
+<p>No atura per si sola un atacant (una VPN se la salta), però elimina molt soroll d''intents automatitzats. Convé combinar-la amb un grup d''excepció per a viatges, amb data de caducitat.</p>
+<h3>6. Polítiques basades en risc</h3>
+<p>Amb Entra ID P2, Identity Protection calcula el risc de l''inici de sessió (IP anònima, credencials filtrades, viatge impossible) i de l''usuari. Exigeix MFA amb risc d''inici de sessió mitjà o alt, i canvi de contrasenya segur amb risc d''usuari alt.</p>
+<h2>El pas següent: el dispositiu</h2>
+<p>Amb les sis anteriors en marxa, la millora més gran és exigir dispositiu gestionat (compliant a Intune o unit a Entra) per accedir a dades sensibles. Així, encara que algú robi una sessió, no la pot fer servir des d''un equip que no controles. És el pas que més protegeix contra el robatori de tokens que acompanya quasi tot <a href="/ca/blog/post/business-email-compromise-senyals-a-microsoft-365/">BEC</a> actual.</p>
+<h2>Com detectar si algú se les salta</h2>
+<p>Als logs d''inici de sessió, cada esdeveniment indica quines polítiques s''han aplicat i amb quin resultat. Busca inicis de sessió correctes amb resultat «notApplied» en usuaris que haurien d''estar coberts: sol ser una exclusió oblidada. I alerta de qualsevol canvi a les polítiques mateixes; modificar una política d''accés condicional és una de les primeres coses que fa un atacant amb privilegis.</p>
+<h2>Preguntes freqüents</h2>
+<h3>Què és l''accés condicional?</h3>
+<p>La funció de Microsoft Entra ID que decideix si permet, bloqueja o exigeix requisits addicionals (MFA, dispositiu gestionat) a cada inici de sessió segons l''usuari, l''aplicació, la ubicació, el dispositiu i el risc.</p>
+<h3>Security defaults o accés condicional?</h3>
+<p>Security defaults si no tens llicència P1: és gratis i molt millor que res. Accés condicional tan bon punt tinguis P1, perquè permet excepcions controlades i mètodes d''MFA forts. No es poden fer servir les dues alhora.</p>
+<h3>Quant de temps deixar una política en mode només informe?</h3>
+<p>El suficient perquè hi passin els patrons normals d''ús: com a mínim una setmana completa, millor dues si hi ha usuaris que viatgen o treballen per torns.</p>',
+  'acceso-condicional,entra-id,microsoft-365,iam,mfa,zero-trust', 'cloud-iam', 'ca', 1, '2026-10-07 09:00:00', '2026-10-07 09:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'acces-condicional-microsoft-365-politiques-base');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'Business Email Compromise: els senyals a Microsoft 365',
+  'business-email-compromise-senyals-a-microsoft-365',
+  'Un BEC quasi mai porta malware: porta un login estrany, una regla de safata oculta i un canvi de compte bancari. Què buscar als logs de Microsoft 365.',
+  '<p>El Business Email Compromise (BEC) és un frau en què l''atacant es fa passar per algú de confiança, o directament fa servir la seva bústia compromesa, per aconseguir un pagament o dades. No sol dur adjunts maliciosos ni enllaços a malware, així que els filtres clàssics el deixen passar. Segons l''informe IC3 de l''FBI, el 2024 el BEC va causar pèrdues declarades de gairebé 2.800 milions de dòlars només als Estats Units, molt per sobre del ransomware.</p>
+<p>Quan el BEC surt d''un compte real compromès, deixa rastre als logs de Microsoft 365. Aquests són els senyals que convé buscar.</p>
+<h2>1. L''inici de sessió</h2>
+<p>Quasi sempre comença amb credencials robades per phishing, i cada cop més amb un proxy AiTM que també roba la cookie de sessió i salta l''MFA tradicional. Als logs d''inici de sessió d''Entra ID:</p>
+<ul>
+  <li>IP d''un proveïdor d''hostatge o VPN comercial, no d''un ISP residencial ni de l''oficina.</li>
+  <li>País o ciutat que no encaixa amb l''usuari, o «viatge impossible» respecte a l''inici de sessió anterior.</li>
+  <li>Un user agent diferent de l''habitual de l''usuari, de vegades de llibreries com <code>python-requests</code> o <code>axios</code>.</li>
+  <li>Un inici de sessió correcte just després que l''usuari fes clic en un enllaç d''un correu.</li>
+</ul>
+<h2>2. Les regles de la safata d''entrada</h2>
+<p>És el senyal més fiable i el que menys falsos positius dona, perquè el primer que fa l''atacant és amagar-se: una regla que mou a «RSS» o «Arxiu» i marca com a llegit qualsevol correu que contingui «factura», «pagament», «transferència» o el nom del proveïdor que vol suplantar. Així la víctima no veu les respostes.</p>
+<p>Al registre d''auditoria unificat, les operacions <code>New-InboxRule</code>, <code>Set-InboxRule</code> i <code>UpdateInboxRules</code>. Desconfia de regles amb noms d''un sol caràcter («.», «..», «a») o que mouen a carpetes que ningú fa servir.</p>
+<h2>3. Reenviaments externs</h2>
+<p>Un <code>Set-Mailbox</code> amb <code>ForwardingSmtpAddress</code> cap a una adreça externa, o una regla que reenvia còpia de tot. L''ideal és bloquejar el reenviament automàtic extern a la política antispam de sortida i crear excepcions només quan hi hagi un motiu.</p>
+<h2>4. Aplicacions OAuth amb permisos de correu</h2>
+<p>Una variant més persistent: l''atacant aconsegueix que l''usuari consenti una aplicació amb permisos com <code>Mail.Read</code> o <code>Mail.Send</code>. Encara que es canviï la contrasenya, l''app continua tenint accés. Revisa els consentiments recents a Entra ID i restringeix qui pot donar-los, com explico a l''article de <a href="/ca/blog/post/minim-privilegi-a-microsoft-entra-id/">mínim privilegi a Entra ID</a>.</p>
+<h2>5. El frau en si</h2>
+<p>El correu final: «hem canviat de banc, a partir d''ara els pagaments a aquest compte», amb un fil real de conversa al darrere i de vegades des d''un domini quasi idèntic al del proveïdor. Aquí la defensa ja no és tècnica: qualsevol canvi de dades bancàries es verifica per un canal diferent (una trucada al número que ja tenies, no al del correu).</p>
+<h2>Resposta en l''ordre correcte</h2>
+<ol>
+  <li>Revocar les sessions de l''usuari (<code>Revoke-MgUserSignInSession</code>), no només canviar la contrasenya: la cookie robada continua valent.</li>
+  <li>Restablir la contrasenya i revisar els mètodes d''MFA registrats, per si l''atacant hi ha afegit el seu.</li>
+  <li>Eliminar regles de safata i reenviaments maliciosos.</li>
+  <li>Revisar i revocar consentiments OAuth sospitosos.</li>
+  <li>Buscar al registre d''auditoria quins correus es van llegir i enviar durant l''accés, i avisar els destinataris.</li>
+</ol>
+<p>Perquè no es repeteixi, el que més redueix el risc és l''<a href="/ca/blog/post/mfa-resistent-al-phishing-per-que-sms-ja-no-basta/">MFA resistent al phishing</a> en els usuaris de finances i direcció, juntament amb <a href="/ca/blog/post/spf-dkim-i-dmarc-de-p-none-a-p-reject/">DMARC en p=reject</a> perquè ningú pugui suplantar el teu domini des de fora.</p>
+<h2>Preguntes freqüents</h2>
+<h3>Què és el BEC?</h3>
+<p>Business Email Compromise: frau per correu en què l''atacant suplanta un directiu, un empleat o un proveïdor, o fa servir el seu compte compromès, per aconseguir transferències, canvis de compte bancari o informació sensible.</p>
+<h3>Canviar la contrasenya n''hi ha prou per fer fora l''atacant?</h3>
+<p>No. Cal revocar les sessions actives, revisar els mètodes d''MFA, les regles de safata i les aplicacions amb consentiment. Si no, l''atacant conserva l''accés.</p>
+<h3>Com distingeixo un BEC d''un phishing normal?</h3>
+<p>El phishing busca credencials o instal·lar malware de manera massiva. El BEC és dirigit, sol anar sense enllaços ni adjunts i busca diners directament, recolzant-se en una relació de confiança real.</p>',
+  'bec,microsoft-365,email-security,respuesta-a-incidentes,fraude,soc', 'blue-team-soc', 'ca', 1, '2026-10-05 09:00:00', '2026-10-05 09:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'business-email-compromise-senyals-a-microsoft-365');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'Secrets en repositoris: com es filtren i com evitar-ho',
+  'secrets-en-repositoris-com-es-filtren-i-com-evitar-ho',
+  'Una clau d''API pujada a GitHub s''explota en minuts i esborrar-la del commit no n''hi ha prou. Com es filtren, com aturar-los abans del push i què fer després.',
+  '<p>Un secret (clau d''API, token, contrasenya de base de dades) pujat a un repositori públic cal donar-lo per compromès des del primer segon. Hi ha bots que llegeixen el flux de commits públics de GitHub en temps real buscant patrons de claus. I esborrar la línia al commit següent no arregla res: la clau continua a l''historial. L''única cosa que funciona és revocar-la i rotar-la.</p>
+<p>GitGuardian, al seu informe <em>State of Secrets Sprawl</em> de 2025, va comptar més de 23 milions de secrets nous exposats en commits públics de GitHub durant el 2024. I no és només cosa de projectes personals: molts surten de repositoris d''empreses.</p>
+<h2>Per on s''escapen</h2>
+<ul>
+  <li>El <code>.env</code> que no era al <code>.gitignore</code>, o que s''hi va afegir després d''haver-lo comès una vegada.</li>
+  <li>La clau «temporal» al codi per provar alguna cosa ràpid, que s''hi queda.</li>
+  <li>Fitxers de configuració d''exemple amb valors reals en lloc de marcadors.</li>
+  <li>Logs i sortides de CI que imprimeixen variables d''entorn.</li>
+  <li>Un repositori privat que es fa públic anys després, amb tot el seu historial.</li>
+</ul>
+<h2>Detectar-los abans del push</h2>
+<p>El millor moment per trobar un secret és abans que surti de la teva màquina. Un hook de pre-commit amb <a href="https://github.com/gitleaks/gitleaks">gitleaks</a> revisa cada commit i el bloqueja si hi troba alguna cosa:</p>
+<pre><code># .pre-commit-config.yaml
+repos:
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.18.4
+    hooks:
+      - id: gitleaks</code></pre>
+<p>Al mateix GitHub, la <em>push protection</em> del secret scanning rebutja el push si detecta un patró d''un proveïdor conegut, i està activa per defecte als repositoris públics des del 2024. En aquest mateix portfolio hi ha un test de PHPUnit (<code>NoSecretsTest</code>) que recorre els fitxers versionats i falla si hi troba una clau d''API. Un hook local es pot saltar amb <code>--no-verify</code>; un test que corre a CI, no.</p>
+<h2>Revisar l''historial que ja existeix</h2>
+<p>Per a repositoris amb anys d''historial, gitleaks i <a href="https://github.com/trufflesecurity/trufflehog">TruffleHog</a> escanegen tots els commits. TruffleHog a més pot verificar si una clau trobada continua sent vàlida, cosa que ajuda a prioritzar.</p>
+<pre><code>gitleaks detect --source . --log-opts="--all"</code></pre>
+<h2>Si ja s''ha filtrat</h2>
+<ol>
+  <li><strong>Revocar i rotar primer.</strong> Abans que netejar l''historial. Cada minut compta.</li>
+  <li><strong>Revisar els logs del servei</strong> afectat per veure si algú l''ha fet servir des que es va pujar. En una clau d''AWS, CloudTrail filtrant per aquell access key ID.</li>
+  <li><strong>Netejar l''historial</strong> amb <code>git filter-repo</code> si el repositori és teu, sabent que qualsevol fork o clon anterior conserva la clau. Per això el pas 1 va primer.</li>
+  <li><strong>Buscar la causa</strong> perquè no es repeteixi: faltava el <code>.gitignore</code>? No hi havia hook?</li>
+</ol>
+<h2>La solució de fons: que no hi hagi secrets per filtrar</h2>
+<p>Com menys secrets estàtics existeixin, menys n''hi ha per protegir. Un gestor de secrets (AWS Secrets Manager, Azure Key Vault, HashiCorp Vault) en lloc de fitxers, i a CI/CD federació OIDC en lloc de claus: GitHub Actions pot demanar credencials temporals a AWS o Azure sense guardar cap clau al repositori. I l''opció més segura continua sent no necessitar credencials: <a href="/ca/blog/post/vigilar-el-cataleg-kev-de-cisa-sense-servidor/">kev-digest</a> només llegeix un catàleg públic, així que corre a Actions sense cap secret de tercers per protegir.</p>
+<h2>Preguntes freqüents</h2>
+<h3>N''hi ha prou amb fer el repositori privat?</h3>
+<p>No. Qualsevol persona amb accés al repositori, o qualsevol integració amb permisos de lectura, veu el secret. I si algú el va clonar mentre era públic, ja el té.</p>
+<h3>Esborrar el commit elimina la clau?</h3>
+<p>No de manera fiable. El commit pot continuar accessible pel seu hash, en forks, en caches i en clons. Cal revocar la clau sempre.</p>
+<h3>Quina eina faig servir per començar?</h3>
+<p>gitleaks com a hook de pre-commit i a CI, més push protection a GitHub. Les dues són gratuïtes.</p>',
+  'secretos,git,github,devsecops,gitleaks,credenciales', 'vulnerabilidades', 'ca', 1, '2026-10-01 09:00:00', '2026-10-01 09:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'secrets-en-repositoris-com-es-filtren-i-com-evitar-ho');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'Errors de configuració al cloud que més es repeteixen',
+  'errors-de-configuracio-al-cloud-mes-repetits',
+  'Quasi totes les bretxes al cloud vénen de la configuració del client: buckets públics, claus eternes, ports oberts i logs apagats. Què revisar primer.',
+  '<p>La majoria de bretxes al cloud no exploten una fallada d''AWS, Azure o Google Cloud. Exploten alguna cosa que el client va configurar malament. És el que diu el <strong>model de responsabilitat compartida</strong>: el proveïdor respon de la seguretat <em>del</em> núvol (centres de dades, hipervisor, xarxa física) i tu de la seguretat <em>al</em> núvol (identitats, dades, configuració de cada servei). Gartner va arribar a predir que fins al 2025 el 99 % de les fallades de seguretat al cloud serien responsabilitat del client.</p>
+<p>Aquesta és la llista curta que miraria primer en un compte cloud desconegut, ordenada pel mal que fa cada fallada.</p>
+<h2>1. Emmagatzematge exposat a internet</h2>
+<p>Buckets de S3, contenidors d''Azure Blob o buckets de GCS amb accés públic. És el clàssic de les filtracions de dades. AWS activa <em>Block Public Access</em> per defecte als buckets nous des de l''abril de 2023, però els antics continuen com estaven i qualsevol persona amb permisos el pot desactivar.</p>
+<p>Què mirar: Block Public Access a nivell de <strong>compte</strong>, no només de bucket, i una alerta si algú el canvia.</p>
+<h2>2. Claus d''accés de llarga durada</h2>
+<p>Access keys d''IAM creades fa anys, assignades a un usuari que ja no és a l''empresa, amb permisos d''administrador i enganxades en algun script. És la credencial ideal per a un atacant: no caduca i no té MFA.</p>
+<p>Què mirar: claus de més de 90 dies, claus sense ús recent, i si es poden substituir per rols amb credencials temporals. Quan una d''aquestes claus acaba en un repositori, el problema és el que explico a <a href="/ca/blog/post/secrets-en-repositoris-com-es-filtren-i-com-evitar-ho/">com es filtren els secrets a Git</a>.</p>
+<h2>3. Rols amb permisos de més</h2>
+<p>Polítiques amb <code>"Action": "*"</code> o <code>"Resource": "*"</code> perquè «així funcionava». La bretxa de Capital One del 2019 va combinar un SSRF en una aplicació web amb el servei de metadades de la instància (IMDSv1) i un rol amb accés a massa buckets. Sense aquest rol sobredimensionat, l''SSRF s''hauria quedat en poca cosa.</p>
+<p>Què mirar: exigir IMDSv2 a les instàncies, i fer servir les eines del mateix proveïdor (IAM Access Analyzer a AWS, per exemple) per veure quins permisos no s''utilitzen mai.</p>
+<h2>4. Ports d''administració oberts a 0.0.0.0/0</h2>
+<p>SSH (22) i RDP (3389) oberts a tot internet en un security group o un NSG. Els escàners els troben en minuts. L''alternativa és un bastió, accés a través del mateix proveïdor (Session Manager, Azure Bastion, IAP) o almenys restringir per IP d''origen.</p>
+<h2>5. Logs apagats o sense retenció</h2>
+<p>CloudTrail desactivat en alguna regió, Azure Activity Log sense exportar, logs d''accés d''emmagatzematge sense habilitar. No impedeix l''atac, però quan arriba l''incident no hi ha manera de saber què ha passat. Sense logs, la investigació es queda en suposicions.</p>
+<h2>6. Identitat feble a la consola</h2>
+<p>El compte arrel d''AWS sense MFA, o amb access keys pròpies. Usuaris de consola sense MFA. És la versió cloud del mateix problema de sempre, i s''arregla amb <a href="/ca/blog/post/mfa-resistent-al-phishing-per-que-sms-ja-no-basta/">MFA resistent al phishing</a> i <a href="/ca/blog/post/minim-privilegi-a-microsoft-entra-id/">mínim privilegi</a>.</p>
+<h2>Revisar-ho una vegada no serveix: CSPM</h2>
+<p>Tot l''anterior es pot revisar a mà, però la configuració canvia cada dia. Les eines de CSPM (Cloud Security Posture Management) comproven la configuració de manera contínua contra marcs com els CIS Benchmarks i avisen quan alguna cosa es desvia. Els proveïdors tenen la seva (AWS Security Hub, Microsoft Defender for Cloud) i plataformes com Trend Micro Vision One també ho cobreixen. Per començar sense cost, <a href="https://github.com/prowler-cloud/prowler">Prowler</a> és de codi obert i molt complet.</p>
+<h2>Preguntes freqüents</h2>
+<h3>Què és el model de responsabilitat compartida?</h3>
+<p>El repartiment de qui protegeix què al núvol. El proveïdor protegeix la infraestructura; el client, tot el que configura al damunt. Com més gestionat és el servei (SaaS davant d''IaaS), més part assumeix el proveïdor, però les identitats i les dades sempre són teves.</p>
+<h3>Què és CSPM?</h3>
+<p>Una categoria d''eines que avaluen de manera contínua la configuració dels teus comptes cloud contra bones pràctiques i normatives, i detecten desviacions com un bucket que s''ha tornat públic.</p>
+<h3>Per on començo si només tinc una tarda?</h3>
+<p>MFA al compte arrel i a tots els administradors, Block Public Access a nivell de compte i CloudTrail (o l''equivalent) actiu a totes les regions.</p>',
+  'cloud-security,aws,azure,cspm,misconfiguration,iam', 'cloud-iam', 'ca', 1, '2026-09-28 09:00:00', '2026-09-28 09:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'errors-de-configuracio-al-cloud-mes-repetits');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'XDR, SIEM i EDR: en què es diferencien en un SOC real',
+  'xdr-siem-i-edr-diferencies-en-un-soc',
+  'L''EDR vigila l''endpoint, el SIEM centralitza logs de qualsevol font i l''XDR correlaciona diverses capes de sèrie. Què aporta cadascun a la feina diària d''un SOC.',
+  '<p>Un EDR vigila el que passa dins de cada equip i el pot aïllar. Un SIEM recull logs de qualsevol font, els guarda i permet correlacionar-los i cercar-hi. Un XDR ajunta la telemetria de diverses capes (endpoint, correu, identitat, xarxa, cloud) normalment d''un mateix fabricant, i la correlaciona per tu en un únic incident. No són substituts exactes: es solapen, i la majoria de SOC acaben fent servir dos dels tres.</p>
+<p>Treballo a diari amb Trend Micro Vision One, que és un XDR, així que el que segueix surt d''aquesta perspectiva.</p>
+<h2>EDR: el detall de l''endpoint</h2>
+<p>L''EDR registra processos, connexions de xarxa, canvis al registre i fitxers, i detecta comportament sospitós al mateix equip. La seva força és la profunditat: pots veure l''arbre de processos complet d''un <code>winword.exe</code> que va llançar <code>powershell.exe</code> amb una ordre codificada, i aïllar l''equip de la xarxa amb un botó.</p>
+<p>El seu límit és que només veu endpoints. Un inici de sessió des d''una IP estranya a Microsoft 365 o una regla de reenviament creada en una bústia no hi passen.</p>
+<h2>SIEM: tot en un lloc, a la teva manera</h2>
+<p>Un SIEM (Splunk, Microsoft Sentinel, QRadar, Elastic, Wazuh) ingesta logs del que vulguis: tallafocs, controladors de domini, proxies, aplicacions pròpies, cloud. El que aporta:</p>
+<ul>
+  <li>Retenció llarga i cerca sobre tot aquest historial.</li>
+  <li>Regles de correlació pròpies, escrites per al teu entorn.</li>
+  <li>Compliment normatiu: moltes auditories demanen logs centralitzats durant un temps concret.</li>
+</ul>
+<p>A canvi, dona feina: normalitzar fonts, escriure i afinar regles, pagar per volum ingestat. Un SIEM acabat d''instal·lar i sense afinar genera soroll, no detecció.</p>
+<h2>XDR: correlació ja feta</h2>
+<p>L''XDR parteix de què el fabricant controla els sensors de diverses capes i per tant els pot correlacionar de sèrie. A la pràctica, en lloc de tres alertes soltes (correu sospitós lliurat, macro executada, connexió a un domini nou) reps un únic incident amb la seqüència completa i l''usuari afectat.</p>
+<p>Per al <a href="/ca/blog/post/triatge-alertes-en-un-soc-en-quin-ordre-mirar/">triatge d''alertes</a> això canvia molt el temps per incident. La contrapartida és que la visibilitat és millor dins de l''ecosistema del fabricant i més pobra fora.</p>
+<h2>Taula comparativa</h2>
+<table>
+  <thead><tr><th></th><th>EDR</th><th>SIEM</th><th>XDR</th></tr></thead>
+  <tbody>
+    <tr><td>Fonts</td><td>Endpoints</td><td>Qualsevol</td><td>Diverses capes, mateix fabricant</td></tr>
+    <tr><td>Correlació</td><td>A l''equip</td><td>Regles pròpies</td><td>De sèrie</td></tr>
+    <tr><td>Resposta</td><td>Aïllar, matar procés</td><td>Via SOAR</td><td>Integrada</td></tr>
+    <tr><td>Retenció</td><td>Curta</td><td>Llarga</td><td>Mitjana</td></tr>
+    <tr><td>Esforç d''ajust</td><td>Baix</td><td>Alt</td><td>Mitjà</td></tr>
+  </tbody>
+</table>
+<h2>Quin necessita una empresa mitjana</h2>
+<p>Si cal triar-ne un, per a una organització sense equip per mantenir regles de correlació, un XDR (o un EDR amb servei gestionat) dona més detecció per hora de feina. El SIEM arriba quan cal retenció per normativa, quan hi ha fonts que l''XDR no cobreix (OT, aplicacions pròpies) o quan l''equip vol escriure la seva pròpia detecció. El normal és acabar amb XDR i SIEM alhora, amb l''XDR enviant els seus incidents al SIEM.</p>
+<h2>Preguntes freqüents</h2>
+<h3>L''XDR substitueix el SIEM?</h3>
+<p>En algunes organitzacions petites, sí. Tan bon punt hi ha requisits de retenció de logs o fonts de tercers, no: es complementen.</p>
+<h3>Què és un SOAR?</h3>
+<p>Una plataforma d''orquestració i resposta automatitzada que executa playbooks sobre alertes: enriquir un IOC, obrir un tiquet, bloquejar un usuari. Molts SIEM i XDR ja inclouen part d''aquesta funció.</p>
+<h3>I l''MDR?</h3>
+<p>Managed Detection and Response no és un producte sinó un servei: un equip extern vigila i respon fent servir EDR o XDR. És l''opció quan no hi ha SOC propi 24x7.</p>',
+  'xdr,siem,edr,soc,vision-one,deteccion', 'blue-team-soc', 'ca', 1, '2026-09-24 09:00:00', '2026-09-24 09:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'xdr-siem-i-edr-diferencies-en-un-soc');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'Mínim privilegi a Microsoft Entra ID, a la pràctica',
+  'minim-privilegi-a-microsoft-entra-id',
+  'Massa administradors globals i rols permanents. Com aplicar el mínim privilegi a Microsoft Entra ID amb rols específics, PIM i comptes break-glass.',
+  '<p>El principi de mínim privilegi diu que cada compte té només els permisos que necessita, durant el temps que els necessita. A Microsoft Entra ID (l''antic Azure AD) això es tradueix en tres coses concretes: fer servir rols específics en lloc d''Administrador global, que els rols privilegiats siguin temporals amb PIM i tenir comptes d''emergència que funcionin quan tota la resta falla.</p>
+<p>És el mateix que <a href="/ca/blog/post/active-directory-els-deu-primers-canvis-en-qualsevol-domini-nou/">revisava a Active Directory amb Domain Admins</a>, però al núvol el radi d''impacte és més gran: un administrador global controla el correu, els fitxers de SharePoint i OneDrive, les identitats i, amb un clic, les subscripcions d''Azure.</p>
+<h2>Quants administradors globals són massa</h2>
+<p>Microsoft recomana <a href="https://learn.microsoft.com/es-es/entra/identity/role-based-access-control/best-practices">menys de cinc administradors globals</a> per inquilí. El normal és el contrari: el tècnic que va muntar l''inquilí, el proveïdor que va fer la migració, el director que ho va demanar «per si de cas» i algun compte de servei que ningú sap per a què és.</p>
+<p>Per treure''ls ràpid, des de PowerShell amb Microsoft Graph:</p>
+<pre><code>Connect-MgGraph -Scopes RoleManagement.Read.Directory
+$rol = Get-MgDirectoryRole -Filter "displayName eq ''Global Administrator''"
+Get-MgDirectoryRoleMember -DirectoryRoleId $rol.Id</code></pre>
+<h2>Rols específics en lloc d''Administrador global</h2>
+<p>Gairebé ningú necessita Administrador global per a la seva feina diària. Les tasques habituals tenen el seu rol:</p>
+<table>
+  <thead><tr><th>Tasca</th><th>Rol suficient</th></tr></thead>
+  <tbody>
+    <tr><td>Restablir contrasenyes</td><td>Helpdesk Administrator</td></tr>
+    <tr><td>Crear usuaris i grups</td><td>User Administrator</td></tr>
+    <tr><td>Gestionar bústies</td><td>Exchange Administrator</td></tr>
+    <tr><td>Revisar alertes</td><td>Security Reader / Operator</td></tr>
+    <tr><td>Llicències</td><td>License Administrator</td></tr>
+    <tr><td>Polítiques d''accés condicional</td><td>Conditional Access Administrator</td></tr>
+  </tbody>
+</table>
+<p>Un detall que es passa per alt: els permisos que té un usuari per <em>consentir aplicacions</em>. Si qualsevol pot donar permisos de lectura de correu a una app OAuth, el mínim privilegi en rols es queda curt. Convé restringir el consentiment a editors verificats o a un flux d''aprovació.</p>
+<h2>PIM: privilegi només quan cal</h2>
+<p>Privileged Identity Management converteix els rols en <em>elegibles</em> en lloc d''<em>actius</em>. La persona no és administradora fins que ho demana, justifica el motiu, passa MFA i, si es configura, algú ho aprova. Al cap d''unes hores el rol caduca sol.</p>
+<p>Per al SOC, l''avantatge és que un compte compromès sense rol actiu no pot fer quasi res, i cada activació queda registrada amb la seva justificació. Una activació d''Administrador global a les tres de la matinada és una alerta molt fàcil d''escriure.</p>
+<p>PIM requereix llicència Entra ID P2 (o Entra ID Governance). Si no n''hi ha, almenys separa el compte d''administració del compte diari amb què es llegeix el correu i es navega.</p>
+<h2>Comptes d''emergència (break-glass)</h2>
+<p>Dos comptes cloud-only, sense bústia, amb Administrador global permanent, exclosos de les polítiques d''accés condicional que et podrien deixar fora, i protegits amb clau FIDO2 física. Microsoft en recomana dos, amb credencials separades.</p>
+<p>El que quasi ningú fa: <strong>provar-los</strong> cada pocs mesos i tenir una alerta que salti cada cop que un d''ells inicia sessió. Si es fan servir i ningú se n''assabenta, són la porta del darrere perfecta.</p>
+<h2>Preguntes freqüents</h2>
+<h3>Què és el principi de mínim privilegi?</h3>
+<p>Concedir a cada usuari, aplicació o servei només els permisos imprescindibles per a la seva funció i durant el temps just. Redueix el que pot fer un atacant amb un compte robat.</p>
+<h3>PIM substitueix l''MFA?</h3>
+<p>No, el complementa. PIM pot exigir MFA a cada activació, i l''ideal és que sigui <a href="/ca/blog/post/mfa-resistent-al-phishing-per-que-sms-ja-no-basta/">MFA resistent al phishing</a>.</p>
+<h3>Cada quant revisar els rols assignats?</h3>
+<p>Com a mínim trimestralment, i sempre que algú canviï de lloc o se''n vagi. És el mateix problema que el <a href="/ca/blog/post/joiner-mover-leaver-comptes-orfes/">cicle joiner-mover-leaver</a>, aplicat a privilegis.</p>',
+  'entra-id,iam,minimo-privilegio,pim,azure,microsoft-365', 'cloud-iam', 'ca', 1, '2026-09-21 09:00:00', '2026-09-21 09:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'minim-privilegi-a-microsoft-entra-id');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'SPF, DKIM i DMARC: com passar de p=none a p=reject',
+  'spf-dkim-i-dmarc-de-p-none-a-p-reject',
+  'Què fan SPF, DKIM i DMARC, per què tants dominis es queden en p=none i com arribar a p=reject per fases sense perdre correu legítim.',
+  '<p>SPF diu quins servidors poden enviar correu en nom del teu domini, DKIM signa cada missatge per demostrar que no s''ha modificat, i DMARC li diu al receptor què fer quan un correu falla aquestes comprovacions i a qui enviar l''informe. Per separat cap d''ells impedeix que algú suplanti el teu domini al camp <code>From</code> que veu l''usuari. DMARC amb <code>p=reject</code> sí.</p>
+<p>I tot i així, moltíssims dominis porten anys amb DMARC publicat en <code>p=none</code>. És l''equivalent de tenir una alarma que només apunta en una llibreta qui ha entrat.</p>
+<h2>Què comprova cada registre</h2>
+<h3>SPF</h3>
+<p>Un registre TXT al domini amb la llista d''IP i serveis autoritzats:</p>
+<pre><code>v=spf1 include:spf.protection.outlook.com include:_spf.google.com -all</code></pre>
+<p>Dos detalls que trenquen més SPF dels que haurien: el límit de <strong>10 consultes DNS</strong> (cada <code>include</code> compta, i els aniuats també) i que SPF valida el remitent del sobre (<code>Return-Path</code>), no el <code>From</code> visible.</p>
+<h3>DKIM</h3>
+<p>El servidor emissor signa capçaleres i cos amb una clau privada, i publica la pública a DNS sota un selector (<code>selector1._domainkey.tudominio.com</code>). Sobreviu als reenviaments millor que SPF, que és just el motiu pel qual DMARC accepta qualsevol dels dos.</p>
+<h3>DMARC</h3>
+<p>DMARC exigeix <em>alineació</em>: que el domini que passa SPF o DKIM coincideixi amb el del <code>From</code>. Aquí hi ha la protecció real contra la suplantació.</p>
+<pre><code>v=DMARC1; p=none; rua=mailto:dmarc@tudominio.com; fo=1</code></pre>
+<h2>Per què ja no és opcional</h2>
+<p>Des del febrer de 2024, Google i Yahoo exigeixen SPF, DKIM i DMARC a qui enviï més de 5.000 correus al dia als seus usuaris, i Microsoft va anunciar requisits equivalents per a Outlook.com el 2025. Per a un domini corporatiu petit el volum no arriba a aquests llindars, però la direcció és clara: el correu sense autenticar arriba cada cop pitjor.</p>
+<h2>El procés per fases fins a p=reject</h2>
+<ol>
+  <li><strong>Inventari.</strong> Publica <code>p=none</code> amb <code>rua</code> i deixa que arribin informes agregats almenys dues o tres setmanes. Et sortiran remitents que ningú recordava: el CRM, l''eina de factures, el formulari del web, l''escàner de l''oficina.</li>
+  <li><strong>Arreglar cada remitent legítim.</strong> Per a cadascun, configurar DKIM amb el teu domini (millor que afegir-lo a SPF, que té el límit de 10 consultes).</li>
+  <li><strong><code>p=quarantine</code> amb <code>pct</code> baix.</strong> Comença amb <code>pct=10</code> o <code>25</code>, revisa informes, puja.</li>
+  <li><strong><code>p=reject</code></strong> quan els informes portin un temps nets. Aquí també convé <code>sp=reject</code> per als subdominis, que és per on entra la suplantació quan el domini principal ja està protegit.</li>
+</ol>
+<p>Els informes agregats són XML i llegir-los a mà és una tortura. Per revisar un missatge concret, l''<a href="/ca/blog/post/blue-team-hub-per-que-vaig-treure-el-vidre-esmerilat/">analitzador de capçaleres de Blue Team Hub</a> mostra el resultat de SPF, DKIM i DMARC i els salts del correu sense enviar res a cap servidor.</p>
+<h2>El que DMARC no fa</h2>
+<p>DMARC protegeix el teu domini exacte. No impedeix que algú registri <code>tudominio-pagos.com</code> o faci servir un nom visible enganyós amb un compte de Gmail. Contra això calen filtres del costat receptor i formació. Tampoc serveix si l''atacant entra en una bústia real de la teva organització, que és l''escenari del <a href="/ca/blog/post/business-email-compromise-senyals-a-microsoft-365/">BEC amb compte compromès</a>.</p>
+<h2>Preguntes freqüents</h2>
+<h3>Puc posar p=reject directament?</h3>
+<p>Pots, però si hi ha un servei legítim que envia en nom teu i no està alineat, els seus correus es rebutjaran sense avís. Les setmanes en <code>p=none</code> serveixen precisament per descobrir-los.</p>
+<h3>Quina diferència hi ha entre ~all i -all a SPF?</h3>
+<p><code>~all</code> (softfail) marca com a sospitós el que no és a la llista; <code>-all</code> (fail) ho marca com a no autoritzat. Amb DMARC en <code>reject</code>, la política que mana és la de DMARC, així que la diferència importa menys del que sembla.</p>
+<h3>Cal DMARC en un domini que no envia correu?</h3>
+<p>Sí, i és el cas més fàcil: <code>v=spf1 -all</code> i <code>v=DMARC1; p=reject</code>. Els dominis aparcats sense protecció són els preferits per a campanyes de suplantació.</p>',
+  'spf,dkim,dmarc,email-security,dns,phishing', 'blue-team-soc', 'ca', 1, '2026-09-17 09:00:00', '2026-09-17 09:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'spf-dkim-i-dmarc-de-p-none-a-p-reject');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'MFA resistent al phishing: per què l''SMS ja no basta',
+  'mfa-resistent-al-phishing-per-que-sms-ja-no-basta',
+  'L''MFA per SMS o push es salta amb phishing en temps real i fatiga d''MFA. Quins mètodes resisteixen de debò el phishing i com migrar sense bloquejar ningú.',
+  '<p>Un segon factor per SMS és millor que no tenir-ne cap, però ja no frena un atacant amb una mica de preparació. L''MFA resistent al phishing és el que no es pot reenviar a una web falsa: la credencial està lligada criptogràficament al domini legítim, així que encara que l''usuari piqui, el que entrega no serveix a cap altre lloc. Avui això vol dir claus FIDO2, passkeys i Windows Hello for Business, o certificats amb smart card.</p>
+<h2>Com es salta un MFA «normal»</h2>
+<p>Hi ha tres tècniques habituals, i cap no necessita trencar criptografia:</p>
+<ul>
+  <li>Phishing en temps real (AiTM): un proxy invers es col·loca entre la víctima i el login real. L''usuari escriu usuari, contrasenya i codi, el proxy els reenvia al servei de veritat i es queda amb la cookie de sessió. Kits com Evilginx o EvilProxy ho deixen a l''abast de qualsevol.</li>
+  <li>Fatiga d''MFA: l''atacant ja té la contrasenya i llança notificacions push una darrere l''altra fins que algú prem «Aprovar» perquè parin. A l''incident d''Uber del 2022 l''atacant va combinar això amb un missatge per WhatsApp fent-se passar pel suport intern.</li>
+  <li>SIM swapping: amb el número de telèfon portat a una altra SIM, els codis per SMS arriben directament a l''atacant.</li>
+</ul>
+<p>Els tres funcionen perquè el factor (un codi de sis dígits, un botó d''aprovar) no sap en quina web s''està fent servir.</p>
+<h2>Quins mètodes són resistents al phishing</h2>
+<p>CISA va publicar el 2022 una guia específica sobre això, <a href="https://www.cisa.gov/sites/default/files/publications/fact-sheet-implementing-phishing-resistant-mfa-508c.pdf">Implementing Phishing-Resistant MFA</a>, i la seva classificació continua sent una bona referència:</p>
+<table>
+  <thead><tr><th>Mètode</th><th>Resistent al phishing?</th></tr></thead>
+  <tbody>
+    <tr><td>Codi per SMS o trucada</td><td>No</td></tr>
+    <tr><td>Codi TOTP (app autenticadora)</td><td>No</td></tr>
+    <tr><td>Push sense number matching</td><td>No</td></tr>
+    <tr><td>Push amb number matching</td><td>Millor, però no</td></tr>
+    <tr><td>Clau FIDO2 / passkey</td><td>Sí</td></tr>
+    <tr><td>Windows Hello for Business</td><td>Sí</td></tr>
+    <tr><td>Certificat (PKI / smart card)</td><td>Sí</td></tr>
+  </tbody>
+</table>
+<p>El number matching (l''usuari tecleja al mòbil el número que veu a la pantalla) acaba quasi del tot amb la fatiga d''MFA, i Microsoft el va activar per a tots els inquilins d''Authenticator el 2023. Però un proxy AiTM pot mostrar aquest número igual que mostra la pàgina de login, així que no protegeix contra el phishing en temps real.</p>
+<h2>Per què FIDO2 i les passkeys sí aguanten</h2>
+<p>Una passkey és un parell de claus. La privada no surt mai del dispositiu, i en registrar-la queda associada al domini exacte del servei. Quan el navegador rep una petició d''autenticació de <code>login.micr0soft-secure.com</code>, la passkey de <code>login.microsoftonline.com</code> senzillament no respon. No hi ha cap codi per copiar ni cap botó per prémer per cansament: l''usuari no té manera d''entregar res que valgui al domini fals.</p>
+<h2>Com migrar sense bloquejar ningú</h2>
+<p>L''error típic és voler activar-ho per a tothom el mateix dia. L''ordre que funciona:</p>
+<ol>
+  <li><strong>Comptes privilegiats primer.</strong> Administradors globals, d''Exchange, de seguretat. Són pocs, el risc és màxim i la gent que els fa servir entén per què es canvia.</li>
+  <li><strong>Comptes d''emergència (break-glass) amb clau FIDO2 física</strong>, guardada fora del flux diari.</li>
+  <li><strong>Usuaris amb més exposició</strong>: finances, recursos humans, direcció. Són els objectius habituals de <a href="/ca/blog/post/business-email-compromise-senyals-a-microsoft-365/">frau BEC</a>.</li>
+  <li><strong>La resta, per fases</strong>, deixant un mètode de reserva temporal i traient-lo quan el registre de passkeys passi d''un llindar que tinguis mesurat.</li>
+</ol>
+<p>A Microsoft Entra ID això es controla amb les <em>authentication strengths</em> dins d''<a href="/ca/blog/post/acces-condicional-microsoft-365-politiques-base/">accés condicional</a>: pots exigir «MFA resistent al phishing» només per a certs rols o aplicacions sense tocar la resta.</p>
+<h2>Preguntes freqüents</h2>
+<h3>Una app autenticadora amb codi és segura?</h3>
+<p>És més segura que l''SMS perquè no depèn del número de telèfon, però el codi es pot introduir en una web falsa igual que una contrasenya. No és resistent al phishing.</p>
+<h3>Les passkeys sincronitzades al núvol compten?</h3>
+<p>Sí que resisteixen el phishing, perquè continuen lligades al domini. La diferència amb una clau física és on viu la clau privada: en una passkey sincronitzada depèn de la seguretat del compte d''Apple, Google o del gestor de contrasenyes. Per a comptes d''administració prefereixo clau física.</p>
+<h3>L''MFA resistent al phishing evita el robatori de cookies de sessió?</h3>
+<p>Evita l''AiTM, que és la forma més comuna de robar-les. Si un infostealer ja és a l''equip i s''emporta la cookie després del login, l''MFA no hi intervé; per a això calen controls de dispositiu i protecció de tokens.</p>',
+  'mfa,passkeys,fido2,iam,phishing,entra-id', 'cloud-iam', 'ca', 1, '2026-09-14 09:00:00', '2026-09-14 09:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'mfa-resistent-al-phishing-per-que-sms-ja-no-basta');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'El desacord entre classificadors perd contra alguna cosa molt més simple',
+  'el-desacord-entre-classificadors-perd-contra-alguna-cosa-mes-simple',
+  'Mesura sobre 7.822 correus reals si el desacord entre quatre classificadors serveix per decidir què revisa abans un analista. Esperava que sí. Les dades diuen que no.',
+  '<p>Un analista no pot revisar tot el correu que marca un classificador. La pregunta que volia respondre amb dades, no amb intuïció: pot el desacord entre diversos classificadors dir-li a aquest analista quin ha de revisar primer? La motivació venia de dos llocs molt diferents: <a href="https://huggingface.co/BSC-LT/catalan-verification-model-pkt-a">els models de verificació del BSC per al català</a>, que entrenen dues còpies del mateix reconeixedor de veu amb meitats disjuntes del corpus perquè els seus errors no estiguin correlacionats, i <a href="https://www.frontiersin.org/journals/artificial-intelligence/articles/10.3389/frai.2026.1829902/full">un estudi del 2026 sobre transcripció mèdica</a> que fa servir el desacord entre vuit transcriptors com a senyal sense referència per decidir què revisa un humà, recuperant el 93,7 % dels errors revisant el 28,6 % del text. L''estructura del problema en un SOC és idèntica: sense veritat de referència, amb revisió humana cara i escassa. Semblava traslladable.</p>
+<h2>El resultat, en una línia</h2>
+<p>Sobre 7.822 correus reals (Nazario phishing corpus + SpamAssassin públic), el desacord funciona per prioritzar la revisió (AUC 0,905 davant de 0,515 de l''atzar), però perd clarament contra un senyal molt més simple: la incertesa mitjana del mateix ensemble, amb AUC 0,959. Per capturar el 95 % dels errors cal revisar el 14,10 % del correu mirant només la incertesa mitjana. Amb el desacord per desviació, en calen el 22,62 %. No cal ensemble per al bon resultat: n''hi ha prou amb mirar on el model no està segur.</p>
+<table>
+<tr><th>Senyal de prioritat</th><th>AUC de triatge</th><th>Correu a revisar per al 95 % d''errors</th></tr>
+<tr><td>Oracle (sostre teòric)</td><td>0,991</td><td>1,75 %</td></tr>
+<tr><td><strong>Incertesa mitjana</strong></td><td><strong>0,959</strong></td><td><strong>14,10 %</strong></td></tr>
+<tr><td>Desacord: desviació</td><td>0,905</td><td>22,62 %</td></tr>
+<tr><td>Desacord: força de majoria</td><td>0,907</td><td>41,20 %</td></tr>
+<tr><td>Atzar (terra)</td><td>0,515</td><td>97,66 %</td></tr>
+</table>
+<h2>Per què va fallar la hipòtesi</h2>
+<p>L''ensemble dona quatre vistes del mateix correu (remitent, URL, estructura de l''HTML i text), però no són igual de fortes. La vista de text (TF-IDF més regressió logística) sola arriba a un 98,17 % d''exactitud i AUC 0,998, pràcticament igualant l''ensemble complet. Quan un membre és molt superior a la resta, el desacord deixa de mesurar dubte genuí i passa a mesurar que els febles s''equivoquen, cosa que no informa sobre si l''ensemble encerta. Aquí hi ha la diferència amb el muntatge del BSC: els seus dos models tenen taxes d''error quasi idèntiques per disseny. Aquesta sembla ser la condició que fa útil el desacord, i és una condició que aquí no es compleix.</p>
+<h2>El control que gairebé invalida l''experiment</h2>
+<p>Els corpus públics de phishing arrosseguen un problema que gairebé mai es declara: el correu legítim i el phishing vénen d''èpoques diferents: el 87 % del phishing és del 2004-2007, el legítim és del 2002. Classificar fent servir només l''any dona un 99,74 % d''exactitud: la drecera existeix i és quasi perfecta. Restringint l''avaluació a la franja on les dues classes se solapen (2004 o abans), el rendiment no cau (98,31 %, AUC 1,000), cosa que indica que el model no està fent servir aquesta drecera, encara que amb la cautela que aquesta franja només té 31 casos de phishing: evidència indicativa, no concloent.</p>
+<h2>Límits, dits sense adorns</h2>
+<ul>
+  <li>No diu que el desacord sigui inútil. Diu que perd contra un baseline més simple en aquest muntatge concret, amb vistes de força desigual.</li>
+  <li>Només 43 errors a la partició de prova: les corbes de triatge són sorolloses.</li>
+  <li>El corpus és del 2004-2007: sense HTTPS generalitzat, sense escurçadors, sense typosquatting modern. Les conclusions de mètode haurien d''aguantar; les xifres absolutes no són extrapolables a un SOC d''avui.</li>
+  <li>Una única partició 70/30 amb llavor fixa, sense validació creuada.</li>
+</ul>
+<p>És el mateix problema, vist des de l''altre costat, que treballo a <a href="/ca/blog/post/classificar-phishing-al-navegador-sense-enviar-la-url/">el classificador de phishing al navegador</a>: allà la pregunta era classificar bé sense enviar res a cap servidor; aquí, un cop classificat, què fa perdre menys temps a l''analista que l''ha de revisar. El següent experiment que tinc a la llista: repetir això amb quatre models de la mateixa família entrenats sobre particions disjuntes del corpus, replicant el mètode del BSC en lloc de només la seva intuïció, per comprovar si el desacord remunta en equiparar forces entre vistes. <a href="https://github.com/eduolihez/phishing-triage">El codi, els experiments i el README complet amb tots els números estan publicats</a>.</p>',
+  'machine-learning,phishing,triaje,soc,scikit-learn,investigacion', 'ia-aplicada', 'ca', 1, '2026-09-04 09:00:00', '2026-09-04 09:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'el-desacord-entre-classificadors-perd-contra-alguna-cosa-mes-simple');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'El que dona temps a aprendre construint un sensor d''aigua en 24 hores',
+  'el-que-dona-temps-a-aprendre-en-24-hores-de-hackathon',
+  'Dewi App va ser el nostre prototip guanyador a la 8a Hackathon TecnoCampus: un sensor físic de cabal connectat a un web de consum d''aigua, muntat entre quatre persones en menys d''un dia.',
+  '<p>Això se surt del terreny habitual d''aquest blog (res de SOC, res de blue team) però mereix un lloc perquè la restricció més dura que he tingut mai en un projecte no va ser tècnica, va ser el rellotge: vint-i-quatre hores, de la idea al prototip funcionant sobre un escenari.</p>
+<h2>Què vam construir</h2>
+<p>Dewi App va néixer a la 8a Hackathon TecnoCampus amb un objectiu simple: ajudar a monitoritzar i reduir el consum d''aigua domèstic. La part física va ser un sensor de cabal per Arduino, programat i calibrat aquella mateixa nit. La part web, una aplicació en Next.js i TypeScript que rebia aquestes dades i les convertia en alguna cosa llegible: consum, tendències, recomanacions per gastar menys.</p>
+<h2>El que canvia quan el límit és el temps, no l''abast</h2>
+<p>En un projecte sense data límit es pot discutir arquitectura durant hores. En una hackathon aquesta discussió és un luxe que no existeix: es tria l''opció que se sap muntar ràpid i s''avança. Això obliga a una disciplina que després trasllado a projectes amb més temps: decidir ràpid, mesurar si funciona, i no protegir-se darrere de «fer-ho bé» quan el que cal és tenir alguna cosa que funcioni ja.</p>
+<h2>Un prototip, no un producte</h2>
+<p>El mateix repositori ho deixa clar: és un prototip, no una cosa llesta per a producció. Falten autenticació real, persistència de dades de debò, integració en temps real amb el sensor més enllà de la demo. Està bé: no era l''objectiu de la nit. L''objectiu era demostrar que la idea se sosté, i vam guanyar la hackathon amb aquesta demostració.</p>
+<p>L''equip va ser Marc Lumbreras, Nil Sentís, Jan Naranjo i jo. El prototip <a href="https://dewi-hackathon.vercel.app">continua desplegat</a>, tal com va sortir aquella nit.</p>',
+  'hackathon,nextjs,arduino,prototipo,trabajo-en-equipo', 'carrera-personal', 'ca', 1, '2026-09-03 18:00:00', '2026-09-03 18:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'el-que-dona-temps-a-aprendre-en-24-hores-de-hackathon');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'Revocar un token sense haver d''enderrocar la sessió sencera',
+  'revocar-un-token-sense-enderrocar-la-sessio-sencera',
+  'BinCat és un SDK de Python per emetre, validar i revocar tokens Fernet i JWT amb registre d''auditoria, amb un panell al damunt per fer-ho sense escriure codi.',
+  '<p>Una petició que he vist repetir-se: revocar l''accés d''un token concret sense forçar tothom a tornar-se a autenticar. Moltes implementacions casolanes de tokens no deixen marge per a això: o el JWT és vàlid fins que caduca per si sol, o cal invalidar la sessió sencera. BinCat va néixer de resoldre just això: emetre, validar i revocar tokens de manera individual, amb registre de cada operació.</p>
+<h2>Dos tipus de token, cadascun per al seu cas</h2>
+<p>Fernet, de la llibreria <code>cryptography</code>, per a xifratge simètric quan el mateix sistema emet i valida. JWT signats criptogràficament amb claims amb estat, per a quan el token viatja entre serveis diferents. Els intervals d''expiració es configuren des de l''API o des del panell, i qualsevol token individual es pot revocar a l''instant sense tocar els altres, que és la diferència davant de dependre només de l''expiració natural.</p>
+<h2>Què porta el paquet</h2>
+<ul>
+  <li>Un SDK de Python que s''integra directament en una aplicació existent.</li>
+  <li>Un panell d''una sola pàgina, tema fosc, amb recompte de tokens totals, actius, revocats i expirats, i una consola de logs que traça l''activitat a mesura que passa.</li>
+  <li>Una API REST amb sis endpoints: generar, validar, revocar, purgar i consultar el log de les últimes cinquanta operacions.</li>
+  <li>Registre a SQLite de cada emissió, validació i revocació, per poder respondre després qui tenia accés i quan va deixar de tenir-ne.</li>
+</ul>
+<h2>La clau de xifratge no es toca a mà</h2>
+<p>Si BinCat no troba cap clau a <code>.env</code> en arrencar, en genera una de criptogràficament segura pel seu compte. És la mateixa lògica que aplico a <a href="/ca/blog/post/comprovar-si-una-contrasenya-esta-filtrada-sense-enviar-la-a-ningu/">Password Sentinel</a>: com menys depèn la seguretat que algú recordi configurar alguna cosa bé, menys maneres hi ha que es quedi mal configurada. Si una clau es filtra, el procediment és simple: esborrar <code>.env</code>, deixar que se''n generi una de nova, i reemetre els tokens que estaven xifrats amb l''anterior. No hi ha rotació màgica que salvi aquest pas: cal reemetre.</p>
+<p>Els tests corren contra una base de dades SQLite aïllada, així que mai toquen la de desenvolupament ni arrosseguen estat entre execucions.</p>',
+  'python,criptografia,jwt,seguridad,tokens,sdk', 'herramientas', 'ca', 1, '2026-09-03 09:00:00', '2026-09-03 09:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'revocar-un-token-sense-enderrocar-la-sessio-sencera');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'Blue Team Hub: per què vaig treure el vidre esmerilat de la meva pròpia eina',
+  'blue-team-hub-per-que-vaig-treure-el-vidre-esmerilat',
+  'Set eines de SOC gratuïtes i del costat del client, més vigilància en viu del catàleg KEV integrada a la portada. I la raó per la qual vaig redissenyar el lloc en blanc i negre.',
+  '<p>Blue Team Hub és un portal estàtic amb set utilitats que faig servir jo mateix en el dia a dia: desarmador d''IOC, analitzador de capçaleres de correu (SPF/DKIM/DMARC i línia de temps de salts), generador de regles YARA amb linter en temps real, playbooks interactius de resposta a incidents amb consultes SIEM generades al moment, descodificador de payloads (Base64/URL/Hex i desofuscació de PowerShell), un hub d''OSINT, i vigilància del catàleg CISA KEV. Tot corre al navegador: res del que enganxis a cap eina surt de la teva màquina.</p>
+<h2>KEV Watch ja no viu darrere d''un enllaç</h2>
+<p>La vigilància de CISA KEV la genera <a href="/ca/blog/post/vigilar-el-cataleg-kev-de-cisa-sense-servidor/">kev-digest</a>, un projecte a part que comprova el catàleg cada tres hores. Al principi KEV Watch era una pàgina d''eina més, amb el seu propi enllaç al menú. La vaig moure a la mateixa portada, com una secció en línia amb la mateixa tipografia i retícula que la resta: no tenia sentit que l''única eina amb dades que canvien soles fos un clic més lluny que les altres.</p>
+<h2>El redisseny que no esperava fer</h2>
+<p>El lloc va néixer amb una estètica glassmorphism de vidre esmerilat, gradients i desenfocaments, molt en la línia del que qualsevol generador d''UI produeix per defecte ara mateix. Funcionava, però no deia res específic sobre el que és l''eina. Vaig provar dues direccions abans de quedar-me amb la definitiva: una consola tipus terminal amb tipografia monoespaiada fins i tot als titulars, i una edició tipus informe editorial amb serif i tinta càlida. Les vaig descartar totes dues: la primera se sentia a clixé de hacker, la segona pesava més del compte per a una cosa que s''utilitza de pressa.</p>
+<p>El que va quedar és minimalisme gairebé suís: blanc, negre, retícula estricta, i un únic vermell reservat sense excepció per al que és urgent: un CVE crític, una entrada marcada com a ransomware. Res d''ombres, res de desenfocaments. La idea central, que només vaig acabar de confirmar després d''auditar el SEO i el posicionament en IA del meu propi portfolio, és que el pes decoratiu no és gratis: costa renderitzar, i comunica «SaaS de consum polit» en lloc d''«eina construïda per algú que la fa servir de debò». Per a una caixa d''eines de SOC, la precisió tipogràfica ven més credibilitat que el vidre.</p>
+<h2>Com es desplega</h2>
+<p>Cada push a la branca principal compila amb Astro i publica a GitHub Pages via Actions, sense intervenció manual. El mateix pipeline etiqueta versions i empaqueta el necessari per desplegar. És exactament el tipus d''automatització que aplico també a <a href="/ca/blog/post/automatitzar-informe-setmanal-del-soc-amb-python/">altres projectes</a>: si un pas es repeteix, no hauria de dependre que me''n recordi de fer-lo.</p>',
+  'blue-team,soc,herramientas,astro,github-actions,cisa-kev', 'herramientas', 'ca', 1, '2026-09-02 09:00:00', '2026-09-02 09:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'blue-team-hub-per-que-vaig-treure-el-vidre-esmerilat');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'Vigilar el catàleg KEV de CISA sense tenir un servidor encès',
+  'vigilar-el-cataleg-kev-de-cisa-sense-servidor',
+  'kev-digest comprova el catàleg CISA KEV cada tres hores, detecta què ha canviat i publica el resultat, tot sobre GitHub Actions i sense cap dependència externa.',
+  '<p>El catàleg KEV (Known Exploited Vulnerabilities) de CISA és de les poques fonts que responen la pregunta que de debò ordena una cua de pedaços: de tot el que s''ha publicat, què s''està explotant ara mateix. <a href="/ca/blog/post/prioritzar-cve-sense-refiar-se-nomes-del-cvss/">Ja vaig escriure sobre per què creuar-lo amb NVD i EPSS canvia per complet l''ordre de prioritat</a>. El que em faltava era deixar de mirar-lo a mà.</p>
+<h2>El disseny: sense dependències, sense servidor</h2>
+<p>kev-digest és un script de Python que fa servir només llibreria estàndard (<code>urllib</code>, <code>json</code>, <code>hashlib</code>, <code>pathlib</code>) i corre cada tres hores en un cron de GitHub Actions. No hi ha base de dades: l''estat complet viu en un fitxer <code>seen_cves.json</code> versionat al mateix repositori. Cada canvi real (entrada nova, camp modificat, termini que entra a la finestra de set dies, o el cas que més m''interessa: un CVE que portava mesos al catàleg i de sobte passa a tenir ús confirmat en ransomware) s''afegeix al fitxer del dia a <code>digest/</code> i genera un commit. Si no hi ha novetats, no s''escriu res: amb vuit passades al dia, escriure sempre ompliria l''historial de commits buits.</p>
+<h2>El guardià anti-encongiment</h2>
+<p>La part que de debò em preocupava no era detectar canvis, era no destruir l''historial per una fallada de xarxa. Si el catàleg arriba buit o amb un deu per cent menys d''entrades que l''última vegada, l''script avorta sense desar res. Una descàrrega a mitges marcaria centenars de CVE com a retirats i gravaria aquella foto com a bona, esborrant la línia base d''un cop. Quan l''encongiment és real (CISA sí que retira entrades de tant en tant), es llança a mà amb <code>--force</code>. És la mateixa lògica que aplicaria a qualsevol pipeline que escriu estat persistent: millor no escriure res que escriure alguna cosa corrupta amb confiança.</p>
+<h2>Enriquiment sense fer-se car</h2>
+<p>Que alguna cosa sigui a KEV diu que s''explota, no si és un 9,8 o un 5,4. Les entrades noves s''enriqueixen amb EPSS (probabilitat d''explotació en 30 dies, consulta en bloc) i NVD (CVSS i severitat, amb cache a disc perquè té rate-limit). Només les entrades noves: demanar el CVSS de les més de mil sis-centes que ja són en seguiment a cada passada no aportaria res i esgotaria la quota.</p>
+<h2>On acaba la dada</h2>
+<p><code>data/latest.json</code> és la sortida pública, amb contracte de camps estable perquè alguna altra cosa el consumeix: la secció <a href="https://eduolihez.github.io/#kev-watch">KEV Watch de Blue Team Hub</a> descarrega aquest JSON ja processat cada tres hores i el pinta. El càlcul del diff viu en un sol lloc a propòsit: dues implementacions del mateix diff en dos llenguatges acabarien discrepant, i aquesta discrepància seria difícil de detectar fins que algú confiés en el número equivocat.</p>
+<p>Ara mateix el catàleg té més de 1.694 CVE en seguiment, 352 amb ús confirmat en campanyes de ransomware. Tot això corre sense que hagi de recordar-me de mirar-ho, i sense cap servidor per mantenir.</p>',
+  'cisa-kev,vulnerabilidades,github-actions,automatizacion,python,blue-team', 'automatizacion', 'ca', 1, '2026-09-01 09:00:00', '2026-09-01 09:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'vigilar-el-cataleg-kev-de-cisa-sense-servidor');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'Active Directory: els deu primers canvis en qualsevol domini nou',
+  'active-directory-els-deu-primers-canvis-en-qualsevol-domini-nou',
+  'Abans de tocar GPO avançades, hi ha una llista curta que reviso sempre en un domini d''Active Directory nou. La majoria porten mal configurades des de la instal·lació.',
+  '<p>Quan hereto un domini d''Active Directory que no vaig muntar jo, hi ha una llista ràpida que reviso abans de res, abans de ficar-me en GPO complexes. Són les fallades més comunes, les més barates d''arreglar, i amb més impacte real si s''exploten.</p>
+<h2>Comptes i privilegis</h2>
+<ol>
+  <li><strong>Contrasenyes de comptes privilegiats que no caduquen.</strong> Sorprenentment comú, fins i tot en administradors de domini. Es revisa en un minut amb PowerShell.</li>
+  <li><strong>Massa gent a Domain Admins.</strong> El grup hauria de tenir el mínim possible, i cap d''aquests comptes s''hauria de fer servir per al dia a dia.</li>
+  <li><strong>Comptes de servei amb privilegis de més.</strong> Es creen «temporalment» amb permisos d''administrador de domini per instal·lar alguna cosa, i hi queden.</li>
+</ol>
+<h2>Configuració que s''hereta malament</h2>
+<ol start="4">
+  <li><strong>Delegació de Kerberos sense restriccions.</strong> És una de les rutes d''escalada de privilegis més explotades en AD real. Migrar a delegació restringida sempre que es pugui.</li>
+  <li><strong>Política de contrasenyes per defecte.</strong> Continua sense exigir una longitud mínima competitiva. Pujar a 14 caràcters o més.</li>
+  <li><strong>LAPS sense desplegar.</strong> Si l''administrador local comparteix contrasenya a tots els equips, un sol equip compromès dona accés lateral a tots els altres. És gratuït i fa anys que és quasi un estàndard.</li>
+  <li><strong>SMBv1 encara actiu</strong> «per si de cas». Anys després que deixés de ser defensable, continua apareixent.</li>
+</ol>
+<h2>Visibilitat i recuperació</h2>
+<ol start="8">
+  <li><strong>Auditoria avançada sense activar.</strong> Sense registre de canvis de grup i autenticacions fallides, qualsevol investigació comença a cegues.</li>
+  <li><strong>Grups aniuats sense documentar.</strong> Diversos nivells d''aniuament acaben donant accessos que ningú recorda haver concedit.</li>
+  <li><strong>Sense pla de recuperació de l''AD mateix provat de debò.</strong> Si el domini cau, tota la resta cau amb ell. És la peça que menys es pot permetre fallar en silenci.</li>
+</ol>
+<p>Cap d''aquests deu punts necessita pressupost ni eines de tercers: és configuració nativa de Windows Server. És exactament el tipus de deute que s''acumula perquè «funciona així de sempre», fins que apareix en una auditoria o, pitjor, en un incident real.</p>',
+  'active-directory,hardening,windows-server,sysadmin', 'blue-team-soc', 'ca', 1, '2026-08-28 09:00:00', '2026-08-28 09:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'active-directory-els-deu-primers-canvis-en-qualsevol-domini-nou');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'De suport tècnic a SOC: el que va canviar no va ser el lloc',
+  'de-suport-tecnic-a-soc-el-que-va-canviar-no-va-ser-el-lloc',
+  'El salt de donar suport a més de 100 usuaris a triar alertes en un SOC no va ser un canvi de títol d''un dia per l''altre. Va ser un canvi en la pregunta davant de cada tasca repetitiva.',
+  '<p>Vaig començar donant suport tècnic a més de cent usuaris: contrasenyes bloquejades, administració d''Active Directory, el dia a dia habitual de qualsevol que comença en IT. No hi ha res dolent en aquesta feina: de fet és on vaig aprendre més del que esperava. Però hi ha un moment en què comences a veure patrons, i aquest moment és el que ningú t''explica per endavant.</p>
+<h2>El tiquet número quaranta i tants</h2>
+<p>La primera vegada que restableixes una contrasenya és un tràmit. La vegada quaranta i tants, comences a preguntar-te per què el procés continua sent manual. Aquest va ser el meu patró: no va ser una vocació sobtada, va ser la irritació acumulada de repetir el mateix sense que ningú es plantegés automatitzar-ho. Allà vaig començar a escriure els primers scripts en Python, no en un curs, sinó per resoldre tasques concretes del dia a dia.</p>
+<h2>El pas intermedi que ningú esmenta</h2>
+<p>De suport no vaig passar directe a SOC. Vaig passar abans per administrar FortiGate i FortiAnalyzer, i per respondre incidents de nivell 1 i 2. Aquest pas intermedi importa més del que sembla: entendre la xarxa des de dins, tocant tallafocs i veient trànsit real, és el que després fa que triar una alerta XDR tingui sentit en lloc de ser una etiqueta de severitat sense context.</p>
+<h2>El canvi real no va ser de títol</h2>
+<p>Passar a analista de SOC no va ser un canvi d''un dia per l''altre. Va ser un canvi en la pregunta que em feia davant de cada tasca repetitiva: de <em>com ho resolc</em> a <em>com faig que això no torni a passar</em>. Aquest gir és el que, amb el temps, porta de gestionar tiquets a gestionar risc.</p>
+<h2>El que m''hauria agradat saber abans</h2>
+<ul>
+  <li><strong>El suport de nivell 1 no és un peatge, és formació.</strong> Veure per què un usuari fa alguna cosa «malament» ensenya a dissenyar sistemes que fallen menys.</li>
+  <li><strong>Ningú et demanarà que automatitzis res.</strong> El primer script que vaig escriure per estalviar-me feina no me''l va demanar ningú.</li>
+  <li><strong>El SOC no és una destinació, és continuar fent la mateixa pregunta.</strong> Continuo automatitzant coses que abans feia a mà, el mateix impuls que el primer script de restabliment de contrasenyes.</li>
+</ul>
+<p>Si ets a suport tècnic i sents que encara no estàs llest per fer el salt: probablement ja tens la part més difícil, que és entendre la infraestructura real, amb usuaris reals trencant-la de maneres que cap curs ensenya. El que falta no és més teoria: és començar a preguntar-te, davant de cada tasca repetitiva, com evitar que torni a passar.</p>',
+  'carrera,soc,blue-team,automatizacion', 'carrera-personal', 'ca', 1, '2026-08-19 08:30:00', '2026-08-19 08:30:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'de-suport-tecnic-a-soc-el-que-va-canviar-no-va-ser-el-lloc');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'Hardening de FortiGate: el que reviso abans de donar un desplegament per bo',
+  'hardening-de-fortigate-abans-de-donar-un-desplegament-per-bo',
+  'La configuració de fàbrica d''un FortiGate no està llesta per a producció només perquè bloqueja trànsit per defecte. La llista que reviso sempre, i per què la inspecció SSL s''ajorna tant.',
+  '<p>La configuració de fàbrica d''un FortiGate és un punt de partida raonable, no un estat final. He heretat més d''un tallafocs ja en producció on ningú havia tocat res d''aquesta llista des del dia de la instal·lació. No és exhaustiva: és el que reviso sempre, en aquest ordre, abans de donar un desplegament per bo.</p>
+<h2>Administració</h2>
+<ul>
+  <li>Només <strong>HTTPS</strong> a la interfície de gestió, mai HTTP, i mai exposada a la WAN.</li>
+  <li>Accés restringit per <em>trusted host</em>: IP concretes, no qualsevol amb la contrasenya.</li>
+  <li>Comptes nominals per administrador. Compartir l''usuari admin per defecte fa impossible saber després qui va canviar què.</li>
+  <li>MFA a tots els comptes d''administració, sense excepció.</li>
+</ul>
+<h2>Polítiques</h2>
+<p>El més comú que trobo en una auditoria no és una fallada tècnica sofisticada: és una política <code>ALL a ALL</code> que va quedar allà «temporalment» fa mesos. Reviso sempre:</p>
+<ul>
+  <li>Que no existeixi cap regla tan àmplia sense data de caducitat.</li>
+  <li>Que totes les polítiques tinguin el <strong>logging activat</strong>. Sense logs, la resta de l''stack (SIEM, XDR) no té res per correlacionar.</li>
+  <li>Que els serveis que no es fan servir estiguin deshabilitats, no només sense política que els permeti.</li>
+</ul>
+<h2>La inspecció SSL, que quasi sempre s''ajorna</h2>
+<p>És el punt que més es retarda perquè «pot trencar alguna cosa», i sense ell el tallafocs és efectivament cec a quasi tot el trànsit modern, que va xifrat. El que faig perquè no trenqui res en activar-la:</p>
+<ul>
+  <li>Començar en mode d''inspecció de certificat si la inspecció completa no és viable de seguida: veure almenys l''SNI i el certificat ja aporta alguna cosa.</li>
+  <li>Desplegar el certificat de la CA del FortiGate per GPO als equips del domini, per no generar avisos de certificat no fiable a cada sessió.</li>
+  <li>Excepcions explícites i documentades per al que de debò no s''ha d''inspeccionar, mai una excepció perquè sí.</li>
+</ul>
+<h2>La regla que més aplico</h2>
+<p>Si una política, una excepció o un compte d''administració no té una raó documentada de per què existeix, no hauria d''existir. La majoria de les exposicions que trobo en auditories no són fallades tècniques complexes: són configuracions «temporals» que ningú va tornar a mirar.</p>',
+  'fortinet,fortigate,hardening,firewall,blue-team', 'blue-team-soc', 'ca', 1, '2026-08-02 09:00:00', '2026-08-02 09:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'hardening-de-fortigate-abans-de-donar-un-desplegament-per-bo');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'Prioritzar CVE sense refiar-se només del CVSS',
+  'prioritzar-cve-sense-refiar-se-nomes-del-cvss',
+  'Un CVSS de 9,8 pot ser irrellevant i un de 6,5 una emergència. Com creuo NVD, el catàleg KEV de CISA i la probabilitat d''EPSS per decidir quina vulnerabilitat es pedaça primer.',
+  '<p>L''error que més vegades he vist, i que vaig cometre jo també al principi, és ordenar una llista de CVE per CVSS i anomenar això priorització. El CVSS mesura gravetat tècnica en abstracte. No diu si algú està explotant aquesta fallada ara mateix. Són preguntes diferents, i tractar-les com si fossin la mateixa fa que es gastin setmanes en un CVE de 9,8 que ningú fa servir mentre un de 6,5 s''explota activament.</p>
+<h2>Tres fonts, tres preguntes diferents</h2>
+<p>Cadascuna de les següents respon alguna cosa que les altres dues no saben:</p>
+<ul>
+  <li><strong>NVD</strong> respon què és la fallada: CVSS, CWE, i la versió que la corregeix.</li>
+  <li><strong>CISA KEV</strong> respon si s''està explotant de veritat, ara mateix, confirmat.</li>
+  <li><strong>EPSS</strong> respon la probabilitat que s''exploti en els propers 30 dies, encara que encara no sigui a KEV.</li>
+</ul>
+<p>Cap no substitueix les altres dues. NVD sense les altres dona llistes llarguíssimes sense ordre real. KEV sol és binari: dins o fora. EPSS sol és un número sense context de què corregeix.</p>
+<h2>El criteri que aplico</h2>
+<p>Amb les tres creuades, l''ordre queda així, sense excepcions:</p>
+<ol>
+  <li>Si és a <strong>KEV</strong>, va primer. És igual el CVSS.</li>
+  <li>Si no és a KEV però l''<strong>EPSS és alt</strong>, va després. És el senyal que comença a explotar-se.</li>
+  <li>CVSS alt amb EPSS baix i fora de KEV pot esperar al cicle normal de pedaços.</li>
+</ol>
+<p>La sorpresa la primera vegada que aplico això sobre un tenant real sempre és la mateixa: la llista final no s''assembla gens a la que surt d''ordenar només per CVSS.</p>
+<h2>Per què ho vaig automatitzar</h2>
+<p>Creuar tres fonts a mà cada mes no escala, i és just el tipus de tasca que es salta quan hi ha pressa, que és precisament quan més falta fa. Ho vaig integrar al generador d''informes que faig servir per als clients: cada CVE que apareix s''enriqueix automàticament contra les tres fonts abans d''entrar al document, amb cache a disc per no tornar a preguntar per un CVE que ja s''ha consultat. <a href="https://github.com/eduolihez/vision-one-crem-report-generator">El codi està publicat</a> si a algú li serveix de referència.</p>
+<h2>El que cap de les tres sap</h2>
+<p>Ni NVD, ni KEV, ni EPSS saben si l''actiu afectat és un portàtil de proves o un controlador de domini. Això només ho sap qui coneix la xarxa. L''automatització ordena per senyal tècnic; el context de negoci continua posant-lo una persona, i aquí és on de debò es decideix què es pedaça aquesta setmana i què espera al mes que ve.</p>
+<p><strong>Relacionat:</strong> <a href="/ca/blog/post/vigilar-el-cataleg-kev-de-cisa-sense-servidor/">vaig automatitzar la vigilància del mateix catàleg KEV</a> per no dependre de recordar-me de consultar-lo.</p>',
+  'cve,vulnerabilidades,nvd,epss,gestion-de-riesgo', 'blue-team-soc', 'ca', 1, '2026-07-14 10:00:00', '2026-07-14 10:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'prioritzar-cve-sense-refiar-se-nomes-del-cvss');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'Automatitzar l''informe setmanal del SOC amb Python',
+  'automatitzar-informe-setmanal-del-soc-amb-python',
+  'L''informe setmanal eren tres hores de copiar i enganxar. En automatitzar-lo amb Python, els problemes de veritat van ser la paginació, les zones horàries i les fallades en silenci.',
+  '<p>Hi ha una tasca que apareix a tots els SOC: l''informe periòdic. Quantes alertes, de quin tipus, quantes tancades, quina tendència. Triga hores, surt quasi idèntic cada vegada i ningú no l''enyora quan desapareix. És el candidat perfecte per automatitzar.</p>
+<p>Ho vaig muntar en Python. El codi va ser el fàcil. El que va costar va ser tota la resta.</p>
+
+<h2>Separar les tres fases</h2>
+<p>El primer intent va ser un script que consultava, calculava i escrivia el document alhora. Va funcionar una setmana i es va tornar impossible de tocar. Refet en tres parts independents:</p>
+<ul>
+  <li><strong>Extreure.</strong> Parlar amb l''API i desar la resposta crua, sense interpretar res.</li>
+  <li><strong>Normalitzar.</strong> Passar aquesta resposta a una estructura pròpia, estable, que no canviï encara que canviï l''API.</li>
+  <li><strong>Renderitzar.</strong> Convertir aquesta estructura en el document final.</li>
+</ul>
+<p>L''avantatge apareix a la primera incidència. Si l''informe surt estrany, se sap en quina fase mirar sense rellegir l''script sencer. I si el fabricant canvia un camp, només es toca la fase de normalitzar.</p>
+
+<h2>La paginació, que sempre mossega</h2>
+<p>L''error clàssic, i el vaig cometre: demanar les dades, rebre una llista amb bona pinta i donar-la per completa. Quasi cap API retorna tot d''un cop. Sol haver-hi un topall per pàgina i un cursor per continuar.</p>
+<p>El pitjor d''aquesta fallada és que <strong>no trenca res</strong>. No hi ha excepció ni traça. Simplement l''informe diu 200 alertes on n''hi va haver 1.400, i el número sembla perfectament plausible. Va estar malament dues setmanes abans que algú ho notés.</p>
+<p>Des de llavors, qualsevol consulta que pugui retornar més d''un element passa per una funció que esgota el cursor, i el resultat es contrasta amb el total que declara la mateixa API. Si no quadren, l''script s''atura.</p>
+
+<h2>Zones horàries</h2>
+<p>L''API respon en UTC. L''informe es llegeix en hora peninsular. Entre una cosa i l''altra hi ha una o dues hores segons l''època de l''any, i això desplaça el tall de la setmana.</p>
+<p>El símptoma és subtil: les alertes del diumenge a la nit cauen a la setmana equivocada. Els totals del mes quadren, els setmanals no, i costa veure per què.</p>
+<p>La regla que segueixo ara és simple i no l''he tornat a trencar: <strong>tot es maneja en UTC i amb dates conscients de zona horària fins a l''últim moment</strong>. La conversió a hora local passa només en escriure el text, mai en un càlcul.</p>
+
+<h2>Que falli en alt, no en silenci</h2>
+<p>Un script programat que falla sense avisar és pitjor que no tenir-lo, perquè l''absència d''informe s''interpreta com una setmana tranquil·la. El que vaig aprendre a cobrir:</p>
+<ul>
+  <li><strong>Reintents amb espera creixent</strong> davant de límits de peticions, en lloc de martellejar l''API.</li>
+  <li><strong>Idempotència.</strong> Executar-lo dues vegades ha de produir el mateix informe, no duplicar res.</li>
+  <li><strong>Un avís explícit en fallar</strong>, amb la fase que s''ha trencat. Un traceback en un log que ningú llegeix no és un avís.</li>
+  <li><strong>Comprovacions de coherència:</strong> si el total de la setmana és zero, quasi segur que el trencat és l''script i no la realitat.</li>
+</ul>
+
+<h2>Què no vaig automatitzar</h2>
+<p>L''anàlisi. L''script reuneix les dades, calcula les xifres i deixa el document muntat. La lectura de <em>per què</em> han pujat les deteccions d''un tipus concret, o si una caiguda és bona notícia o un sensor caigut, continua fent-la una persona.</p>
+<p>Automatitzar la recollida retorna les hores que se n''anaven a copiar i enganxar. Automatitzar la conclusió produeix informes que ningú no es creu, i amb raó.</p>
+<p>Aquell generador setmanal va créixer amb el temps fins a convertir-se en alguna cosa més completa: un sistema que també enriqueix cada CVE contra NVD, CISA KEV i EPSS abans de posar-lo a l''informe. El vaig publicar en obert: <a href="https://github.com/eduolihez/vision-one-crem-report-generator">el codi és a GitHub</a>.</p>',
+  'python,automatizacion,soc,reporting,buenas-practicas', 'automatizacion', 'ca', 1, '2026-06-18 12:00:00', '2026-06-18 12:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'automatitzar-informe-setmanal-del-soc-amb-python');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'Classificar phishing al navegador sense enviar la URL a cap servidor',
+  'classificar-phishing-al-navegador-sense-enviar-la-url',
+  'Les llistes de navegació segura funcionen, però impliquen explicar a algú per on navegues. A NorthGate Browser provo el contrari: portar un model ONNX petit al navegador.',
+  '<p>Els navegadors fa anys que protegeixen contra el phishing amb llistes de reputació. Funciona bé i té un cost que quasi mai s''esmenta: per saber si un lloc és perillós, algú s''ha d''assabentar que vas a visitar-lo. Les implementacions serioses fan servir trucs per reduir-ho, però la forma del problema no canvia.</p>
+<p><strong>NorthGate Browser</strong> és un projecte en desenvolupament primerenc on estic explorant l''altra direcció: en lloc d''enviar la URL al model, enviar el model al navegador.</p>
+
+<h2>Què es pot saber només amb la URL</h2>
+<p>Abans de descarregar res, la mateixa cadena ja diu bastant. Els senyals que faig servir surten tots d''aquí:</p>
+<ul>
+  <li><strong>Longitud i profunditat</strong> del domini i de la ruta.</li>
+  <li><strong>Nombre de subdominis.</strong> <code>banco.seguro.login.ejemplo.tk</code> té una forma característica.</li>
+  <li><strong>Entropia dels caràcters</strong>, que delata dominis generats per algorisme.</li>
+  <li><strong>Presència de punycode</strong>, la via clàssica de l''atac homògraf.</li>
+  <li><strong>Marca coneguda al subdomini però no al domini registrable.</strong> Aquest és el senyal més fort que he trobat, i també el més fàcil d''explicar: <code>paypal.com.verificacion-cuenta.xyz</code> no és PayPal.</li>
+  <li><strong>Proporció de dígits i guions</strong>, i el TLD.</li>
+</ul>
+<p>Res d''això és concloent per separat. Junts, i amb prou exemples, se separen raonablement bé.</p>
+
+<h2>Per què ONNX</h2>
+<p>Entrenar és còmode en Python i executar dins d''un navegador no ho és. <strong>ONNX</strong> resol exactament aquest forat: s''entrena amb les eines de sempre, s''exporta a un format intermedi i s''executa des del runtime natiu, sense arrossegar Python al producte final.</p>
+<p>En un navegador això importa per tres motius molt concrets:</p>
+<ul>
+  <li><strong>La mida es paga a cada instal·lació.</strong> Un model de desenes de megues no és viable dins d''un binari que la gent descarrega.</li>
+  <li><strong>El pressupost de latència és minúscul.</strong> Això s''ha de resoldre abans que la pàgina pinti. Parlem d''un grapat de mil·lisegons, no de centenars.</li>
+  <li><strong>No pot dependre de la xarxa.</strong> Si necessités connexió per decidir, hauríem tornat al punt de partida.</li>
+</ul>
+<p>La integració va en <strong>Rust</strong>, que és el llenguatge del nucli sobre el qual treballo, i encaixa bé: sense recol·lector d''escombraries, sense pauses imprevisibles en una ruta que s''executa a cada navegació.</p>
+
+<h2>El llindar és la decisió difícil</h2>
+<p>La part que més temps m''està portant no és el model, és on posar el tall. I és perquè els dos errors no costen el mateix:</p>
+<ul>
+  <li>Un <strong>fals negatiu</strong> deixa passar una pàgina de phishing. Dolent, però és l''estat actual sense cap protecció.</li>
+  <li>Un <strong>fals positiu</strong> marca el banc real de l''usuari com a fraudulent. Això és pitjor del que sembla: ensenya la gent a ignorar l''avís. I un avís que s''ignora no protegeix de res, només dona sensació que sí.</li>
+</ul>
+<p>Per això el llindar està deliberadament conservador i el senyal es planteja com a advertència, no com a bloqueig. Prefereixo cobrir menys i que l''avís conservi el seu significat.</p>
+
+<h2>Estat</h2>
+<p>Està en desenvolupament primerenc i ho dic sense adorns: hi ha un pipeline d''extracció de característiques, un model que es comporta de manera raonable en validació i una integració que encara no consideraria llesta. El que té d''interessant el projecte, de moment, és la restricció de partida: <strong>si la URL no surt de l''equip, hi ha una categoria sencera de fuites que simplement no pot passar</strong>. Dissenyar amb aquesta limitació des del principi obliga a decisions força més honestes que afegir privadesa al final.</p>
+<p><strong>Relacionat:</strong> <a href="/ca/blog/post/el-desacord-entre-classificadors-perd-contra-alguna-cosa-mes-simple/">vaig mesurar després si el desacord entre diversos classificadors ajuda a prioritzar quin correu revisar</a> — la resposta no va ser l''esperada.</p>',
+  'machine-learning,onnx,rust,phishing,privacidad,navegadores', 'ia-aplicada', 'ca', 1, '2026-05-30 18:00:00', '2026-05-30 18:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'classificar-phishing-al-navegador-sense-enviar-la-url');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'Triatge d''alertes en un SOC: en quin ordre mirar el que salta',
+  'triatge-alertes-en-un-soc-en-quin-ordre-mirar',
+  'La severitat d''una alerta no és la seva prioritat. Com ordeno la cua quan hi ha més alertes que hores, les tres preguntes amb què obro cadascuna i per què un fals positiu recurrent és error de la regla.',
+  '<p>El primer que s''aprèn en un SOC és que la cua no es buida. Sempre hi ha més alertes que hores, i la feina no consisteix a mirar-les totes sinó a <strong>encertar l''ordre</strong>. Això és com ho enfoco jo.</p>
+
+<h2>La severitat no és la prioritat</h2>
+<p>Tota alerta arriba amb una severitat posada pel fabricant. És un punt de partida útil i un mal criteri únic, perquè aquesta etiqueta es calcula en el buit: descriu com de greu <em>seria</em> aquell esdeveniment en abstracte, sense saber res de la teva organització.</p>
+<p>La prioritat real surt de creuar aquesta severitat amb el context:</p>
+<ul>
+  <li><strong>Quin actiu és.</strong> El mateix esdeveniment no pesa igual en un portàtil de becari que en un controlador de domini.</li>
+  <li><strong>Quin usuari.</strong> Un compte amb privilegis d''administració canvia la conversa sencera.</li>
+  <li><strong>Quan.</strong> Activitat normal a les onze del matí; la mateixa a les quatre de la matinada d''un diumenge mereix una mirada.</li>
+  <li><strong>Què hi ha al voltant.</strong> Una alerta mitjana aïllada és soroll. Tres alertes mitjanes sobre el mateix host en deu minuts són una cadena.</li>
+</ul>
+<p>Aquest últim punt és on una plataforma XDR se separa d''un SIEM clàssic. Treballant amb <strong>Trend Micro Vision One</strong>, el que més m''ha canviat el triatge no és detectar més coses, sinó que els esdeveniments arribin ja <strong>correlacionats</strong>. Veure la cadena completa (correu, execució, connexió de sortida) evita l''error de tancar tres alertes per separat com a poc rellevants quan juntes expliquen una altra història.</p>
+
+<h2>Les tres preguntes</h2>
+<p>En obrir una alerta vaig sempre en el mateix ordre, i en aquest ordre concret:</p>
+<ol>
+  <li><strong>És real?</strong> Distingir detecció d''incident. La major part del volum mor aquí, i està bé que sigui així.</li>
+  <li><strong>És rellevant?</strong> Pot ser perfectament real i no importar. Un escaneig bloquejat al perímetre és real i no és un incident.</li>
+  <li><strong>Està contingut?</strong> Si ha passat alguna cosa, el que és urgent no és entendre-ho del tot: és que deixi d''estendre''s. Entendre ve després.</li>
+</ol>
+<p>L''ordre importa perquè l''error car és saltar-se la tercera per continuar investigant la primera. La curiositat tècnica estira molt, i contenir és avorrit comparat amb reconstruir. Contenir primer.</p>
+
+<h2>Enriquir abans d''escalar</h2>
+<p>Una alerta escalada sense context trasllada la feina al nivell següent i no estalvia res. Abans de moure alguna cosa cap amunt intento portar respost:</p>
+<ul>
+  <li>Què fa normalment aquell host o aquell usuari, per tenir amb què comparar.</li>
+  <li>Si l''indicador apareix en fonts d''intel·ligència i des de quan.</li>
+  <li>Si això ja s''havia vist abans i com es va tancar llavors.</li>
+  <li>Què s''ha fet ja i què està pendent.</li>
+</ul>
+<p>El tercer es paga sol. La meitat de les alertes que arriben són variacions d''alguna cosa ja resolta, i sense registre de la decisió anterior l''anàlisi es repeteix sencera cada vegada.</p>
+
+<h2>Un fals positiu recurrent és un error de la regla</h2>
+<p>Aquesta és la part que més es descuida, perquè tancar ràpid sempre sembla més productiu que arreglar. Si una alerta es tanca com a fals positiu per sistema, el problema ja no és l''alerta: <strong>és la regla</strong>. Cada repetició costa atenció, i l''atenció és el recurs escàs d''un SOC.</p>
+<p>Pitjor encara: una cua plena de soroll conegut educa l''equip a tancar de pressa. I el dia que entri alguna cosa de debò, arribarà amb el mateix aspecte que les mil anteriors.</p>
+<p>Ajustar una regla no és abaixar la guàrdia. És decidir a consciència què mereix interrompre una persona, en lloc de deixar que ho decideixi un valor per defecte que va posar algú que no coneix la teva xarxa.</p>',
+  'soc,blue-team,xdr,respuesta-a-incidentes,trend-micro-vision-one,triaje', 'blue-team-soc', 'ca', 1, '2026-04-22 09:30:00', '2026-04-22 09:30:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'triatge-alertes-en-un-soc-en-quin-ordre-mirar');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'Comprovar si una contrasenya està filtrada sense enviar-la a ningú',
+  'comprovar-si-una-contrasenya-esta-filtrada-sense-enviar-la-a-ningu',
+  'Have I Been Pwned té més de 800 milions de contrasenyes filtrades. Es pot consultar sense revelar quina cerques: el truc es diu k-anonimat. Així el vaig implementar a Password Sentinel.',
+  '<p>Quan vaig construir <strong>Password Sentinel</strong>, una extensió de navegador que avisa si una contrasenya apareix en filtracions conegudes, el problema no era tècnic sinó de confiança. Per saber si la teva contrasenya és en una bretxa cal comparar-la contra un corpus de centenars de milions. I aquest corpus no cap en una extensió.</p>
+<p>La solució òbvia és preguntar-ho a un servidor. La solució òbvia és també terrible: implicaria que la meva extensió envia les teves contrasenyes a un tercer. Ningú no hauria d''instal·lar això, i jo no ho volia escriure.</p>
+
+<h2>El truc: preguntar sense dir quines preguntes</h2>
+<p>Have I Been Pwned resol això amb una tècnica anomenada <strong>k-anonimat</strong>. La idea és que en lloc de preguntar per la teva contrasenya, preguntes per un grup prou gran de candidates perquè la teva s''hi perdi dins.</p>
+<p>El procediment té tres passos:</p>
+<ul>
+  <li>Es calcula el <code>SHA-1</code> de la contrasenya <strong>en local</strong>, dins del navegador.</li>
+  <li>S''envien al servidor únicament els <strong>cinc primers caràcters</strong> hexadecimals d''aquest hash. Res més.</li>
+  <li>El servidor retorna tots els hashes de la seva base que comencen per aquest prefix, i la comparació final es fa <strong>una altra vegada en local</strong>.</li>
+</ul>
+<pre><code>Contrasenya: correcthorsebatterystaple
+SHA-1:       BE4A8DE9AFCEE30B29C0A0AB29F9E7A9CF4E1B2C
+S''envia:     BE4A8
+Es rep:      ~800 sufixos que comencen per BE4A8
+Es compara:  al navegador, contra la llista rebuda</code></pre>
+
+<h2>Per què els números funcionen</h2>
+<p>Cinc caràcters hexadecimals donen <code>16^5</code>, una mica més d''un milió de prefixos possibles. Repartits sobre un corpus d''uns 850 milions de hashes, a cada prefix li toquen de l''ordre de <strong>800 candidats</strong>.</p>
+<p>Això vol dir que el servidor sap que has preguntat per una d''unes 800 contrasenyes, sense cap manera de distingir quina. I no pot afinar amb peticions successives, perquè cada consulta retorna el grup sencer: no hi ha un segon intent que estrenyi el setge.</p>
+
+<h2>Tres detalls que convé no passar per alt</h2>
+<p><strong>SHA-1 aquí no és una fallada.</strong> És el primer que salta en llegir el protocol, i la resposta és que SHA-1 no s''està fent servir com a funció de seguretat: és l''índex del corpus. Que SHA-1 tingui col·lisions no ajuda ningú a esbrinar què vas preguntar, perquè la part sensible mai surt del navegador. Una altra cosa ben diferent seria fer servir SHA-1 per emmagatzemar contrasenyes, que sí és un error greu.</p>
+<p><strong>TLS continua fent falta.</strong> El k-anonimat protegeix davant del servidor. No protegeix davant d''algú que observi la xarxa i vegi el prefix. Són dues capes diferents i les dues són necessàries.</p>
+<p><strong>Zero aparicions no vol dir contrasenya bona.</strong> Aquest és el malentès més comú. Que una contrasenya no sigui al corpus només vol dir que encara no s''ha filtrat. <code>Barcelona2026!</code> probablement doni zero resultats, i continua sent una contrasenya pèssima: entra en qualsevol atac de diccionari amb regles. La comprovació de filtracions descarta el que ja se sap trencat; no certifica el que queda.</p>
+
+<h2>El que em vaig endur d''escriure-ho</h2>
+<p>El k-anonimat m''interessa menys per la criptografia que pel plantejament. La pregunta de partida no va ser <em>com xifro això</em>, sinó <strong>què és el mínim que necessita saber l''altra part per respondre''m</strong>. Quasi sempre és molt menys del que s''acaba enviant per costum.</p>
+<p>És el mateix raonament que aplico a l''analítica d''aquest web: no deso adreces IP perquè per comptar visitants no me les fan falta. Deso un hash amb sal i amb això n''hi ha prou. Recollir dades que no necessites no és neutral: és assumir un risc a canvi de res.</p>
+<p><strong>Relacionat:</strong> el mateix principi de minimitzar el que es confia a mans alienes apareix a <a href="/ca/blog/post/revocar-un-token-sense-enderrocar-la-sessio-sencera/">BinCat</a>, per revocar un token sense enderrocar tota la sessió.</p>',
+  'criptografia,have-i-been-pwned,k-anonimato,extensiones,javascript,privacidad', 'herramientas', 'ca', 1, '2026-03-14 10:00:00', '2026-03-14 10:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'comprovar-si-una-contrasenya-esta-filtrada-sense-enviar-la-a-ningu');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'Què fa un analista SOC: un dia de feina real i com començar',
+  'que-fa-un-analista-soc-un-dia-de-feina-real',
+  'Què fa un analista SOC en el seu dia a dia: revisar alertes, investigar, contenir i documentar. Nivells N1 a N3, eines, habilitats i com entrar-hi sense experiència.',
+  '<p>Un analista SOC (Security Operations Center) vigila els sistemes d''una organització per detectar, investigar i contenir incidents de seguretat. A la pràctica, el seu dia consisteix a revisar alertes, decidir quines són reals, investigar les que ho són i escalar o contenir el que calgui. No és un lloc de «hackejar»: és un lloc d''analitzar, comparar i decidir amb rapidesa i amb poca informació.</p>
+<h2>Com és un dia normal</h2>
+<ol>
+  <li><strong>Traspàs.</strong> Es comença llegint què va deixar obert el torn anterior: incidents en curs, alertes pendents de resposta, canvis a la infraestructura.</li>
+  <li><strong>Cua d''alertes.</strong> S''obre la consola (en el meu cas Trend Micro Vision One) i s''ordena el que ha saltat. L''ordre importa més que la velocitat: ho explico a <a href="/ca/blog/post/triatge-alertes-en-un-soc-en-quin-ordre-mirar/">triatge d''alertes en un SOC</a>.</li>
+  <li><strong>Investigació.</strong> Per a cada alerta real: quin actiu i quin usuari, què va passar abans i després, si l''indicador apareix en fonts d''intel·ligència, si això ja s''havia vist abans.</li>
+  <li><strong>Contenció i escalat.</strong> Aïllar un equip, deshabilitar un compte, bloquejar un domini, o passar el cas al nivell següent amb tot el context ja reunit.</li>
+  <li><strong>Documentació.</strong> Cada decisió queda escrita al tiquet. És la part menys vistosa i la que més estalvia l''endemà.</li>
+  <li><strong>Millora.</strong> Afinar regles que generen soroll, revisar falsos positius recurrents i <a href="/ca/blog/post/automatitzar-informe-setmanal-del-soc-amb-python/">automatitzar informes</a> que es repeteixen.</li>
+</ol>
+<h2>Els nivells d''un SOC</h2>
+<table>
+  <thead><tr><th>Nivell</th><th>Què fa</th></tr></thead>
+  <tbody>
+    <tr><td>N1</td><td>Triatge: revisa alertes, descarta falsos positius, escala el rellevant.</td></tr>
+    <tr><td>N2</td><td>Investigació i resposta: analitza incidents, conté, coordina amb altres equips.</td></tr>
+    <tr><td>N3</td><td>Caça d''amenaces, anàlisi forense i de malware, enginyeria de detecció.</td></tr>
+  </tbody>
+</table>
+<p>Els noms i els límits canvien d''una empresa a l''altra, i en un SOC petit una mateixa persona fa les tres coses.</p>
+<h2>Amb quines eines es treballa</h2>
+<ul>
+  <li><strong>EDR / XDR</strong> per veure l''endpoint, el correu i la identitat. Què aporta cadascun és a <a href="/ca/blog/post/xdr-siem-i-edr-diferencies-en-un-soc/">XDR, SIEM i EDR</a>.</li>
+  <li><strong>SIEM</strong> per centralitzar logs i cercar-hi.</li>
+  <li><strong>Gestor de tiquets</strong> per registrar cada cas.</li>
+  <li><strong>Fonts d''intel·ligència</strong> (VirusTotal, AbuseIPDB, el catàleg KEV de CISA) per saber si un indicador és conegut.</li>
+  <li><strong>Consola de correu i d''identitat</strong> (Microsoft 365, Entra ID) per investigar <a href="/ca/blog/post/business-email-compromise-senyals-a-microsoft-365/">fraus de correu</a> i comptes compromesos.</li>
+</ul>
+<h2>Què cal saber per començar</h2>
+<ul>
+  <li>Xarxes bàsiques: TCP/IP, DNS, HTTP, què és normal en un trànsit.</li>
+  <li>Windows i Active Directory: com s''autentica un usuari i quin rastre deixa.</li>
+  <li>Llegir logs sense espantar-se, i saber què preguntar a una línia estranya.</li>
+  <li>Una mica d''scripting (Python o PowerShell) per no repetir a mà el que es pot automatitzar.</li>
+  <li>Escriure clar: un bon resum d''incident val tant com una bona detecció.</li>
+</ul>
+<p>Molta gent arriba des de suport tècnic o administració de sistemes, i és una bona ruta: entendre la infraestructura real pesa més que qualsevol curs. Ho explico a <a href="/ca/blog/post/de-suport-tecnic-a-soc-el-que-va-canviar-no-va-ser-el-lloc/">de suport tècnic a SOC</a>, i quines certificacions ajuden a <a href="/ca/blog/post/certificacions-per-comencar-com-a-analista-soc-quines-valen-la-pena/">certificacions per començar com a analista SOC</a>.</p>
+<h2>Preguntes freqüents</h2>
+<h3>Què fa un analista SOC?</h3>
+<p>Monitoritza alertes de seguretat, decideix quines són incidents reals, les investiga i les conté o escala. A més documenta cada cas i ajuda a afinar les regles de detecció per reduir el soroll.</p>
+<h3>Quina diferència hi ha entre un analista SOC i un pentester?</h3>
+<p>L''analista SOC defensa: detecta i respon a atacs reals sobre els sistemes de l''organització. El pentester ataca de manera autoritzada per trobar debilitats abans que els atacants. Són perfils complementaris.</p>
+<h3>Es pot entrar a un SOC sense experiència prèvia?</h3>
+<p>Sí, en llocs de nivell 1, sobretot amb base en sistemes o xarxes, alguna certificació i pràctica en laboratoris. Els SOC solen valorar més la curiositat i la capacitat d''explicar un raonament que el títol.</p>
+<h3>Cal treballar de nit?</h3>
+<p>Depèn del SOC. Els que donen servei 24x7 treballen per torns; d''altres cobreixen només horari d''oficina i deixen la nit a un servei extern (MDR).</p>',
+  'soc,analista-soc,blue-team,carrera,xdr', 'blue-team-soc', 'ca', 1, '2026-10-14 09:00:00', '2026-10-14 09:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'que-fa-un-analista-soc-un-dia-de-feina-real');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'Ciberseguretat per a pimes a Barcelona i Badalona: 10 mesures per aplicar aquest mes',
+  'ciberseguretat-per-a-pimes-a-barcelona-i-badalona-deu-mesures',
+  'Deu mesures de ciberseguretat per a una pime amb eines que ja pagues: MFA, còpies de seguretat, baixes de comptes, DMARC i un procediment contra el frau.',
+  '<p>Una pime no necessita un pressupost de gran empresa per protegir-se del que de debò li passa: correus de phishing, comptes robats, ransomware i fraus de canvi de compte bancari. Aquestes deu mesures cobreixen la major part del risc habitual d''una petita empresa a Barcelona, Badalona o qualsevol altre lloc, quasi totes es fan amb eines que ja pagues (Microsoft 365 o Google Workspace) i es poden aplicar en un mes.</p>
+<h2>Les deu mesures, per ordre</h2>
+<ol>
+  <li><strong>MFA a tots els comptes de correu i d''administració.</strong> És la mesura que més risc treu per menys esforç. Millor si és <a href="/ca/blog/post/mfa-resistent-al-phishing-per-que-sms-ja-no-basta/">resistent al phishing</a> almenys per a administradors i finances.</li>
+  <li><strong>Còpies de seguretat que no siguin a l''abast de l''atacant.</strong> Una còpia al mateix servidor o en una unitat de xarxa sempre connectada es xifra amb la resta. La regla 3-2-1: tres còpies, dos suports, una fora. I provar de restaurar de debò, almenys una vegada.</li>
+  <li><strong>Actualitzar sistemes i aplicacions.</strong> Activa les actualitzacions automàtiques i presta atenció especial a tot el que sigui exposat a internet (VPN, tallafocs, servidor de correu). Per decidir què urgeix, <a href="/ca/blog/post/prioritzar-cve-sense-refiar-se-nomes-del-cvss/">no miris només el CVSS</a>.</li>
+  <li><strong>Un usuari per a cada persona, i sense permisos d''administrador al dia a dia.</strong> Qui llegeix correu no hauria de ser administrador del domini. Detall a <a href="/ca/blog/post/minim-privilegi-a-microsoft-entra-id/">mínim privilegi</a>.</li>
+  <li><strong>Donar de baixa els comptes de qui se''n va, el mateix dia.</strong> És la fallada més repetida: <a href="/ca/blog/post/joiner-mover-leaver-comptes-orfes/">comptes òrfenes</a> que ningú revisa.</li>
+  <li><strong>Protegir el domini de correu amb SPF, DKIM i DMARC.</strong> Evita que algú enviï correus en nom de la teva empresa. Com arribar a <a href="/ca/blog/post/spf-dkim-i-dmarc-de-p-none-a-p-reject/">p=reject</a> sense perdre correu legítim.</li>
+  <li><strong>Un procediment per a canvis de compte bancari.</strong> Qualsevol canvi d''IBAN es confirma per telèfon, al número que ja tenies. És la defensa contra el <a href="/ca/blog/post/business-email-compromise-senyals-a-microsoft-365/">frau BEC</a>.</li>
+  <li><strong>Antivirus amb EDR a tots els equips</strong> i el tallafocs amb la configuració revisada, no la de fàbrica.</li>
+  <li><strong>Formació breu i repetida.</strong> Quinze minuts al trimestre amb exemples reals de phishing serveixen més que una xerrada anual. I una norma clara: dubtar i preguntar no és molestar.</li>
+  <li><strong>Saber a qui trucar si passa alguna cosa.</strong> Un contacte tècnic, una persona amb autoritat per prendre decisions i el telèfon d''ajuda d''INCIBE (017). Millor tenir-ho escrit abans de necessitar-ho.</li>
+</ol>
+<h2>Si només tens una tarda</h2>
+<p>MFA al correu, una còpia de seguretat desconnectada i la baixa dels comptes que ja no es fan servir. Amb aquestes tres, el risc cau molt.</p>
+<h2>Normativa: què t''afecta</h2>
+<p>Si tractes dades personals, el RGPD t''obliga a notificar a l''AEPD una bretxa en un termini màxim de 72 hores des que la coneixes, tret que sigui improbable que suposi risc per a les persones. Si ets proveïdor d''una empresa gran o d''un sector regulat, és probable que et arribin requisits per contracte; mira <a href="/ca/blog/post/nis2-a-espanya-estat-octubre-2026/">com està NIS2 a Espanya</a>.</p>
+<h2>Recursos públics</h2>
+<p>INCIBE ofereix informació i una línia d''ajuda gratuïta (017) per a empreses i ciutadans, i a Catalunya l''Agència de Ciberseguretat de Catalunya publica avisos i guies. Són un bon punt de partida abans de contractar res.</p>
+<h2>Preguntes freqüents</h2>
+<h3>Per on comença la ciberseguretat d''una pime?</h3>
+<p>Pel correu i els comptes: MFA, baixes d''usuaris i còpies de seguretat fora de l''abast de l''atacant. És on es produeixen la majoria d''incidents reals.</p>
+<h3>Una pime és objectiu d''atacs?</h3>
+<p>Sí. Els atacs massius (phishing, ransomware) no trien per mida, sinó per com de fàcil sigui entrar. Les pimes solen tenir menys defenses i per això surten rendibles.</p>
+<h3>Necessito un SOC propi?</h3>
+<p>Normalment no. Una pime pot contractar un servei gestionat (MDR) que vigili alertes 24x7. El que sí necessita és tenir les bases cobertes i saber qui respon quan salta una alerta.</p>',
+  'pymes,barcelona,badalona,ciberseguridad,mfa,backup', 'blue-team-soc', 'ca', 1, '2026-10-16 09:00:00', '2026-10-16 09:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'ciberseguretat-per-a-pimes-a-barcelona-i-badalona-deu-mesures');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'He fet clic a un phishing: què fer ara mateix',
+  'he-fet-clic-a-un-phishing-que-fer-ara-mateix',
+  'Què fer en els primers minuts després de fer clic a un phishing, segons el que va passar: només clic, contrasenya introduïda, fitxer obert o dades bancàries. I què evitar.',
+  '<p>Si has fet clic en un enllaç de phishing, el que facis en els primers minuts importa més que el que passi després. L''essencial: no cal entrar en pànic, però sí actuar ja. Desconnecta l''equip de la xarxa si has descarregat o obert alguna cosa, canvia la contrasenya del compte afectat des d''un altre dispositiu, avisa qui gestioni la seguretat a la teva empresa i no esborris el correu, perquè serveix com a evidència.</p>
+<h2>Què fer segons el que va passar</h2>
+<h3>Vaig fer clic, però no vaig escriure res</h3>
+<p>Tanca la pestanya. Si el navegador va descarregar un fitxer, no l''obris i esborra''l. Passa una anàlisi amb l''antivirus. En molts casos no ha passat res, però avisa igualment: altres persones poden haver rebut el mateix correu.</p>
+<h3>Vaig escriure la meva contrasenya a la pàgina falsa</h3>
+<ol>
+  <li>Canvia la contrasenya ja, <strong>des d''un altre dispositiu</strong> si dubtes de l''equip.</li>
+  <li>Tanca totes les sessions obertes d''aquest compte (a Microsoft 365: «Tancar sessió a tot arreu», o que l''administrador revoqui les sessions). Canviar la contrasenya sense tancar sessions pot deixar l''atacant a dins si ja té una sessió activa.</li>
+  <li>Si fas servir aquesta contrasenya en altres serveis, canvia-la també allà.</li>
+  <li>Revisa els mètodes d''MFA registrats: l''atacant pot haver afegit el seu.</li>
+  <li>Revisa regles de safata d''entrada i reenviaments: són el primer que creen per amagar-se. Què buscar, a <a href="/ca/blog/post/business-email-compromise-senyals-a-microsoft-365/">senyals de BEC a Microsoft 365</a>.</li>
+</ol>
+<h3>Vaig descarregar i obrir un fitxer o vaig instal·lar alguna cosa</h3>
+<ol>
+  <li><strong>Desconnecta l''equip de la xarxa</strong> (cable i Wi-Fi). No l''apaguis si ho pots evitar: apagar-lo esborra informació útil per a la investigació.</li>
+  <li>Avisa el responsable de seguretat o el teu proveïdor informàtic, i no continuïs fent servir aquest equip.</li>
+  <li>Canvia les contrasenyes des d''un altre dispositiu, començant per correu i banca.</li>
+</ol>
+<h3>Vaig introduir dades d''una targeta o bancàries</h3>
+<p>Truca al teu banc ja, bloqueja la targeta i demana que revisin els moviments. Si hi ha un càrrec no reconegut, denuncia davant de la Policia o els Mossos d''Esquadra.</p>
+<h2>Què NO fer</h2>
+<ul>
+  <li>No esborris el correu ni el reenviïs a companys: es reenvia com a adjunt a l''equip de seguretat.</li>
+  <li>No et quedis callat per vergonya. Un avís ràpid evita que altres hi caiguin, i qualsevol SOC prefereix vint avisos falsos a un incident tardà.</li>
+  <li>No responguis a l''atacant.</li>
+</ul>
+<h2>Què mira l''equip de seguretat després</h2>
+<p>Revisa si l''enllaç es va obrir des de més usuaris, si hi va haver un inici de sessió sospitós després del clic, si es van crear regles de safata o consentiments OAuth, i si l''equip va executar alguna cosa estranya. Amb un EDR o XDR es veu la cadena completa; és el que explico a <a href="/ca/blog/post/xdr-siem-i-edr-diferencies-en-un-soc/">XDR, SIEM i EDR</a>.</p>
+<p>Perquè el pròxim clic sigui menys perillós: <a href="/ca/blog/post/mfa-resistent-al-phishing-per-que-sms-ja-no-basta/">MFA resistent al phishing</a>, que no cau encara que l''usuari introdueixi tot a la web falsa.</p>
+<h2>Preguntes freqüents</h2>
+<h3>Què passa si faig clic en un enllaç de phishing?</h3>
+<p>Depèn del que faci la pàgina: pot demanar-te credencials, descarregar un fitxer maliciós o només registrar que el correu és real. Fer clic sense més rarament compromet l''equip, però convé avisar.</p>
+<h3>Em poden robar el compte encara que tingui MFA?</h3>
+<p>Sí, amb phishing en temps real que roba també la sessió. Per això convé tancar sessions i revisar els mètodes d''MFA, i fer servir mètodes resistents al phishing.</p>
+<h3>A qui aviso?</h3>
+<p>En una empresa, a l''equip de seguretat o d''informàtica. Si ets particular i hi ha frau econòmic, al teu banc i a la policia. INCIBE té una línia gratuïta d''ajuda: 017.</p>',
+  'phishing,respuesta-a-incidentes,guia-rapida,mfa,microsoft-365', 'blue-team-soc', 'ca', 1, '2026-10-19 09:00:00', '2026-10-19 09:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'he-fet-clic-a-un-phishing-que-fer-ara-mateix');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'Ransomware: què fer en les primeres 24 hores',
+  'ransomware-que-fer-en-les-primeres-24-hores',
+  'Ordre d''actuació davant d''un ransomware: aïllar, tallar l''accés, protegir les còpies, preservar evidències, notificar a l''AEPD en 72 hores i recuperar des de còpies netes.',
+  '<p>Davant d''un ransomware, les primeres 24 hores decideixen quant de dany es produeix. L''ordre d''actuació: aïllar els equips afectats per frenar la propagació, activar el pla de resposta i avisar les persones que prenen decisions, preservar evidències, avaluar l''abast, i només després pensar a recuperar. I quasi mai pagar: no garanteix recuperar les dades i les autoritats ho desaconsellen.</p>
+<h2>Primera hora: contenir</h2>
+<ol>
+  <li><strong>Aïlla, no apaguis.</strong> Desconnecta de la xarxa (cable, Wi-Fi, VPN) els equips amb símptomes: fitxers amb extensions estranyes, notes de rescat, equips lents. Apagar-los pot destruir informació en memòria útil per a la investigació; si l''aïllament no és possible, llavors sí, apagar és millor que deixar que continuï xifrant.</li>
+  <li><strong>Talla l''accés de l''atacant.</strong> Deshabilita els comptes compromesos (començant pels privilegiats), revoca sessions i bloqueja accessos remots (RDP, VPN) sospitosos. Si l''atacant té credencials d''administrador de domini, assumeix que tota la xarxa està compromesa.</li>
+  <li><strong>Protegeix les còpies de seguretat.</strong> Desconnecta les còpies de la resta de la xarxa abans que el ransomware les xifri o les esborri. Els atacants les busquen expressament.</li>
+  <li><strong>Reuneix l''equip de crisi.</strong> Tècnics, direcció, qui porti comunicació i assessoria legal. Una persona decideix, una altra documenta cada acció amb hora.</li>
+</ol>
+<h2>Primeres hores: entendre</h2>
+<ul>
+  <li><strong>Preserva evidències.</strong> Notes de rescat, llistes de fitxers afectats, logs del tallafocs i del controlador de domini, mostres de l''executable. No reinstal·lis equips encara.</li>
+  <li><strong>Esbrina el vector d''entrada</strong> abans de restaurar: un accés remot exposat, un compte robat per phishing, una vulnerabilitat sense pedaç. Si no es tanca, l''atacant torna.</li>
+  <li><strong>Avalua quines dades s''han exfiltrat.</strong> Avui el més habitual és la doble extorsió: xifren i a més roben dades per amenaçar amb publicar-les.</li>
+</ul>
+<h2>Avisos i obligacions</h2>
+<ul>
+  <li>Si hi ha dades personals afectades, el RGPD obliga a notificar la bretxa a l''AEPD en un màxim de 72 hores des que la coneixes, tret que sigui improbable que suposi un risc per a les persones.</li>
+  <li>Si la teva empresa entra a l''àmbit de NIS2 o de la normativa sectorial, hi ha terminis de notificació específics (consulta <a href="/ca/blog/post/nis2-a-espanya-estat-octubre-2026/">on és NIS2 a Espanya</a>).</li>
+  <li>Denuncia a la Policia Nacional, la Guàrdia Civil o els Mossos d''Esquadra, i informa INCIBE-CERT. També avisa la teva asseguradora si tens ciberassegurança: algunes pòlisses exigeixen avisar en termini.</li>
+</ul>
+<h2>Recuperació</h2>
+<ol>
+  <li>Restaura des de còpies <strong>netes</strong>, comprovant que la còpia és anterior a la intrusió.</li>
+  <li>Reconstrueix els sistemes crítics des d''imatge neta en lloc de netejar a mà el que estava compromès.</li>
+  <li>Canvia totes les credencials, especialment les de comptes de servei i administració, i revisa <a href="/ca/blog/post/joiner-mover-leaver-comptes-orfes/">comptes òrfenes</a> i accessos que no haurien d''existir.</li>
+  <li>Reconnecta per fases, amb monitorització reforçada.</li>
+</ol>
+<h2>Pagar el rescat?</h2>
+<p>Les autoritats ho desaconsellen: no hi ha garantia de rebre una clau que funcioni, finança els atacants i et marca com a pagador. És una decisió de la direcció amb assessorament legal i, si es contempla, amb una empresa especialitzada. Tenir còpies fora de línia és el que evita arribar a plantejar-se la pregunta.</p>
+<h2>El que evita arribar aquí</h2>
+<ul>
+  <li><a href="/ca/blog/post/mfa-resistent-al-phishing-per-que-sms-ja-no-basta/">MFA</a> a tots els accessos remots i comptes d''administració.</li>
+  <li>Còpies de seguretat desconnectades i provades.</li>
+  <li><a href="/ca/blog/post/errors-de-configuracio-al-cloud-mes-repetits/">Sense ports d''administració exposats a internet</a> i amb pedaços al dia.</li>
+  <li>Un EDR o <a href="/ca/blog/post/xdr-siem-i-edr-diferencies-en-un-soc/">XDR</a> vigilat, amb algú que respongui a l''alerta.</li>
+</ul>
+<h2>Preguntes freqüents</h2>
+<h3>Què és el ransomware?</h3>
+<p>Un malware que xifra els fitxers d''una organització i exigeix un pagament a canvi de la clau per recuperar-los. Cada cop més, també roba les dades abans de xifrar per pressionar amb la seva publicació.</p>
+<h3>Es poden recuperar els fitxers sense pagar?</h3>
+<p>A vegades. Amb còpies netes, sí. En alguns casos hi ha desxifradors gratuïts per a certes famílies; el projecte No More Ransom reuneix els disponibles.</p>
+<h3>Cal apagar l''ordinador infectat?</h3>
+<p>El preferible és aïllar-lo de la xarxa sense apagar-lo, per conservar evidències. Si no pots aïllar-lo i continua xifrant, apaga''l.</p>',
+  'ransomware,respuesta-a-incidentes,backup,rgpd,incidentes', 'blue-team-soc', 'ca', 1, '2026-10-21 09:00:00', '2026-10-21 09:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'ransomware-que-fer-en-les-primeres-24-hores');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'Certificacions per començar com a analista SOC: quines valen la pena',
+  'certificacions-per-comencar-com-a-analista-soc-quines-valen-la-pena',
+  'Security+, SC-200, CySA+ i BTL1: què aporta cada certificació per a un primer lloc en un SOC, quines deixar per més endavant i què pesa més que qualsevol títol.',
+  '<p>Per començar com a analista SOC no hi ha una certificació obligatòria, però algunes ajuden a passar el primer filtre i a ordenar el que cal aprendre. Les més habituals en ofertes de nivell 1 són CompTIA Security+, Microsoft SC-200, CompTIA CySA+ i Blue Team Level 1 (BTL1). Pesen molt menys que demostrar que saps investigar una alerta, així que l''ideal és combinar una certificació amb pràctica real en laboratoris.</p>
+<h2>Les certificacions més útils per començar</h2>
+<table>
+  <thead><tr><th>Certificació</th><th>Per a qui</th><th>Què aporta</th></tr></thead>
+  <tbody>
+    <tr><td>CompTIA Security+</td><td>Punt de partida general</td><td>Base àmplia: amenaces, controls, risc, criptografia. Molt reconeguda en ofertes.</td></tr>
+    <tr><td>Microsoft SC-200 (Security Operations Analyst)</td><td>Entorns Microsoft</td><td>Defender XDR, Sentinel i KQL: molt pràctica si el SOC fa servir Microsoft.</td></tr>
+    <tr><td>CompTIA CySA+</td><td>Ja amb base de seguretat</td><td>Anàlisi d''amenaces, logs i resposta a incidents, orientada a SOC.</td></tr>
+    <tr><td>Blue Team Level 1 (BTL1)</td><td>Qui vol pràctica</td><td>Examen pràctic de 24 hores sobre phishing, DFIR, intel·ligència i SIEM.</td></tr>
+    <tr><td>Certificacions de fabricant (Trend Micro, Fortinet, Splunk...)</td><td>Segons l''eina del SOC</td><td>Demostren el maneig de la plataforma concreta que faràs servir.</td></tr>
+  </tbody>
+</table>
+<p>Les certificacions de fabricant pesen segons el lloc: si el SOC treballa amb aquesta eina, són de les que més es noten.</p>
+<h2>Les que deixaria per més endavant</h2>
+<p>Les certificacions d''alt nivell (GIAC com GCIH o GCFA, o similars) són cares i es valoren més quan ja hi ha experiència. Val la pena fer-les quan la teva empresa les finança o quan ja saps en quina especialitat vols créixer: resposta a incidents, forense o intel·ligència.</p>
+<h2>El que pesa més que qualsevol títol</h2>
+<ul>
+  <li><strong>Pràctica en laboratoris.</strong> Plataformes com TryHackMe, LetsDefend o Blue Team Labs Online permeten simular alertes reals d''un SOC. Un perfil amb casos resolts val més que una llista de cursos.</li>
+  <li><strong>Alguna cosa pròpia per ensenyar.</strong> Un script que automatitzi una tasca, una anàlisi publicada, una eina petita. Per exemple, <a href="/ca/blog/post/automatitzar-informe-setmanal-del-soc-amb-python/">automatitzar un informe</a> o <a href="/ca/blog/post/vigilar-el-cataleg-kev-de-cisa-sense-servidor/">vigilar el catàleg KEV</a> demostren criteri, no només teoria.</li>
+  <li><strong>Base de sistemes i xarxes.</strong> Molts bons analistes vénen de suport o administració: <a href="/ca/blog/post/de-suport-tecnic-a-soc-el-que-va-canviar-no-va-ser-el-lloc/">aquest camí funciona</a>.</li>
+  <li><strong>Saber explicar.</strong> En una entrevista, explicar com investigaries una alerta pas a pas pesa més que recitar sigles. Si no saps com funciona un dia de feina, comença per <a href="/ca/blog/post/que-fa-un-analista-soc-un-dia-de-feina-real/">què fa un analista SOC</a>.</li>
+</ul>
+<h2>Una ruta raonable</h2>
+<ol>
+  <li>Base de xarxes, Windows i Linux, i Active Directory.</li>
+  <li>Security+ si necessites el segell; si ja tens base, ves directe a SC-200 o BTL1.</li>
+  <li>Pràctiques en laboratoris mentre estudies, i documenta el que fas.</li>
+  <li>Certificació de l''eina concreta del SOC al qual aspires.</li>
+  <li>Una especialitat (IAM, cloud, resposta a incidents) quan ja tinguis experiència.</li>
+</ol>
+<h2>Preguntes freqüents</h2>
+<h3>Quina certificació demana més un SOC de nivell 1?</h3>
+<p>Security+ és la que més apareix com a requisit general; SC-200 i les de fabricant pesen quan el SOC fa servir aquestes eines.</p>
+<h3>Cal carrera universitària?</h3>
+<p>No sempre. Molts SOC valoren experiència, certificacions i pràctica per sobre del títol, encara que alguns llocs el demanen.</p>
+<h3>Quant costen?</h3>
+<p>Varien molt i canvien cada any: convé consultar el preu actual a la web de l''organisme. Algunes empreses financen la formació, i els exàmens de fabricant de vegades són gratuïts o estan inclosos en programes de partners.</p>',
+  'certificaciones,soc,carrera,security-plus,sc-200', 'carrera-personal', 'ca', 1, '2026-10-23 09:00:00', '2026-10-23 09:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'certificacions-per-comencar-com-a-analista-soc-quines-valen-la-pena');
+
+INSERT INTO `posts` (`title`, `slug`, `summary`, `content`, `tags`, `category`, `lang`, `visible`, `published_at`, `created_at`)
+SELECT
+  'Auditar els permisos de Microsoft 365 en una tarda',
+  'auditar-els-permisos-de-microsoft-365-en-una-tarda',
+  'Auditoria bàsica de permisos de Microsoft 365 en unes hores: administradors, MFA, comptes sense ús, consentiments OAuth i reenviaments, amb PowerShell de només lectura.',
+  '<p>Es pot fer una auditoria bàsica de permisos de Microsoft 365 en una tarda si es limita al que concentra més risc: administradors, convidats externs, comptes sense MFA o sense ús, aplicacions amb consentiment i reenviaments de correu. No substitueix una auditoria completa, però troba les fallades que fan servir els atacants i que quasi sempre s''acumulen sense que ningú les miri.</p>
+<p>Necessites un rol de lectura (Global Reader o Security Reader) i el mòdul de PowerShell de Microsoft Graph. Tot el que segueix és de només lectura.</p>
+<h2>1. Administradors (30 minuts)</h2>
+<p>Llista qui té rols privilegiats i per què. Més de cinc administradors globals ja és un senyal d''alerta, i cadascun hauria de poder justificar-se. El detall de quins rols fer servir en el seu lloc és a <a href="/ca/blog/post/minim-privilegi-a-microsoft-entra-id/">mínim privilegi a Entra ID</a>.</p>
+<pre><code>Connect-MgGraph -Scopes "RoleManagement.Read.Directory","User.Read.All"
+Get-MgDirectoryRole -All | ForEach-Object {
+  $rol = $_.DisplayName
+  Get-MgDirectoryRoleMember -DirectoryRoleId $_.Id |
+    ForEach-Object { [pscustomobject]@{ Rol = $rol; Usuario = $_.AdditionalProperties.userPrincipalName } }
+}</code></pre>
+<h2>2. MFA (30 minuts)</h2>
+<p>L''informe de registre de mètodes d''autenticació mostra qui no té MFA i qui fa servir mètodes febles.</p>
+<pre><code>Connect-MgGraph -Scopes "AuditLog.Read.All"
+Get-MgReportAuthenticationMethodUserRegistrationDetail -All |
+  Where-Object { -not $_.IsMfaRegistered } |
+  Select-Object UserPrincipalName, IsAdmin</code></pre>
+<p>Primer els administradors sense MFA, després finances i direcció. Per quins mètodes exigir, mira <a href="/ca/blog/post/mfa-resistent-al-phishing-per-que-sms-ja-no-basta/">MFA resistent al phishing</a>.</p>
+<h2>3. Comptes sense ús i convidats (30 minuts)</h2>
+<pre><code>Connect-MgGraph -Scopes "User.Read.All","AuditLog.Read.All"
+Get-MgUser -All -Property DisplayName,UserPrincipalName,UserType,SignInActivity,AccountEnabled |
+  Where-Object { $_.AccountEnabled -and $_.SignInActivity.LastSignInDateTime -lt (Get-Date).AddDays(-90) } |
+  Select-Object UserPrincipalName, UserType, @{n=''UltimAcces'';e={$_.SignInActivity.LastSignInDateTime}}</code></pre>
+<p>Compte habilitat sense accés en 90 dies: pregunta al seu responsable. Els convidats externs (<code>UserType = Guest</code>) mereixen revisió a part: continuen col·laborant? A quins equips tenen accés? Aquest mateix problema, en versió de cicle de vida, és el de <a href="/ca/blog/post/joiner-mover-leaver-comptes-orfes/">les comptes òrfenes</a>. Tingues en compte que <code>SignInActivity</code> requereix llicència Entra ID P1.</p>
+<h2>4. Aplicacions amb consentiment (30 minuts)</h2>
+<p>Les aplicacions OAuth amb permisos com <code>Mail.Read</code> o <code>Files.Read.All</code> continuen tenint accés encara que canviïs la contrasenya.</p>
+<pre><code>Connect-MgGraph -Scopes "Directory.Read.All"
+Get-MgOauth2PermissionGrant -All |
+  Select-Object ClientId, ConsentType, Scope</code></pre>
+<p>Busca aplicacions desconegudes amb permisos amplis i consentiment d''usuari. Revoca el que ningú reconegui i restringeix qui pot donar consentiment.</p>
+<h2>5. Reenviaments de correu (20 minuts)</h2>
+<pre><code>Connect-ExchangeOnline
+Get-Mailbox -ResultSize Unlimited |
+  Where-Object { $_.ForwardingSmtpAddress -or $_.ForwardingAddress } |
+  Select-Object UserPrincipalName, ForwardingSmtpAddress, ForwardingAddress</code></pre>
+<p>Un reenviament a una adreça externa que ningú recorda haver creat és un dels senyals de <a href="/ca/blog/post/business-email-compromise-senyals-a-microsoft-365/">BEC</a>. Revisa també les regles de safata que reenvien o mouen correu.</p>
+<h2>6. Polítiques d''accés (20 minuts)</h2>
+<p>Comprova que existeixen les polítiques base i que cap compte està exclòs sense motiu. Llista i ordre a <a href="/ca/blog/post/acces-condicional-microsoft-365-politiques-base/">accés condicional: les polítiques base</a>. Mira també la puntuació de seguretat (Secure Score) al portal de Defender, que serveix com a llista de tasques prioritzada.</p>
+<h2>Què fer amb el que trobis</h2>
+<ol>
+  <li>Anota cada troballa amb responsable i data, en un full.</li>
+  <li>Arregla primer el que sigui de risc alt i esforç baix: MFA a administradors, baixes de comptes, reenviaments desconeguts.</li>
+  <li>Repeteix cada trimestre. La utilitat d''una auditoria és en la comparació entre dates.</li>
+</ol>
+<h2>Preguntes freqüents</h2>
+<h3>Cada quant convé revisar els permisos?</h3>
+<p>Com a mínim cada trimestre, i sempre després de canvis grans (fusions, sortides de personal clau, migracions).</p>
+<h3>Necessito llicències especials?</h3>
+<p>Per al bàsic no. L''activitat d''inici de sessió requereix Entra ID P1, i les revisions d''accés automàtiques, Entra ID Governance.</p>
+<h3>És segur executar aquestes ordres?</h3>
+<p>Són de només lectura i no modifiquen res, però prova-les primer amb un compte de lectura i revisa l''abast dels permisos que concedeixes a Graph.</p>',
+  'microsoft-365,entra-id,auditoria,powershell,iam', 'cloud-iam', 'ca', 1, '2026-10-25 09:00:00', '2026-10-25 09:00:00'
+WHERE NOT EXISTS (SELECT 1 FROM `posts` WHERE `slug` = 'auditar-els-permisos-de-microsoft-365-en-una-tarda');
+
+
+
 -- ===========================================================================
 --  7. LIMPIEZA
 --  Los helpers ya han hecho su trabajo: no deben quedarse en la base de datos.

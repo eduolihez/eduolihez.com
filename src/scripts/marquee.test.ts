@@ -35,3 +35,14 @@ describe('cloneMarquee', () => {
     expect(track().children).toHaveLength(0);
   });
 });
+
+describe('cloneMarquee — several tracks', () => {
+  it('clones every track on the page, each one once', () => {
+    document.body.innerHTML =
+      '<ul data-marquee><li>A</li></ul><ul data-marquee><li>B</li><li>C</li></ul>';
+    cloneMarquee();
+    cloneMarquee();
+    const tracks = [...document.querySelectorAll('[data-marquee]')];
+    expect(tracks.map((t) => t.children.length)).toEqual([2, 4]);
+  });
+});

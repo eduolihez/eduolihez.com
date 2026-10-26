@@ -34,9 +34,9 @@ export const faqItems: FaqItem[] = [
       ca: 'Qui és Eduardo Olivares?',
     },
     answer: {
-      es: 'Eduardo Olivares Hernández es analista de ciberseguridad en Barcelona, especializado en seguridad cloud, gestión de identidades y accesos (IAM) y seguridad del correo y la colaboración. Trabaja en Dagram, donde hace triaje de alertas en Trend Micro Vision One, automatiza informes de seguridad con Python y da soporte de IAM. Tiene certificaciones de Trend Micro, Fortinet y Microsoft.',
-      en: 'Eduardo Olivares Hernández is a cybersecurity analyst in Barcelona, Spain, focused on cloud security, identity and access management (IAM) and email and collaboration security. He works at Dagram, where he triages alerts in Trend Micro Vision One, automates security reporting with Python and supports IAM work. He holds certifications from Trend Micro, Fortinet and Microsoft.',
-      ca: "Eduardo Olivares Hernández és analista de ciberseguretat a Barcelona, especialitzat en seguretat cloud, gestió d'identitats i accessos (IAM) i seguretat del correu i la col·laboració. Treballa a Dagram, on fa triatge d'alertes a Trend Micro Vision One, automatitza informes de seguretat amb Python i dona suport d'IAM. Té certificacions de Trend Micro, Fortinet i Microsoft.",
+      es: 'Eduardo Olivares Hernández es analista de ciberseguridad en Barcelona, especializado en seguridad cloud, gestión de identidades y accesos (IAM) y seguridad del correo y la colaboración. Trabaja en Dagram, donde hace triaje de alertas en Trend Micro Vision One, automatiza informes de seguridad con Python y da soporte de IAM. Además trabaja la seguridad de la IA (red teaming de chatbots LLM). Tiene certificaciones de Trend Micro, Fortinet y Microsoft.',
+      en: 'Eduardo Olivares Hernández is a cybersecurity analyst in Barcelona, Spain, focused on cloud security, identity and access management (IAM) and email and collaboration security. He works at Dagram, where he triages alerts in Trend Micro Vision One, automates security reporting with Python and supports IAM work. He also works on AI security (LLM chatbot red teaming). He holds certifications from Trend Micro, Fortinet and Microsoft.',
+      ca: "Eduardo Olivares Hernández és analista de ciberseguretat a Barcelona, especialitzat en seguretat cloud, gestió d'identitats i accessos (IAM) i seguretat del correu i la col·laboració. Treballa a Dagram, on fa triatge d'alertes a Trend Micro Vision One, automatitza informes de seguretat amb Python i dona suport d'IAM. També treballa la seguretat de la IA (red teaming de chatbots LLM). Té certificacions de Trend Micro, Fortinet i Microsoft.",
     },
   },
   {
@@ -58,9 +58,33 @@ export const faqItems: FaqItem[] = [
       ca: 'On treballa Eduardo Olivares? Treballa a Barcelona o en remot?',
     },
     answer: {
-      es: 'Trabaja en Barcelona y vive en Badalona, en el área metropolitana. Está abierto a puestos presenciales o híbridos en Barcelona y a trabajo en remoto con equipos de toda España.',
-      en: 'He works in Barcelona and lives in Badalona, in the Barcelona metropolitan area. He is open to on-site or hybrid roles in Barcelona and to remote work with teams anywhere in Spain.',
-      ca: "Treballa a Barcelona i viu a Badalona, a l'àrea metropolitana. Està obert a llocs presencials o híbrids a Barcelona i a treball en remot amb equips de tota Espanya.",
+      es: 'Trabaja en Barcelona y vive en Badalona, en el área metropolitana. Está abierto a puestos presenciales o híbridos en Barcelona y a trabajo en remoto.',
+      en: 'He works in Barcelona and lives in Badalona, in the Barcelona metropolitan area. He is open to on-site or hybrid roles in Barcelona and to remote work.',
+      ca: "Treballa a Barcelona i viu a Badalona, a l'àrea metropolitana. Està obert a llocs presencials o híbrids a Barcelona i a treball en remot.",
+    },
+  },
+  {
+    question: {
+      es: '¿Qué experiencia tiene Eduardo Olivares en seguridad de la IA y red teaming de LLM?',
+      en: 'What experience does Eduardo Olivares have in AI security and LLM red teaming?',
+      ca: 'Quina experiència té Eduardo Olivares en seguretat de la IA i red teaming de LLM?',
+    },
+    answer: {
+      es: 'Aborda la seguridad de la IA desde los dos lados. En ofensiva, creó llm-chatbot-pentest, una herramienta de código abierto para el red teaming autónomo de chatbots LLM: identifica el objetivo, genera payloads alineados con el OWASP Top 10 para aplicaciones LLM, los puntúa con un modelo juez independiente y no se ejecuta sin autorización explícita y un alcance definido. En defensa, trabaja los riesgos de la IA que llegan a un SOC: inyección de prompts, fuga de datos por asistentes de IA, shadow AI y los permisos que se dan a los agentes. Sus referencias son OWASP Top 10 para LLM, MITRE ATLAS y NIST AI RMF.',
+      en: 'He approaches AI security from both sides. Offensively, he built llm-chatbot-pentest, an open-source tool for autonomous red teaming of LLM chatbots: it fingerprints the target, generates payloads mapped to the OWASP Top 10 for LLM Applications, scores them with an independent judge model, and will not run without explicit authorization and a defined scope. Defensively, he works on the AI risks that reach a SOC: prompt injection, data leakage through AI assistants, shadow AI and the permissions handed to AI agents. His references are the OWASP Top 10 for LLM Applications, MITRE ATLAS and NIST AI RMF.',
+      ca: "Aborda la seguretat de la IA des dels dos costats. En ofensiva, va crear llm-chatbot-pentest, una eina de codi obert per al red teaming autònom de chatbots LLM: identifica l'objectiu, genera payloads alineats amb l'OWASP Top 10 per a aplicacions LLM, els puntua amb un model jutge independent i no s'executa sense autorització explícita i un abast definit. En defensa, treballa els riscos de la IA que arriben a un SOC: injecció de prompts, fuita de dades per assistents d'IA, shadow AI i els permisos que es donen als agents. Les seves referències són l'OWASP Top 10 per a LLM, MITRE ATLAS i NIST AI RMF.",
+    },
+  },
+  {
+    question: {
+      es: '¿Qué estudia Eduardo Olivares y hacia dónde quiere evolucionar?',
+      en: 'What does Eduardo Olivares study and where does he want to go professionally?',
+      ca: 'Què estudia Eduardo Olivares i cap a on vol evolucionar?',
+    },
+    answer: {
+      es: 'Está terminando el ciclo superior de Administración de Sistemas Informáticos en Red con itinerario de Ciberseguridad (previsto para 2027) en el Col·legi Cultural, y después planea estudiar Ingeniería Informática. A largo plazo quiere especializarse en seguridad cloud e IAM, con la seguridad de la IA presente en ambas, y llegar a liderar un equipo de seguridad.',
+      en: 'He is finishing an Associate Degree in Network Systems Administration with a Cybersecurity track (expected 2027) at Col·legi Cultural, and then plans to study Computer Engineering. Long term, he wants to specialize in cloud security and IAM, with AI security running through both, and eventually lead a security team.',
+      ca: "Està acabant el cicle superior d'Administració de Sistemes Informàtics en Xarxa amb itinerari de Ciberseguretat (previst per al 2027) al Col·legi Cultural, i després planeja estudiar Enginyeria Informàtica. A llarg termini vol especialitzar-se en seguretat cloud i IAM, amb la seguretat de la IA present en totes dues, i arribar a liderar un equip de seguretat.",
     },
   },
   {

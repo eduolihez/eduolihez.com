@@ -123,9 +123,9 @@ const altLocales = (Object.keys(localeMap) as Array<keyof typeof localeMap>)
 // Primera frase = la que citan los asistentes de IA cuando resumen el perfil:
 // puesto, ciudad y foco, en ese orden. Mismo enfoque que el titular de LinkedIn.
 const bio: Record<Lang, string> = {
-  es: `Analista de ciberseguridad en ${loc.region} (vive en ${loc.city}), especializado en seguridad cloud, gestión de identidades y accesos (IAM) y seguridad del correo y la colaboración. En ${SITE.worksFor.name} hace triaje de alertas en Trend Micro Vision One, automatiza informes de seguridad con Python y da soporte de IAM. Certificado por Trend Micro (Cloud, Identity y Email & Collaboration Security), Fortinet y Microsoft.`,
-  en: `Cybersecurity analyst in ${loc.region}, Spain (based in ${loc.city}), focused on cloud security, identity and access management (IAM) and email and collaboration security. At ${SITE.worksFor.name} he triages alerts in Trend Micro Vision One, automates security reporting with Python and supports IAM work. Certified by Trend Micro (Cloud, Identity and Email & Collaboration Security), Fortinet and Microsoft.`,
-  ca: `Analista de ciberseguretat a ${loc.region} (viu a ${loc.city}), especialitzat en seguretat cloud, gestió d'identitats i accessos (IAM) i seguretat del correu i la col·laboració. A ${SITE.worksFor.name} fa triatge d'alertes a Trend Micro Vision One, automatitza informes de seguretat amb Python i dona suport d'IAM. Certificat per Trend Micro (Cloud, Identity i Email & Collaboration Security), Fortinet i Microsoft.`,
+  es: `Analista de ciberseguridad en ${loc.region} (vive en ${loc.city}), especializado en seguridad cloud, gestión de identidades y accesos (IAM) y seguridad del correo y la colaboración, con la seguridad de la IA como línea transversal (red teaming de chatbots LLM). En ${SITE.worksFor.name} hace triaje de alertas en Trend Micro Vision One, automatiza informes de seguridad con Python y da soporte de IAM. Certificado por Trend Micro, Fortinet y Microsoft.`,
+  en: `Cybersecurity analyst in ${loc.region}, Spain (based in ${loc.city}), focused on cloud security, identity and access management (IAM) and email and collaboration security, with AI security (LLM chatbot red teaming) running through all of it. At ${SITE.worksFor.name} he triages alerts in Trend Micro Vision One, automates security reporting with Python and supports IAM work. Certified by Trend Micro, Fortinet and Microsoft.`,
+  ca: `Analista de ciberseguretat a ${loc.region} (viu a ${loc.city}), especialitzat en seguretat cloud, gestió d'identitats i accessos (IAM) i seguretat del correu i la col·laboració, amb la seguretat de la IA com a línia transversal (red teaming de chatbots LLM). A ${SITE.worksFor.name} fa triatge d'alertes a Trend Micro Vision One, automatitza informes de seguretat amb Python i dona suport d'IAM. Certificat per Trend Micro, Fortinet i Microsoft.`,
 };
 
 const siteNameByLang: Record<Lang, string> = {
@@ -170,6 +170,10 @@ const keywords = [
   'Fortinet NSE',
   'Trend Micro Vision One',
   'Threat Intelligence',
+  'AI Security',
+  'seguridad de la IA',
+  'LLM Red Teaming',
+  'OWASP Top 10 for LLM Applications',
   'analisis de phishing',
   'Python',
   'Eduardo Olivares',
@@ -269,7 +273,11 @@ const person = {
     name: c.name,
     credentialCategory: 'certificate',
     recognizedBy: { '@type': 'Organization', name: c.issuer },
-    dateCreated: c.year,
+    ...(c.year ? { dateCreated: c.year } : {}),
+  })),
+  alumniOf: SITE.education.map((e) => ({
+    '@type': 'EducationalOrganization',
+    name: e.school,
   })),
   award: SITE.awards.map((a) => a.name),
   sameAs: [SITE.social.linkedin, SITE.social.github, 'https://eduolihez.github.io/'],

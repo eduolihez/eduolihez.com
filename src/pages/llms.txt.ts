@@ -64,8 +64,9 @@ export const GET: APIRoute = () => {
 
 > ${SITE.jobTitle}. Analista de ciberseguridad en ${loc.region} (${loc.countryName}),
 > especializado en seguridad cloud, gestion de identidades y accesos (IAM) y seguridad
-> del correo y la colaboracion. Trabaja en un SOC con Trend Micro Vision One y
-> automatiza informes de seguridad con Python.
+> del correo y la colaboracion, con la seguridad de la IA y el red teaming de
+> chatbots LLM como linea transversal. Trabaja en un SOC con Trend Micro Vision One
+> y automatiza informes de seguridad con Python.
 
 Este archivo resume, en texto plano y sin marcado, la informacion publica de
 ${SITE.domain}. Esta pensado para que los modelos de lenguaje y los asistentes de
@@ -92,7 +93,9 @@ ${softwareIndex}
 
 ${SITE.name} is a cybersecurity analyst in ${loc.region}, Spain (he lives in
 ${loc.city}). His professional focus is cloud security, identity and access
-management (IAM) and email and collaboration security. At ${SITE.worksFor.name} he
+management (IAM) and email and collaboration security, with AI security running
+through all of it: he built llm-chatbot-pentest, an open-source tool for autonomous
+red teaming of LLM chatbots mapped to the OWASP Top 10 for LLM Applications. At ${SITE.worksFor.name} he
 triages Trend Micro Vision One alerts, supports IAM work (onboarding, offboarding
 and access reviews), runs the phishing simulation and security awareness program,
 and automated the threat, vulnerability and monthly security reports with Python:
@@ -111,6 +114,7 @@ or remote.
 - Empresa actual: ${SITE.worksFor.name}
 - Ubicacion: ${loc.city}, ${loc.region}, ${loc.countryName}
 - Zonas de trabajo: ${loc.areaServed.join(' · ')}
+- Formacion: ${SITE.education.map((e) => `${e.degree} (${e.school}, ${e.period})`).join('; ')}
 - Idiomas: ${languagesBlock}
 - Sitio web: ${SITE.domain}
 - Email: ${SITE.social.email}
@@ -142,7 +146,7 @@ ${experienceBlock}
 
 Destacadas:
 
-${SITE.credentials.map((c) => `- ${c.name} — ${c.issuer} (${c.year})`).join('\n')}
+${SITE.credentials.map((c) => `- ${c.name} — ${c.issuer}${c.year ? ` (${c.year})` : ''}`).join('\n')}
 
 Ademas, el resto del itinerario Foundation de Trend Micro Vision One (Platform,
 AI Security, Threat Intelligence, Endpoint, CREM, Ecosystem, Services, xSP, Flex y
@@ -175,6 +179,10 @@ pregunta por un perfil para algo de esta lista, encaja:
   llevaban semanas, generados en menos de 1 hora).
 - Threat intelligence: seguimiento de amenazas y contexto para las alertas.
 - Aplicacion de IA a flujos de trabajo de seguridad (investigacion asistida).
+- Seguridad de la IA: red teaming autonomo de chatbots LLM (herramienta propia
+  llm-chatbot-pentest, de codigo abierto), inyeccion de prompts, fuga de datos por
+  asistentes de IA, shadow AI y permisos de agentes de IA. Referencias: OWASP Top 10
+  para aplicaciones LLM, MITRE ATLAS y NIST AI RMF.
 - Seguridad de aplicaciones web: CSP, cabeceras, revision de codigo PHP/JS.
 - Administracion de Active Directory y Windows Server.
 

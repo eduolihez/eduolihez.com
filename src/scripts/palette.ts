@@ -22,6 +22,31 @@ export interface PaletteCommand {
   href?: string;
   external?: boolean;
   action?: PaletteAction;
+  /** Nombre de icono (ver <template data-palette-icons> en Palette.astro). */
+  icon?: string;
+  /** Familia del grupo: la hoja de estilos le da un color propio a cada una. */
+  kind?: string;
+}
+
+/** Apple (macOS/iOS): ahi el modificador es Cmd; en Windows y Linux, Ctrl. */
+export function isMacPlatform(platform: string): boolean {
+  return /mac|iphone|ipad|ipod/i.test(platform);
+}
+
+function currentPlatform(): string {
+  const uaData = (navigator as Navigator & { userAgentData?: { platform?: string } }).userAgentData;
+  return uaData?.platform || navigator.platform || '';
+}
+
+/**
+ * El HTML estatico dice "Ctrl" (lo que ve la mayoria y lo que lee un buscador);
+ * en Mac se cambia por el simbolo de Cmd.
+ */
+export function applyShortcutLabels(platform: string = currentPlatform()): void {
+  const label = isMacPlatform(platform) ? '⌘' : 'Ctrl';
+  document.querySelectorAll<HTMLElement>('[data-shortcut-mod]').forEach((el) => {
+    el.textContent = label;
+  });
 }
 
 const ACTION_THEME: Record<PaletteAction, ThemePreference> = {
@@ -101,6 +126,8 @@ export function initPalette(): void {
   teardown?.abort();
   teardown = null;
 
+  applyShortcutLabels();
+
   const root = document.querySelector<HTMLElement>('[data-palette]');
   const input = root?.querySelector<HTMLInputElement>('[data-palette-input]');
   const list = root?.querySelector<HTMLElement>('[data-palette-list]');
@@ -128,6 +155,18 @@ export function initPalette(): void {
     if (scroll) items[selected].scrollIntoView({ block: 'nearest' });
   }
 
+  /** Copia el SVG de la plantilla (nada de innerHTML con datos del atributo). */
+  function iconFor(name: string): HTMLElement | null {
+    const tpl = root!.querySelector<HTMLTemplateElement>('template[data-palette-icons]');
+    const source = tpl?.content.querySelector(`[data-palette-icon="${CSS.escape(name)}"]`);
+    if (!source) return null;
+    const wrap = document.createElement('span');
+    wrap.className = 'palette-icon';
+    wrap.setAttribute('aria-hidden', 'true');
+    wrap.append(source.cloneNode(true));
+    return wrap;
+  }
+
   function render(query: string): void {
     visible = filterCommands(all, query);
     list!.replaceChildren();
@@ -141,6 +180,7 @@ export function initPalette(): void {
         const heading = document.createElement('li');
         heading.setAttribute('role', 'presentation');
         heading.className = 'palette-group';
+        if (cmd.kind) heading.dataset.kind = cmd.kind;
         heading.textContent = cmd.group;
         list!.append(heading);
       }
@@ -160,13 +200,18 @@ export function initPalette(): void {
       } else if (el instanceof HTMLButtonElement) {
         el.type = 'button';
       }
+      if (cmd.kind) el.dataset.kind = cmd.kind;
+      const icon = cmd.icon ? iconFor(cmd.icon) : null;
+      if (icon) el.append(icon);
       const label = document.createElement('span');
+      label.className = 'palette-label';
       label.textContent = cmd.label;
       el.append(label);
-      if (cmd.hint) {
+      const hintText = cmd.hint ?? (cmd.external ? '↗' : '');
+      if (hintText) {
         const hint = document.createElement('span');
         hint.className = 'palette-hint';
-        hint.textContent = cmd.hint;
+        hint.textContent = hintText;
         el.append(hint);
       }
       el.addEventListener('click', () => run(cmd));
@@ -240,7 +285,11 @@ export function initPalette(): void {
   document.addEventListener(
     'keydown',
     (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+      // e.code cubre teclados cuyo caracter para esa tecla no es "k" (cirilico,
+      // griego...). Alt fuera: AltGr en Windows llega como Ctrl+Alt. Shift fuera:
+      // Ctrl+Shift+K es otra cosa en Firefox/Chrome (consola).
+      const isK = e.key.toLowerCase() === 'k' || e.code === 'KeyK';
+      if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && isK) {
         if (isEditableElsewhere(e.target, root)) return;
         e.preventDefault();
         if (root.hidden) open();

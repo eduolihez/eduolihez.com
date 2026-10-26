@@ -754,6 +754,22 @@ WHERE EXISTS (SELECT 1 FROM `projects`)
 UPDATE `projects` SET `status` = 'draft'
 WHERE `title_es` = 'Zéora' AND `status` = 'published';
 
+-- Proyectos: anadir llm-chatbot-pentest (2026-10-26). Herramienta open source
+-- de red teaming autonomo de chatbots LLM (OWASP Top 10 para aplicaciones LLM,
+-- juez LLM independiente, informe reproducible; solo uso autorizado). Mismo
+-- patron idempotente que los bloques de arriba: solo actua sobre una tabla
+-- que ya tiene datos y no duplica si el titulo ya existe.
+INSERT INTO `projects`
+  (`title_es`, `title_en`, `summary_es`, `summary_en`, `stack`, `badges`,
+   `repo_url`, `demo_url`, `store_url`, `featured`, `sort_order`, `status`)
+SELECT 'llm-chatbot-pentest', 'llm-chatbot-pentest',
+       'Red teaming autonomo de chatbots LLM: identifica el objetivo, genera payloads alineados con el OWASP Top 10 para aplicaciones LLM y los puntua con un modelo juez independiente. No se ejecuta sin autorizacion explicita y un alcance definido. CLI y panel web.',
+       'Autonomous red teaming of LLM chatbots: fingerprints the target, generates payloads mapped to the OWASP Top 10 for LLM Applications and scores them with an independent judge model. Will not run without explicit authorization and a defined scope. CLI and web dashboard.',
+       '["Python","OWASP LLM Top 10","PyRIT","Red Teaming"]', '["open-source"]',
+       'https://github.com/eduolihez/llm-chatbot-pentest', NULL, NULL, 1, 14, 'published'
+WHERE EXISTS (SELECT 1 FROM `projects`)
+  AND NOT EXISTS (SELECT 1 FROM `projects` WHERE `title_es` = 'llm-chatbot-pentest');
+
 -- ---------------------------------------------------------------------------
 -- Certificaciones: correcciones y ampliacion con las insignias de Credly
 -- (https://www.credly.com/users/eduolihez), revisadas 2026-08-25.

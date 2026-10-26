@@ -200,9 +200,13 @@ el acento sigue siendo "vivo, disponible, accionable"; un fallo usa `danger`, nu
 
 - **Cuadrícula de fondo** (`.hero-grid`) con máscara radial y resplandor del acento.
 - **Paleta de comandos** Ctrl/Cmd+K (`Palette.astro`, `palette.ts`): patrón combobox +
-  listbox, filtrado sin acentos, foco devuelto al cerrar. En el admin se reutiliza el mismo
+  listbox, filtrado sin acentos, foco devuelto al cerrar. La etiqueta del atajo se adapta a la
+  plataforma (`data-shortcut-mod`); grupos con color propio (`data-kind`) e iconos clonados de
+  un `<template>`. En el admin se reutiliza el mismo
   módulo, empaquetado a `server/admin/assets/palette.js` con `npm run admin:palette`
   (también se ejecuta en `npm run build`).
+- **Doble carrusel de habilidades** (`Skills.astro`, `skillRows()`): dos filas en sentido
+  contrario; el título abre una ventana con todo agrupado (`skills.ts`).
 - **Franja de stack** (`StackStrip`): tecnologías reales de `src/data/skills.ts`. El HTML
   lleva una copia; la segunda la clona `marquee.ts`.
 - **Marca:** `EO // security` en la web y `EO // admin` en el panel.

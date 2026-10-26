@@ -1,10 +1,16 @@
 ---
 /**
- * <Skills /> - Habilidades agrupadas por categoria (estatico, minimalista).
+ * <Skills /> - Habilidades: doble carrusel (dos filas en sentido contrario) y,
+ * al pulsar el titulo, una ventana con todas agrupadas por categoria.
+ *
+ * SEO/GEO: cada habilidad esta en el HTML estatico (las filas llevan una sola
+ * copia; la segunda la clona marquee.ts con aria-hidden) y la ventana con los
+ * grupos completos esta en el DOM, solo oculta con `hidden`. La lista tambien
+ * viaja en el JSON-LD (Seo.astro) y en /llms.txt.
  */
 import { useTranslations, pick } from '../i18n/utils';
 import type { Lang } from '../i18n/ui';
-import { skillGroups } from '../data/skills';
+import { skillGroups, skillRows } from '../data/skills';
 import Icon from './Icon.astro';
 
 interface Props {
@@ -12,32 +18,103 @@ interface Props {
 }
 const { lang } = Astro.props;
 const t = useTranslations(lang);
+const rows = skillRows();
 ---
 
 <section id="habilidades" class="border-b border-bg-border py-20 sm:py-28">
   <div class="container-page">
-    <div class="reveal mb-12">
+    <div class="reveal mb-10">
       <p class="section-kicker">{t('kicker.skills')}</p>
-      <h2 class="section-title">{t('skills.title')}</h2>
+      <h2 class="section-title">
+        <button
+          type="button"
+          data-skills-open
+          class="skills-title-btn"
+          aria-haspopup="dialog"
+          aria-expanded="false"
+          aria-controls="skills-modal"
+          title={t('skills.openAll')}
+        >
+          {t('skills.title')}
+          <span class="skills-title-cta" aria-hidden="true">
+            <Icon name="arrowRight" class="h-4 w-4" />
+          </span>
+          <span class="sr-only">— {t('skills.openAll')}</span>
+        </button>
+      </h2>
       <p class="section-subtitle">{t('skills.subtitle')}</p>
     </div>
+  </div>
 
-    <div class="grid gap-x-10 gap-y-8 sm:grid-cols-2">
-      {
-        skillGroups.map((group) => (
-          <div class="reveal">
-            <h3 class="mb-3 flex items-center gap-2 font-mono text-sm text-accent-cyan">
-              <Icon name={group.icon} class="h-4 w-4 shrink-0" />
-              {pick(group.category, lang)}
-            </h3>
-            <ul class="flex flex-wrap gap-2">
-              {group.items.map((item) => (
-                <li class="badge">{item}</li>
-              ))}
-            </ul>
-          </div>
-        ))
-      }
+  <div class="skills-rows" role="group" aria-label={t('skills.rowsLabel')}>
+    {
+      rows.map((row, i) => (
+        <div class="skills-marquee reveal" style={`--reveal-delay:${i * 0.12}s`}>
+          <ul class={`marquee-track skills-track ${i === 1 ? 'is-reverse' : ''}`} data-marquee>
+            {row.map((chip) => (
+              <li class="skill-chip">
+                <Icon name={chip.icon} class="h-3.5 w-3.5 shrink-0" />
+                {chip.label}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))
+    }
+  </div>
+
+  <div
+    id="skills-modal"
+    data-skills-modal
+    class="modal-backdrop"
+    hidden
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="skills-modal-title"
+  >
+    <div
+      class="relative max-h-[85vh] w-full max-w-3xl overflow-y-auto rounded-2xl border border-bg-border bg-bg-card p-6 shadow-2xl sm:p-8"
+    >
+      <button
+        type="button"
+        data-skills-close
+        class="absolute right-3 top-3 rounded-md p-1.5 text-text-muted transition hover:bg-bg-soft hover:text-text"
+        aria-label={t('skills.close')}
+      >
+        <Icon name="close" class="h-5 w-5" />
+      </button>
+      <h3 id="skills-modal-title" class="pr-8 font-mono text-lg font-semibold text-text-title">
+        {t('skills.modalTitle')}
+      </h3>
+      <div class="mt-6 grid gap-x-10 gap-y-7 sm:grid-cols-2">
+        {
+          skillGroups.map((group) => (
+            <div>
+              <h4 class="mb-3 flex items-center gap-2 font-mono text-sm text-accent-cyan">
+                <Icon name={group.icon} class="h-4 w-4 shrink-0" />
+                {pick(group.category, lang)}
+              </h4>
+              <ul class="flex flex-wrap gap-2">
+                {group.items.map((item) => (
+                  <li class="badge">{item}</li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </div>
     </div>
   </div>
 </section>
+
+<script>
+  import { cloneMarquee } from '../scripts/marquee';
+  import { initSkillsModal } from '../scripts/skills';
+
+  function init() {
+    cloneMarquee();
+    initSkillsModal();
+  }
+  init();
+  document.addEventListener('astro:page-load', init);
+</script>

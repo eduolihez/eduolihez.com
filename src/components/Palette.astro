@@ -7,6 +7,7 @@
 import { useTranslations, localeBase } from '../i18n/utils';
 import { languages, type Lang } from '../i18n/ui';
 import { SITE } from '../config';
+import Icon from './Icon.astro';
 import type { PaletteCommand } from '../scripts/palette';
 
 interface Props {
@@ -29,30 +30,33 @@ const actions = t('palette.group.actions');
 const language = t('palette.group.language');
 const links = t('palette.group.links');
 
+// `kind` colorea cada familia de grupo; `icon` sale de <template data-palette-icons>.
 const commands: PaletteCommand[] = [
-  { id: 'experience', group: go, label: t('nav.experience'), href: `${base}#experiencia` },
-  { id: 'skills', group: go, label: t('nav.skills'), href: `${base}#habilidades` },
-  { id: 'projects', group: go, label: t('nav.projects'), href: `${base}#proyectos` },
-  { id: 'certs', group: go, label: t('nav.certifications'), href: `${base}#certificaciones` },
-  { id: 'faq', group: go, label: t('nav.faq'), href: `${base}#faq` },
-  { id: 'contact', group: go, label: t('nav.contact'), href: `${base}#contacto` },
+  { id: 'experience', group: go, kind: 'go', icon: 'briefcase', label: t('nav.experience'), href: `${base}#experiencia` },
+  { id: 'skills', group: go, kind: 'go', icon: 'bolt', label: t('nav.skills'), href: `${base}#habilidades` },
+  { id: 'projects', group: go, kind: 'go', icon: 'code', label: t('nav.projects'), href: `${base}#proyectos` },
+  { id: 'certs', group: go, kind: 'go', icon: 'award', label: t('nav.certifications'), href: `${base}#certificaciones` },
+  { id: 'faq', group: go, kind: 'go', icon: 'help', label: t('nav.faq'), href: `${base}#faq` },
+  { id: 'contact', group: go, kind: 'go', icon: 'mail', label: t('nav.contact'), href: `${base}#contacto` },
   // El blog solo tiene contenido en espanol (ver Header.astro).
   ...(lang === 'es'
-    ? [{ id: 'blog', group: pages, label: t('nav.blog'), href: `${base}blog/`, keywords: 'articulos posts escritos' }]
+    ? [{ id: 'blog', group: pages, kind: 'pages', icon: 'book', label: t('nav.blog'), href: `${base}blog/`, keywords: 'articulos posts escritos' }]
     : []),
-  { id: 'about', group: pages, label: t('palette.about'), href: aboutPath, keywords: 'colofon stack tecnico' },
-  { id: 'cv', group: actions, label: t('palette.cv'), href: SITE.cv[lang] ?? SITE.cv.es, keywords: 'curriculum pdf resume' },
-  { id: 'email', group: actions, label: t('palette.email'), href: `mailto:${SITE.social.email}`, keywords: 'correo contacto mail' },
-  { id: 'theme-light', group: actions, label: t('palette.theme.light'), action: 'theme-light', keywords: 'claro light' },
-  { id: 'theme-dark', group: actions, label: t('palette.theme.dark'), action: 'theme-dark', keywords: 'oscuro dark noche' },
-  { id: 'theme-system', group: actions, label: t('palette.theme.system'), action: 'theme-system', keywords: 'automatico system' },
-  { id: 'lang-es', group: language, label: languages.es === 'Espanol' ? 'Español' : languages.es, href: '/', keywords: 'idioma spanish castellano' },
-  { id: 'lang-en', group: language, label: languages.en, href: '/en/', keywords: 'idioma ingles' },
-  { id: 'lang-ca', group: language, label: 'Català', href: '/ca/', keywords: 'idioma catalan' },
-  { id: 'github', group: links, label: 'GitHub', href: SITE.social.github, external: true },
-  { id: 'linkedin', group: links, label: 'LinkedIn', href: SITE.social.linkedin, external: true },
-  { id: 'repo', group: links, label: t('nav.githubRepo'), href: SITE.githubRepo, external: true },
+  { id: 'about', group: pages, kind: 'pages', icon: 'terminal', label: t('palette.about'), href: aboutPath, keywords: 'colofon stack tecnico' },
+  { id: 'cv', group: actions, kind: 'actions', icon: 'download', label: t('palette.cv'), href: SITE.cv[lang] ?? SITE.cv.es, keywords: 'curriculum pdf resume' },
+  { id: 'email', group: actions, kind: 'actions', icon: 'mail', label: t('palette.email'), href: `mailto:${SITE.social.email}`, keywords: 'correo contacto mail' },
+  { id: 'theme-light', group: actions, kind: 'actions', icon: 'sun', label: t('palette.theme.light'), action: 'theme-light', keywords: 'claro light' },
+  { id: 'theme-dark', group: actions, kind: 'actions', icon: 'moon', label: t('palette.theme.dark'), action: 'theme-dark', keywords: 'oscuro dark noche' },
+  { id: 'theme-system', group: actions, kind: 'actions', icon: 'monitor', label: t('palette.theme.system'), action: 'theme-system', keywords: 'automatico system' },
+  { id: 'lang-es', group: language, kind: 'language', icon: 'languages', label: languages.es === 'Espanol' ? 'Español' : languages.es, href: '/', keywords: 'idioma spanish castellano' },
+  { id: 'lang-en', group: language, kind: 'language', icon: 'languages', label: languages.en, href: '/en/', keywords: 'idioma ingles' },
+  { id: 'lang-ca', group: language, kind: 'language', icon: 'languages', label: 'Català', href: '/ca/', keywords: 'idioma catalan' },
+  { id: 'github', group: links, kind: 'links', icon: 'github', label: 'GitHub', href: SITE.social.github, external: true },
+  { id: 'linkedin', group: links, kind: 'links', icon: 'linkedin', label: 'LinkedIn', href: SITE.social.linkedin, external: true },
+  { id: 'repo', group: links, kind: 'links', icon: 'code', label: t('nav.githubRepo'), href: SITE.githubRepo, external: true },
 ];
+
+const iconNames = [...new Set(commands.map((c) => c.icon).filter((n): n is string => Boolean(n)))];
 ---
 
 <div
@@ -66,6 +70,27 @@ const commands: PaletteCommand[] = [
   data-empty={t('palette.empty')}
 >
   <div class="palette-panel">
+    <!-- Iconos que clona palette.ts (el JS no pinta HTML que venga de datos) -->
+    <template data-palette-icons>
+      {iconNames.map((name) => <Icon name={name} class="h-4 w-4" data-palette-icon={name} />)}
+    </template>
+
+    <header class="palette-profile">
+      <img
+        src={SITE.avatar}
+        alt=""
+        width="36"
+        height="36"
+        loading="lazy"
+        decoding="async"
+        class="palette-avatar"
+      />
+      <div class="min-w-0">
+        <p class="palette-profile-name">{SITE.shortName}</p>
+        <p class="palette-profile-role">{SITE.jobTitle}</p>
+      </div>
+      <kbd class="palette-kbd ml-auto" aria-hidden="true">Esc</kbd>
+    </header>
     <input
       data-palette-input
       type="text"
@@ -82,7 +107,10 @@ const commands: PaletteCommand[] = [
     />
     <ul id="palette-list" data-palette-list role="listbox" aria-label={t('palette.title')} class="palette-list"></ul>
     <p data-palette-empty hidden class="palette-empty" role="status"></p>
-    <p class="palette-footer" aria-hidden="true">{t('palette.hint')}</p>
+    <p class="palette-footer" aria-hidden="true">
+      <span>{t('palette.hint')}</span>
+      <span class="palette-footer-keys"><kbd class="palette-kbd" data-shortcut-mod>Ctrl</kbd><kbd class="palette-kbd">K</kbd></span>
+    </p>
   </div>
 </div>
 

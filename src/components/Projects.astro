@@ -128,6 +128,9 @@ const labels = {
       <button
         type="button"
         id="projects-show-more"
+        aria-expanded="false"
+        data-label-more={t('projects.showAll')}
+        data-label-less={t('projects.showLess')}
         class="inline-flex items-center gap-1.5 rounded-lg border border-bg-border bg-bg-soft/40 px-4 py-2 text-xs font-semibold text-text-muted transition duration-200 hover:bg-bg-card hover:text-text cursor-pointer"
       >
         {t('projects.showAll')}

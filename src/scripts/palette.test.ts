@@ -1,5 +1,12 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { filterCommands, initPalette, normalize, type PaletteCommand } from './palette';
+import {
+  applyShortcutLabels,
+  filterCommands,
+  initPalette,
+  isMacPlatform,
+  normalize,
+  type PaletteCommand,
+} from './palette';
 
 const COMMANDS: PaletteCommand[] = [
   { id: 'projects', label: 'Proyectos', group: 'Navegar', href: '/#proyectos' },
@@ -288,5 +295,71 @@ describe('initPalette — unsafe URLs', () => {
     initPalette();
     press('k', { ctrlKey: true });
     expect(options().map((o) => o.textContent)).toEqual(['Bueno', 'Correo']);
+  });
+});
+
+describe('initPalette — Windows/Linux key handling', () => {
+  it('opens by physical key (KeyK) when the layout reports another character', () => {
+    press('л', { ctrlKey: true, code: 'KeyK' });
+    expect(root().hidden).toBe(false);
+  });
+
+  it('ignores Ctrl+Alt+K (AltGr on Windows layouts) and Ctrl+Shift+K', () => {
+    press('k', { ctrlKey: true, altKey: true, code: 'KeyK' });
+    press('k', { ctrlKey: true, shiftKey: true, code: 'KeyK' });
+    expect(root().hidden).toBe(true);
+  });
+});
+
+describe('isMacPlatform / applyShortcutLabels', () => {
+  it('detects Apple platforms and not Windows or Linux', () => {
+    expect(isMacPlatform('MacIntel')).toBe(true);
+    expect(isMacPlatform('iPhone')).toBe(true);
+    expect(isMacPlatform('Win32')).toBe(false);
+    expect(isMacPlatform('Linux x86_64')).toBe(false);
+    expect(isMacPlatform('')).toBe(false);
+  });
+
+  it('writes Ctrl on Windows and the command symbol on Mac', () => {
+    document.body.innerHTML = '<kbd data-shortcut-mod>Ctrl</kbd><kbd data-shortcut-mod>Ctrl</kbd>';
+    applyShortcutLabels('MacIntel');
+    expect([...document.querySelectorAll('[data-shortcut-mod]')].map((e) => e.textContent)).toEqual(['⌘', '⌘']);
+    applyShortcutLabels('Win32');
+    expect(document.querySelector('[data-shortcut-mod]')!.textContent).toBe('Ctrl');
+  });
+});
+
+describe('initPalette — icons and group kinds', () => {
+  const withIcons = (cmds: PaletteCommand[]): void => {
+    document.body.innerHTML = '';
+    mountPalette(cmds);
+    root().insertAdjacentHTML(
+      'beforeend',
+      '<template data-palette-icons><svg data-palette-icon="user" id="i-user"></svg></template>',
+    );
+    initPalette();
+    press('k', { ctrlKey: true });
+  };
+
+  it('puts a cloned icon before the label of a command with a known icon', () => {
+    withIcons([{ id: 'a', label: 'Perfil', group: 'Ir a', href: '/', icon: 'user' }]);
+    const opt = options()[0];
+    expect(opt.querySelector('svg[data-palette-icon="user"]')).not.toBeNull();
+    expect(opt.querySelector('.palette-icon')).not.toBeNull();
+    expect(document.getElementById('i-user')!.isConnected).toBe(true); // el original no se mueve
+  });
+
+  it('still renders a command whose icon is unknown', () => {
+    withIcons([{ id: 'a', label: 'Perfil', group: 'Ir a', href: '/', icon: 'nope' }]);
+    expect(options().length).toBe(1);
+  });
+
+  it('tags each group heading with its kind', () => {
+    withIcons([
+      { id: 'a', label: 'A', group: 'Ir a', kind: 'go', href: '/' },
+      { id: 'b', label: 'B', group: 'Acciones', kind: 'actions', href: '/b' },
+    ]);
+    const headings = [...document.querySelectorAll<HTMLElement>('.palette-group')];
+    expect(headings.map((h) => h.dataset.kind)).toEqual(['go', 'actions']);
   });
 });

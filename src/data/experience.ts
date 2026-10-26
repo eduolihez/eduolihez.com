@@ -44,9 +44,9 @@ export const experiences: Experience[] = [
     // La cifra (semanas -> menos de 1 hora) la ha dado Eduardo: es el dato
     // que mas pesa para un reclutador. No la cambies sin preguntarle.
     description: {
-      es: 'Triaje diario de alertas de Trend Micro Vision One (TrendAI), con IA para acelerar la investigación. Automaticé con Python los informes de amenazas, vulnerabilidades y el informe mensual: lo que antes llevaba semanas de trabajo manual se genera ahora en menos de 1 hora. Diseño y ejecuto las campañas de phishing simulado y el programa de concienciación (SAT), doy soporte en gestión de identidades y accesos (altas, bajas y revisiones de permisos) y mantengo los SOPs y la documentación de cumplimiento para auditorías.',
-      en: 'Daily triage of Trend Micro Vision One (TrendAI) alerts, using AI to speed up investigations. I automated the threat, vulnerability and monthly reports in Python: work that used to take weeks by hand now runs in under 1 hour. I design and run the phishing simulation campaigns and the security awareness training (SAT) program, support identity and access management (onboarding, offboarding and access reviews), and keep SOPs and compliance documentation ready for audits.',
-      ca: "Triatge diari d'alertes de Trend Micro Vision One (TrendAI), amb IA per accelerar la investigació. Vaig automatitzar amb Python els informes d'amenaces, de vulnerabilitats i l'informe mensual: el que abans portava setmanes de feina manual ara es genera en menys d'1 hora. Dissenyo i executo les campanyes de phishing simulat i el programa de conscienciació (SAT), dono suport en gestió d'identitats i accessos (altes, baixes i revisions de permisos) i mantinc els SOPs i la documentació de compliment per a auditories.",
+      es: 'Triaje diario de alertas de Trend Micro Vision One (TrendAI), con IA para acelerar la investigación. Automaticé con Python los informes de amenazas, vulnerabilidades y el informe mensual: lo que antes llevaba semanas de trabajo manual se genera ahora en menos de 1 hora. Diseño y ejecuto las campañas de phishing simulado y el programa de concienciación (SAT), doy soporte en gestión de identidades y accesos (altas, bajas y revisiones de permisos) y contengo y remedio las amenazas confirmadas, con SOPs y documentación de cumplimiento para auditorías.',
+      en: 'Daily triage of Trend Micro Vision One (TrendAI) alerts, using AI to speed up investigations. I automated the threat, vulnerability and monthly reports in Python: work that used to take weeks by hand now runs in under 1 hour. I design and run the phishing simulation campaigns and the security awareness training (SAT) program, support identity and access management (onboarding, offboarding and access reviews), and contain and remediate confirmed threats, with SOPs and compliance documentation ready for audits.',
+      ca: "Triatge diari d'alertes de Trend Micro Vision One (TrendAI), amb IA per accelerar la investigació. Vaig automatitzar amb Python els informes d'amenaces, de vulnerabilitats i l'informe mensual: el que abans portava setmanes de feina manual ara es genera en menys d'1 hora. Dissenyo i executo les campanyes de phishing simulat i el programa de conscienciació (SAT), dono suport en gestió d'identitats i accessos (altes, baixes i revisions de permisos) i continc i remedio les amenaces confirmades, amb SOPs i documentació de compliment per a auditories.",
     },
     tech: [
       'Trend Micro Vision One',
@@ -77,9 +77,9 @@ export const experiences: Experience[] = [
     startDateISO: '2026-01-01',
     endDateISO: '2026-04-01',
     description: {
-      es: 'Configuración y gestión de firewalls FortiGate y FortiAnalyzer en distintos entornos de cliente, respuesta a incidentes de nivel 1 y 2 y scripts en Python para informes de seguridad y análisis de logs. Este trabajo me llevó al puesto de Analista de Ciberseguridad cuatro meses después.',
-      en: 'Configured and managed FortiGate firewalls and FortiAnalyzer across client environments, handled L1/L2 incident response and wrote Python scripts for security reporting and log analysis. This work led to my promotion to Cybersecurity Analyst four months later.',
-      ca: "Configuració i gestió de tallafocs FortiGate i FortiAnalyzer en diferents entorns de client, resposta a incidents de nivell 1 i 2 i scripts en Python per a informes de seguretat i anàlisi de logs. Aquesta feina em va portar al lloc d'Analista de Ciberseguretat quatre mesos després.",
+      es: 'Configuración y gestión de firewalls FortiGate y FortiAnalyzer para la seguridad de red centralizada en distintos entornos de cliente. Scripts en Python a medida para informes de seguridad y análisis de logs, que mejoraron la eficiencia operativa del SOC. Implantación de políticas de seguridad y ejecución de protocolos de respuesta a incidentes en entornos corporativos. Este trabajo me llevó al puesto de Analista de Ciberseguridad cuatro meses después.',
+      en: 'Configured and managed FortiGate firewalls and FortiAnalyzer for centralized network security across client environments. Built custom Python scripts for automated security reporting and log analysis, increasing SOC operational efficiency. Implemented security policies and executed incident response protocols in corporate environments. That work is what got me moved up to Cybersecurity Analyst four months in.',
+      ca: "Configuració i gestió de tallafocs FortiGate i FortiAnalyzer per a la seguretat de xarxa centralitzada en diferents entorns de client. Scripts en Python a mida per a informes de seguretat i anàlisi de logs, que van millorar l'eficiència operativa del SOC. Implantació de polítiques de seguretat i execució de protocols de resposta a incidents en entorns corporatius. Aquesta feina em va portar al lloc d'Analista de Ciberseguretat quatre mesos després.",
     },
     tech: ['FortiGate', 'FortiAnalyzer', 'Python', 'Incident Response', 'Log Analysis'],
   },
@@ -90,9 +90,9 @@ export const experiences: Experience[] = [
     startDateISO: '2024-10-01',
     endDateISO: '2025-04-01',
     description: {
-      es: 'Soporte técnico a más de 100 usuarios, administración de Active Directory y automatización de tareas con scripts en Python.',
-      en: 'Technical support for 100+ users, Active Directory administration, and task automation with Python scripts.',
-      ca: "Suport tècnic a més de 100 usuaris, administració d'Active Directory i automatització de tasques amb scripts en Python.",
+      es: 'Soporte técnico a más de 100 usuarios, resolviendo la mayoría de incidencias en menos de 24 horas. Administración de Active Directory y de la red local (LAN). Scripts en Python para quitarme de encima las tareas repetitivas.',
+      en: 'Technical support for 100+ users, resolving most issues in under 24 hours. Managed Active Directory and the LAN. Wrote Python scripts to get repetitive tasks off my plate.',
+      ca: "Suport tècnic a més de 100 usuaris, resolent la majoria d'incidències en menys de 24 hores. Administració d'Active Directory i de la xarxa local (LAN). Scripts en Python per treure'm de sobre les tasques repetitives.",
     },
     tech: ['Active Directory', 'Python', 'Windows Server', 'Help Desk'],
   },
@@ -103,9 +103,9 @@ export const experiences: Experience[] = [
     startDateISO: '2024-05-01',
     endDateISO: '2024-09-01',
     description: {
-      es: 'Liderazgo de grupos, comunicación y gestión de personas: habilidades transferibles clave para el trabajo en equipo y la comunicación de un SOC.',
-      en: 'Group leadership, communication and people management: key transferable skills for teamwork and communication within a SOC.',
-      ca: "Lideratge de grups, comunicació i gestió de persones: habilitats transferibles clau per al treball en equip i la comunicació d'un SOC.",
+      es: 'Dirección de grupos de hasta 13 personas en sesiones de alta intensidad. Aprendí a tomar decisiones rápidas cuando algo sale mal y a explicar lo mismo de tres maneras según quién escuche, algo que uso a diario al redactar informes de seguridad para lectores técnicos y no técnicos.',
+      en: 'Led groups of up to 13 people through high-intensity sessions. Learned to make fast calls when something goes wrong and to explain the same thing three different ways depending on who is listening, something I use every day writing security reports for technical and non-technical readers.',
+      ca: "Direcció de grups de fins a 13 persones en sessions d'alta intensitat. Vaig aprendre a prendre decisions ràpides quan alguna cosa va malament i a explicar el mateix de tres maneres segons qui escolti, cosa que faig servir cada dia en redactar informes de seguretat per a lectors tècnics i no tècnics.",
     },
     tech: ['Liderazgo', 'Comunicación', 'Gestión de personas'],
   },

@@ -53,9 +53,11 @@ export const ui = {
 
     'hero.status': 'Disponible para trabajar',
     // Mismo titular que LinkedIn (sin la ciudad, que va en hero.location).
-    'hero.role': 'Analista de Ciberseguridad · SOC · Cloud Security e IAM · Seguridad de correo y colaboración',
+    'hero.role': 'Analista de Ciberseguridad · SOC · Cloud Security e IAM · Seguridad de correo y colaboración · Seguridad de la IA y red teaming de LLM',
     'hero.tagline':
-      'Analista de ciberseguridad en Dagram: triaje de alertas en Trend Micro Vision One, automatización de informes con Python y apoyo en gestión de identidades y accesos. Mi foco es la seguridad cloud e IAM.',
+      'Analista de ciberseguridad en Dagram: triaje de alertas en Trend Micro Vision One, automatización de informes con Python y apoyo en gestión de identidades y accesos. Mi foco es la seguridad cloud e IAM, con la seguridad de la IA como hilo conductor.',
+    'hero.card.role': 'SOC · Cloud · IAM · IA',
+    'hero.card.focus': 'Áreas de especialización',
     'hero.location': 'Badalona, Barcelona (España)',
     'hero.languages': 'Español · Catalán · Inglés B2',
     'hero.cta.contact': 'Contactar',
@@ -82,6 +84,10 @@ export const ui = {
 
     'skills.title': 'Habilidades',
     'skills.subtitle': 'Tecnologías y áreas de conocimiento',
+    'skills.openAll': 'Ver todas las habilidades',
+    'skills.modalTitle': 'Todas las habilidades',
+    'skills.rowsLabel': 'Resumen de habilidades',
+    'skills.close': 'Cerrar',
 
     'projects.title': 'Proyectos',
     'projects.subtitle': 'Trabajo técnico seleccionado y proyectos personales',
@@ -99,6 +105,7 @@ export const ui = {
     'projects.filter.inDevelopment': 'En Desarrollo',
     'projects.filter.privateCode': 'Código Privado',
     'projects.showAll': 'Ver todos los proyectos',
+    'projects.showLess': 'Ver menos',
     'projects.badge.openSource': 'Open Source',
     'projects.badge.inDevelopment': 'En Desarrollo',
     'projects.badge.privateCode': 'Código Privado',
@@ -113,7 +120,7 @@ export const ui = {
     'certs.credly': 'Ver más insignias en Credly',
 
     'contact.title': 'Contacto',
-    'contact.subtitle': 'Estoy abierto a nuevas oportunidades. Hablemos.',
+    'contact.subtitle': 'Estoy abierto a oportunidades en Cloud Security, IAM, seguridad del correo y seguridad de la IA, en Barcelona o en remoto. Hablemos.',
     'contact.name': 'Nombre',
     'contact.email': 'Email',
     'contact.subject': 'Asunto',
@@ -204,9 +211,11 @@ export const ui = {
     'theme.toggle': 'Switch between light and dark theme',
 
     'hero.status': 'Open to work',
-    'hero.role': 'Cybersecurity Analyst · SOC · Cloud Security & IAM · Email & Collaboration Security',
+    'hero.role': 'Cybersecurity Analyst · SOC · Cloud Security & IAM · Email & Collaboration Security · AI Security & LLM Red Teaming',
     'hero.tagline':
-      'Cybersecurity analyst at Dagram: alert triage in Trend Micro Vision One, Python report automation and identity and access management support. My focus is cloud security and IAM.',
+      'Cybersecurity analyst at Dagram: alert triage in Trend Micro Vision One, Python report automation and identity and access management support. My focus is cloud security and IAM, with AI security running through both.',
+    'hero.card.role': 'SOC · Cloud · IAM · AI',
+    'hero.card.focus': 'Areas of focus',
     'hero.location': 'Badalona, Barcelona (Spain)',
     'hero.languages': 'Spanish · Catalan · English B2',
     'hero.cta.contact': 'Get in touch',
@@ -233,6 +242,10 @@ export const ui = {
 
     'skills.title': 'Skills',
     'skills.subtitle': 'Technologies and areas of expertise',
+    'skills.openAll': 'View all skills',
+    'skills.modalTitle': 'All skills',
+    'skills.rowsLabel': 'Skills overview',
+    'skills.close': 'Close',
 
     'projects.title': 'Projects',
     'projects.subtitle': 'Selected technical work and personal projects',
@@ -250,6 +263,7 @@ export const ui = {
     'projects.filter.inDevelopment': 'In Development',
     'projects.filter.privateCode': 'Private Code',
     'projects.showAll': 'Show all projects',
+    'projects.showLess': 'Show less',
     'projects.badge.openSource': 'Open Source',
     'projects.badge.inDevelopment': 'In Development',
     'projects.badge.privateCode': 'Private Code',
@@ -264,7 +278,7 @@ export const ui = {
     'certs.credly': 'View more badges on Credly',
 
     'contact.title': 'Contact',
-    'contact.subtitle': "I'm open to new opportunities. Let's talk.",
+    'contact.subtitle': "I'm open to Cloud Security, IAM, email security and AI security roles, in Barcelona or remote. Let's talk.",
     'contact.name': 'Name',
     'contact.email': 'Email',
     'contact.subject': 'Subject',
@@ -353,9 +367,11 @@ export const ui = {
     'theme.toggle': 'Canviar entre tema clar i fosc',
 
     'hero.status': 'Disponible per treballar',
-    'hero.role': 'Analista de Ciberseguretat · SOC · Cloud Security i IAM · Seguretat del correu i la col·laboració',
+    'hero.role': 'Analista de Ciberseguretat · SOC · Cloud Security i IAM · Seguretat del correu i la col·laboració · Seguretat de la IA i red teaming de LLM',
     'hero.tagline':
-      "Analista de ciberseguretat a Dagram: triatge d'alertes a Trend Micro Vision One, automatització d'informes amb Python i suport en gestió d'identitats i accessos. El meu focus és la seguretat cloud i IAM.",
+      "Analista de ciberseguretat a Dagram: triatge d'alertes a Trend Micro Vision One, automatització d'informes amb Python i suport en gestió d'identitats i accessos. El meu focus és la seguretat cloud i IAM, amb la seguretat de la IA com a fil conductor.",
+    'hero.card.role': 'SOC · Cloud · IAM · IA',
+    'hero.card.focus': "Àrees d'especialització",
     'hero.location': 'Badalona, Barcelona (Espanya)',
     'hero.languages': 'Espanyol · Català · Anglès B2',
     'hero.cta.contact': 'Contactar',
@@ -382,6 +398,10 @@ export const ui = {
 
     'skills.title': 'Habilitats',
     'skills.subtitle': 'Tecnologies i àrees de coneixement',
+    'skills.openAll': 'Veure totes les habilitats',
+    'skills.modalTitle': 'Totes les habilitats',
+    'skills.rowsLabel': "Resum d'habilitats",
+    'skills.close': 'Tancar',
 
     'projects.title': 'Projectes',
     'projects.subtitle': 'Treball tècnic seleccionat i projectes personals',
@@ -399,6 +419,7 @@ export const ui = {
     'projects.filter.inDevelopment': 'En Desenvolupament',
     'projects.filter.privateCode': 'Codi Privat',
     'projects.showAll': 'Veure tots els projectes',
+    'projects.showLess': "Veure'n menys",
     'projects.badge.openSource': 'Open Source',
     'projects.badge.inDevelopment': 'En Desenvolupament',
     'projects.badge.privateCode': 'Codi Privat',
@@ -413,7 +434,7 @@ export const ui = {
     'certs.credly': 'Veure més insígnies a Credly',
 
     'contact.title': 'Contacte',
-    'contact.subtitle': 'Estic obert a noves oportunitats. Parlem-ne.',
+    'contact.subtitle': 'Estic obert a oportunitats en Cloud Security, IAM, seguretat del correu i seguretat de la IA, a Barcelona o en remot. Parlem-ne.',
     'contact.name': 'Nom',
     'contact.email': 'Email',
     'contact.subject': 'Assumpte',

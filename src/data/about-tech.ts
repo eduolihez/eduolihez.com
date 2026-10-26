@@ -521,6 +521,63 @@ export const techSections: TechSection[] = [
       },
     ],
   },
+  // -------------------------------------------------------------------------
+  {
+    num: '07',
+    icon: 'command',
+    tone: 'cyan',
+    title: {
+      es: 'Interfaz: teclado, movimiento y accesibilidad',
+      en: 'Interface: keyboard, motion and accessibility',
+      ca: 'Interfície: teclat, moviment i accessibilitat',
+    },
+    intro: {
+      es: 'La interfaz tiene animación y atajos, pero ninguno de los dos es requisito para leer la web: sin JavaScript o con "menos movimiento" el contenido sigue ahí, entero y en orden.',
+      en: 'The interface has motion and shortcuts, but neither is required to read the site: without JavaScript or with "reduce motion" on, the content is still there, complete and in order.',
+      ca: 'La interfície té animació i dreceres, però cap de les dues és necessària per llegir el web: sense JavaScript o amb "menys moviment" el contingut hi és igualment, sencer i en ordre.',
+    },
+    items: [
+      {
+        term: {
+          es: 'Paleta de comandos con Ctrl+K (⌘K en Mac)',
+          en: 'Command palette on Ctrl+K (⌘K on Mac)',
+          ca: 'Paleta de comandes amb Ctrl+K (⌘K a Mac)',
+        },
+        detail: {
+          es: 'Patrón combobox + listbox con aria-activedescendant. Mientras está abierta el resto de la página queda inert, el foco no se escapa y Esc devuelve el foco a donde estaba. La etiqueta del atajo se ajusta a la plataforma (Ctrl en Windows y Linux, ⌘ en Mac) y se reconoce la tecla física K, de modo que funciona también con teclados no latinos. Los textos se pintan con textContent y se descarta cualquier enlace con esquema distinto de http, https o mailto.',
+          en: 'A combobox + listbox pattern with aria-activedescendant. While it is open the rest of the page is inert, focus cannot escape, and Esc returns focus to where it was. The shortcut label adapts to the platform (Ctrl on Windows and Linux, ⌘ on Mac) and the physical K key is recognised, so it also works on non-Latin keyboards. Text is rendered with textContent, and any link whose scheme is not http, https or mailto is dropped.',
+          ca: "Patró combobox + listbox amb aria-activedescendant. Mentre és oberta la resta de la pàgina queda inert, el focus no se n'escapa i Esc retorna el focus on era. L'etiqueta de la drecera s'ajusta a la plataforma (Ctrl a Windows i Linux, ⌘ a Mac) i es reconeix la tecla física K, de manera que també funciona amb teclats no llatins. Els textos es pinten amb textContent i es descarta qualsevol enllaç amb un esquema diferent de http, https o mailto.",
+        },
+        source: 'src/scripts/palette.ts',
+      },
+      {
+        term: {
+          es: 'Doble carrusel de habilidades sin duplicar contenido',
+          en: 'Double skills carousel without duplicated content',
+          ca: 'Doble carrusel d’habilitats sense duplicar contingut',
+        },
+        detail: {
+          es: 'El HTML lleva una sola copia de cada habilidad; la segunda, necesaria para que el bucle sea continuo, la clona un script con aria-hidden. Con "menos movimiento" las filas se quedan quietas y en varias líneas. El título abre una ventana con todo agrupado por categoría, y ese contenido ya está en el HTML (solo oculto), así que lo leen buscadores y lectores de pantalla.',
+          en: 'The HTML carries a single copy of each skill; the second one, needed for a seamless loop, is cloned by a script with aria-hidden. With "reduce motion" the rows stand still and wrap over several lines. The title opens a dialog with everything grouped by category, and that content is already in the HTML (just hidden), so search engines and screen readers read it.',
+          ca: "L'HTML porta una sola còpia de cada habilitat; la segona, necessària perquè el bucle sigui continu, la clona un script amb aria-hidden. Amb \"menys moviment\" les files es queden quietes i en diverses línies. El títol obre una finestra amb tot agrupat per categoria, i aquest contingut ja és a l'HTML (només ocult), així que el llegeixen cercadors i lectors de pantalla.",
+        },
+        source: 'src/components/Skills.astro',
+      },
+      {
+        term: {
+          es: 'Animaciones solo con transform y opacidad',
+          en: 'Animation with transform and opacity only',
+          ca: 'Animacions només amb transform i opacitat',
+        },
+        detail: {
+          es: 'La entrada escalonada del perfil, el pulso de estado y las apariciones al hacer scroll no tocan el layout, así que no mueven el contenido ni empeoran el CLS. Si el sistema pide menos movimiento, las duraciones se reducen a cero y todo queda en su estado final.',
+          en: 'The staggered profile entrance, the status pulse and the scroll reveals never touch layout, so they do not shift content or hurt CLS. If the system asks for reduced motion, durations drop to zero and everything lands in its final state.',
+          ca: "L'entrada esglaonada del perfil, el pols d'estat i les aparicions en fer scroll no toquen el layout, així que no mouen el contingut ni empitjoren el CLS. Si el sistema demana menys moviment, les durades es redueixen a zero i tot queda en el seu estat final.",
+        },
+        source: 'src/styles/global.css',
+      },
+    ],
+  },
 ];
 
 /** Resumen del stack, para la tabla de cabecera. */

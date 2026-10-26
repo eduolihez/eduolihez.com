@@ -15,7 +15,8 @@ export const SITE = {
   // Mismo titular que LinkedIn: Cloud Security e IAM es el foco profesional
   // y SOC es el trabajo de hoy. Si cambia en un sitio, cambialo en el otro
   // (Google cruza ambos perfiles via sameAs).
-  jobTitle: 'Cybersecurity Analyst · SOC · Cloud Security & IAM',
+  jobTitle:
+    'Cybersecurity Analyst · SOC · Cloud Security & IAM · Email & Collaboration Security · AI Security & LLM Red Teaming',
 
   /**
    * Ubicacion. Alimenta el SEO local (que te encuentren buscando
@@ -67,6 +68,11 @@ export const SITE = {
     'Fortinet FortiGate y FortiAnalyzer',
     'Simulación de phishing y concienciación en seguridad (SAT)',
     'Threat Intelligence',
+    'Seguridad de la IA (AI Security)',
+    'Red teaming de chatbots LLM',
+    'OWASP Top 10 para aplicaciones LLM',
+    'MITRE ATLAS y NIST AI RMF',
+    'Pentesting y OWASP',
     'Automatización de seguridad con Python',
     'Inteligencia artificial aplicada a ciberseguridad',
     'Active Directory y Windows Server',
@@ -76,8 +82,22 @@ export const SITE = {
   /** Idiomas que hablas (codigo BCP-47 + nivel legible). */
   languages: [
     { code: 'es', name: 'Español', level: 'Nativo' },
-    { code: 'ca', name: 'Catalan', level: 'Nativo' },
-    { code: 'en', name: 'Ingles', level: 'B2' },
+    { code: 'ca', name: 'Catalán', level: 'Nativo' },
+    { code: 'en', name: 'Inglés', level: 'B2 (profesional)' },
+  ],
+
+  /** Formacion reglada (LinkedIn). Alimenta alumniOf en Schema.org y /llms.txt. */
+  education: [
+    {
+      school: 'Col·legi Cultural',
+      degree: 'Técnico Superior en Administración de Sistemas Informáticos en Red (itinerario Ciberseguridad)',
+      period: '2025 - 2027',
+    },
+    {
+      school: 'Col·legi Cultural',
+      degree: 'Técnico en Sistemas Microinformáticos y Redes',
+      period: '2023 - 2025',
+    },
   ],
 
   /**
@@ -93,6 +113,7 @@ export const SITE = {
    */
   // Las tres primeras son las que respaldan el foco Cloud Security & IAM;
   // van delante a proposito (es el orden en que las leen Schema.org y llms.txt).
+  // `year` es opcional: solo se pone cuando se conoce con certeza (no se inventa).
   credentials: [
     { name: 'Trend Micro Vision One Cloud Security Foundation', issuer: 'Trend Micro', year: '2024' },
     { name: 'Trend Micro Vision One Identity Security Foundation', issuer: 'Trend Micro', year: '2024' },
@@ -111,11 +132,15 @@ export const SITE = {
       issuer: 'Trend Micro',
       year: '2024',
     },
+    { name: 'Trend Micro Vision One AI Security Foundation', issuer: 'Trend Micro' },
+    { name: 'Trend Micro Vision One Threat Intelligence Foundation', issuer: 'Trend Micro' },
     { name: 'Fortinet NSE 3 Certified in Cybersecurity', issuer: 'Fortinet', year: '2026' },
+    { name: 'Fortinet Certified Associate Cybersecurity', issuer: 'Fortinet' },
     { name: 'Fortinet FortiGate 7.6 Operator', issuer: 'Fortinet', year: '2026' },
     { name: 'Microsoft Certified: Azure AI Fundamentals', issuer: 'Microsoft', year: '2026' },
+    { name: 'IT Specialist - Python', issuer: 'Certiport' },
     { name: 'First Certificate in English (B2)', issuer: 'Cambridge English', year: '2021' },
-  ],
+  ] as { name: string; issuer: string; year?: string }[],
 
   /** Reconocimientos. Alimentan la propiedad `award` de Schema.org. */
   awards: [

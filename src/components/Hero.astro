@@ -40,30 +40,31 @@ const flow = [
     class="container-page relative grid gap-12 pb-16 pt-28 sm:pt-32 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] lg:items-center lg:gap-14"
   >
     <div>
-      <p class="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs uppercase tracking-[0.18em] text-text-muted">
+      <p style="--i:0" class="boot-line flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs uppercase tracking-[0.18em] text-text-muted">
         <span id="hero-status" class="inline-flex items-center gap-2 text-accent">
-          <span class="h-2 w-2 animate-pulse-dot rounded-full bg-accent" aria-hidden="true"></span>
+          <span class="sig-dot h-2 w-2 rounded-full bg-accent" aria-hidden="true"></span>
           {t('hero.status')}
         </span>
       </p>
 
       <h1
-        class="mt-5 font-mono text-[clamp(2rem,4.6vw,3.25rem)] font-bold leading-[1.05] tracking-tight text-text-title"
+        style="--i:1"
+        class="boot-line mt-5 font-mono text-[clamp(2rem,4.6vw,3.25rem)] font-bold leading-[1.05] tracking-tight text-text-title"
       >
         {SITE.name}
       </h1>
 
-      <p class="mt-5 font-serif text-2xl italic leading-snug text-text sm:text-3xl">
+      <p style="--i:2" class="boot-line mt-5 font-serif text-2xl italic leading-snug text-text sm:text-3xl">
         {t('hero.lead')} <span class="text-accent">{t('hero.lead.em')}</span>
       </p>
 
-      <p class="mt-5 font-mono text-sm leading-relaxed text-accent">{t('hero.role')}</p>
+      <p style="--i:3" class="boot-line mt-5 font-mono text-sm leading-relaxed text-accent">{t('hero.role')}</p>
 
-      <p class="mt-4 max-w-xl text-base leading-relaxed text-text-muted">
+      <p style="--i:4" class="boot-line mt-4 max-w-xl text-base leading-relaxed text-text-muted">
         {t('hero.tagline')}
       </p>
 
-      <div class="mt-8 flex flex-wrap gap-3">
+      <div style="--i:5" class="boot-line mt-8 flex flex-wrap gap-3">
         <a href="#contacto" class="btn-primary">{t('hero.cta.contact')}</a>
         <button id="cv-download-btn" type="button" class="btn-ghost">
           <Icon name="download" class="h-4 w-4" />
@@ -79,13 +80,13 @@ const flow = [
           {t('hero.cta.linkedin')}
         </a>
         <button type="button" data-palette-open class="btn-ghost hidden font-mono sm:inline-flex">
-          <span class="text-accent" aria-hidden="true">⌘K</span>
+          <span class="text-accent" aria-hidden="true"><span data-shortcut-mod>Ctrl</span> K</span>
           {t('hero.cta.palette')}
         </button>
       </div>
 
       <!-- Bloque tipo terminal: texto estatico y verificable, sin metricas inventadas. -->
-      <div class="mt-9 space-y-1 font-mono text-xs leading-relaxed text-text-muted">
+      <div style="--i:6" class="boot-line mt-9 space-y-1 font-mono text-xs leading-relaxed text-text-muted">
         <p><span class="text-accent" aria-hidden="true">$</span> whoami</p>
         <p><span class="text-accent" aria-hidden="true">→</span> {SITE.jobTitle}</p>
         <p><span class="text-accent" aria-hidden="true">$</span> stack</p>
@@ -96,26 +97,43 @@ const flow = [
     </div>
 
     <!-- Tarjeta: foto + diagrama del flujo de triaje -->
-    <div class="relative">
+    <div class="boot-line relative" style="--i:3">
       <div
         class="rounded-2xl border border-bg-border bg-bg-card p-5"
         style="box-shadow: var(--shadow-card)"
       >
         <div class="flex items-center gap-4">
-          <img
-            id="avatar-img"
-            src={SITE.avatar}
-            alt={`${t('hero.photoAlt')} ${SITE.name}`}
-            width="64"
-            height="64"
-            loading="eager"
-            fetchpriority="high"
-            decoding="async"
-            class="h-16 w-16 rounded-xl border border-bg-border object-cover"
-          />
+          <div class="relative shrink-0">
+            <img
+              id="avatar-img"
+              src={SITE.avatar}
+              alt={`${t('hero.photoAlt')} ${SITE.name}`}
+              width="72"
+              height="72"
+              loading="eager"
+              fetchpriority="high"
+              decoding="async"
+              class="h-[72px] w-[72px] rounded-2xl border border-bg-border object-cover"
+            />
+            <span
+              class="absolute -bottom-1 -right-1 grid h-5 w-5 place-items-center rounded-full border-2 border-bg-card bg-bg-card"
+              aria-hidden="true"
+            >
+              <span class="sig-dot h-2.5 w-2.5 rounded-full bg-accent"></span>
+            </span>
+          </div>
           <div class="min-w-0">
             <p class="truncate font-semibold text-text-title">{SITE.shortName}</p>
-            <p class="font-mono text-xs text-text-faint">SOC · Cloud Security · IAM</p>
+            <p class="font-mono text-xs text-text-faint">{t('hero.card.role')}</p>
+            <ul class="mt-2 flex flex-wrap gap-1.5" aria-label={t('hero.card.focus')}>
+              {
+                ['SOC', 'Cloud', 'IAM', 'AI Sec'].map((chip) => (
+                  <li class="rounded-full border border-accent/30 bg-accent-soft px-2 py-0.5 font-mono text-[10px] text-accent">
+                    {chip}
+                  </li>
+                ))
+              }
+            </ul>
           </div>
         </div>
 
@@ -132,7 +150,7 @@ const flow = [
           <ol class="relative space-y-5" aria-label={t('hero.flow.label')}>
           {
             flow.map((step, i) => (
-              <li class="relative flex items-center gap-3.5">
+              <li class="flow-step relative flex items-center gap-3.5" style={`--s:${i}`}>
                 <span
                   class={`grid h-9 w-9 shrink-0 place-items-center rounded-lg border ${
                     i === flow.length - 1

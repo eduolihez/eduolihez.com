@@ -306,25 +306,39 @@ export function initProjects(): void {
         const showMoreWrap = document.getElementById('projects-show-more-wrap');
         const showMoreBtn = document.getElementById('projects-show-more');
         let activeFilter = 'all';
-        // Una vez se pulsa "ver todos" o se cambia de filtro, el limite
-        // inicial deja de aplicar para el resto de la sesion en esta pagina.
+        // "Ver todos" / "Ver menos" alternan el limite inicial. Cambiar de
+        // filtro lo abre (limitar a 6 solo tiene sentido en la vista "todos").
         let expanded = cards.length <= INITIAL_VISIBLE_COUNT;
+        const labelMore = showMoreBtn?.dataset.labelMore ?? showMoreBtn?.textContent ?? '';
+        const labelLess = showMoreBtn?.dataset.labelLess ?? labelMore;
 
         function applyVisibility(): void {
-          cards.forEach((card, i) => {
+          // El limite cuenta las tarjetas que coinciden con el filtro, no su
+          // posicion en la lista completa.
+          let matching = 0;
+          cards.forEach((card) => {
             const badgesAttr = card.getAttribute('data-badges') || '';
             const badges = badgesAttr ? badgesAttr.split(',') : [];
             const matchesFilter = activeFilter === 'all' || badges.includes(activeFilter);
-            const withinInitialLimit = expanded || i < INITIAL_VISIBLE_COUNT;
-            card.classList.toggle('hidden', !(matchesFilter && withinInitialLimit));
+            const withinLimit = expanded || matching < INITIAL_VISIBLE_COUNT;
+            if (matchesFilter) matching += 1;
+            card.classList.toggle('hidden', !(matchesFilter && withinLimit));
           });
-          showMoreWrap?.classList.toggle('hidden', expanded);
+          // Con 6 o menos coincidencias no hay nada que mostrar ni ocultar.
+          showMoreWrap?.classList.toggle('hidden', matching <= INITIAL_VISIBLE_COUNT);
+          if (showMoreBtn) {
+            showMoreBtn.textContent = expanded ? labelLess : labelMore;
+            showMoreBtn.setAttribute('aria-expanded', String(expanded));
+          }
         }
         applyVisibility();
 
         showMoreBtn?.addEventListener('click', () => {
-          expanded = true;
+          expanded = !expanded;
           applyVisibility();
+          // Al contraer, la pagina se queda en el inicio de la seccion en vez
+          // de dejar al visitante perdido mas abajo.
+          if (!expanded) document.getElementById('proyectos')?.scrollIntoView?.({ block: 'start' });
         });
 
         const filterButtons = document.querySelectorAll<HTMLButtonElement>('.project-filter-btn');

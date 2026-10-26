@@ -31,6 +31,26 @@ export const skillGroups: SkillGroup[] = [
     ],
   },
   {
+    icon: 'robot',
+    category: {
+      es: 'Seguridad de la IA & Red Teaming',
+      en: 'AI Security & Red Teaming',
+      ca: 'Seguretat de la IA & Red Teaming',
+    },
+    items: [
+      'AI Security',
+      'LLM Red Teaming',
+      'Prompt Injection',
+      'OWASP Top 10 for LLM Apps',
+      'MITRE ATLAS',
+      'NIST AI RMF',
+      'OWASP',
+      'Penetration Testing',
+      'Red Teaming',
+      'Web Application Security',
+    ],
+  },
+  {
     icon: 'shield',
     category: {
       es: 'Seguridad & Blue Team',
@@ -45,7 +65,6 @@ export const skillGroups: SkillGroup[] = [
       'Trend Micro Vision One',
       'Fortinet (FortiGate/FortiAnalyzer)',
       'Vulnerability Management',
-      'Web Application Security',
       'Criptografía',
       'Análisis de Phishing',
     ],
@@ -60,7 +79,7 @@ export const skillGroups: SkillGroup[] = [
     items: ['Python', 'JavaScript', 'TypeScript', 'Rust', 'SQL', 'Bash'],
   },
   {
-    icon: 'robot',
+    icon: 'database',
     category: {
       es: 'IA & Datos',
       en: 'AI & Data',
@@ -87,3 +106,29 @@ export const skillGroups: SkillGroup[] = [
     items: ['Next.js', 'Tailwind CSS', 'SQLite', 'Git', 'Chrome Extensions'],
   },
 ];
+
+export interface SkillChip {
+  label: string;
+  icon: string;
+}
+
+/**
+ * Reparte todas las habilidades en dos filas para el doble carrusel de
+ * <Skills />. Se intercalan los grupos (uno de cada, por turnos) para que en
+ * una fila no se junten diez chips del mismo tema, y las filas quedan
+ * equilibradas (difieren como mucho en uno).
+ */
+export function skillRows(): [SkillChip[], SkillChip[]] {
+  const queues = skillGroups.map((g) => g.items.map((label) => ({ label, icon: g.icon })));
+  const rows: [SkillChip[], SkillChip[]] = [[], []];
+  let turn = 0;
+  while (queues.some((q) => q.length > 0)) {
+    for (const queue of queues) {
+      const chip = queue.shift();
+      if (!chip) continue;
+      rows[turn % 2].push(chip);
+      turn += 1;
+    }
+  }
+  return rows;
+}

@@ -14,7 +14,7 @@ function setupGrid() {
       data-labels='{"loading":"Cargando","empty":"Sin proyectos","error":"Error","details":"Ver detalles","demo":"Demo","repo":"Codigo","featured":"Destacado"}'
     ></div>
     <div id="projects-show-more-wrap" class="hidden">
-      <button id="projects-show-more">Ver todos</button>
+      <button id="projects-show-more" aria-expanded="false" data-label-more="Ver todos" data-label-less="Ver menos">Ver todos</button>
     </div>
     <div id="project-modal" hidden>
       <img id="pm-image" class="hidden" />
@@ -232,7 +232,7 @@ describe('initProjects()', () => {
       expect(document.getElementById('projects-show-more-wrap')?.classList.contains('hidden')).toBe(false);
     });
 
-    it('pulsar "ver todos" revela el resto y oculta el propio boton', async () => {
+    it('pulsar "ver todos" revela el resto y el boton pasa a "ver menos"', async () => {
       const grid = setupGrid();
       mockFetchOnce({ ok: true, json: () => Promise.resolve(makeProjects(9)) });
 
@@ -243,6 +243,61 @@ describe('initProjects()', () => {
 
       const cards = Array.from(grid.querySelectorAll('article'));
       expect(cards.every((c) => !c.classList.contains('hidden'))).toBe(true);
+      const btn = document.getElementById('projects-show-more')!;
+      expect(document.getElementById('projects-show-more-wrap')?.classList.contains('hidden')).toBe(false);
+      expect(btn.textContent).toBe('Ver menos');
+      expect(btn.getAttribute('aria-expanded')).toBe('true');
+    });
+
+    it('pulsar "ver menos" vuelve a las 6 primeras y restaura "ver todos"', async () => {
+      const grid = setupGrid();
+      mockFetchOnce({ ok: true, json: () => Promise.resolve(makeProjects(9)) });
+
+      initProjects();
+      await vi.waitFor(() => expect(grid.querySelectorAll('article').length).toBe(9));
+
+      const btn = document.getElementById('projects-show-more')!;
+      btn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      btn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+      const visible = Array.from(grid.querySelectorAll('article')).filter((c) => !c.classList.contains('hidden'));
+      expect(visible.length).toBe(6);
+      expect(btn.textContent).toBe('Ver todos');
+      expect(btn.getAttribute('aria-expanded')).toBe('false');
+    });
+
+    it('con un filtro activo, "ver menos" limita a 6 entre las tarjetas que coinciden', async () => {
+      const grid = setupGrid();
+      document.body.insertAdjacentHTML(
+        'beforeend',
+        '<button class="project-filter-btn" data-filter="open-source">OSS</button>',
+      );
+      // Las 3 primeras no coinciden: el limite cuenta solo las que si.
+      const projects = makeProjects(12).map((p, i) => ({ ...p, badges: i < 3 ? ['private-code'] : ['open-source'] }));
+      mockFetchOnce({ ok: true, json: () => Promise.resolve(projects) });
+
+      initProjects();
+      await vi.waitFor(() => expect(grid.querySelectorAll('article').length).toBe(12));
+
+      document.querySelector<HTMLButtonElement>('.project-filter-btn')!.click();
+      document.getElementById('projects-show-more')!.click(); // contraer
+      const visible = Array.from(grid.querySelectorAll('article')).filter((c) => !c.classList.contains('hidden'));
+      expect(visible.length).toBe(6);
+      expect(visible.every((c) => (c.getAttribute('data-badges') || '').includes('open-source'))).toBe(true);
+    });
+
+    it('con un filtro que deja 6 o menos, el boton se oculta', async () => {
+      const grid = setupGrid();
+      document.body.insertAdjacentHTML(
+        'beforeend',
+        '<button class="project-filter-btn" data-filter="open-source">OSS</button>',
+      );
+      const projects = makeProjects(12).map((p, i) => ({ ...p, badges: i < 4 ? ['open-source'] : ['private-code'] }));
+      mockFetchOnce({ ok: true, json: () => Promise.resolve(projects) });
+
+      initProjects();
+      await vi.waitFor(() => expect(grid.querySelectorAll('article').length).toBe(12));
+      document.querySelector<HTMLButtonElement>('.project-filter-btn')!.click();
       expect(document.getElementById('projects-show-more-wrap')?.classList.contains('hidden')).toBe(true);
     });
 

@@ -17,6 +17,7 @@ const { lang } = Astro.props;
 const t = useTranslations(lang);
 const base = localeBase(lang);
 
+// Menu movil y paleta: todas las secciones.
 const nav = [
   { href: `${base}#experiencia`, label: t('nav.experience') },
   { href: `${base}#habilidades`, label: t('nav.skills') },
@@ -33,6 +34,11 @@ const nav = [
   { href: `${base}#faq`, label: t('nav.faq') },
   { href: `${base}#contacto`, label: t('nav.contact') },
 ];
+
+// Barra de escritorio: solo lo esencial. Certificaciones y FAQ siguen a un
+// Ctrl+K de distancia (paleta) y en el menu movil.
+const DESKTOP_HIDDEN = new Set([`${base}#certificaciones`, `${base}#faq`]);
+const desktopNav = nav.filter((item) => !DESKTOP_HIDDEN.has(item.href));
 
 // Enlaces de idioma (a la home de cada idioma).
 const langLinks: { code: Lang; href: string }[] = [
@@ -74,7 +80,7 @@ const flagSvgs = {
         visual). lg da holgura real en vez de quedar al filo. */}
     <ul class="hidden items-center gap-1 lg:flex">
       {
-        nav.map((item) => (
+        desktopNav.map((item) => (
           <li>
             <a
               href={item.href}
@@ -92,11 +98,12 @@ const flagSvgs = {
       <button
         type="button"
         data-palette-open
-        class="hidden items-center gap-1.5 rounded-md border border-bg-border bg-bg-card px-2.5 py-1.5 font-mono text-xs text-text-muted transition hover:border-bg-border-hover hover:text-text sm:inline-flex"
+        class="bar-btn hidden gap-1.5 px-2.5 py-1.5 font-mono text-xs sm:inline-flex"
         aria-label={t('palette.open')}
         aria-keyshortcuts="Control+K Meta+K"
       >
-        <span aria-hidden="true" class="text-accent">⌘</span><span aria-hidden="true">K</span>
+        <Icon name="search" class="h-3.5 w-3.5" />
+        <span aria-hidden="true" class="text-accent" data-shortcut-mod>Ctrl</span><span aria-hidden="true">K</span>
       </button>
 
       <!-- Tema claro/oscuro: por defecto sigue al sistema; al pulsar se guarda. -->
@@ -104,7 +111,7 @@ const flagSvgs = {
         type="button"
         data-theme-toggle
         aria-pressed="false"
-        class="inline-flex items-center justify-center rounded-md border border-bg-border bg-bg-card p-2 text-text-muted transition hover:border-bg-border-hover hover:text-text"
+        class="bar-btn inline-flex p-2"
         aria-label={t('theme.toggle')}
         title={t('theme.toggle')}
       >
@@ -112,25 +119,12 @@ const flagSvgs = {
         <Icon name="sun" class="theme-icon-sun h-4 w-4" />
       </button>
 
-      <!-- Repositorio de esta web: la demostracion vive en el sitio, la
-           prueba en el codigo (ver PRODUCT.md, seccion Positioning). -->
-      <a
-        href={SITE.githubRepo}
-        target="_blank"
-        rel="noopener noreferrer"
-        class="hidden items-center justify-center rounded-md p-2 text-text-muted transition hover:text-accent lg:inline-flex"
-        aria-label={t('nav.githubRepo')}
-        title={t('nav.githubRepo')}
-      >
-        <Icon name="github" class="h-4 w-4" />
-      </a>
-
       <!-- Selector de idioma (dropdown) -->
       <div class="relative">
         <button
           id="lang-toggle"
           type="button"
-          class="flex items-center gap-2 rounded-md border border-bg-border px-2.5 py-1.5 font-mono text-xs font-medium text-text-muted transition hover:border-text-faint hover:text-text"
+          class="bar-btn inline-flex gap-2 px-2.5 py-1.5 font-mono text-xs font-medium"
           aria-haspopup="true"
           aria-expanded="false"
           aria-controls="lang-menu"
@@ -198,20 +192,32 @@ const flagSvgs = {
           </li>
         ))
       }
-      <li class="mt-1 border-t border-bg-border/50 pt-1">
-        <a
-          href={SITE.githubRepo}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="mobile-link flex items-center gap-2 rounded-md px-3 py-2.5 text-base text-text-muted transition hover:bg-bg-soft hover:text-text"
-        >
-          <Icon name="github" class="h-4 w-4" />
-          {t('nav.githubRepo')}
-        </a>
-      </li>
     </ul>
   </div>
 </header>
+
+<style>
+  /* Misma estetica para el atajo, el tema y el idioma. */
+  .bar-btn {
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+    border: 1px solid var(--color-bg-border);
+    background: var(--color-bg-card);
+    color: var(--color-text-muted);
+    transition:
+      border-color 0.15s ease,
+      color 0.15s ease,
+      transform 0.15s ease;
+  }
+  .bar-btn:hover {
+    border-color: var(--color-bg-border-hover);
+    color: var(--color-text);
+  }
+  .bar-btn:active {
+    transform: scale(0.96);
+  }
+</style>
 
 <script>
   // Menu movil + dropdown de idioma (procesado por Astro -> externo, CSP 'self').

@@ -174,7 +174,7 @@ export const SITE = {
   // Deja '' para desactivarlo. Si lo activas, pon aqui la CLAVE PUBLICA y la
   // secreta en server/config.php. Ademas anade challenges.cloudflare.com a la
   // CSP del .htaccess. Ver CLOUDFLARE.md.
-  turnstileSiteKey: '',
+  turnstileSiteKey: '0x4AAAAAAFm2qQAg_JPRQW2A',
 
   // Cloudflare Web Analytics (capa ADICIONAL a la analitica propia de
   // src/scripts/analytics.ts, no la sustituye). Cookieless, sin banner de

@@ -1,0 +1,94 @@
+---
+/**
+ * <Palette /> - Paleta de comandos (Ctrl/Cmd+K). El marcado es estatico y
+ * traducido en build; la logica (filtrado, teclado, foco) vive en
+ * src/scripts/palette.ts. Los comandos viajan en data-commands como JSON.
+ */
+import { useTranslations, localeBase } from '../i18n/utils';
+import { languages, type Lang } from '../i18n/ui';
+import { SITE } from '../config';
+import type { PaletteCommand } from '../scripts/palette';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const base = localeBase(lang);
+
+const aboutPath =
+  lang === 'en'
+    ? '/en/about-this-website/'
+    : lang === 'ca'
+      ? '/ca/sobre-aquesta-web/'
+      : '/sobre-esta-web/';
+
+const go = t('palette.group.go');
+const pages = t('palette.group.pages');
+const actions = t('palette.group.actions');
+const language = t('palette.group.language');
+const links = t('palette.group.links');
+
+const commands: PaletteCommand[] = [
+  { id: 'experience', group: go, label: t('nav.experience'), href: `${base}#experiencia` },
+  { id: 'skills', group: go, label: t('nav.skills'), href: `${base}#habilidades` },
+  { id: 'projects', group: go, label: t('nav.projects'), href: `${base}#proyectos` },
+  { id: 'certs', group: go, label: t('nav.certifications'), href: `${base}#certificaciones` },
+  { id: 'faq', group: go, label: t('nav.faq'), href: `${base}#faq` },
+  { id: 'contact', group: go, label: t('nav.contact'), href: `${base}#contacto` },
+  // El blog solo tiene contenido en espanol (ver Header.astro).
+  ...(lang === 'es'
+    ? [{ id: 'blog', group: pages, label: t('nav.blog'), href: `${base}blog/`, keywords: 'articulos posts escritos' }]
+    : []),
+  { id: 'about', group: pages, label: t('palette.about'), href: aboutPath, keywords: 'colofon stack tecnico' },
+  { id: 'cv', group: actions, label: t('palette.cv'), href: SITE.cv[lang] ?? SITE.cv.es, keywords: 'curriculum pdf resume' },
+  { id: 'email', group: actions, label: t('palette.email'), href: `mailto:${SITE.social.email}`, keywords: 'correo contacto mail' },
+  { id: 'theme-light', group: actions, label: t('palette.theme.light'), action: 'theme-light', keywords: 'claro light' },
+  { id: 'theme-dark', group: actions, label: t('palette.theme.dark'), action: 'theme-dark', keywords: 'oscuro dark noche' },
+  { id: 'theme-system', group: actions, label: t('palette.theme.system'), action: 'theme-system', keywords: 'automatico system' },
+  { id: 'lang-es', group: language, label: languages.es === 'Espanol' ? 'Español' : languages.es, href: '/', keywords: 'idioma spanish castellano' },
+  { id: 'lang-en', group: language, label: languages.en, href: '/en/', keywords: 'idioma ingles' },
+  { id: 'lang-ca', group: language, label: 'Català', href: '/ca/', keywords: 'idioma catalan' },
+  { id: 'github', group: links, label: 'GitHub', href: SITE.social.github, external: true },
+  { id: 'linkedin', group: links, label: 'LinkedIn', href: SITE.social.linkedin, external: true },
+  { id: 'repo', group: links, label: t('nav.githubRepo'), href: SITE.githubRepo, external: true },
+];
+---
+
+<div
+  data-palette
+  hidden
+  class="palette-backdrop"
+  role="dialog"
+  aria-modal="true"
+  aria-label={t('palette.title')}
+  data-commands={JSON.stringify(commands)}
+  data-empty={t('palette.empty')}
+>
+  <div class="palette-panel">
+    <input
+      data-palette-input
+      type="text"
+      role="combobox"
+      aria-expanded="true"
+      aria-controls="palette-list"
+      aria-autocomplete="list"
+      autocomplete="off"
+      autocapitalize="off"
+      spellcheck="false"
+      placeholder={t('palette.placeholder')}
+      aria-label={t('palette.placeholder')}
+      class="palette-input"
+    />
+    <ul id="palette-list" data-palette-list role="listbox" aria-label={t('palette.title')} class="palette-list"></ul>
+    <p data-palette-empty hidden class="palette-empty" role="status"></p>
+    <p class="palette-footer" aria-hidden="true">{t('palette.hint')}</p>
+  </div>
+</div>
+
+<script>
+  import { initPalette } from '../scripts/palette';
+
+  initPalette();
+  document.addEventListener('astro:page-load', initPalette);
+</script>

@@ -124,6 +124,7 @@ export const ui = {
     'contact.error': 'Hubo un problema al enviar. Inténtalo de nuevo o escríbeme por LinkedIn.',
     'contact.required': 'Por favor rellena todos los campos obligatorios.',
     'contact.invalidEmail': 'Introduce un email válido.',
+    'contact.captcha': 'Completa la verificación anti-bots antes de enviar.',
     'contact.or': 'o encuéntrame en',
     'contact.vcard': 'Guardar contacto',
 
@@ -274,6 +275,7 @@ export const ui = {
     'contact.error': 'Something went wrong. Try again or reach me on LinkedIn.',
     'contact.required': 'Please fill in all required fields.',
     'contact.invalidEmail': 'Enter a valid email address.',
+    'contact.captcha': 'Please complete the anti-bot check before sending.',
     'contact.or': 'or find me on',
     'contact.vcard': 'Save contact',
 
@@ -422,6 +424,7 @@ export const ui = {
     'contact.error': 'Hi ha hagut un problema en enviar. Torna-ho a provar o escriu-me per LinkedIn.',
     'contact.required': 'Si us plau, omple tots els camps obligatoris.',
     'contact.invalidEmail': 'Introdueix un email vàlid.',
+    'contact.captcha': "Completa la verificació anti-bots abans d'enviar.",
     'contact.or': "o troba'm a",
     'contact.vcard': 'Desar contacte',
 

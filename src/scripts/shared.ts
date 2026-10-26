@@ -138,3 +138,13 @@ export function getSettings(url: string): Promise<unknown> {
 export function resetSettingsCache(): void {
   settingsCache.clear();
 }
+
+/**
+ * Indica si el formulario debe esperar a que el visitante resuelva el captcha
+ * de Cloudflare Turnstile antes de enviarse: hay widget en la pagina y todavia
+ * no ha rellenado el token (`cf-turnstile-response`). Sin widget (clave no
+ * configurada) nunca bloquea.
+ */
+export function captchaPending(widgetPresent: boolean, token: string): boolean {
+  return widgetPresent && token.trim() === '';
+}

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { safeUrl, setStatusPanel, fetchWithRetry, getSettings, resetSettingsCache } from './shared';
+import { safeUrl, setStatusPanel, fetchWithRetry, getSettings, resetSettingsCache, captchaPending } from './shared';
 
 describe('safeUrl()', () => {
   it('permite http(s), rutas relativas y mailto', () => {
@@ -219,5 +219,20 @@ describe('getSettings()', () => {
     await second;
 
     expect(fetchMock.mock.calls.length).toBeGreaterThan(callsAfterFirst);
+  });
+});
+
+describe('captchaPending()', () => {
+  it('no bloquea si el formulario no lleva widget de Turnstile', () => {
+    expect(captchaPending(false, '')).toBe(false);
+  });
+
+  it('bloquea si hay widget y el token esta vacio', () => {
+    expect(captchaPending(true, '')).toBe(true);
+    expect(captchaPending(true, '   ')).toBe(true);
+  });
+
+  it('deja pasar si hay widget y ya hay token', () => {
+    expect(captchaPending(true, '0.abc123')).toBe(false);
   });
 });

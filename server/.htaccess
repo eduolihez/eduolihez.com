@@ -186,14 +186,15 @@ RedirectMatch 410 ^/(projects/)?badaveu(/.*)?$
 RedirectMatch 410 ^/(projects/)?mesbadalona(/.*)?$
 
 # ---------------------------------------------------------------------------
-# Blog EN/CA: sin articulos todavia (ver BlogPreview.astro y Header.astro).
-# El listado en esos idiomas no tiene nada que mostrar, asi que en vez de
-# servir un indice vacio se redirige a la home del idioma. Reversible: en
-# cuanto haya contenido real en EN/CA basta con borrar estas dos lineas.
+# Blog EN: sin articulos todavia (ver BlogPreview.astro y Header.astro).
+# El listado en ingles no tiene nada que mostrar, asi que en vez de servir un
+# indice vacio se redirige a la home del idioma. Reversible: en cuanto haya
+# contenido real en EN basta con borrar esta linea. El blog en catalan ya
+# tiene articulos (database/schema.sql, bloque "Blog: SEO local y catalan"),
+# asi que /ca/blog/ se sirve normal.
 # Va FUERA del bloque mod_rewrite: Redirect no necesita ese modulo.
 # ---------------------------------------------------------------------------
 RedirectMatch 301 ^/en/blog/?$ /en/
-RedirectMatch 301 ^/ca/blog/?$ /ca/
 
 # Pagina propia para el 410, para que el visitante no vea la de Apache.
 # Con build.format 'directory', Astro la compila a /410/index.html.

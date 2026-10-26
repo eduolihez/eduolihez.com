@@ -38,6 +38,9 @@ const title = 'Blog de Ciberseguridad: IAM, Microsoft 365 y SOC | Eduardo Olivar
 const description =
   'Artículos prácticos de ciberseguridad: IAM y Entra ID, Microsoft 365, phishing, NIS2, hardening y automatización del SOC con Python.';
 
+// El indice existe en espanol y catalan; en ingles /en/blog/ redirige a la home.
+const alternates = { es: '/blog/', ca: '/ca/blog/' };
+
 const posts = await fetchAllPostSummaries(lang);
 // Categoria, no etiqueta: son ~5 valores fijos pensados para navegar el
 // listado (ver POST_CATEGORIES en server/lib/post.php). Las tags siguen
@@ -48,7 +51,15 @@ const categories = [...new Set(posts.map((p) => p.category).filter((c): c is str
 );
 ---
 
-<BaseLayout title={title} description={description} lang={lang} path="/blog/" withFaq={false} breadcrumbName="Blog">
+<BaseLayout
+  title={title}
+  description={description}
+  lang={lang}
+  path="/blog/"
+  alternates={alternates}
+  withFaq={false}
+  breadcrumbName="Blog"
+>
   <section class="border-b border-bg-border bg-bg-soft py-20 sm:py-28">
     <div class="container-page">
       <a

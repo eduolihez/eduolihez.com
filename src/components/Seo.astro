@@ -50,7 +50,7 @@ interface Props {
    *
    * Toda pagina traducida DEBE pasar su propio mapa.
    */
-  alternates?: Record<Lang, string>;
+  alternates?: Partial<Record<Lang, string>>;
   /**
    * Migas de pan de la pagina, de la raiz hacia dentro y SIN incluir la
    * pagina actual (se anade sola al final).
@@ -407,12 +407,12 @@ const graph = {
 {
   alternates && (
     <>
-      <link rel="alternate" hreflang="es-ES" href={new URL(alternates.es, SITE.domain).href} />
-      <link rel="alternate" hreflang="es" href={new URL(alternates.es, SITE.domain).href} />
-      <link rel="alternate" hreflang="en" href={new URL(alternates.en, SITE.domain).href} />
-      <link rel="alternate" hreflang="ca-ES" href={new URL(alternates.ca, SITE.domain).href} />
-      <link rel="alternate" hreflang="ca" href={new URL(alternates.ca, SITE.domain).href} />
-      <link rel="alternate" hreflang="x-default" href={new URL(alternates.es, SITE.domain).href} />
+      {alternates.es && <link rel="alternate" hreflang="es-ES" href={new URL(alternates.es, SITE.domain).href} />}
+      {alternates.es && <link rel="alternate" hreflang="es" href={new URL(alternates.es, SITE.domain).href} />}
+      {alternates.en && <link rel="alternate" hreflang="en" href={new URL(alternates.en, SITE.domain).href} />}
+      {alternates.ca && <link rel="alternate" hreflang="ca-ES" href={new URL(alternates.ca, SITE.domain).href} />}
+      {alternates.ca && <link rel="alternate" hreflang="ca" href={new URL(alternates.ca, SITE.domain).href} />}
+      <link rel="alternate" hreflang="x-default" href={new URL(alternates.es ?? alternates.ca ?? "/", SITE.domain).href} />
     </>
   )
 }

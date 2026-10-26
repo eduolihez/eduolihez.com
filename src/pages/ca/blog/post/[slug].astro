@@ -2,26 +2,32 @@
 /**
  * /ca/blog/post/<slug>/ — Detall d'un article, generat en build-time.
  * Mateix patró que src/pages/blog/post/[slug].astro (vegeu aquell fitxer pel
- * "perquè" complet); aquesta és la variant en català. Avui no genera cap
- * ruta perquè encara no hi ha cap article publicat en català -- és l'estat
- * esperat, no un error.
+ * "perquè" complet); aquesta és la variant en català. No genera cap
+ * ruta si encara no hi ha cap article publicat en català.
  */
 import BaseLayout from '../../../../layouts/BaseLayout.astro';
 import BlogPostBody from '../../../../components/BlogPostBody.astro';
 import { useTranslations } from '../../../../i18n/utils';
 import { SITE } from '../../../../config';
 import { fetchAllPostDetails, isoDate, type PostDetail } from '../../../../lib/posts';
+import { postAlternates } from '../../../../lib/postTranslations';
+import type { Lang } from '../../../../i18n/ui';
 
 export async function getStaticPaths() {
   const posts = await fetchAllPostDetails('ca');
-  return posts.map((post) => ({ params: { slug: post.slug }, props: { post } }));
+  const publishedCa = new Set(posts.map((p) => p.slug));
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post, alternates: postAlternates('ca', post.slug, publishedCa) },
+  }));
 }
 
 interface Props {
   post: PostDetail;
+  alternates?: Partial<Record<Lang, string>>;
 }
 
-const { post } = Astro.props;
+const { post, alternates } = Astro.props;
 const lang = 'ca';
 const t = useTranslations(lang);
 
@@ -40,6 +46,7 @@ const image = new URL(
   description={post.summary}
   lang={lang}
   path={path}
+  alternates={alternates}
   withFaq={false}
   breadcrumbs={[{ name: 'Blog', path: '/ca/blog/' }]}
   breadcrumbName={post.title}

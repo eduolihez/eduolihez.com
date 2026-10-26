@@ -26,10 +26,10 @@ const nav = [
   // que la pagina real es /blog/. Sin la barra, Apache responde un 301 a
   // /blog/ en cada clic (un salto de mas) y el enlace interno deja de
   // coincidir con la canonica que declara la propia pagina.
-  // Solo en espanol: el blog no tiene contenido en EN/CA todavia (ver
-  // BlogPreview.astro), asi que un enlace a un listado vacio en esos idiomas
+  // Solo en espanol y catalan: el blog no tiene contenido en ingles todavia
+  // (ver BlogPreview.astro), asi que un enlace a un listado vacio en ese idioma
   // solo genera contenido fino y confunde al visitante.
-  ...(lang === 'es' ? [{ href: `${base}blog/`, label: t('nav.blog') }] : []),
+  ...(lang === 'es' || lang === 'ca' ? [{ href: `${base}blog/`, label: t('nav.blog') }] : []),
   { href: `${base}#faq`, label: t('nav.faq') },
   { href: `${base}#contacto`, label: t('nav.contact') },
 ];

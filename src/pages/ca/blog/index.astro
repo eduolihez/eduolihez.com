@@ -1,26 +1,44 @@
 ---
 /**
- * /ca/blog/ — Index del blog en catala.
+ * /ca/blog/ — Índex d'articles en català, renderitzat EN BUILD TIME.
+ * Mateix patró que src/pages/blog/index.astro (vegeu aquell fitxer pel "perquè"
+ * complet): el llistat és HTML real al servidor, no un fetch al navegador, de
+ * manera que els rastrejadors que no executen JavaScript també el veuen.
  *
- * El llistat es carrega des de l'API de PHP en obrir la pagina, de manera que
- * el que publiquis a /admin surt immediatament sense recompilar el web.
- *
- * La logica viu a src/scripts/blog.ts, compartida amb el castella i l'angles.
+ * Les categories venen de l'API en castellà (POST_CATEGORIES a
+ * server/lib/post.php); aquí només se'n tradueix l'etiqueta del botó, el
+ * valor del filtre (data-category) es manté perquè coincideixi amb el de
+ * cada targeta.
  */
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { useTranslations } from '../../../i18n/utils';
-import { api } from '../../../config';
-import StatusPanel from '../../../components/StatusPanel.astro';
+import { fetchAllPostSummaries, isoDate } from '../../../lib/posts';
+import { formatDate, safeUrl } from '../../../scripts/blog';
 
 const lang = 'ca';
 const t = useTranslations(lang);
 
-const title = 'Blog de Ciberseguretat | Eduardo Olivares';
+const title = 'Blog de Ciberseguretat: IAM, Microsoft 365 i SOC | Eduardo Olivares';
 const description =
-  'Articles, tutorials i anàlisi sobre ciberseguretat, resposta a incidents, programari maliciós, Blue Team i automatització amb Python.';
+  'Articles pràctics de ciberseguretat: IAM i Entra ID, Microsoft 365, phishing, NIS2, hardening i automatització del SOC amb Python.';
 
-const apiUrl = api(`/api/posts.php?lang=${lang}`);
-const alternates = { es: '/blog/', en: '/en/blog/', ca: '/ca/blog/' };
+const alternates = { es: '/blog/', ca: '/ca/blog/' };
+
+const CATEGORY_LABELS_CA: Record<string, string> = {
+  'Blue Team & SOC': 'Blue Team i SOC',
+  'Cloud Security e IAM': 'Cloud Security i IAM',
+  'Vulnerabilidades': 'Vulnerabilitats',
+  'Automatización': 'Automatització',
+  'IA aplicada a seguridad': 'IA aplicada a la seguretat',
+  'Herramientas y proyectos': 'Eines i projectes',
+  'Carrera y trayectoria': 'Carrera i trajectòria',
+  'Normativa y cumplimiento': 'Normativa i compliment',
+};
+
+const posts = await fetchAllPostSummaries(lang);
+const categories = [...new Set(posts.map((p) => p.category).filter((c): c is string => Boolean(c)))].sort((a, b) =>
+  a.localeCompare(b)
+);
 ---
 
 <BaseLayout
@@ -28,8 +46,8 @@ const alternates = { es: '/blog/', en: '/en/blog/', ca: '/ca/blog/' };
   description={description}
   lang={lang}
   path="/ca/blog/"
-  withFaq={false}
   alternates={alternates}
+  withFaq={false}
   breadcrumbName="Blog"
 >
   <section class="border-b border-bg-border bg-bg-soft py-20 sm:py-28">
@@ -41,41 +59,94 @@ const alternates = { es: '/blog/', en: '/en/blog/', ca: '/ca/blog/' };
         <span class="transition-transform group-hover:-translate-x-1">&larr;</span> Tornar a l'inici
       </a>
 
-      <div class="reveal mb-12">
-        <p class="section-kicker">Divulgació tècnica</p>
-        <h1 class="section-title">{t('blog.title')}</h1>
-        <p class="section-subtitle">{t('blog.subtitle')}</p>
+      <div class="reveal mb-12 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p class="section-kicker">Divulgació tècnica</p>
+          <h1 class="section-title">{t('blog.title')}</h1>
+          <p class="section-subtitle">{t('blog.subtitle')}</p>
+        </div>
+        <a
+          href="/blog/rss.xml"
+          class="inline-flex items-center gap-1.5 rounded-md border border-bg-border px-3 py-1.5 font-mono text-xs text-text-muted transition hover:border-accent/40 hover:text-accent"
+        >
+          RSS
+        </a>
       </div>
 
-      <!-- Estat de carrega -->
-      <StatusPanel
-        id="blog-status"
-        class="mb-8"
-        loadingText={t('blog.loading')}
-        retryText={t('status.retry')}
-      />
+      {posts.length === 0 && <p class="text-sm text-text-muted">{t('blog.empty')}</p>}
 
-      <!-- Filtres per etiqueta (els omple blog.ts a partir dels articles) -->
-      <div id="blog-filters" class="mb-8 hidden flex-wrap gap-2" data-all="Tots"></div>
+      {categories.length > 0 && (
+        <div id="blog-filters" class="mb-8 flex flex-wrap gap-2" data-all="Tots">
+          <button
+            type="button"
+            class="blog-filter-btn cursor-pointer rounded-lg border px-4 py-1.5 text-xs font-semibold transition duration-200 border-accent bg-accent text-bg"
+            data-filter="all"
+          >
+            Tots
+          </button>
+          {categories.map((category) => (
+            <button
+              type="button"
+              class="blog-filter-btn cursor-pointer rounded-lg border border-bg-border/60 bg-bg-soft/40 px-4 py-1.5 text-xs font-semibold text-text-muted transition duration-200 hover:bg-bg-card hover:text-text"
+              data-filter={category}
+            >
+              {CATEGORY_LABELS_CA[category] ?? category}
+            </button>
+          ))}
+        </div>
+      )}
 
-      <!-- Llistat d'articles (l'omple blog.ts) -->
-      <div
-        id="blog-grid"
-        class="hidden grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
-        data-api={apiUrl}
-        data-loading={t('blog.loading')}
-        data-empty={t('blog.empty')}
-        data-error={t('blog.error')}
-        data-readmore={t('blog.readMore')}
-        data-lang={lang}
-        data-detail="/ca/blog/post/"
-      >
+      <div id="blog-grid" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {posts.map((post) => {
+          const href = `/ca/blog/post/${encodeURIComponent(post.slug || '')}/`;
+          const cover = safeUrl(post.cover_url) || `/ca/blog/covers/${encodeURIComponent(post.slug || '')}.png`;
+          return (
+            <article
+              class="group reveal flex flex-col overflow-hidden rounded-xl border border-bg-border bg-bg-card shadow-xs transition hover:-translate-y-1 hover:border-bg-border-hover hover:shadow-md"
+              data-category={post.category || undefined}
+            >
+              <a href={href} class="block overflow-hidden" aria-hidden="true" tabindex="-1">
+                {/* width/height + aspect-ratio: el navegador reserva el hueco antes
+                    de que la imagen cargue, así que la cuadrícula ya no da el salto
+                    de layout (CLS) que se medía al pintarla por JS tras el fetch.
+                    1200x630 es la relación real de la portada generada en
+                    src/lib/cover.ts -- con el contenedor a la misma proporción,
+                    object-cover ya no tiene que recortar nada en horizontal. */}
+                <img
+                  src={cover}
+                  alt=""
+                  width="1200"
+                  height="630"
+                  style="aspect-ratio: 1200 / 630"
+                  loading="lazy"
+                  decoding="async"
+                  class="w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+              </a>
+              <div class="flex flex-1 flex-col p-5">
+                <p class="mb-2 flex items-center gap-2 font-mono text-xs text-text-muted">
+                  <time datetime={isoDate(post.published_at).slice(0, 10)}>{formatDate(post.published_at, lang)}</time>
+                </p>
+                <h2 class="mb-2 text-lg font-bold leading-snug text-text-title transition group-hover:text-accent">
+                  <a href={href}>{post.title}</a>
+                </h2>
+                <p class="mb-4 line-clamp-3 flex-1 text-sm text-text-muted">{post.summary}</p>
+                <a
+                  href={href}
+                  class="mt-auto inline-flex items-center gap-1.5 text-sm font-semibold text-accent transition group-hover:gap-2.5"
+                >
+                  {t('blog.readMore')} →
+                </a>
+              </div>
+            </article>
+          );
+        })}
       </div>
     </div>
   </section>
 </BaseLayout>
 
 <script>
-  import { initBlogList } from '../../../scripts/blog';
-  initBlogList();
+  import { initStaticBlogFilters } from '../../../scripts/blog';
+  initStaticBlogFilters();
 </script>

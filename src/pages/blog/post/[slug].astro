@@ -18,18 +18,27 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 import BlogPostBody from '../../../components/BlogPostBody.astro';
 import { useTranslations } from '../../../i18n/utils';
 import { SITE } from '../../../config';
-import { fetchAllPostDetails, isoDate, type PostDetail } from '../../../lib/posts';
+import { fetchAllPostDetails, fetchAllPostSummaries, isoDate, type PostDetail } from '../../../lib/posts';
+import { postAlternates } from '../../../lib/postTranslations';
+import type { Lang } from '../../../i18n/ui';
 
 export async function getStaticPaths() {
   const posts = await fetchAllPostDetails('es');
-  return posts.map((post) => ({ params: { slug: post.slug }, props: { post } }));
+  // Slugs catalanes realmente publicados en este build: el hreflang solo se
+  // declara hacia traducciones que existen (ver postAlternates).
+  const publishedCa = new Set((await fetchAllPostSummaries('ca')).map((p) => p.slug));
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post, alternates: postAlternates('es', post.slug, publishedCa) },
+  }));
 }
 
 interface Props {
   post: PostDetail;
+  alternates?: Partial<Record<Lang, string>>;
 }
 
-const { post } = Astro.props;
+const { post, alternates } = Astro.props;
 const lang = 'es';
 const t = useTranslations(lang);
 
@@ -48,6 +57,7 @@ const image = new URL(
   description={post.summary}
   lang={lang}
   path={path}
+  alternates={alternates}
   withFaq={false}
   breadcrumbs={[{ name: 'Blog', path: '/blog/' }]}
   breadcrumbName={post.title}

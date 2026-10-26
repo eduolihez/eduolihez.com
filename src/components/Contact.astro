@@ -93,6 +93,7 @@ const messages = {
           data-api={apiUrl}
           data-settings={settingsUrl}
           data-formspree={SITE.formspree}
+          data-lang={lang}
           data-messages={JSON.stringify(messages)}
         >
           <!-- Honeypot: oculto para humanos y lectores, presente para bots (B6).
@@ -287,6 +288,8 @@ const messages = {
         subject: (data.subject || '').trim(),
         message: data.message.trim(),
         turnstileToken: data['cf-turnstile-response'] || '',
+        // Idioma de la pagina: sale en el email de aviso (es/en/ca).
+        lang: form.dataset.lang || '',
       };
 
       try {

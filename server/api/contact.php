@@ -5,10 +5,13 @@
  * y (opcional) envia un email de aviso. Incluye honeypot + rate-limit por IP.
  *
  * Cuerpo esperado (JSON):
- *   { "name": "...", "email": "...", "subject": "...", "message": "...", "website": "" }
+ *   { "name": "...", "email": "...", "subject": "...", "message": "...", "lang": "es|en|ca", "website": "" }
+ * "lang" es el idioma de la pagina desde la que se envia (solo informativo: sale en el email).
  * "website" es el honeypot: si viene relleno, es un bot.
  */
 require_once __DIR__ . '/../lib/http.php';
+require_once __DIR__ . '/../lib/site.php';
+require_once __DIR__ . '/../lib/mail_template.php';
 
 apply_cors();
 require_method('POST');
@@ -81,6 +84,9 @@ $name    = strip_ctl((string) ($input['name'] ?? ''));
 $email   = strip_ctl((string) ($input['email'] ?? ''));
 $subject = strip_ctl((string) ($input['subject'] ?? ''));
 $message = trim((string) ($input['message'] ?? '')); // aqui SI permitimos saltos de linea
+// Solo los idiomas de la web; cualquier otro valor se descarta (sale como "No indicado").
+$langIn  = $input['lang'] ?? '';
+$lang    = is_string($langIn) && array_key_exists($langIn, MAIL_LANGS) ? $langIn : '';
 
 if ($name === '' || $email === '' || $message === '') {
     json(['error' => 'Faltan campos obligatorios.'], 422);
@@ -130,14 +136,9 @@ try {
         "INSERT INTO messages (name, email, subject, message, ip_address, user_agent, is_read, created_at)
          VALUES (?, ?, ?, ?, ?, ?, 0, NOW())"
     );
-    $stmt->execute([
-        $name,
-        $email,
-        $subject,
-        $message,
-        $ip,
-        mb_substr((string) ($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 255),
-    ]);
+    $userAgent = mb_substr((string) ($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 255);
+    $stmt->execute([$name, $email, $subject, $message, $ip, $userAgent]);
+    $messageId = (int) db()->lastInsertId();
 } catch (Throwable $e) {
     json(['error' => 'No se pudo guardar el mensaje.'], 500);
 }
@@ -150,25 +151,25 @@ if (!empty($mail['enabled'])) {
     $subjPre = $mail['subject_prefix'] ?? '';
 
     if ($to !== '') {
-        $mailSubject = $subjPre . ($subject !== '' ? $subject : 'Nuevo mensaje de contacto');
-        $body = "Nuevo mensaje desde el portfolio:\n\n"
-            . "Nombre:  {$name}\n"
-            . "Email:   {$email}\n"
-            . "Asunto:  {$subject}\n"
-            . "IP:      {$ip}\n"
-            . "-----------------------------------------\n\n"
-            . $message . "\n";
-
-        // Cabeceras. Reply-To apunta al remitente para que puedas responderle
-        // directo. $email ya paso FILTER_VALIDATE_EMAIL + strip_ctl, asi que no
-        // puede contener saltos de linea (anti inyeccion de cabeceras).
-        $headers  = 'From: ' . strip_ctl($from) . "\r\n";
-        $headers .= "Reply-To: {$email}\r\n";
-        $headers .= "Content-Type: text/plain; charset=utf-8\r\n";
-        $headers .= 'X-Mailer: PHP/' . phpversion();
+        $built = contact_email_build([
+            'name'        => $name,
+            'email'       => $email,
+            'subject'     => $subject,
+            'message'     => $message,
+            'ip'          => $ip,
+            'user_agent'  => $userAgent,
+            'lang'        => $lang,
+            'received_at' => new DateTimeImmutable('now', new DateTimeZone('UTC')),
+            'message_id'  => $messageId > 0 ? $messageId : null,
+            'site_origin' => SITE_ORIGIN,
+        ], $subjPre);
+        // Reply-To apunta al remitente para responderle directo. $email ya paso
+        // FILTER_VALIDATE_EMAIL + strip_ctl; contact_email_mime() vuelve a limpiar
+        // las cabeceras (anti inyeccion).
+        $mime = contact_email_mime($built, $from, $email);
 
         // @ para que un fallo de mail() no genere warning ni rompa la respuesta.
-        @mail($to, '=?UTF-8?B?' . base64_encode($mailSubject) . '?=', $body, $headers);
+        @mail($to, '=?UTF-8?B?' . base64_encode($built['subject']) . '?=', $mime['body'], $mime['headers']);
     }
 }
 

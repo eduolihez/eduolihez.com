@@ -22,6 +22,7 @@
  * Es lo que Google recomienda y evita que se contradigan entre si.
  */
 import { SITE } from '../config';
+import { buildSoftwareNodes } from '../lib/softwareSchema';
 import type { Lang } from '../i18n/ui';
 import { experiences } from '../data/experience';
 import { skillGroups } from '../data/skills';
@@ -271,7 +272,7 @@ const person = {
     dateCreated: c.year,
   })),
   award: SITE.awards.map((a) => a.name),
-  sameAs: [SITE.social.linkedin, SITE.social.github],
+  sameAs: [SITE.social.linkedin, SITE.social.github, 'https://eduolihez.github.io/'],
 };
 
 const website = {
@@ -365,6 +366,9 @@ const graph = {
     website,
     profilePage,
     ...(breadcrumb ? [breadcrumb] : []),
+    // Software publicado, solo en las portadas: ahi vive la lista de proyectos
+    // y asi el grafo no se repite en cada pagina.
+    ...(path === homePath ? buildSoftwareNodes(lang, SITE.domain, personId) : []),
     ...(withFaq ? [faqPage] : []),
     ...(blogPosting ? [blogPosting] : []),
   ],

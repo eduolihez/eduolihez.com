@@ -1,6 +1,8 @@
 ---
 /**
- * <Footer /> - Pie minimalista con enlaces sociales y "volver arriba".
+ * <Footer /> - Pie compacto: marca, contacto, proyectos publicados y una barra
+ * final. La navegacion por secciones vive en la cabecera y en la paleta
+ * (Ctrl/Cmd+K); repetirla aqui solo añadia ruido.
  */
 import { useTranslations, localeBase } from '../i18n/utils';
 import type { Lang } from '../i18n/ui';
@@ -12,122 +14,72 @@ interface Props {
 }
 const { lang } = Astro.props;
 const t = useTranslations(lang);
-// Los enlaces de este pie apuntaban todos a "/", asi que desde /en/ o /ca/
-// devolvian al visitante a la home castellana. <Header /> ya resolvia esto
-// con localeBase(); el pie no.
+// Los enlaces del pie apuntaban todos a "/", asi que desde /en/ o /ca/
+// devolvian al visitante a la home castellana: se resuelven con localeBase().
 const base = localeBase(lang);
 const year = new Date().getFullYear();
-const aboutPath = lang === 'en' ? '/en/about-this-website/' : (lang === 'ca' ? '/ca/sobre-aquesta-web/' : '/sobre-esta-web/');
+const aboutPath =
+  lang === 'en' ? '/en/about-this-website/' : lang === 'ca' ? '/ca/sobre-aquesta-web/' : '/sobre-esta-web/';
 
 /**
- * Proyectos publicados bajo /projects/.
+ * Proyectos publicados bajo /projects/ y /apps/.
  *
- * IMPORTANTE (SEO): antes de esto, ninguna pagina del sitio enlazaba a estas
- * webs, asi que para Google eran "paginas huerfanas": sin ningun enlace
- * entrante, un rastreador no tiene forma de llegar a ellas ni de repartirles
- * autoridad, por mucho que esten en el sitemap. Al ponerlas en el pie
- * aparecen en TODAS las paginas del portfolio, que es la forma estandar de
- * resolverlo.
- *
- * La seccion "Proyectos" de la portada se sirve desde MySQL y sus enlaces
- * dependen de lo que haya en la base de datos; esta lista es estatica a
- * proposito, para que la ruta de rastreo no dependa del backend.
+ * IMPORTANTE (SEO): estas paginas no tienen otro enlace entrante estatico (la
+ * seccion "Proyectos" de la portada se sirve desde MySQL), asi que sin esta
+ * lista serian "paginas huerfanas" para un rastreador. Por eso se mantiene en
+ * TODAS las paginas, como HTML estatico, sin depender del backend.
  */
 const projects = [
-  {
-    name: 'Password Centinel',
-    href: '/apps/password-centinel/',
-    badgeKey: 'projects.badge.privateCode',
-    badgeType: 'private-code'
-  },
-  {
-    name: 'PromptMaster',
-    href: '/apps/prompt-master/',
-    badgeKey: 'projects.badge.privateCode',
-    badgeType: 'private-code'
-  },
-  {
-    name: 'NoWait',
-    href: '/apps/nowait/',
-    badgeKey: 'projects.badge.privateCode',
-    badgeType: 'private-code'
-  },
-  {
-    name: 'FollowGuard',
-    href: '/projects/followguard/',
-    badgeKey: 'projects.badge.openSource',
-    badgeType: 'open-source'
-  },
-  {
-    name: 'Blue Team Hub',
-    href: 'https://eduolihez.github.io/',
-    badgeKey: 'projects.badge.openSource',
-    badgeType: 'open-source',
-    external: true
-  },
-  {
-    name: 'Fluence',
-    href: '/projects/fluence/',
-    badgeKey: 'projects.badge.privateCode',
-    badgeType: 'private-code'
-  },
-  {
-    name: 'Zéora',
-    href: '/projects/zeora/',
-    badgeKey: 'projects.badge.privateCode',
-    badgeType: 'private-code'
-  },
+  { name: 'Password Centinel', href: '/apps/password-centinel/' },
+  { name: 'PromptMaster', href: '/apps/prompt-master/' },
+  { name: 'NoWait', href: '/apps/nowait/' },
+  { name: 'FollowGuard', href: '/projects/followguard/' },
+  { name: 'Fluence', href: '/projects/fluence/' },
+  { name: 'Zéora', href: '/projects/zeora/' },
+  { name: 'Blue Team Hub', href: 'https://eduolihez.github.io/', external: true },
+];
+
+const social = [
+  { label: 'LinkedIn', href: SITE.social.linkedin, icon: 'linkedin', external: true },
+  { label: 'GitHub', href: SITE.social.github, icon: 'github', external: true },
+  { label: t('hero.cta.cv'), href: SITE.cv[lang] ?? SITE.cv.es, icon: 'download', external: false },
 ];
 ---
 
-<footer class="relative border-t border-bg-border/60 bg-bg-soft/40 backdrop-blur-xs text-sm">
-  <!-- Efecto de línea de resplandor superior sutil -->
-  <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/25 to-transparent"></div>
-
-  <div class="container-page py-16 grid gap-10 sm:grid-cols-2 md:grid-cols-4 relative z-10">
-    <!-- Columna 1: Bio & Info de Marca -->
-    <div class="flex flex-col gap-4">
-      <div>
-        <div class="font-mono font-bold text-base tracking-tight text-text-title">
-          {SITE.name}
-        </div>
-        <p class="mt-1 text-xs text-text-muted leading-relaxed max-w-xs">
-          {SITE.jobTitle}
-        </p>
-      </div>
-      <p class="font-mono text-[11px] text-text-faint mt-auto pt-4 border-t border-bg-border/30">
-        &copy; {year} {SITE.shortName}<br/>
-        <span class="inline-block mt-1 opacity-75">{t('footer.built')}</span>
-      </p>
-    </div>
-
-    <!-- Columna 2: Proyectos -->
+<footer class="border-t border-bg-border bg-bg-soft text-sm">
+  <div class="container-page grid gap-10 py-12 md:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)] md:gap-16">
+    <!-- Marca y contacto -->
     <div>
-      <p class="mb-5 font-mono text-[11px] uppercase tracking-widest text-text-faint font-semibold">
-        <a href="/projects/" class="transition hover:text-accent hover:no-underline">{t('footer.projects')}</a>
+      <a href={base} class="font-mono text-sm font-semibold tracking-tight text-text-title">
+        EO <span class="text-accent">//</span> <span class="font-medium text-text-muted">security</span>
+      </a>
+      <p class="mt-3 max-w-sm text-text-muted">{SITE.jobTitle}</p>
+
+      <p class="mt-4 flex items-center gap-2 font-mono text-xs text-text-muted">
+        <Icon name="location" class="h-3.5 w-3.5 shrink-0 text-text-faint" />
+        {t('footer.location')}
       </p>
-      <ul class="flex flex-col gap-3">
+      <a
+        href={`mailto:${SITE.social.email}`}
+        class="mt-1.5 flex items-center gap-2 font-mono text-xs font-semibold text-text transition hover:text-accent"
+      >
+        <Icon name="mail" class="h-3.5 w-3.5 shrink-0 text-text-faint" />
+        {SITE.social.email}
+      </a>
+
+      <ul class="mt-5 flex flex-wrap gap-2" aria-label={t('footer.contact')}>
         {
-          projects.map((p) => (
+          social.map((s) => (
             <li>
               <a
-                href={p.href}
-                target={p.external ? '_blank' : undefined}
-                rel={p.external ? 'noopener noreferrer' : undefined}
-                class="group inline-flex items-center gap-2 font-mono text-xs text-text-muted transition hover:text-accent hover:no-underline"
+                href={s.href}
+                target={s.external ? '_blank' : undefined}
+                rel={s.external ? 'noopener noreferrer' : undefined}
+                class="flex h-9 w-9 items-center justify-center rounded-lg border border-bg-border bg-bg-card text-text-muted transition hover:border-accent hover:text-accent"
+                aria-label={s.label}
+                title={s.label}
               >
-                <span class="border-b border-transparent group-hover:border-accent/30">{p.name}</span>
-                {p.badgeKey && (
-                  <span class={`rounded-xs px-1.5 py-px text-[10px] font-semibold font-sans tracking-wide leading-normal border transition-colors ${
-                    p.badgeType === 'open-source' 
-                      ? 'bg-oss/5 text-oss border-oss/15 group-hover:bg-oss/10' 
-                      : p.badgeType === 'in-development'
-                      ? 'bg-wip/5 text-wip border-wip/15 group-hover:bg-wip/10'
-                      : 'bg-closed/5 text-closed border-closed/15 group-hover:bg-closed/10'
-                  }`}>
-                    {t(p.badgeKey as any)}
-                  </span>
-                )}
+                <Icon name={s.icon} class="h-4 w-4" />
               </a>
             </li>
           ))
@@ -135,78 +87,55 @@ const projects = [
       </ul>
     </div>
 
-    {/* Columna 3: Navegación. Va en <nav> con nombre propio: la pagina solo
-        declaraba el landmark de la cabecera, asi que un lector de pantalla no
-        podia saltar a estos enlaces. El aria-label lo distingue del principal. */}
-    <nav aria-label={t('footer.nav')}>
-      <p class="mb-5 font-mono text-[11px] uppercase tracking-widest text-text-faint font-semibold">
-        {t('footer.nav')}
+    <!-- Proyectos publicados (enlaces estaticos: ver nota de SEO arriba) -->
+    <nav aria-label={t('footer.projects')}>
+      <p class="mb-4 font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-text-faint">
+        <a href="/projects/" class="transition hover:text-accent">{t('footer.projects')}</a>
       </p>
-      <ul class="grid grid-cols-2 gap-x-3 gap-y-3 font-mono text-xs">
-        <li><a href={`${base}#perfil`} class="text-text-muted hover:text-accent transition hover:no-underline flex items-center gap-1 group"><span class="opacity-0 group-hover:opacity-100 transition-opacity text-accent text-[10px]">&rarr;</span>{t('nav.about')}</a></li>
-        <li><a href={`${base}#experiencia`} class="text-text-muted hover:text-accent transition hover:no-underline flex items-center gap-1 group"><span class="opacity-0 group-hover:opacity-100 transition-opacity text-accent text-[10px]">&rarr;</span>{t('nav.experience')}</a></li>
-        <li><a href={`${base}#habilidades`} class="text-text-muted hover:text-accent transition hover:no-underline flex items-center gap-1 group"><span class="opacity-0 group-hover:opacity-100 transition-opacity text-accent text-[10px]">&rarr;</span>{t('nav.skills')}</a></li>
-        <li><a href={`${base}#proyectos`} class="text-text-muted hover:text-accent transition hover:no-underline flex items-center gap-1 group"><span class="opacity-0 group-hover:opacity-100 transition-opacity text-accent text-[10px]">&rarr;</span>{t('nav.projects')}</a></li>
-        <li><a href={`${base}#certificaciones`} class="text-text-muted hover:text-accent transition hover:no-underline flex items-center gap-1 group"><span class="opacity-0 group-hover:opacity-100 transition-opacity text-accent text-[10px]">&rarr;</span>{t('nav.certifications')}</a></li>
-        <li><a href={`${base}#faq`} class="text-text-muted hover:text-accent transition hover:no-underline flex items-center gap-1 group"><span class="opacity-0 group-hover:opacity-100 transition-opacity text-accent text-[10px]">&rarr;</span>{t('nav.faq')}</a></li>
-        <li><a href={`${base}#contacto`} class="text-text-muted hover:text-accent transition hover:no-underline flex items-center gap-1 group"><span class="opacity-0 group-hover:opacity-100 transition-opacity text-accent text-[10px]">&rarr;</span>{t('nav.contact')}</a></li>
-        {lang === 'es' && <li><a href={`${base}blog/`} class="text-text-muted hover:text-accent transition hover:no-underline flex items-center gap-1 group"><span class="opacity-0 group-hover:opacity-100 transition-opacity text-accent text-[10px]">&rarr;</span>{t('nav.blog')}</a></li>}
+      <ul class="grid gap-x-8 gap-y-2.5 font-mono text-xs sm:grid-cols-2">
+        {
+          projects.map((p) => (
+            <li>
+              <a
+                href={p.href}
+                target={p.external ? '_blank' : undefined}
+                rel={p.external ? 'noopener noreferrer' : undefined}
+                class="group inline-flex items-center gap-2 text-text-muted transition hover:text-accent"
+              >
+                <Icon
+                  name={p.external ? 'external' : 'arrowRight'}
+                  class="h-3 w-3 shrink-0 text-text-faint transition group-hover:text-accent"
+                />
+                {p.name}
+              </a>
+            </li>
+          ))
+        }
       </ul>
     </nav>
+  </div>
 
-    <!-- Columna 4: Contacto & Redes -->
-    <div class="flex flex-col gap-4">
-      <div>
-        <p class="mb-4 font-mono text-[11px] uppercase tracking-widest text-text-faint font-semibold">
-          {t('footer.contact')}
-        </p>
-        <p class="text-xs text-text-muted font-mono leading-relaxed">
-          <span class="not-italic block mb-1 text-text-faint">{t('footer.location')}</span>
-          <a class="transition hover:text-accent block font-semibold" href={`mailto:${SITE.social.email}`}>
-            {SITE.social.email}
-          </a>
-        </p>
-      </div>
-      
-      <div class="flex items-center gap-2">
-        <a
-          href={SITE.social.linkedin}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="flex h-8 w-8 items-center justify-center rounded-lg border border-bg-border bg-bg-card/40 text-text-faint transition duration-200 hover:-translate-y-0.5 hover:bg-accent/10 hover:text-accent hover:border-accent/30"
-          aria-label="LinkedIn"
+  <!-- Barra final -->
+  <div class="border-t border-bg-border">
+    <div class="container-page flex flex-wrap items-center justify-between gap-x-6 gap-y-2 py-4 font-mono text-xs text-text-faint">
+      <p>
+        &copy; {year} {SITE.shortName}
+        <span aria-hidden="true">·</span>
+        <a href={aboutPath} class="transition hover:text-accent">{t('footer.aboutSite')}</a>
+      </p>
+      <div class="flex items-center gap-5">
+        <button
+          type="button"
+          data-palette-open
+          class="hidden items-center gap-1.5 transition hover:text-accent sm:inline-flex"
+          aria-label={t('palette.open')}
         >
-          <Icon name="linkedin" class="h-4 w-4" />
-        </a>
-        <a
-          href={SITE.social.github}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="flex h-8 w-8 items-center justify-center rounded-lg border border-bg-border bg-bg-card/40 text-text-faint transition duration-200 hover:-translate-y-0.5 hover:bg-accent/10 hover:text-accent hover:border-accent/30"
-          aria-label="GitHub"
-        >
-          <Icon name="github" class="h-4 w-4" />
-        </a>
-        <a
-          href={`mailto:${SITE.social.email}`}
-          class="flex h-8 w-8 items-center justify-center rounded-lg border border-bg-border bg-bg-card/40 text-text-faint transition duration-200 hover:-translate-y-0.5 hover:bg-accent/10 hover:text-accent hover:border-accent/30"
-          aria-label="Email"
-        >
-          <Icon name="mail" class="h-4 w-4" />
-        </a>
-      </div>
-
-      <div class="mt-auto flex flex-col gap-2 pt-4 border-t border-bg-border/30">
-        <a class="transition hover:text-accent text-accent font-mono text-xs font-semibold hover:no-underline flex items-center gap-1 group" href={aboutPath}>
-          <span>{t('footer.aboutSite')}</span>
-          <span class="transition-transform group-hover:translate-x-0.5">&rarr;</span>
-        </a>
-        <a
-          href="#top"
-          class="inline-flex items-center gap-1.5 text-xs font-mono text-text-muted hover:text-accent transition hover:no-underline"
-        >
+          <Icon name="terminal" class="h-3.5 w-3.5" />
+          <span aria-hidden="true">⌘K</span>
+        </button>
+        <a href="#top" class="inline-flex items-center gap-1.5 transition hover:text-accent">
           <Icon name="arrowUp" class="h-3.5 w-3.5" />
-          <span>{t('footer.backTop')}</span>
+          {t('footer.backTop')}
         </a>
       </div>
     </div>

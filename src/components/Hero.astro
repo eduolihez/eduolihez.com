@@ -22,16 +22,14 @@ const cvHref = SITE.cv[lang] ?? SITE.cv.es;
 // sola peticion por URL, y con URLs distintas volverian a ser dos.
 const settingsUrl = api(`/api/settings.php?lang=${lang}`);
 
-// Nodos del diagrama: [x, etiqueta]. Logs y XDR son nombres tecnicos, iguales
-// en los tres idiomas; triaje y respuesta se traducen.
-const NODE_W = 72;
-const NODE_STEP = 102;
+// Etapas del flujo de triaje. Los textos salen de tu experiencia real (ver
+// src/data/experience.ts); es un diagrama del proceso, no datos en vivo.
 const flow = [
-  'Logs',
-  'XDR',
-  t('hero.flow.triage'),
-  t('hero.flow.response'),
-].map((label, i) => ({ label, x: 4 + i * NODE_STEP }));
+  { icon: 'logs', title: t('hero.flow.logs'), sub: t('hero.flow.logs.sub') },
+  { icon: 'shield', title: t('hero.flow.xdr'), sub: t('hero.flow.xdr.sub') },
+  { icon: 'search', title: t('hero.flow.triage'), sub: t('hero.flow.triage.sub') },
+  { icon: 'bolt', title: t('hero.flow.response'), sub: t('hero.flow.response.sub') },
+];
 ---
 
 <section id="perfil" class="relative overflow-hidden" data-settings={settingsUrl}>
@@ -121,56 +119,40 @@ const flow = [
           </div>
         </div>
 
-        <svg
-          viewBox="0 0 382 96"
-          class="mt-6 h-auto w-full"
-          role="img"
-          aria-label={`Logs → XDR → ${t('hero.flow.triage')} → ${t('hero.flow.response')}`}
-        >
-          {
-            flow.slice(0, -1).map((n) => (
-              <line
-                x1={n.x + NODE_W}
-                y1="48"
-                x2={n.x + NODE_STEP}
-                y2="48"
-                class="flow-line stroke-accent"
-                stroke-width="1.5"
-              />
-            ))
-          }
-          {
-            flow.map((n, i) => (
-              <g>
-                <rect
-                  x={n.x}
-                  y="26"
-                  width={NODE_W}
-                  height="44"
-                  rx="8"
-                  class={i === flow.length - 1 ? 'fill-accent-soft stroke-accent' : 'fill-bg-soft stroke-bg-border'}
-                  stroke-width="1"
-                />
-                <text
-                  x={n.x + NODE_W / 2}
-                  y="52"
-                  text-anchor="middle"
-                  class={i === flow.length - 1 ? 'fill-accent' : 'fill-text'}
-                  font-size="12"
-                  font-family="var(--font-mono)"
-                  font-weight="600"
-                >
-                  {n.label}
-                </text>
-              </g>
-            ))
-          }
-        </svg>
-
-        <p class="mt-4 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-text-faint">
+        <p class="mt-6 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-text-faint">
           <span class="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden="true"></span>
           {t('hero.flow.label')}
         </p>
+
+        <div class="relative mt-4">
+          <!-- Linea que une las etapas y pulso de señal que la recorre -->
+          <span class="absolute bottom-5 left-[17px] top-5 w-0.5 overflow-hidden rounded-full bg-bg-border" aria-hidden="true">
+            <span class="flow-pulse block h-full w-full bg-gradient-to-b from-transparent via-accent to-transparent"></span>
+          </span>
+          <ol class="relative space-y-5" aria-label={t('hero.flow.label')}>
+          {
+            flow.map((step, i) => (
+              <li class="relative flex items-center gap-3.5">
+                <span
+                  class={`grid h-9 w-9 shrink-0 place-items-center rounded-lg border ${
+                    i === flow.length - 1
+                      ? 'border-accent/50 bg-accent-soft text-accent'
+                      : 'border-bg-border bg-bg-card text-text-muted'
+                  }`}
+                >
+                  <Icon name={step.icon} class="h-[18px] w-[18px]" />
+                </span>
+                <span class="min-w-0">
+                  <span class="block font-mono text-[13px] font-semibold leading-tight text-text-title">
+                    <span class="text-text-faint" aria-hidden="true">0{i + 1}</span> {step.title}
+                  </span>
+                  <span class="mt-0.5 block text-xs leading-snug text-text-muted">{step.sub}</span>
+                </span>
+              </li>
+            ))
+          }
+          </ol>
+        </div>
       </div>
     </div>
   </div>

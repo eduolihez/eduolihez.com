@@ -5,6 +5,7 @@
 import { useTranslations, pick } from '../i18n/utils';
 import type { Lang } from '../i18n/ui';
 import { skillGroups } from '../data/skills';
+import Icon from './Icon.astro';
 
 interface Props {
   lang: Lang;
@@ -25,7 +26,8 @@ const t = useTranslations(lang);
       {
         skillGroups.map((group) => (
           <div class="reveal">
-            <h3 class="mb-3 font-mono text-sm text-accent-cyan">
+            <h3 class="mb-3 flex items-center gap-2 font-mono text-sm text-accent-cyan">
+              <Icon name={group.icon} class="h-4 w-4 shrink-0" />
               {pick(group.category, lang)}
             </h3>
             <ul class="flex flex-wrap gap-2">

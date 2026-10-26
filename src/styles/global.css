@@ -489,14 +489,16 @@
     mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, #000 40%, transparent 100%);
   }
 
-  /* Linea discontinua que "fluye" por el diagrama del hero. */
-  .flow-line {
-    stroke-dasharray: 5 6;
-    animation: flow-dash 1.4s linear infinite;
+  /* Pulso de señal que baja por la linea del flujo de triaje (solo transform). */
+  .flow-pulse {
+    animation: flow-pulse 2.8s linear infinite;
   }
-  @keyframes flow-dash {
+  @keyframes flow-pulse {
+    from {
+      transform: translateY(-100%);
+    }
     to {
-      stroke-dashoffset: -22;
+      transform: translateY(100%);
     }
   }
 

@@ -206,6 +206,17 @@ el acento sigue siendo "vivo, disponible, accionable"; un fallo usa `danger`, nu
 - **Franja de stack** (`StackStrip`): tecnologías reales de `src/data/skills.ts`. El HTML
   lleva una copia; la segunda la clona `marquee.ts`.
 - **Marca:** `EO // security` en la web y `EO // admin` en el panel.
+- **Flujo de triaje** (tarjeta del hero): lista vertical de cuatro etapas (Logs → XDR →
+  Triaje → Respuesta) con icono, subtítulo real de tu experiencia y un pulso de señal
+  (`.flow-pulse`, solo `transform`) que baja por la línea. Es un diagrama del proceso:
+  nada de él pretende ser un dato en vivo.
+- **Iconos** (`Icon.astro`): los de trazo (`sun`, `moon`, `terminal`, `arrowRight`,
+  `cloud`, `server`, `globe`, `logs`, `user`) comparten el envoltorio `stroke()`; el
+  resto son rellenos. Las categorías de habilidades llevan icono (`icon` en `skills.ts`).
+- **Footer compacto:** marca + contacto a la izquierda, proyectos publicados a la derecha
+  (enlaces estáticos: sostienen el rastreo de `/projects/` y `/apps/`) y una barra final con
+  copyright, "Sobre esta web", ⌘K y volver arriba. Se eliminó la columna de navegación
+  (duplicaba cabecera y paleta), los badges repetidos y el texto "Diseñado por…".
 
 ### Reglas que se mantienen
 

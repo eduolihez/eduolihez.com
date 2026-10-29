@@ -65,6 +65,28 @@ describe('initCvModal', () => {
     expect(modal().hidden).toBe(true);
   });
 
+  it('makes the rest of the page inert while open, so Tab cannot leave the dialog', () => {
+    const hero = document.getElementById('hero-btn')!;
+    hero.click();
+    expect(hero.hasAttribute('inert')).toBe(true);
+    expect(modal().hasAttribute('inert')).toBe(false);
+
+    document.getElementById('cv-modal-close')!.click();
+    vi.runAllTimers();
+    expect(hero.hasAttribute('inert')).toBe(false);
+  });
+
+  it('keeps the original opener when reopened during the closing transition', () => {
+    const opener = document.getElementById('hero-btn')!;
+    opener.focus();
+    opener.click();
+    document.getElementById('cv-modal-close')!.click(); // empieza a cerrarse, foco en el boton de cerrar
+    document.dispatchEvent(new CustomEvent(CV_OPEN_EVENT)); // se reabre antes de los 200 ms
+    document.getElementById('cv-modal-close')!.click();
+    vi.runAllTimers();
+    expect(document.activeElement).toBe(opener);
+  });
+
   it('ignores Escape while the dialog is closed', () => {
     const spy = vi.spyOn(modal().classList, 'remove');
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));

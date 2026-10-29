@@ -22,6 +22,12 @@ export function loadTurnstileOnDemand(form: HTMLElement, src: string): void {
     const script = document.createElement('script');
     script.src = src;
     script.async = true;
+    // Red caida o bloqueador: sin esto el captcha no aparecia nunca y el
+    // formulario quedaba sin poder enviarse. Se reintenta al siguiente foco.
+    script.addEventListener('error', () => {
+      script.remove();
+      form.addEventListener('focusin', load);
+    });
     document.head.append(script);
   };
 

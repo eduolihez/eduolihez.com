@@ -79,4 +79,15 @@ describe('loadTurnstileOnDemand', () => {
     document.getElementById('name')!.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
     expect(scripts()).toHaveLength(1);
   });
+
+  it('retries on the next focus when the script fails to load', () => {
+    loadTurnstileOnDemand(form(), SRC);
+    const name = document.getElementById('name')!;
+    name.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+    scripts()[0].dispatchEvent(new Event('error'));
+    expect(scripts()).toHaveLength(0);
+
+    name.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+    expect(scripts()).toHaveLength(1);
+  });
 });

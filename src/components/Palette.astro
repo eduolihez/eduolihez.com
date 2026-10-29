@@ -43,7 +43,7 @@ const commands: PaletteCommand[] = [
     ? [{ id: 'blog', group: pages, kind: 'pages', icon: 'book', label: t('nav.blog'), href: `${base}blog/`, keywords: 'articulos posts escritos' }]
     : []),
   { id: 'about', group: pages, kind: 'pages', icon: 'terminal', label: t('palette.about'), href: aboutPath, keywords: 'colofon stack tecnico' },
-  { id: 'cv', group: actions, kind: 'actions', icon: 'download', label: t('palette.cv'), href: SITE.cv[lang] ?? SITE.cv.es, keywords: 'curriculum pdf resume' },
+  { id: 'cv', group: actions, kind: 'actions', icon: 'download', label: t('palette.cv'), action: 'open-cv', keywords: 'curriculum pdf resume' },
   { id: 'email', group: actions, kind: 'actions', icon: 'mail', label: t('palette.email'), href: `mailto:${SITE.social.email}`, keywords: 'correo contacto mail' },
   { id: 'theme-light', group: actions, kind: 'actions', icon: 'sun', label: t('palette.theme.light'), action: 'theme-light', keywords: 'claro light' },
   { id: 'theme-dark', group: actions, kind: 'actions', icon: 'moon', label: t('palette.theme.dark'), action: 'theme-dark', keywords: 'oscuro dark noche' },

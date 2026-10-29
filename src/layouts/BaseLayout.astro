@@ -21,6 +21,7 @@ import Seo from '../components/Seo.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Palette from '../components/Palette.astro';
+import CvModal from '../components/CvModal.astro';
 import Announcement from '../components/Announcement.astro';
 import type { Lang } from '../i18n/ui';
 import { useTranslations } from '../i18n/utils';
@@ -149,6 +150,7 @@ const t = useTranslations(lang);
     {/* Fuera de <Header>: su backdrop-filter crearia un bloque contenedor y la
         paleta (position: fixed) quedaria atrapada dentro de la cabecera. */}
     <Palette lang={lang} />
+    <CvModal lang={lang} />
 
     <!-- Tema claro/oscuro/sistema -->
     <script src="../scripts/theme-boot.ts"></script>

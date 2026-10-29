@@ -42,8 +42,9 @@ const projects = [
 const social = [
   { label: 'LinkedIn', href: SITE.social.linkedin, icon: 'linkedin', external: true },
   { label: 'GitHub', href: SITE.social.github, icon: 'github', external: true },
-  { label: t('hero.cta.cv'), href: SITE.cv[lang] ?? SITE.cv.es, icon: 'download', external: false },
 ];
+const iconLinkClass =
+  'flex h-9 w-9 items-center justify-center rounded-lg border border-bg-border bg-bg-card text-text-muted transition hover:border-accent hover:text-accent';
 ---
 
 <footer class="border-t border-bg-border bg-bg-soft text-sm">
@@ -75,7 +76,7 @@ const social = [
                 href={s.href}
                 target={s.external ? '_blank' : undefined}
                 rel={s.external ? 'noopener noreferrer' : undefined}
-                class="flex h-9 w-9 items-center justify-center rounded-lg border border-bg-border bg-bg-card text-text-muted transition hover:border-accent hover:text-accent"
+                class={iconLinkClass}
                 aria-label={s.label}
                 title={s.label}
               >
@@ -84,6 +85,20 @@ const social = [
             </li>
           ))
         }
+        {/* El CV no es un enlace: abre el aviso "CV en actualizacion" (ver CvModal). */}
+        <li>
+          <button
+            type="button"
+            data-cv-open
+            aria-haspopup="dialog"
+            aria-controls="cv-modal"
+            class={iconLinkClass}
+            aria-label={t('hero.cta.cv')}
+            title={t('hero.cta.cv')}
+          >
+            <Icon name="download" class="h-4 w-4" />
+          </button>
+        </li>
       </ul>
     </div>
 

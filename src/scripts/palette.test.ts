@@ -7,6 +7,7 @@ import {
   normalize,
   type PaletteCommand,
 } from './palette';
+import { CV_OPEN_EVENT } from './cvModal';
 
 const COMMANDS: PaletteCommand[] = [
   { id: 'projects', label: 'Proyectos', group: 'Navegar', href: '/#proyectos' },
@@ -204,6 +205,18 @@ describe('initPalette — keyboard selection', () => {
     });
     press('Enter');
     expect(clicked).toBe(true);
+  });
+
+  it('runs the CV action: closes the palette and asks for the CV dialog', () => {
+    mountPalette([{ id: 'cv', label: 'Descargar CV', group: 'Acciones', action: 'open-cv' }]);
+    initPalette();
+    let requested = 0;
+    document.addEventListener(CV_OPEN_EVENT, () => requested++);
+    press('k', { ctrlKey: true });
+    press('Enter');
+    expect(root().hidden).toBe(true);
+    expect(requested).toBe(1);
+    expect(document.documentElement.hasAttribute('data-theme')).toBe(false);
   });
 
   it('runs the "system" theme action, clearing data-theme', () => {

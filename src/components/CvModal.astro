@@ -1,0 +1,67 @@
+---
+/**
+ * <CvModal /> - Aviso "CV en actualizacion". Se pinta una vez en BaseLayout y
+ * lo abre cualquier elemento con [data-cv-open] (hero, pie, paleta). La logica
+ * vive en src/scripts/cvModal.ts.
+ */
+import { useTranslations } from '../i18n/utils';
+import type { Lang } from '../i18n/ui';
+import { SITE } from '../config';
+import Icon from './Icon.astro';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<div id="cv-modal" class="modal-backdrop" hidden role="dialog" aria-modal="true" aria-labelledby="cv-modal-title">
+  <div class="relative max-h-[85vh] w-full max-w-md overflow-y-auto rounded-xl border border-bg-border bg-bg-card p-6 shadow-2xl">
+    <button id="cv-modal-close" type="button" class="absolute right-3 top-3 rounded-md p-1.5 text-text-muted transition hover:bg-bg-soft hover:text-text" aria-label={t('projects.close')}>
+      <svg class="h-5 w-5" viewBox="0 0 24 24" aria-hidden="true">
+        <path fill="currentColor" d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12Z"></path>
+      </svg>
+    </button>
+
+    <div class="flex flex-col items-center text-center mt-4 font-mono">
+      <span class="relative flex h-12 w-12 items-center justify-center rounded-full bg-accent/10 text-accent mb-4 border border-accent/20">
+        <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent/5 opacity-75"></span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16" class="text-accent animate-pulse" aria-hidden="true">
+          <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+          <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z"/>
+        </svg>
+      </span>
+
+      <h2 class="text-lg font-bold text-text uppercase tracking-wider" id="cv-modal-title">{t('cv.modal.title')}</h2>
+
+      <p class="mt-4 text-sm text-text-muted leading-relaxed" id="cv-modal-body">
+        {t('cv.modal.body')}
+      </p>
+
+      <div class="mt-6 rounded-sm border border-bg-border bg-bg-soft/50 p-3 text-xs text-text-faint w-full">
+        <span>Status: OPTIMIZING_CV // Severity: INFO</span>
+      </div>
+
+      <div class="mt-6 flex flex-col sm:flex-row gap-3 w-full">
+        <a href={SITE.social.linkedin} target="_blank" rel="noopener noreferrer" class="btn-primary flex-1 font-sans text-xs flex items-center justify-center gap-2">
+          <Icon name="linkedin" class="h-4 w-4" />
+          {t('cv.modal.linkedin')}
+        </a>
+        <a href={`mailto:${SITE.social.email}`} class="btn-ghost flex-1 font-sans text-xs flex items-center justify-center gap-2">
+          <Icon name="mail" class="h-4 w-4" />
+          {t('cv.modal.email')}
+        </a>
+      </div>
+      <button type="button" id="cv-modal-btn-close" class="btn-ghost mt-3 w-full font-sans text-xs">
+        {t('cv.modal.close')}
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { initCvModal } from '../scripts/cvModal';
+
+  initCvModal();
+</script>

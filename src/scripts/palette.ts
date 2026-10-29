@@ -8,8 +8,10 @@
  * se interpreta como HTML.
  */
 import { setTheme, type ThemePreference } from './theme';
+import { CV_OPEN_EVENT } from './cvModal';
 
-export type PaletteAction = 'theme-light' | 'theme-dark' | 'theme-system';
+type ThemeAction = 'theme-light' | 'theme-dark' | 'theme-system';
+export type PaletteAction = ThemeAction | 'open-cv';
 
 export interface PaletteCommand {
   id: string;
@@ -49,7 +51,7 @@ export function applyShortcutLabels(platform: string = currentPlatform()): void 
   });
 }
 
-const ACTION_THEME: Record<PaletteAction, ThemePreference> = {
+const ACTION_THEME: Record<ThemeAction, ThemePreference> = {
   'theme-light': 'light',
   'theme-dark': 'dark',
   'theme-system': 'system',
@@ -225,6 +227,13 @@ export function initPalette(): void {
   }
 
   function run(cmd: PaletteCommand): void {
+    if (cmd.action === 'open-cv') {
+      // El modal de CV guarda el foco de quien lo abrio: hay que devolverlo
+      // antes de pedirlo, o se quedaria apuntando al input de la paleta.
+      close();
+      document.dispatchEvent(new CustomEvent(CV_OPEN_EVENT));
+      return;
+    }
     if (cmd.action) setTheme(ACTION_THEME[cmd.action]);
     // Un enlace de la misma pestana recarga la pagina; los externos y mailto: no,
     // y ahi el foco se perderia en <body>.

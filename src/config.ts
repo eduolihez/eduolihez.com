@@ -152,18 +152,14 @@ export const SITE = {
     },
   ],
 
-  // Foto de perfil y CV (colocados en /public, se sirven desde la raiz).
+  // Foto de perfil (en /public, se sirve desde la raiz). El CV no tiene PDF:
+  // los botones "Descargar CV" abren el aviso de src/components/CvModal.astro.
   avatar: '/img/eduardo.webp',
   // Portada para redes (1200x630). Las paginas usan la tarjeta generada en el
   // build por idioma (/og/<lang>.png, ver src/pages/og/[lang].png.ts), con
   // nombre, puesto y ubicacion. Este placeholder sin texto (`npm run icons`)
   // queda solo como respaldo.
   ogImage: '/img/og-cover.png',
-  cv: {
-    es: '/cv/CV-Eduardo-Olivares-ES.pdf',
-    en: '/cv/CV-Eduardo-Olivares-EN.pdf',
-    ca: '/cv/CV-Eduardo-Olivares-CA.pdf',
-  },
 
   // Tarjeta de contacto descargable (vCard). Se genera en /public.
   vcard: '/eduardo-olivares.vcf',

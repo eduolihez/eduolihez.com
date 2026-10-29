@@ -57,6 +57,15 @@
         ],
         "createdAt": "2026-10-29T08:42:27.365Z",
         "reason": "Claude: PhishLab is a standalone demo app with its own type system, not governed by the portfolio DESIGN.md"
+      },
+      {
+        "rule": "overused-font",
+        "value": "instrument sans",
+        "files": [
+          "public/projects/phishlab/index.html"
+        ],
+        "createdAt": "2026-10-29T08:52:17.260Z",
+        "reason": "Claude: pre-existing font of the standalone PhishLab demo app, outside the portfolio design system; only a canonical tag was added this session"
       }
     ]
   }

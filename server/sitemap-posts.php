@@ -21,6 +21,7 @@
  */
 require_once __DIR__ . '/lib/http.php';
 require_once __DIR__ . '/lib/site.php';
+require_once __DIR__ . '/lib/sitemap.php';
 
 header('Content-Type: application/xml; charset=utf-8');
 // Una hora: suficiente para no castigar la base de datos y lo bastante corto
@@ -52,34 +53,32 @@ try {
     exit;
 }
 
+// Traducciones ES <-> CA que publica el build (ver server/lib/sitemap.php).
+// Un hreflang solo se anuncia si la version catalana esta visible ahora.
+$caByEs = sitemap_load_translations(__DIR__ . '/blog/translations.json');
+$publishedCa = [];
+foreach ($rows as $row) {
+    if ((string) $row['lang'] === 'ca') {
+        $publishedCa[] = (string) $row['slug'];
+    }
+}
+
+// Cada slug es una pagina propia generada en build-time (src/lib/posts.ts).
+// La URL vieja con ?slug= sigue funcionando via el rewrite del .htaccess,
+// pero el sitemap solo anuncia la canonica.
 $entries = '';
 foreach ($rows as $row) {
     $lang = (string) $row['lang'];
-    $base = POST_PATHS[$lang] ?? POST_PATHS['es'];
-
-    // Antes: $base . '?slug=' . rawurlencode(...) -- la URL con query string
-    // que Astro solo sabia servir como una unica plantilla vacia para los N
-    // articulos. Ahora cada slug es una pagina propia generada en build-time
-    // (ver src/lib/posts.ts), asi que el sitemap debe apuntar directamente ahi
-    // -- la version con ?slug= sigue funcionando via el rewrite del
-    // .htaccess, pero el sitemap no debe anunciar la URL vieja como canonica.
-    $loc = SITE_ORIGIN . $base . rawurlencode((string) $row['slug']) . '/';
-    $loc = htmlspecialchars($loc, ENT_XML1 | ENT_QUOTES, 'UTF-8');
-
-    $lastmod = substr((string) $row['lastmod'], 0, 10);
-    if ($lastmod === '' || $lastmod === '0000-00-00') {
-        $lastmod = null;
-    }
-
-    $entries .= "  <url>\n";
-    $entries .= "    <loc>{$loc}</loc>\n";
-    if ($lastmod !== null) {
-        $entries .= "    <lastmod>{$lastmod}</lastmod>\n";
-    }
-    $entries .= "  </url>\n";
+    $slug = (string) $row['slug'];
+    $entries .= sitemap_post_entry(
+        $lang,
+        $slug,
+        (string) $row['lastmod'],
+        sitemap_post_alternates($lang, $slug, $caByEs, $publishedCa)
+    );
 }
 
 echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">' . "\n";
 echo $entries;
 echo '</urlset>' . "\n";

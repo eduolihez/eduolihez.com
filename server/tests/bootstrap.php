@@ -24,6 +24,7 @@ require_once __DIR__ . '/../lib/validate.php';
 require_once __DIR__ . '/../lib/turnstile.php'; // parse pura; turnstile_verify() (red) no se testea aqui
 require_once __DIR__ . '/../lib/mail_template.php'; // pura: plantilla del aviso por email (usa ua.php)
 require_once __DIR__ . '/../lib/db_retry.php'; // pura: reintento de conexion con $connect/$sleep inyectables
+require_once __DIR__ . '/../lib/sitemap.php'; // pura: entradas de /sitemap-posts.xml (sin db())
 require_once __DIR__ . '/../lab/next.php'; // pura: solo lab_safe_next(), sin sesion ni cabeceras
 // Partials del panel admin SIN dependencias (puros: sin auth.php/db.php/sesion).
 // layout.php NO va aqui: requiere auth.php y mataria el proceso de PHPUnit.

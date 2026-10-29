@@ -57,6 +57,8 @@ export function initCerts(): void {
 
   const apiUrl = grid.dataset.api || '';
   const labels: CertLabels = JSON.parse(grid.dataset.labels || '{}');
+  // Version WebP de cada logo generada en el build (ver buildLogoMap).
+  const logos: Record<string, string> = JSON.parse(grid.dataset.logos || '{}');
 
   let allCerts: Certification[] = [];
   let activeFilter = 'all';
@@ -107,7 +109,7 @@ export function initCerts(): void {
     if (logo) {
       box.classList.add('bg-bg-soft');
       const img = document.createElement('img');
-      img.src = logo;
+      img.src = logos[logo] ?? logo;
       img.alt = altText || '';
       img.loading = 'lazy';
       img.decoding = 'async';
@@ -288,7 +290,8 @@ export function initCerts(): void {
         break;
       }
     }
-    btn.appendChild(logoBox(logo, issuer, color));
+    // alt vacio: el nombre del emisor ya va como texto justo debajo.
+    btn.appendChild(logoBox(logo, '', color));
 
     const name = document.createElement('p');
     name.className = 'line-clamp-2 text-sm font-semibold text-text';

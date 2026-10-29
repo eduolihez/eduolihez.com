@@ -13,7 +13,8 @@
 import { useTranslations } from '../i18n/utils';
 import type { Lang } from '../i18n/ui';
 import { api } from '../config';
-import { fetchCertificationSummaries } from '../lib/certifications';
+import { getImage } from 'astro:assets';
+import { buildLogoMap, fetchCertificationSummaries } from '../lib/certifications';
 import { safeUrl } from '../scripts/shared';
 import { issuerColor } from '../scripts/certifications';
 import StatusPanel from './StatusPanel.astro';
@@ -32,6 +33,13 @@ const apiUrl = api(`/api/certifications.php?lang=${lang}`);
 // cuanto carga (ver #certs-grid mas abajo) -- esto solo evita que un
 // rastreador sin JS vea el contenedor vacio.
 const ssrCerts = await fetchCertificationSummaries(lang);
+// Logos a 128 px (2x de la caja de 64 px) en WebP; image.domains en
+// astro.config.mjs autoriza a images.credly.com.
+const LOGO_WIDTH = 128;
+const logoMap = await buildLogoMap(ssrCerts, async (src) => {
+  const img = await getImage({ src, inferSize: true, width: LOGO_WIDTH, format: 'webp' });
+  return img.src;
+});
 
 const pick = <T,>(es: T, ca: T, en: T): T => (lang === 'es' ? es : lang === 'ca' ? ca : en);
 
@@ -149,6 +157,7 @@ const labels = {
       class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5"
       data-api={apiUrl}
       data-labels={JSON.stringify(labels)}
+      data-logos={JSON.stringify(logoMap)}
     >
       {ssrCerts.map((c) => {
         const color = issuerColor((c.issuer || c.name || '?').trim());
@@ -166,7 +175,7 @@ const labels = {
               style={logo ? undefined : `background-color:${color}1a;border-color:${color}33`}
             >
               {logo ? (
-                <img src={logo} alt="" loading="lazy" decoding="async" class="h-full w-full object-contain p-2 bg-bg-soft" />
+                <img src={logoMap[logo] ?? logo} alt="" width="64" height="64" loading="lazy" decoding="async" class="h-full w-full object-contain p-2 bg-bg-soft" />
               ) : (
                 <Icon name="award" class="h-7 w-7" style={`color:${color}`} />
               )}

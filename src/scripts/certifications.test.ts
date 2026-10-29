@@ -87,6 +87,30 @@ describe('initCerts()', () => {
     expect(grid.textContent).toContain('Microsoft');
   });
 
+  it('usa la version optimizada del logo cuando el build la genero (data-logos)', async () => {
+    const grid = setupGrid();
+    const fortinetLogo = 'https://images.credly.com/images/f/fortinet.png';
+    grid.dataset.logos = JSON.stringify({ [fortinetLogo]: '/_astro/fortinet.webp' });
+    mockFetchOnce({
+      ok: true,
+      json: () =>
+        Promise.resolve([
+          { ...sampleCert, logo_url: fortinetLogo },
+          { ...sampleCert, issuer: 'Microsoft', logo_url: 'https://x.test/ms.png' },
+        ]),
+    });
+
+    initCerts();
+    await vi.waitFor(() => expect(grid.querySelectorAll('img').length).toBe(2));
+
+    const srcs = [...grid.querySelectorAll('img')].map((img) => img.getAttribute('src'));
+    expect(srcs).toContain('/_astro/fortinet.webp');
+    // Sin entrada en el mapa: se queda el original.
+    expect(srcs).toContain('https://x.test/ms.png');
+    // En la tarjeta de emisor el nombre ya es texto visible: el logo es decorativo.
+    expect([...grid.querySelectorAll('img')].every((img) => img.alt === '')).toBe(true);
+  });
+
   it('la tarjeta de emisor se nombra con su texto visible (WCAG 2.5.3) y explica la accion en el title', async () => {
     const grid = setupGrid();
     mockFetchOnce({ ok: true, json: () => Promise.resolve([sampleCert]) });

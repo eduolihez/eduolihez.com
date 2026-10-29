@@ -155,6 +155,9 @@ export const SITE = {
   // Foto de perfil (en /public, se sirve desde la raiz). El CV no tiene PDF:
   // los botones "Descargar CV" abren el aviso de src/components/CvModal.astro.
   avatar: '/img/eduardo.webp',
+  // Miniatura 144x144 (2x de los 72 px del hero) para las vistas pequenas:
+  // la de 800 px pesa 30 KB y queda solo para Schema.org y redes.
+  avatarThumb: '/img/eduardo-144.webp',
   // Portada para redes (1200x630). Las paginas usan la tarjeta generada en el
   // build por idioma (/og/<lang>.png, ver src/pages/og/[lang].png.ts), con
   // nombre, puesto y ubicacion. Este placeholder sin texto (`npm run icons`)

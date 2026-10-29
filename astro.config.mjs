@@ -76,6 +76,12 @@ export default defineConfig({
     inlineStylesheets: 'always',
   },
 
+  // Insignias de Credly: se descargan en el build y se sirven como WebP
+  // pequenos desde /_astro/ (ver buildLogoMap en src/lib/certifications.ts).
+  image: {
+    domains: ['images.credly.com'],
+  },
+
   // Optimizaciones para hosting compartido.
   compressHTML: true,
 });

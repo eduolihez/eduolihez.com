@@ -166,7 +166,7 @@ const messages = {
               <div
                 class="cf-turnstile mt-4"
                 data-sitekey={turnstileKey}
-                data-theme="dark"
+                data-theme="auto"
               />
             )
           }
@@ -187,27 +187,21 @@ const messages = {
     </div>
   </div>
 
-  {
-    /* Turnstile: solo se carga su script externo si has configurado la clave.
-       Recuerda anadir challenges.cloudflare.com a la CSP (ver CLOUDFLARE.md). */
-    turnstileKey && (
-      <script
-        is:inline
-        src="https://challenges.cloudflare.com/turnstile/v0/api.js"
-        async
-        defer
-      />
-    )
-  }
 </section>
 
 <script>
   import { getSettings, captchaPending } from '../scripts/shared';
+  import { loadTurnstileOnDemand } from '../scripts/turnstile';
+
+  // Turnstile se carga bajo demanda (ver scripts/turnstile.ts). Su dominio ya
+  // esta en la CSP de astro.config.mjs (ver CLOUDFLARE.md).
+  const TURNSTILE_SRC = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
 
   function initContact() {
     const form = document.getElementById('contact-form');
     if (!form || form.dataset.bound) return;
     form.dataset.bound = '1';
+    loadTurnstileOnDemand(form, TURNSTILE_SRC);
 
     const apiUrl = form.dataset.api || '';
     const formspree = form.dataset.formspree || '';

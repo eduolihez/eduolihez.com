@@ -20,7 +20,7 @@ RECOMENDADAS (PWA / iconos)
 - apple-touch-icon.png -> 180x180 px
 - icon-192.png         -> 192x192 px
 - icon-512.png         -> 512x512 px
-- favicon.ico          -> 32x32 (colocalo en /public, no aqui)
+- favicon.ico          -> 16/32/48 px generado desde public/favicon.svg (ya esta en /public)
 
 LOGOS DE CERTIFICACIONES (opcional)
 -----------------------------------

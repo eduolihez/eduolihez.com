@@ -39,6 +39,24 @@
         ],
         "createdAt": "2026-09-06T19:47:56.954Z",
         "reason": "matches the identical inline credit-line footer already used verbatim in public/projects/passwdcentinel/index.html"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "general sans",
+        "files": [
+          "public/projects/phishlab/index.html"
+        ],
+        "createdAt": "2026-10-29T08:42:27.160Z",
+        "reason": "Claude: PhishLab is a standalone demo app with its own type system, not governed by the portfolio DESIGN.md"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "instrument sans",
+        "files": [
+          "public/projects/phishlab/index.html"
+        ],
+        "createdAt": "2026-10-29T08:42:27.365Z",
+        "reason": "Claude: PhishLab is a standalone demo app with its own type system, not governed by the portfolio DESIGN.md"
       }
     ]
   }

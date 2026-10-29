@@ -9,6 +9,7 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
 import BlogPostBody from '../../../../components/BlogPostBody.astro';
 import { useTranslations } from '../../../../i18n/utils';
 import { SITE } from '../../../../config';
+import { metaDescription, postTitle } from '../../../../lib/seoText';
 import { fetchAllPostDetails, isoDate, type PostDetail } from '../../../../lib/posts';
 import { postAlternates } from '../../../../lib/postTranslations';
 import type { Lang } from '../../../../i18n/ui';
@@ -31,7 +32,7 @@ const { post, alternates } = Astro.props;
 const lang = 'ca';
 const t = useTranslations(lang);
 
-const title = `${post.title} | Blog | ${SITE.shortName}`;
+const title = postTitle(post.title, SITE.shortName);
 const path = `/ca/blog/post/${post.slug}/`;
 // Fallback a la portada generada (ver src/lib/cover.ts) quan l'article no
 // te cover_url propi a la base de dades.
@@ -43,7 +44,7 @@ const image = new URL(
 
 <BaseLayout
   title={title}
-  description={post.summary}
+  description={metaDescription(post.summary)}
   lang={lang}
   path={path}
   alternates={alternates}

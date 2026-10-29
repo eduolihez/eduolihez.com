@@ -23,6 +23,7 @@
  *     Schema.org con los datos reales del articulo.
  */
 
+import { metaDescription, postTitle } from '../lib/seoText';
 import { safeUrl, setStatusPanel } from './shared';
 
 // Re-exportado por compatibilidad: los tests importan safeUrl desde './blog'.
@@ -447,7 +448,8 @@ function applySeo(
   post: Post,
   opts: { lang: string; siteName: string; authorName: string },
 ): void {
-  const title = `${post.title} | Blog | ${opts.siteName}`;
+  const title = postTitle(post.title, opts.siteName);
+  const description = metaDescription(post.summary || '');
   const url = window.location.href;
   const image = safeUrl(post.cover_url);
   const absoluteImage = image ? new URL(image, window.location.origin).href : '';
@@ -459,13 +461,13 @@ function applySeo(
     if (el && content) el.setAttribute('content', content);
   };
 
-  meta('meta[name="description"]', post.summary || '');
+  meta('meta[name="description"]', description);
   meta('meta[property="og:title"]', title);
-  meta('meta[property="og:description"]', post.summary || '');
+  meta('meta[property="og:description"]', description);
   meta('meta[property="og:url"]', url);
   meta('meta[property="og:type"]', 'article');
   meta('meta[name="twitter:title"]', title);
-  meta('meta[name="twitter:description"]', post.summary || '');
+  meta('meta[name="twitter:description"]', description);
   if (absoluteImage) {
     meta('meta[property="og:image"]', absoluteImage);
     meta('meta[name="twitter:image"]', absoluteImage);

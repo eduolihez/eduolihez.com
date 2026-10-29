@@ -281,6 +281,16 @@ describe('initPalette — modal behaviour', () => {
     input().dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true, bubbles: true }));
     expect(root().hidden).toBe(true);
   });
+
+  it('does not open over another open modal dialog (the CV notice)', () => {
+    document.body.insertAdjacentHTML('beforeend', '<div id="cv" role="dialog" aria-modal="true"></div>');
+    press('k', { ctrlKey: true });
+    expect(root().hidden).toBe(true);
+
+    document.getElementById('cv')!.setAttribute('hidden', '');
+    press('k', { ctrlKey: true });
+    expect(root().hidden).toBe(false);
+  });
 });
 
 function mountPaletteAppend(): void {

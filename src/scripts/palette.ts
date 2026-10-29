@@ -120,6 +120,13 @@ function isEditableElsewhere(target: EventTarget | null, palette: HTMLElement): 
   return target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName);
 }
 
+/** Otro dialogo modal abierto (p. ej. el aviso del CV): la paleta no se abre encima. */
+function otherModalOpen(palette: HTMLElement): boolean {
+  return [...document.querySelectorAll<HTMLElement>('[aria-modal="true"]')].some(
+    (el) => el !== palette && !el.hidden,
+  );
+}
+
 // Una sola instancia viva: reiniciar (astro:page-load) suelta los listeners
 // del documento de la anterior en vez de acumularlos.
 let teardown: AbortController | null = null;
@@ -300,6 +307,7 @@ export function initPalette(): void {
       const isK = e.key.toLowerCase() === 'k' || e.code === 'KeyK';
       if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && isK) {
         if (isEditableElsewhere(e.target, root)) return;
+        if (root.hidden && otherModalOpen(root)) return;
         e.preventDefault();
         if (root.hidden) open();
         else close();

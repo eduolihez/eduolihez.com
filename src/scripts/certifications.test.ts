@@ -87,6 +87,21 @@ describe('initCerts()', () => {
     expect(grid.textContent).toContain('Microsoft');
   });
 
+  it('la tarjeta de emisor se nombra con su texto visible (WCAG 2.5.3) y explica la accion en el title', async () => {
+    const grid = setupGrid();
+    mockFetchOnce({ ok: true, json: () => Promise.resolve([sampleCert]) });
+
+    initCerts();
+    await vi.waitFor(() => expect(grid.querySelector('button')).not.toBeNull());
+
+    const card = grid.querySelector('button')!;
+    // Sin aria-label: el nombre accesible es el propio texto ("Fortinet 1 credencial"),
+    // asi quien usa control por voz puede decir lo que ve.
+    expect(card.hasAttribute('aria-label')).toBe(false);
+    expect(card.textContent).toContain('Fortinet');
+    expect(card.title).toBe('Ver certificaciones de Fortinet');
+  });
+
   it('muestra el estado vacio cuando la API devuelve un array vacio', async () => {
     setupGrid();
     mockFetchOnce({ ok: true, json: () => Promise.resolve([]) });

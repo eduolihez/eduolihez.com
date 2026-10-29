@@ -276,7 +276,9 @@ export function initCerts(): void {
     btn.type = 'button';
     btn.className =
       'reveal is-visible group flex w-full cursor-pointer flex-col items-center gap-2 rounded-lg border border-bg-border bg-bg-card p-4 text-center transition hover:border-accent/40 hover:bg-bg-soft/40 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-accent';
-    btn.setAttribute('aria-label', `${labels.viewIssuer} ${issuer} (${certs.length})`);
+    // Sin aria-label: el nombre accesible sale del texto visible (emisor + numero),
+    // como pide WCAG 2.5.3. La accion queda como descripcion en el title.
+    btn.title = `${labels.viewIssuer} ${issuer}`;
 
     let logo = '';
     for (const c of certs) {

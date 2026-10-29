@@ -48,7 +48,7 @@ export const softwareEntries: SoftwareEntry[] = [
     path: '/projects/phishlab/',
     repo: `${GH}/phishlab`,
     description: {
-      es: 'Plantillas para simulaciones de phishing autorizadas por contrato, con exportacion para GoPhish y checklist de autorizacion.',
+      es: 'Plantillas para simulaciones de phishing autorizadas por contrato, con exportación para GoPhish y checklist de autorización.',
       en: 'Templates for contract-authorised phishing simulations, with GoPhish export and an authorisation checklist.',
     },
   },
@@ -58,7 +58,7 @@ export const softwareEntries: SoftwareEntry[] = [
     kind: 'code',
     repo: `${GH}/phishing-triage`,
     description: {
-      es: 'Investigacion sobre 7.822 correos reales: la incertidumbre del propio ensemble prioriza mejor que el desacuerdo entre clasificadores.',
+      es: 'Investigación sobre 7.822 correos reales: la incertidumbre del propio ensemble prioriza mejor que el desacuerdo entre clasificadores.',
       en: "Research on 7,822 real emails: the ensemble's own uncertainty prioritises better than classifier disagreement.",
     },
   },
@@ -68,7 +68,7 @@ export const softwareEntries: SoftwareEntry[] = [
     kind: 'code',
     repo: `${GH}/kev-digest`,
     description: {
-      es: 'Vigilancia automatizada del catalogo CISA KEV cada tres horas sobre GitHub Actions, con las vulnerabilidades usadas en ransomware marcadas aparte.',
+      es: 'Vigilancia automatizada del catálogo CISA KEV cada tres horas sobre GitHub Actions, con las vulnerabilidades usadas en ransomware marcadas aparte.',
       en: 'Automated CISA KEV catalogue monitoring every three hours on GitHub Actions, with ransomware-linked vulnerabilities flagged separately.',
     },
   },
@@ -78,7 +78,7 @@ export const softwareEntries: SoftwareEntry[] = [
     kind: 'code',
     repo: `${GH}/vision-one-crem-report-generator`,
     description: {
-      es: 'Generador no oficial de informes de riesgo y exposicion para Trend Micro Vision One, con enriquecimiento de CVEs (NVD, CISA KEV, EPSS).',
+      es: 'Generador no oficial de informes de riesgo y exposición para Trend Micro Vision One, con enriquecimiento de CVEs (NVD, CISA KEV, EPSS).',
       en: 'Unofficial risk and exposure report generator for Trend Micro Vision One, with CVE enrichment (NVD, CISA KEV, EPSS).',
     },
   },
@@ -88,7 +88,7 @@ export const softwareEntries: SoftwareEntry[] = [
     kind: 'code',
     repo: `${GH}/llm-chatbot-pentest`,
     description: {
-      es: 'Red-teaming autonomo de chatbots LLM segun el OWASP Top 10 para aplicaciones LLM, con juez LLM e informe reproducible. Solo uso autorizado.',
+      es: 'Red-teaming autónomo de chatbots LLM según el OWASP Top 10 para aplicaciones LLM, con juez LLM e informe reproducible. Solo uso autorizado.',
       en: 'Autonomous red-teaming of LLM chatbots against the OWASP Top 10 for LLM applications, with an LLM judge and a reproducible report. Authorised use only.',
     },
   },
@@ -119,7 +119,7 @@ export const softwareEntries: SoftwareEntry[] = [
     kind: 'code',
     repo: `${GH}/BinCat`,
     description: {
-      es: 'SDK en Python y panel Flask para emitir, validar y revocar tokens Fernet y JWT con registro de auditoria.',
+      es: 'SDK en Python y panel Flask para emitir, validar y revocar tokens Fernet y JWT con registro de auditoría.',
       en: 'Python SDK and Flask dashboard to issue, validate and revoke Fernet and JWT tokens with an audit log.',
     },
   },
@@ -130,7 +130,7 @@ export const softwareEntries: SoftwareEntry[] = [
     path: '/apps/password-centinel/',
     category: 'BrowserApplication',
     description: {
-      es: 'Gestor de contrasenas 100% local (AES-256-GCM, TOTP/2FA, comprobacion de filtraciones con Have I Been Pwned).',
+      es: 'Gestor de contraseñas 100% local (AES-256-GCM, TOTP/2FA, comprobación de filtraciones con Have I Been Pwned).',
       en: '100% local password manager (AES-256-GCM, TOTP/2FA, breach checks via Have I Been Pwned).',
     },
   },
@@ -141,7 +141,7 @@ export const softwareEntries: SoftwareEntry[] = [
     path: '/apps/prompt-master/',
     category: 'BrowserApplication',
     description: {
-      es: 'Extension de navegador que mejora prompts para ChatGPT, Claude, Gemini y otras plataformas de IA.',
+      es: 'Extensión de navegador que mejora prompts para ChatGPT, Claude, Gemini y otras plataformas de IA.',
       en: 'Browser extension that improves prompts for ChatGPT, Claude, Gemini and other AI platforms.',
     },
   },
@@ -152,7 +152,7 @@ export const softwareEntries: SoftwareEntry[] = [
     path: '/apps/nowait/',
     category: 'BrowserApplication',
     description: {
-      es: 'Extension que evita acortadores de enlaces y paginas de espera (Linkvertise, ouo.io, adf.ly y 90+ sitios mas).',
+      es: 'Extensión que evita acortadores de enlaces y páginas de espera (Linkvertise, ouo.io, adf.ly y 90+ sitios más).',
       en: 'Extension that skips link shorteners and wait pages (Linkvertise, ouo.io, adf.ly and 90+ more sites).',
     },
   },
@@ -174,7 +174,7 @@ export const softwareEntries: SoftwareEntry[] = [
     path: '/projects/fluence/',
     category: 'DesktopEnhancementApplication',
     description: {
-      es: 'Asistente de escritorio para el crecimiento organico en Instagram; procesado local, sin servidores propios.',
+      es: 'Asistente de escritorio para el crecimiento orgánico en Instagram; procesado local, sin servidores propios.',
       en: 'Desktop assistant for organic Instagram growth; local processing, no servers of its own.',
     },
   },

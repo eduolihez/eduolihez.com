@@ -94,14 +94,14 @@ export const faqItems: FaqItem[] = [
       ca: 'Què fa exactament un analista SOC?',
     },
     answer: {
-      es: 'Un analista SOC (Security Operations Center) vigila de forma continua los sistemas de una organización para detectar ataques. Su día a día es triar alertas de las plataformas XDR y SIEM, investigar cuales son amenazas reales, contener los incidentes y documentar lo ocurrido para que no se repita.',
+      es: 'Un analista SOC (Security Operations Center) vigila de forma continua los sistemas de una organización para detectar ataques. Su día a día es triar alertas de las plataformas XDR y SIEM, investigar cuáles son amenazas reales, contener los incidentes y documentar lo ocurrido para que no se repita.',
       en: 'A SOC (Security Operations Center) analyst continuously monitors an organisation’s systems to detect attacks. Day to day that means triaging alerts from XDR and SIEM platforms, investigating which ones are real threats, containing incidents and documenting what happened so it does not repeat.',
       ca: "Un analista SOC (Security Operations Center) vigila de manera continua els sistemes d'una organització per detectar atacs. El seu dia a dia és triar alertes de les plataformes XDR i SIEM, investigar quines són amenaces reals, contenir els incidents i documentar el que ha passat perquè no es repeteixi.",
     },
   },
   {
     question: {
-      es: '¿Con que tecnologías y herramientas de seguridad trabaja?',
+      es: '¿Con qué tecnologías y herramientas de seguridad trabaja?',
       en: 'Which security technologies and tools does he work with?',
       ca: 'Amb quines tecnologies i eines de seguretat treballa?',
     },
@@ -137,7 +137,7 @@ export const faqItems: FaqItem[] = [
   },
   {
     question: {
-      es: '¿En que idiomas trabaja?',
+      es: '¿En qué idiomas trabaja?',
       en: 'Which languages does he work in?',
       ca: 'En quins idiomes treballa?',
     },
@@ -154,7 +154,7 @@ export const faqItems: FaqItem[] = [
       ca: 'Com puc contactar amb ell?',
     },
     answer: {
-      es: 'Mediante el formulario de contacto de esta misma web, por correo a eduardo@eduolihez.com o a traves de su perfil de LinkedIn. También puedes descargar su tarjeta de contacto (vCard) desde la sección de contacto.',
+      es: 'Mediante el formulario de contacto de esta misma web, por correo a eduardo@eduolihez.com o a través de su perfil de LinkedIn. También puedes descargar su tarjeta de contacto (vCard) desde la sección de contacto.',
       en: 'Through the contact form on this site, by email at eduardo@eduolihez.com, or via his LinkedIn profile. You can also download his contact card (vCard) from the contact section.',
       ca: 'Mitjançant el formulari de contacte del web, per correu a eduardo@eduolihez.com o a través del seu perfil de LinkedIn. També pots descarregar la seva targeta de contacte (vCard) des de la secció de contacte.',
     },

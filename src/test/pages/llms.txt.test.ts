@@ -94,14 +94,24 @@ describe('GET /llms.txt', () => {
     const body = await response.text();
 
     // Debe aparecer antes que las secciones largas de prosa.
-    const index = body.indexOf('## Indice');
+    const index = body.indexOf('## Índice');
     expect(index).toBeGreaterThan(-1);
     expect(index).toBeLessThan(body.indexOf('## Identidad'));
 
     // Formato "- [Titulo](URL): descripcion" para las portadas y los proyectos.
     expect(body).toContain(`- [English](${SITE.domain}/en/):`);
-    expect(body).toContain(`- [Catala](${SITE.domain}/ca/):`);
+    expect(body).toContain(`- [Català](${SITE.domain}/ca/):`);
     expect(body).toMatch(/- \[Blue Team Hub\]\(https:\/\/eduolihez\.github\.io\/\): .+/);
     expect(body).toMatch(/- \[NoWait\]\(https:\/\/eduolihez\.com\/apps\/nowait\/\): .+/);
+  });
+
+  it('escribe el castellano con tildes y eñes (es lo que citan las IAs)', async () => {
+    const body = await GET({} as APIContext).text();
+    // Formas sin tilde que ya se colaron una vez en este archivo. Las IAs
+    // citan el texto tal cual: "gestion" o "Espanol" en una respuesta delatan
+    // dejadez justo en el perfil de alguien que se vende por el detalle.
+    const unaccented =
+      /\b(gestion|colaboracion|informacion|tecnicas?|Espanol|Catala|Ubicacion|Profesion|Formacion|especializacion|automatizo|Ademas|Areas|codigo|catalogo|contrasenas|Extension|paginas|ejecucion|exportacion|Donde esta|Cual es|Estan mas|telefono|dinamica|Indice|integro|articulos)\b/;
+    expect(body).not.toMatch(unaccented);
   });
 });

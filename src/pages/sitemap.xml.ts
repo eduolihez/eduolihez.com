@@ -121,6 +121,21 @@ const translatedGroups: { paths: Record<'es' | 'en' | 'ca', string>; lastmod: st
       'src/data/about-tech.ts',
     ]),
   },
+  {
+    // "Analista SOC en Barcelona".
+    paths: {
+      es: '/analista-soc-barcelona/',
+      en: '/en/soc-analyst-barcelona/',
+      ca: '/ca/analista-soc-barcelona/',
+    },
+    lastmod: gitLastMod([
+      'src/pages/analista-soc-barcelona.astro',
+      'src/pages/en/soc-analyst-barcelona.astro',
+      'src/pages/ca/analista-soc-barcelona.astro',
+      'src/components/SocProfile.astro',
+      'src/data/soc-profile.ts',
+    ]),
+  },
 ];
 
 /**

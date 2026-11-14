@@ -129,9 +129,9 @@ const bio: Record<Lang, string> = {
 };
 
 const siteNameByLang: Record<Lang, string> = {
-  es: `${SITE.name} — Analista de Ciberseguridad Cloud e IAM en ${loc.region}`,
-  en: `${SITE.name} — Cloud Security & IAM Analyst in ${loc.region}`,
-  ca: `${SITE.name} — Analista de Ciberseguretat Cloud i IAM a ${loc.region}`,
+  es: `${SITE.name} — Analista SOC y de Ciberseguridad en ${loc.region} y ${loc.city}`,
+  en: `${SITE.name} — SOC & Cybersecurity Analyst in ${loc.region} and ${loc.city}`,
+  ca: `${SITE.name} — Analista SOC i de Ciberseguretat a ${loc.region} i ${loc.city}`,
 };
 
 // Texto alternativo de la tarjeta para compartir. Antes llevaba un "en"
@@ -216,7 +216,7 @@ const person = {
   description: bio[lang],
   url: SITE.domain,
   image: { '@type': 'ImageObject', url: avatarUrl, caption: `${SITE.name}, ${SITE.jobTitle}` },
-  email: `mailto:${SITE.social.email}`,
+  email: SITE.social.email,
   nationality: { '@type': 'Country', name: loc.countryName },
   address: {
     '@type': 'PostalAddress',
@@ -280,7 +280,7 @@ const person = {
     name: e.school,
   })),
   award: SITE.awards.map((a) => a.name),
-  sameAs: [SITE.social.linkedin, SITE.social.github, 'https://eduolihez.github.io/'],
+  sameAs: [SITE.social.linkedin, SITE.social.github, 'https://eduolihez.github.io/', 'https://www.youtube.com/@eduolihez'],
 };
 
 const website = {

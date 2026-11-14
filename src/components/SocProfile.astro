@@ -1,0 +1,69 @@
+---
+/**
+ * Pagina "Analista SOC en Barcelona" (las tres lenguas comparten esta plantilla;
+ * el texto vive en src/data/soc-profile.ts).
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { socProfile, socAlternates } from '../data/soc-profile';
+import type { Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const p = socProfile[lang];
+const home = lang === 'es' ? '/' : `/${lang}/`;
+---
+
+<BaseLayout
+  title={p.title}
+  description={p.description}
+  lang={lang}
+  path={p.path}
+  withFaq={false}
+  alternates={socAlternates}
+  breadcrumbName={p.breadcrumb}
+>
+  <section class="border-b border-bg-border py-20 sm:py-28">
+    <div class="container-page max-w-4xl">
+      <a
+        href={home}
+        class="group mb-8 inline-flex items-center gap-2 font-mono text-xs text-text-muted transition hover:text-accent"
+      >
+        <span class="transition-transform group-hover:-translate-x-1">&larr;</span> {p.back}
+      </a>
+
+      <div class="reveal mb-12">
+        <p class="section-kicker">{p.kicker}</p>
+        <h1 class="mb-5 text-3xl font-bold tracking-tight text-text sm:text-5xl">{p.h1}</h1>
+        <p class="max-w-3xl text-base leading-relaxed text-text sm:text-lg">{p.answer}</p>
+      </div>
+
+      {p.sections.map((s) => (
+        <div class="reveal mb-10">
+          <h2 class="mb-4 text-xl font-bold text-text-title sm:text-2xl">{s.h}</h2>
+          <ul class="max-w-3xl list-disc space-y-2 pl-5 text-base leading-relaxed text-text-muted">
+            {s.items.map((i) => <li>{i}</li>)}
+          </ul>
+        </div>
+      ))}
+
+      <div class="reveal mb-12">
+        <h2 class="mb-4 text-xl font-bold text-text-title sm:text-2xl">{p.faqTitle}</h2>
+        <dl class="max-w-3xl space-y-5">
+          {p.faq.map((f) => (
+            <div>
+              <dt class="font-semibold text-text">{f.q}</dt>
+              <dd class="mt-1 text-text-muted">{f.a}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+
+      <div class="flex flex-wrap gap-3">
+        <a href={`${home}#contacto`} class="btn-primary">{p.ctaContact}</a>
+        <a href={home} class="btn-ghost">{p.ctaHome}</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

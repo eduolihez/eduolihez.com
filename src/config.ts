@@ -76,7 +76,6 @@ export const SITE = {
     'Automatización de seguridad con Python',
     'Inteligencia artificial aplicada a ciberseguridad',
     'Active Directory y Windows Server',
-    'Ciberseguridad en Barcelona',
   ],
 
   /** Idiomas que hablas (codigo BCP-47 + nivel legible). */

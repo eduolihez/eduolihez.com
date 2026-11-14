@@ -28,6 +28,7 @@ import { experiences } from '../data/experience';
 import { skillGroups } from '../data/skills';
 import { faqItems } from '../data/faq';
 import { pick } from '../i18n/utils';
+import { shouldEmitProfilePage } from '../scripts/seo-graph';
 
 interface Props {
   title: string;
@@ -37,6 +38,12 @@ interface Props {
   path?: string;
   /** Incluir el bloque FAQPage (solo en paginas que muestran la FAQ). */
   withFaq?: boolean;
+  /**
+   * Emitir ProfilePage. Google lo reserva para paginas cuyo tema principal es la
+   * persona: por defecto solo en las portadas; la pagina SOC lo activa a mano.
+   * En posts y proyectos seria declarar algo falso.
+   */
+  profile?: boolean;
   /** Pedir a los buscadores que NO indexen esta pagina (errores, utilidades). */
   noindex?: boolean;
   /**
@@ -96,6 +103,7 @@ const {
   lang,
   path = '/',
   withFaq = true,
+  profile,
   noindex = false,
   alternates,
   breadcrumbs = [],
@@ -372,7 +380,7 @@ const graph = {
   '@graph': [
     person,
     website,
-    profilePage,
+    ...(shouldEmitProfilePage(profile, path, homePath) ? [profilePage] : []),
     ...(breadcrumb ? [breadcrumb] : []),
     // Software publicado, solo en las portadas: ahi vive la lista de proyectos
     // y asi el grafo no se repite en cada pagina.

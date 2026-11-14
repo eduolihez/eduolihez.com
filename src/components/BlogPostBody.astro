@@ -88,8 +88,12 @@ const cover = safeUrl(post.cover_url) || `${coversBase}${post.slug}.png`;
           <img
             src={cover}
             alt={post.title}
-            class="max-h-[400px] w-full rounded-xl border border-bg-border object-cover"
+            width="1200"
+            height="630"
+            class="aspect-[1200/630] max-h-[400px] w-full rounded-xl border border-bg-border object-cover"
             loading="eager"
+            fetchpriority="high"
+            decoding="async"
           />
         </div>
       )

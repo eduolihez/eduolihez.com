@@ -34,6 +34,8 @@ interface Props {
   path?: string;
   /** Incluir el dato estructurado FAQPage (solo donde se muestra la FAQ). */
   withFaq?: boolean;
+  /** Forzar o impedir ProfilePage (por defecto, solo en portadas). */
+  profile?: boolean;
   /** Marcar la pagina como no indexable (paginas de error, utilidades). */
   noindex?: boolean;
   /** Equivalente de esta pagina en cada idioma (hreflang). Ver <Seo />. */
@@ -61,6 +63,7 @@ const {
   lang,
   path = '/',
   withFaq = true,
+  profile,
   noindex = false,
   alternates,
   breadcrumbs,
@@ -107,6 +110,7 @@ const t = useTranslations(lang);
       lang={lang}
       path={path}
       withFaq={withFaq}
+      profile={profile}
       noindex={noindex}
       alternates={alternates}
       breadcrumbs={breadcrumbs}

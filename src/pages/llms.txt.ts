@@ -17,6 +17,7 @@
  */
 import type { APIRoute } from 'astro';
 import { SITE } from '../config';
+import { socAlternates } from '../data/soc-profile';
 import { experiences } from '../data/experience';
 import { skillGroups } from '../data/skills';
 import { faqItems } from '../data/faq';
@@ -79,6 +80,9 @@ Paginas principales:
 - [Portada (Español)](${SITE.domain}/): perfil profesional, experiencia, habilidades, certificaciones y contacto.
 - [English](${SITE.domain}/en/): profile summary in English.
 - [Català](${SITE.domain}/ca/): resum del perfil en català.
+- [Analista SOC en Barcelona y Badalona](${SITE.domain}${socAlternates.es}): qué hace, con qué herramientas y certificaciones, y cómo contactar.
+- [SOC analyst in Barcelona](${SITE.domain}${socAlternates.en}): same profile in English.
+- [Analista SOC a Barcelona i Badalona](${SITE.domain}${socAlternates.ca}): el mateix perfil en català.
 - [Sobre esta web](${SITE.domain}/sobre-esta-web/): decisiones técnicas y de seguridad de este sitio.
 - [Proyectos](${SITE.domain}/projects/): índice de los proyectos publicados.
 - [Blog](${SITE.domain}/blog/): notas técnicas de ciberseguridad.
@@ -310,6 +314,9 @@ ${faqBlock}
 - ${SITE.domain}/ — Portfolio completo (español)
 - ${SITE.domain}/en/ — Portfolio completo (inglés)
 - ${SITE.domain}/ca/ — Portfolio completo (catalán)
+- ${SITE.domain}${socAlternates.es} — Perfil de analista SOC en Barcelona y Badalona (español)
+- ${SITE.domain}${socAlternates.en} — SOC analyst profile, Barcelona (inglés)
+- ${SITE.domain}${socAlternates.ca} — Perfil d'analista SOC a Barcelona i Badalona (catalán)
 - ${SITE.domain}/blog/ — Blog técnico (español)
 - ${SITE.domain}/ca/blog/ — Blog técnico (catalán)
 - ${SITE.domain}/sobre-esta-web/ — Cómo está construida esta web (español)

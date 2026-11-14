@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { GET } from '../../pages/llms.txt';
 import { SITE } from '../../config';
+import { socAlternates } from '../../data/soc-profile';
 import type { APIContext } from 'astro';
 
 // Smoke test para el endpoint que alimenta a las IAs (ver comentario de
@@ -29,6 +30,16 @@ describe('GET /llms.txt', () => {
     expect(body).toContain(SITE.domain);
     expect(body).toContain(SITE.jobTitle);
     expect(body).toContain(SITE.social.linkedin);
+  });
+
+  it('enlaza las tres paginas de perfil SOC en el indice y en la lista de paginas', async () => {
+    const body = await GET({} as APIContext).text();
+
+    for (const path of Object.values(socAlternates)) {
+      const url = `${SITE.domain}${path}`;
+      // Una vez como enlace Markdown del indice y otra en "Paginas del sitio".
+      expect(body.split(url).length - 1).toBeGreaterThanOrEqual(2);
+    }
   });
 
   it('no deja huecos de plantilla sin rellenar', async () => {

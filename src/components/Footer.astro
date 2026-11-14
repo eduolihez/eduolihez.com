@@ -8,6 +8,7 @@ import { useTranslations, localeBase } from '../i18n/utils';
 import type { Lang } from '../i18n/ui';
 import { SITE } from '../config';
 import Icon from './Icon.astro';
+import { socAlternates, socProfile } from '../data/soc-profile';
 
 interface Props {
   lang: Lang;
@@ -137,6 +138,8 @@ const iconLinkClass =
         &copy; {year} {SITE.shortName}
         <span aria-hidden="true">·</span>
         <a href={aboutPath} class="transition hover:text-accent">{t('footer.aboutSite')}</a>
+        <span aria-hidden="true">·</span>
+        <a href={socAlternates[lang]} class="transition hover:text-accent">{socProfile[lang].breadcrumb}</a>
       </p>
       <div class="flex items-center gap-5">
         <button

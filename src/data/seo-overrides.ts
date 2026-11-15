@@ -33,7 +33,7 @@ export const seoOverrides: Record<string, SeoOverride> = {
     description: 'Qué hace un analista SOC cada día: revisar alertas, investigar, contener y documentar. Niveles N1 a N3, herramientas y cómo entrar sin experiencia.',
   },
   'errores-de-configuracion-cloud-mas-comunes': {
-    description: 'Casi todas las brechas en cloud vienen de la configuración: buckets públicos, claves eternas, puertos abiertos y logs apagados. Qué revisar primero.',
+    description: 'Configuraciones erróneas en la nube: casi todas las brechas cloud vienen de la configuración. Buckets públicos, claves eternas, logs apagados.',
   },
   'minimo-privilegio-en-microsoft-entra-id': {
     description: 'Demasiados administradores globales y roles permanentes. Cómo aplicar el mínimo privilegio en Microsoft Entra ID con roles, PIM y cuentas break-glass.',
@@ -84,6 +84,13 @@ export const seoOverrides: Record<string, SeoOverride> = {
   'comprobar-si-una-contrasena-esta-filtrada-sin-enviarsela-a-nadie': {
     title: 'Comprobar si una contraseña está filtrada sin enviarla',
     description: 'Cómo consultar Have I Been Pwned, con más de 800 millones de contraseñas filtradas, sin revelar cuál buscas: k-anonimato, aplicado en Password Sentinel.',
+  },
+  'mfa-resistente-a-phishing-por-que-el-sms-ya-no-basta': {
+    title: 'MFA resistente a phishing: por qué el SMS no basta',
+    description: 'MFA resistente a phishing (phishing-resistant MFA): por qué el SMS y el push ya no bastan y qué usar en su lugar, con FIDO2 y passkeys.',
+  },
+  'xdr-vs-siem-vs-edr-diferencias-en-un-soc': {
+    description: 'SIEM vs EDR vs XDR: en qué se diferencian, qué ve cada uno y cuándo usarlos en un SOC real. Explicado por un analista SOC en Barcelona.',
   },
   // --- CA ---
   'auditar-els-permisos-de-microsoft-365-en-una-tarda': {

@@ -16,7 +16,9 @@
  */
 import { formatDate } from '../scripts/blog';
 import { safeUrl } from '../scripts/shared';
-import type { PostDetail } from '../lib/posts';
+import { fetchAllPostSummaries, type PostDetail } from '../lib/posts';
+import { relatedPosts } from '../lib/related';
+import { blogPostPath } from '../data/soc-profile';
 import { authorByline, socAlternates } from '../data/soc-profile';
 import type { Lang } from '../i18n/ui';
 
@@ -33,6 +35,9 @@ const { post, lang, backHref, backLabel } = Astro.props;
 const coversBase = lang === 'es' ? '/blog/covers/' : `/${lang}/blog/covers/`;
 const byline = authorByline[(lang as Lang) in authorByline ? (lang as Lang) : 'es'];
 const socHref = socAlternates[(lang as Lang) in socAlternates ? (lang as Lang) : 'es'];
+const L: Lang = (lang as Lang) in authorByline ? (lang as Lang) : 'es';
+const related = relatedPosts(post, await fetchAllPostSummaries(L));
+const moreTitle = { es: 'Sigue leyendo', en: 'Keep reading', ca: 'Continua llegint' }[L];
 const cover = safeUrl(post.cover_url) || `${coversBase}${post.slug}.png`;
 ---
 
@@ -107,5 +112,20 @@ const cover = safeUrl(post.cover_url) || `${coversBase}${post.slug}.png`;
     }
 
     <div class="prose max-w-none leading-relaxed text-text" set:html={post.content} />
+
+    {
+      related.length > 0 && (
+        <aside class="mt-12 border-t border-bg-border pt-8">
+          <h2 class="mb-4 text-xl font-bold text-text-title">{moreTitle}</h2>
+          <ul class="list-disc space-y-2 pl-5">
+            {related.map((r) => (
+              <li>
+                <a href={blogPostPath(L, r.slug)} class="text-accent hover:underline">{r.title}</a>
+              </li>
+            ))}
+          </ul>
+        </aside>
+      )
+    }
   </div>
 </article>

@@ -120,6 +120,7 @@ export const seoOverrides: Record<string, SeoOverride> = {
     title: 'Què dona temps a aprendre en 24 hores de hackathon',
   },
   'revocar-un-token-sense-enderrocar-la-sessio-sencera': {
+    title: 'Revocar un token sense enderrocar la sessió sencera',
     description: 'BinCat, un SDK de Python per emetre, validar i revocar tokens Fernet i JWT amb auditoria i panell, per fer-ho sense escriure codi.',
   },
   'blue-team-hub-per-que-vaig-treure-el-vidre-esmerilat': {
@@ -150,6 +151,7 @@ export const seoOverrides: Record<string, SeoOverride> = {
     description: "Un model ONNX petit dins del navegador classifica phishing sense que la URL surti de l'equip. El provo a NorthGate Browser com a alternativa a les llistes.",
   },
   'triatge-alertes-en-un-soc-en-quin-ordre-mirar': {
+    title: "Triatge d'alertes en un SOC: en quin ordre mirar",
     description: "La severitat d'una alerta no és la seva prioritat. Com ordeno la cua quan hi ha més alertes que hores i les tres preguntes amb què obro cadascuna.",
   },
   'comprovar-si-una-contrasenya-esta-filtrada-sense-enviar-la-a-ningu': {

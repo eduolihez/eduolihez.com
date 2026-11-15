@@ -36,7 +36,7 @@ export const socProfile: Record<Lang, SocProfile> = {
     path: socAlternates.es,
     title: 'Analista SOC en Barcelona y Badalona | Eduardo Olivares',
     description:
-      'Analista SOC en Barcelona y Badalona: triaje de alertas en Trend Micro Vision One, detección de amenazas, respuesta a incidentes y automatización con Python.',
+      'Analista SOC en Barcelona y Badalona: triaje de alertas en Trend Micro Vision One, detección, respuesta a incidentes y Python.',
     breadcrumb: 'Analista SOC en Barcelona',
     kicker: 'Perfil / SOC',
     h1: 'Analista SOC en Barcelona y Badalona',

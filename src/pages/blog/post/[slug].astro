@@ -18,7 +18,9 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 import BlogPostBody from '../../../components/BlogPostBody.astro';
 import { useTranslations } from '../../../i18n/utils';
 import { SITE } from '../../../config';
-import { metaDescription, postTitle } from '../../../lib/seoText';
+import { postSeo } from '../../../lib/seoText';
+import { extractFaqFromHtml } from '../../../scripts/seo-graph';
+import { seoOverrides } from '../../../data/seo-overrides';
 import { fetchAllPostDetails, fetchAllPostSummaries, isoDate, type PostDetail } from '../../../lib/posts';
 import { postAlternates } from '../../../lib/postTranslations';
 import type { Lang } from '../../../i18n/ui';
@@ -43,7 +45,8 @@ const { post, alternates } = Astro.props;
 const lang = 'es';
 const t = useTranslations(lang);
 
-const title = postTitle(post.title, SITE.shortName);
+const seo = postSeo(post, SITE.shortName, seoOverrides);
+const title = seo.title;
 const path = `/blog/post/${post.slug}/`;
 // Fallback a la portada generada (ver src/lib/cover.ts) cuando el articulo
 // no tiene cover_url propio en la base de datos -- hoy, los 13.
@@ -55,11 +58,12 @@ const image = new URL(
 
 <BaseLayout
   title={title}
-  description={metaDescription(post.summary)}
+  description={seo.description}
   lang={lang}
   path={path}
   alternates={alternates}
   withFaq={false}
+  faq={extractFaqFromHtml(post.content)}
   breadcrumbs={[{ name: 'Blog', path: '/blog/' }]}
   breadcrumbName={post.title}
   ogType="article"

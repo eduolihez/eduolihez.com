@@ -51,3 +51,42 @@ export function buildFaqPage(
     })),
   };
 }
+
+const FAQ_HEADING = /<h2[^>]*>\s*(preguntas frecuentes|preguntes freq[uü]ents|frequently asked questions|faq)\s*<\/h2>/i;
+
+function plainText(html: string): string {
+  return html
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#0?39;|&apos;/g, "'")
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
+ * Saca las preguntas del bloque "Preguntas frecuentes" de un articulo (HTML
+ * del cuerpo): tras ese <h2>, cada <h3> es una pregunta y los parrafos/listas
+ * hasta el siguiente <h3>/<h2> son su respuesta. Solo devuelve pares completos,
+ * es decir, lo que el lector ve en la pagina.
+ */
+export function extractFaqFromHtml(html: string): { q: string; a: string }[] {
+  const m = FAQ_HEADING.exec(html);
+  if (!m) return [];
+  let rest = html.slice(m.index + m[0].length);
+  const nextH2 = rest.search(/<h2[\s>]/i);
+  if (nextH2 >= 0) rest = rest.slice(0, nextH2);
+  const out: { q: string; a: string }[] = [];
+  const parts = rest.split(/<h3[^>]*>/i).slice(1);
+  for (const part of parts) {
+    const end = part.search(/<\/h3>/i);
+    if (end < 0) continue;
+    const q = plainText(part.slice(0, end));
+    const a = plainText(part.slice(end + 5));
+    if (q && a) out.push({ q, a });
+  }
+  return out;
+}

@@ -10,7 +10,9 @@ import BaseLayout from '../../../../layouts/BaseLayout.astro';
 import BlogPostBody from '../../../../components/BlogPostBody.astro';
 import { useTranslations } from '../../../../i18n/utils';
 import { SITE } from '../../../../config';
-import { metaDescription, postTitle } from '../../../../lib/seoText';
+import { postSeo } from '../../../../lib/seoText';
+import { extractFaqFromHtml } from '../../../../scripts/seo-graph';
+import { seoOverrides } from '../../../../data/seo-overrides';
 import { fetchAllPostDetails, isoDate, type PostDetail } from '../../../../lib/posts';
 
 export async function getStaticPaths() {
@@ -26,7 +28,8 @@ const { post } = Astro.props;
 const lang = 'en';
 const t = useTranslations(lang);
 
-const title = postTitle(post.title, SITE.shortName);
+const seo = postSeo(post, SITE.shortName, seoOverrides);
+const title = seo.title;
 const path = `/en/blog/post/${post.slug}/`;
 // Fallback to the generated cover (see src/lib/cover.ts) when the post has
 // no cover_url of its own in the database.
@@ -38,10 +41,11 @@ const image = new URL(
 
 <BaseLayout
   title={title}
-  description={metaDescription(post.summary)}
+  description={seo.description}
   lang={lang}
   path={path}
   withFaq={false}
+  faq={extractFaqFromHtml(post.content)}
   breadcrumbs={[{ name: 'Blog', path: '/en/blog/' }]}
   breadcrumbName={post.title}
   ogType="article"

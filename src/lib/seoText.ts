@@ -9,7 +9,7 @@
  */
 
 export const TITLE_MAX = 60;
-export const DESCRIPTION_MAX = 158;
+export const DESCRIPTION_MAX = 155;
 
 export function postTitle(headline: string, siteName: string): string {
   const candidates = [`${headline} | Blog | ${siteName}`, `${headline} | ${siteName}`];
@@ -23,4 +23,20 @@ export function metaDescription(text: string, max: number = DESCRIPTION_MAX): st
   const lastSpace = room.lastIndexOf(' ');
   const cut = lastSpace > 0 ? room.slice(0, lastSpace) : room;
   return `${cut.replace(/[\s,;:.\-–—]+$/, '')}…`;
+}
+
+/**
+ * Titulo y descripcion finales de un articulo: el override por slug (si existe)
+ * manda; si no, se aplican las reglas automaticas de arriba.
+ */
+export function postSeo(
+  post: { slug: string; title: string; summary: string },
+  siteName: string,
+  overrides: Record<string, { title?: string; description?: string }>,
+): { title: string; description: string } {
+  const o = overrides[post.slug];
+  return {
+    title: o?.title ?? postTitle(post.title, siteName),
+    description: o?.description ?? metaDescription(post.summary),
+  };
 }

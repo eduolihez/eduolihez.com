@@ -1,4 +1,18 @@
 /**
+ * Fechas de ProfilePage en ISO 8601 completo (fecha + hora + zona).
+ * Google Search Console marca "Invalid datetime value" si solo llevan la fecha
+ * (2026-11-14), asi que dateCreated se fija con su zona horaria y dateModified
+ * sale del instante del build en UTC.
+ */
+export function profileDates(now: Date = new Date()): { dateCreated: string; dateModified: string } {
+  return {
+    // Primer commit del repositorio (verano: CEST, +02:00).
+    dateCreated: '2026-07-25T00:00:00+02:00',
+    dateModified: now.toISOString(),
+  };
+}
+
+/**
  * Decide si una pagina lleva el nodo ProfilePage en su JSON-LD.
  *
  * Google reserva ProfilePage para paginas cuyo tema principal es una persona.

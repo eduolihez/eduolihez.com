@@ -28,7 +28,7 @@ import { experiences } from '../data/experience';
 import { skillGroups } from '../data/skills';
 import { faqItems } from '../data/faq';
 import { pick } from '../i18n/utils';
-import { shouldEmitProfilePage } from '../scripts/seo-graph';
+import { profileDates, shouldEmitProfilePage } from '../scripts/seo-graph';
 
 interface Props {
   title: string;
@@ -318,8 +318,7 @@ const profilePage = {
   // dateModified se recalcula en cada build, asi que refleja el ultimo
   // despliegue real -- es lo que Google usa para la elegibilidad de
   // ProfilePage en resultados enriquecidos.
-  dateCreated: '2026-07-25',
-  dateModified: new Date().toISOString().slice(0, 10),
+  ...profileDates(),
 };
 
 const faqPage = {

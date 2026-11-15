@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { profileDates, shouldEmitProfilePage } from './seo-graph';
+import { profileDates, shouldEmitProfilePage, buildFaqPage } from './seo-graph';
 
 describe('profileDates', () => {
   // ISO 8601 con hora y zona: lo que Google acepta (la fecha sola da aviso).
@@ -37,5 +37,21 @@ describe('shouldEmitProfilePage', () => {
 
   it('profile=false lo impide incluso en la portada', () => {
     expect(shouldEmitProfilePage(false, '/', '/')).toBe(false);
+  });
+});
+
+describe('buildFaqPage', () => {
+  it('sin preguntas no emite nada', () => {
+    expect(buildFaqPage('https://x.com/a/', 'https://x.com/#website', 'es', [])).toBeNull();
+  });
+
+  it('construye FAQPage con id, idioma y preguntas', () => {
+    const n = buildFaqPage('https://x.com/a/', 'https://x.com/#website', 'es', [{ q: 'P1', a: 'R1' }])!;
+    expect(n['@type']).toBe('FAQPage');
+    expect(n['@id']).toBe('https://x.com/a/#faq');
+    expect(n.inLanguage).toBe('es');
+    expect(n.mainEntity).toEqual([
+      { '@type': 'Question', name: 'P1', acceptedAnswer: { '@type': 'Answer', text: 'R1' } },
+    ]);
   });
 });

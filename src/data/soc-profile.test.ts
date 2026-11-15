@@ -26,3 +26,28 @@ describe('socProfile', () => {
     expect(p.faq.length).toBeGreaterThanOrEqual(3);
   });
 });
+
+import { pickSocArticles, blogPostPath, socArticleSlugs, authorByline } from './soc-profile';
+
+describe('artículos y firma SOC', () => {
+  it('blogPostPath respeta el prefijo de idioma', () => {
+    expect(blogPostPath('es', 'x')).toBe('/blog/post/x/');
+    expect(blogPostPath('ca', 'x')).toBe('/ca/blog/post/x/');
+  });
+
+  it('pickSocArticles devuelve solo los que existen, en orden curado', () => {
+    const [a, b] = socArticleSlugs.es;
+    const got = pickSocArticles('es', [{ slug: b }, { slug: 'otro' }, { slug: a }]);
+    expect(got.map((p) => p.slug)).toEqual([a, b]);
+  });
+
+  it('pickSocArticles con API vacía o sin artículos en ese idioma da []', () => {
+    expect(pickSocArticles('es', [])).toEqual([]);
+    expect(pickSocArticles('en', [{ slug: socArticleSlugs.es[0] }])).toEqual([]);
+  });
+
+  it.each(langs)('%s: la firma tiene enlace y texto', (l) => {
+    expect(authorByline[l].link.length).toBeGreaterThan(5);
+    expect(authorByline[l].before).toMatch(/Eduardo Olivares/);
+  });
+});

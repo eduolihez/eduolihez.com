@@ -17,6 +17,8 @@
 import { formatDate } from '../scripts/blog';
 import { safeUrl } from '../scripts/shared';
 import type { PostDetail } from '../lib/posts';
+import { authorByline, socAlternates } from '../data/soc-profile';
+import type { Lang } from '../i18n/ui';
 
 interface Props {
   post: PostDetail;
@@ -29,6 +31,8 @@ const { post, lang, backHref, backLabel } = Astro.props;
 // Fallback a la portada generada (ver src/lib/cover.ts) cuando el articulo
 // no tiene cover_url propio en la base de datos.
 const coversBase = lang === 'es' ? '/blog/covers/' : `/${lang}/blog/covers/`;
+const byline = authorByline[(lang as Lang) in authorByline ? (lang as Lang) : 'es'];
+const socHref = socAlternates[(lang as Lang) in socAlternates ? (lang as Lang) : 'es'];
 const cover = safeUrl(post.cover_url) || `${coversBase}${post.slug}.png`;
 ---
 
@@ -68,6 +72,9 @@ const cover = safeUrl(post.cover_url) || `${coversBase}${post.slug}.png`;
       </h1>
       <p class="border-l-2 border-accent pl-4 text-base italic text-text-muted">
         {post.summary}
+      </p>
+      <p class="mt-4 text-sm text-text-muted">
+        {byline.before}<a href={socHref} class="text-accent hover:underline">{byline.link}</a>{byline.after}
       </p>
       {
         post.tags?.length > 0 && (

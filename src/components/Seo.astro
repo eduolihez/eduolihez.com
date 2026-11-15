@@ -28,7 +28,7 @@ import { experiences } from '../data/experience';
 import { skillGroups } from '../data/skills';
 import { faqItems } from '../data/faq';
 import { pick } from '../i18n/utils';
-import { profileDates, shouldEmitProfilePage } from '../scripts/seo-graph';
+import { buildFaqPage, profileDates, shouldEmitProfilePage } from '../scripts/seo-graph';
 
 interface Props {
   title: string;
@@ -38,6 +38,8 @@ interface Props {
   path?: string;
   /** Incluir el bloque FAQPage (solo en paginas que muestran la FAQ). */
   withFaq?: boolean;
+  /** FAQ propia de la pagina (ya en su idioma). Si se pasa, sustituye a la FAQ global. */
+  faq?: { q: string; a: string }[];
   /**
    * Emitir ProfilePage. Google lo reserva para paginas cuyo tema principal es la
    * persona: por defecto solo en las portadas; la pagina SOC lo activa a mano.
@@ -103,6 +105,7 @@ const {
   lang,
   path = '/',
   withFaq = true,
+  faq,
   profile,
   noindex = false,
   alternates,
@@ -149,49 +152,6 @@ const shareAltByLang: Record<Lang, string> = {
   en: `${SITE.name}, cybersecurity analyst (Cloud Security & IAM) in ${loc.region}`,
   ca: `${SITE.name}, analista de ciberseguretat (Cloud Security i IAM) a ${loc.region}`,
 };
-
-// Palabras clave: siguen sin usarse para posicionar, pero algunos agregadores
-// y herramientas de IA las leen. Cuestan cero y no hacen dano.
-const keywords = [
-  'analista de ciberseguridad',
-  `analista de ciberseguridad ${loc.region}`,
-  'Cybersecurity Analyst',
-  `Cybersecurity Analyst ${loc.region}`,
-  'Cloud Security',
-  'seguridad cloud',
-  `Cloud Security ${loc.region}`,
-  'IAM',
-  'gestión de identidades y accesos',
-  'Identity and Access Management',
-  'Email Security',
-  'seguridad del correo',
-  'SOC Analyst',
-  'analista SOC',
-  `analista SOC ${loc.region}`,
-  `ciberseguridad ${loc.region}`,
-  `ciberseguridad ${loc.city}`,
-  'Blue Team',
-  'deteccion de amenazas',
-  'respuesta a incidentes',
-  'XDR',
-  'SIEM',
-  'Fortinet NSE',
-  'Trend Micro Vision One',
-  'Threat Intelligence',
-  'AI Security',
-  'seguridad de la IA',
-  'LLM Red Teaming',
-  'OWASP Top 10 for LLM Applications',
-  'analisis de phishing',
-  'Python',
-  'Eduardo Olivares',
-  'Eduardo Olivares Hernandez',
-  'Eduardo Olivares Hernández',
-  'Edu Olivares',
-  'Edu Olivares Hernandez',
-  'Edu Olivares Hernández',
-  'eduolihez',
-].join(', ');
 
 // --- Datos estructurados ----------------------------------------------------
 const personId = `${SITE.domain}/#person`;
@@ -321,17 +281,12 @@ const profilePage = {
   ...profileDates(),
 };
 
-const faqPage = {
-  '@type': 'FAQPage',
-  '@id': `${canonical}#faq`,
-  inLanguage: lang,
-  isPartOf: { '@id': siteId },
-  mainEntity: faqItems.map((item) => ({
-    '@type': 'Question',
-    name: pick(item.question, lang),
-    acceptedAnswer: { '@type': 'Answer', text: pick(item.answer, lang) },
-  })),
-};
+const faqPage = buildFaqPage(
+  canonical,
+  siteId,
+  lang,
+  faq ?? faqItems.map((item) => ({ q: pick(item.question, lang), a: pick(item.answer, lang) })),
+);
 
 // Ruta completa: la portada del idioma, las migas intermedias y la pagina
 // actual al final. Antes era una lista de UN solo elemento con el nombre de la
@@ -384,7 +339,7 @@ const graph = {
     // Software publicado, solo en las portadas: ahi vive la lista de proyectos
     // y asi el grafo no se repite en cada pagina.
     ...(path === homePath ? buildSoftwareNodes(lang, SITE.domain, personId) : []),
-    ...(withFaq ? [faqPage] : []),
+    ...((withFaq || faq) && faqPage ? [faqPage] : []),
     ...(blogPosting ? [blogPosting] : []),
   ],
 };
@@ -395,7 +350,6 @@ const graph = {
 <meta name="description" content={description} />
 <link rel="canonical" href={canonical} />
 <meta name="author" content={SITE.name} />
-<meta name="keywords" content={keywords} />
 <meta
   name="robots"
   content={

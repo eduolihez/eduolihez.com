@@ -27,3 +27,27 @@ export function shouldEmitProfilePage(
 ): boolean {
   return profile ?? path === homePath;
 }
+
+/**
+ * Nodo FAQPage de JSON-LD a partir de preguntas ya resueltas a un idioma.
+ * Devuelve null si no hay preguntas (un FAQPage vacio es invalido).
+ */
+export function buildFaqPage(
+  canonical: string,
+  siteId: string,
+  lang: string,
+  items: { q: string; a: string }[],
+): Record<string, unknown> | null {
+  if (items.length === 0) return null;
+  return {
+    '@type': 'FAQPage',
+    '@id': `${canonical}#faq`,
+    inLanguage: lang,
+    isPartOf: { '@id': siteId },
+    mainEntity: items.map((i) => ({
+      '@type': 'Question',
+      name: i.q,
+      acceptedAnswer: { '@type': 'Answer', text: i.a },
+    })),
+  };
+}

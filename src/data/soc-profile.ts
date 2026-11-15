@@ -216,3 +216,48 @@ export const socProfile: Record<Lang, SocProfile> = {
     back: 'Tornar a l\'inici',
   },
 };
+
+/** Articulos del blog que respaldan la pagina SOC (slugs reales; solo se muestran los que existan). */
+export const socArticleSlugs: Record<Lang, string[]> = {
+  es: [
+    'que-hace-un-analista-soc-un-dia-de-trabajo-real',
+    'triaje-de-alertas-en-un-soc-en-que-orden-mirar',
+    'xdr-vs-siem-vs-edr-diferencias-en-un-soc',
+    'certificaciones-para-empezar-como-analista-soc',
+    'he-hecho-clic-en-un-phishing-que-hacer-ahora',
+    'de-soporte-tecnico-a-soc-lo-que-cambio-no-fue-el-puesto',
+  ],
+  en: [],
+  ca: [
+    'que-fa-un-analista-soc-un-dia-de-feina-real',
+    'triatge-alertes-en-un-soc-en-quin-ordre-mirar',
+    'xdr-siem-i-edr-diferencies-en-un-soc',
+    'certificacions-per-comencar-com-a-analista-soc-quines-valen-la-pena',
+    'he-fet-clic-a-un-phishing-que-fer-ara-mateix',
+    'de-suport-tecnic-a-soc-el-que-va-canviar-no-va-ser-el-lloc',
+  ],
+};
+
+export const socArticlesTitle: Record<Lang, string> = {
+  es: 'Artículos sobre trabajo en un SOC',
+  en: 'Articles on working in a SOC',
+  ca: 'Articles sobre la feina en un SOC',
+};
+
+/** Firma de autor de cada artículo: enlaza a la página SOC del idioma. */
+export const authorByline: Record<Lang, { before: string; link: string; after: string }> = {
+  es: { before: 'Escrito por Eduardo Olivares, ', link: 'analista SOC en Barcelona', after: '.' },
+  en: { before: 'Written by Eduardo Olivares, ', link: 'SOC analyst in Barcelona', after: '.' },
+  ca: { before: 'Escrit per Eduardo Olivares, ', link: 'analista SOC a Barcelona', after: '.' },
+};
+
+/** Ruta de un artículo del blog en el idioma dado. */
+export function blogPostPath(lang: Lang, slug: string): string {
+  return `${lang === 'es' ? '' : `/${lang}`}/blog/post/${slug}/`;
+}
+
+/** Artículos curados que existen de verdad (los que falten en la API se omiten). */
+export function pickSocArticles<T extends { slug: string }>(lang: Lang, available: T[]): T[] {
+  const bySlug = new Map(available.map((p) => [p.slug, p]));
+  return socArticleSlugs[lang].flatMap((s) => (bySlug.has(s) ? [bySlug.get(s)!] : []));
+}

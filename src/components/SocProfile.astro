@@ -4,7 +4,8 @@
  * el texto vive en src/data/soc-profile.ts).
  */
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { socProfile, socAlternates } from '../data/soc-profile';
+import { socProfile, socAlternates, socArticlesTitle, pickSocArticles, blogPostPath } from '../data/soc-profile';
+import { fetchAllPostSummaries } from '../lib/posts';
 import type { Lang } from '../i18n/ui';
 
 interface Props {
@@ -12,6 +13,7 @@ interface Props {
 }
 const { lang } = Astro.props;
 const p = socProfile[lang];
+const articles = pickSocArticles(lang, await fetchAllPostSummaries(lang));
 const home = lang === 'es' ? '/' : `/${lang}/`;
 ---
 
@@ -21,6 +23,7 @@ const home = lang === 'es' ? '/' : `/${lang}/`;
   lang={lang}
   path={p.path}
   withFaq={false}
+  faq={p.faq}
   profile={true}
   alternates={socAlternates}
   breadcrumbName={p.breadcrumb}
@@ -60,6 +63,19 @@ const home = lang === 'es' ? '/' : `/${lang}/`;
           ))}
         </dl>
       </div>
+
+      {articles.length > 0 && (
+        <div class="reveal mb-12">
+          <h2 class="mb-4 text-xl font-bold text-text-title sm:text-2xl">{socArticlesTitle[lang]}</h2>
+          <ul class="max-w-3xl list-disc space-y-2 pl-5 text-base leading-relaxed">
+            {articles.map((a) => (
+              <li>
+                <a href={blogPostPath(lang, a.slug)} class="text-accent hover:underline">{a.title}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <div class="flex flex-wrap gap-3">
         <a href={`${home}#contacto`} class="btn-primary">{p.ctaContact}</a>

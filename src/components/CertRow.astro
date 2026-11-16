@@ -1,7 +1,6 @@
 ---
 /**
- * <CertRow /> - Fila estatica de una certificacion (insignia, nombre + emisor,
- * ano). Mismo marcado que makeCertRow() de src/scripts/certifications.ts: es
+ * <CertRow /> - Fila estatica de una certificacion (insignia, cintillo emisor + ano, nombre). Mismo marcado que makeCertRow() de src/scripts/certifications.ts: es
  * lo que ven buscadores y visitantes sin JS hasta que initCerts() la repinta.
  */
 import { safeUrl } from '../scripts/shared';
@@ -32,8 +31,10 @@ const Tag = link ? 'a' : 'div';
     <span class="cert-badge cert-badge--mono" aria-hidden="true">{issuerInitials(c.issuer)}</span>
   )}
   <span class="min-w-0">
+    <span class="cert-meta">
+      <span class="cert-issuer">{c.issuer}</span>
+      <span class="cert-year">{c.issue_date}</span>
+    </span>
     <span class="cert-name block text-sm font-semibold text-text-title">{c.name}</span>
-    <span class="block truncate text-xs text-text-muted">{c.issuer}</span>
   </span>
-  <span class="cert-year">{c.issue_date}</span>
 </Tag>

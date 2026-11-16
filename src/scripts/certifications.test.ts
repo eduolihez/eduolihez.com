@@ -26,7 +26,7 @@ function setupGrid() {
       data-labels='{"loading":"Cargando","error":"Error","empty":"Sin certificaciones","countLabel":"certificaciones"}'
     ></div>
     <div id="certs-load-more-container" class="hidden">
-      <button id="certs-load-more-btn"></button>
+      <button id="certs-load-more-btn"><span>Ver todas</span></button>
     </div>
   `;
   return document.getElementById('certs-grid') as HTMLElement;
@@ -85,6 +85,26 @@ describe('initCerts()', () => {
     expect(rows[0].textContent).toContain('Fortinet');
     expect(rows[0].querySelector('.cert-year')?.textContent).toBe('2026-01');
     expect(grid.querySelectorAll('button').length).toBe(0);
+  });
+
+  it('cintillo: emisor y ano comparten linea (.cert-meta) encima del nombre; sin emisor/ano queda vacio', async () => {
+    const grid = setupGrid();
+    mockFetchOnce({
+      ok: true,
+      json: () => Promise.resolve([sampleCert, { name: 'Solo nombre' }]),
+    });
+
+    initCerts();
+    await vi.waitFor(() => expect(grid.children.length).toBe(2));
+
+    const [full, bare] = Array.from(grid.querySelectorAll('.cert-row'));
+    const meta = full.querySelector('.cert-meta')!;
+    expect(meta.children[0].className).toBe('cert-issuer');
+    expect(meta.children[0].textContent).toBe('Fortinet');
+    expect(meta.children[1].className).toBe('cert-year');
+    expect(meta.nextElementSibling?.className).toContain('cert-name');
+    expect(bare.querySelector('.cert-issuer')?.textContent).toBe('');
+    expect(bare.querySelector('.cert-year')?.textContent).toBe('');
   });
 
   it('usa la version optimizada del logo cuando el build la genero (data-logos)', async () => {
@@ -360,6 +380,7 @@ describe('initCerts()', () => {
       expect(grid.children[0].textContent).toContain('Cert 1');
       const loadMoreContainer = document.getElementById('certs-load-more-container') as HTMLElement;
       expect(loadMoreContainer.classList.contains('hidden')).toBe(false);
+      expect(document.querySelector('#certs-load-more-btn span')?.textContent).toBe(`Ver todas (${many.length})`);
     });
 
     it('"Ver todas" pinta el resto y oculta el boton', async () => {

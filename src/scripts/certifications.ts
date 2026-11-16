@@ -4,7 +4,7 @@
  * projects.ts: Astro no permite importar/testear codigo dentro de un bloque
  * <script> de un .astro.
  *
- * Vista "Expediente": lista densa de filas (insignia, nombre, emisor, ano). Las
+ * Vista "Expediente": lista densa de filas (insignia, cintillo emisor + ano, nombre). Las
  * primeras --en el orden de la API-- son las destacadas; "Ver todas" despliega
  * el resto. Cada fila con credential_url es un enlace de verificacion.
  */
@@ -77,6 +77,7 @@ export function initCerts(): void {
   let animationFrameId: number | null = null;
   let hasAnimatedOnce = false;
   let limit = DEFAULT_LIMIT;
+  let loadMoreBase: string | undefined;
 
   /**
    * Recuadro de insignia: la imagen real de Credly si existe, si no el
@@ -203,6 +204,12 @@ export function initCerts(): void {
     filtered.slice(0, limit).forEach((c) => grid.appendChild(makeCertRow(c)));
 
     if (filtered.length > limit) {
+      // "Ver todas (N)": mismo recuento que el <summary> del HTML estatico.
+      const label = loadMoreBtn?.querySelector('span');
+      if (label) {
+        loadMoreBase ??= (label.textContent || '').trim();
+        label.textContent = `${loadMoreBase} (${filtered.length})`;
+      }
       loadMoreContainer?.classList.remove('hidden');
       loadMoreContainer?.classList.add('flex');
     } else {
@@ -230,20 +237,23 @@ export function initCerts(): void {
 
     const text = document.createElement('span');
     text.className = 'min-w-0';
-    const name = document.createElement('span');
-    name.className = 'cert-name block text-sm font-semibold text-text-title';
-    name.textContent = c.name || '';
+    // Cintillo: emisor y ano en la misma linea, encima del nombre.
+    const meta = document.createElement('span');
+    meta.className = 'cert-meta';
     const issuer = document.createElement('span');
-    issuer.className = 'block truncate text-xs text-text-muted';
+    issuer.className = 'cert-issuer';
     issuer.textContent = c.issuer || '';
-    text.appendChild(name);
-    text.appendChild(issuer);
-    row.appendChild(text);
-
     const year = document.createElement('span');
     year.className = 'cert-year';
     year.textContent = c.issue_date || '';
-    row.appendChild(year);
+    meta.appendChild(issuer);
+    meta.appendChild(year);
+    const name = document.createElement('span');
+    name.className = 'cert-name block text-sm font-semibold text-text-title';
+    name.textContent = c.name || '';
+    text.appendChild(meta);
+    text.appendChild(name);
+    row.appendChild(text);
     return row;
   }
 

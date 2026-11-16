@@ -14,11 +14,11 @@
 /* TECNOLOGIA */
     Frontend: Astro (salida 100% estatica), Tailwind CSS, TypeScript
     Backend: PHP 8 + MySQL (API propia, sin frameworks)
-    Analitica: propia, sin cookies y con las IPs hasheadas
+    Analitica: propia, con las IPs hasheadas; cookie solo si la aceptas
     Hosting: CDMON · CDN y WAF: Cloudflare
     Tipografias: Inter y JetBrains Mono (autoalojadas, subset latino)
 
 /* NOTAS */
-    Sin cookies de seguimiento. Sin scripts de terceros.
+    Sin cookies de terceros. Cookie propia de analitica solo opt-in (180 dias).
     Politica de seguridad: /.well-known/security.txt
     Resumen para IAs: /llms.txt

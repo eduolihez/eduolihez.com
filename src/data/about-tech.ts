@@ -328,14 +328,14 @@ export const techSections: TechSection[] = [
       },
       {
         term: {
-          es: 'Sin cookies de seguimiento y con Do Not Track respetado',
-          en: 'No tracking cookies, and Do Not Track honoured',
-          ca: 'Sense galetes de seguiment i amb Do Not Track respectat',
+          es: 'Cookie de analítica solo si la aceptas, y Do Not Track respetado',
+          en: 'An analytics cookie only if you accept it, and Do Not Track honoured',
+          ca: 'Galeta d\'analítica només si l\'acceptes, i Do Not Track respectat',
         },
         detail: {
-          es: 'No hay banner de consentimiento porque no hay nada que consentir. Si el navegador envia la señal Do Not Track, la visita ni siquiera se registra.',
-          en: 'There is no consent banner because there is nothing to consent to. If the browser sends the Do Not Track signal, the visit is not recorded at all.',
-          ca: "No hi ha bàner de consentiment perquè no hi ha res a consentir. Si el navegador envia el senyal Do Not Track, la visita ni tan sols es registra.",
+          es: 'Por defecto no hay cookies. El aviso te ofrece una opcional: si la aceptas, tu navegador guarda eo_vid, un número aleatorio de 16 caracteres, durante 180 días. Solo sirve para distinguir visitantes nuevos de los que vuelven. No contiene datos personales, no es de terceros y no te sigue por otras webs. La crea el propio navegador, así que no puede ser HttpOnly; tampoco hace falta, porque no da acceso a nada. Puedes retirarla cuando quieras desde «Cookies» en el pie de página y se borra al momento. Tu elección se recuerda 6 meses. Si el navegador envía Do Not Track o Global Privacy Control, no aparece el aviso, no se crea la cookie y, con Do Not Track, la visita ni siquiera se registra.',
+          en: 'By default there are no cookies. The notice offers one optional cookie: if you accept, your browser keeps eo_vid, a random 16-character number, for 180 days. Its only job is to tell new visitors from returning ones. It holds no personal data, is not third-party and does not follow you to other sites. The browser itself creates it, so it cannot be HttpOnly, and it does not need to be: it unlocks nothing. You can withdraw it at any time from "Cookies" in the footer, and it is deleted on the spot. Your choice is remembered for 6 months. If your browser sends Do Not Track or Global Privacy Control, the notice never shows, no cookie is set and, with Do Not Track, the visit is not recorded at all.',
+          ca: "Per defecte no hi ha galetes. L'avís t'ofereix una galeta opcional: si l'acceptes, el navegador desa eo_vid, un número aleatori de 16 caràcters, durant 180 dies. Només serveix per distingir visitants nous dels que tornen. No conté dades personals, no és de tercers i no et segueix per altres webs. La crea el mateix navegador, així que no pot ser HttpOnly; tampoc cal, perquè no dona accés a res. La pots retirar quan vulguis des de «Galetes» al peu de pàgina i s'esborra a l'instant. La teva elecció es recorda 6 mesos. Si el navegador envia Do Not Track o Global Privacy Control, no surt l'avís, no es crea la galeta i, amb Do Not Track, la visita ni tan sols es registra.",
         },
       },
       {
@@ -345,9 +345,9 @@ export const techSections: TechSection[] = [
           ca: 'La sessió viu i mor amb la pestanya',
         },
         detail: {
-          es: 'Para saber si dos páginas vistas son la misma visita, el navegador guarda un identificador aleatorio en sessionStorage (no localStorage, no una cookie). Técnicamente sigue siendo "almacenamiento en el equipo" bajo la ePrivacy, pero al morir al cerrar la pestaña y no combinarse nunca con otra visita, encaja en la excepción de medición de audiencia que reconocen la mayoría de autoridades de protección de datos de la UE: por eso no cambia la respuesta de arriba.',
-          en: 'To know whether two pageviews belong to the same visit, the browser keeps a random id in sessionStorage (not localStorage, not a cookie). That is technically still "storage on the device" under ePrivacy, but since it dies when the tab closes and is never combined with another visit, it fits the audience-measurement exemption most EU data protection authorities recognise — which is why the answer above still holds.',
-          ca: 'Per saber si dues pàgines vistes són la mateixa visita, el navegador desa un identificador aleatori a sessionStorage (no localStorage, no una galeta). Tècnicament segueix sent "emmagatzematge a l\'equip" sota l\'ePrivacy, però en morir en tancar la pestanya i no combinar-se mai amb una altra visita, encaixa en l\'excepció de mesura d\'audiència que reconeixen la majoria d\'autoritats de protecció de dades de la UE: per això no canvia la resposta d\'aquí dalt.',
+          es: 'Para saber si dos páginas vistas son la misma visita, el navegador guarda un identificador aleatorio en sessionStorage (no localStorage, no una cookie). Técnicamente sigue siendo "almacenamiento en el equipo" bajo la ePrivacy, pero al morir al cerrar la pestaña y no combinarse nunca con otra visita, encaja en la excepción de medición de audiencia que reconocen la mayoría de autoridades de protección de datos de la UE: por eso no necesita consentimiento, a diferencia de la cookie opcional de arriba.',
+          en: 'To know whether two pageviews belong to the same visit, the browser keeps a random id in sessionStorage (not localStorage, not a cookie). That is technically still "storage on the device" under ePrivacy, but since it dies when the tab closes and is never combined with another visit, it fits the audience-measurement exemption most EU data protection authorities recognise — which is why it needs no consent, unlike the optional cookie above.',
+          ca: 'Per saber si dues pàgines vistes són la mateixa visita, el navegador desa un identificador aleatori a sessionStorage (no localStorage, no una galeta). Tècnicament segueix sent "emmagatzematge a l\'equip" sota l\'ePrivacy, però en morir en tancar la pestanya i no combinar-se mai amb una altra visita, encaixa en l\'excepció de mesura d\'audiència que reconeixen la majoria d\'autoritats de protecció de dades de la UE: per això no necessita consentiment, a diferència de la galeta opcional d\'aquí dalt.',
         },
         source: 'src/scripts/analytics.ts',
       },

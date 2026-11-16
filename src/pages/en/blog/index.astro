@@ -71,6 +71,19 @@ const alternates = { es: '/blog/', en: '/en/blog/', ca: '/ca/blog/' };
         data-detail="/en/blog/post/"
       >
       </div>
+
+      <div id="blog-show-more-wrap" class="mt-6 flex hidden justify-center">
+        <button
+          type="button"
+          id="blog-show-more"
+          aria-expanded="false"
+          data-label-more={t('blog.showMore')}
+          data-label-less={t('blog.showLess')}
+          class="btn-ghost min-h-11 cursor-pointer"
+        >
+          {t('blog.showMore')}
+        </button>
+      </div>
     </div>
   </section>
 </BaseLayout>

@@ -124,7 +124,7 @@ export const ui = {
     'contact.name': 'Nombre',
     'contact.email': 'Email',
     'contact.subject': 'Asunto',
-    'contact.reason': 'Motivo',
+    'contact.reason': 'Motivo del mensaje',
     'contact.reason.job': 'Oferta de trabajo',
     'contact.reason.project': 'Proyecto',
     'contact.reason.other': 'Otro',
@@ -184,6 +184,8 @@ export const ui = {
     'blog.homeTitle': 'Últimas entradas',
     'blog.homeSubtitle': 'Lo último que he escrito sobre SOC, Blue Team y automatización',
     'blog.viewAll': 'Ver todas las entradas',
+    'blog.showMore': 'Ver más entradas ({n})',
+    'blog.showLess': 'Ver menos entradas',
   },
 
   en: {
@@ -289,7 +291,7 @@ export const ui = {
     'contact.name': 'Name',
     'contact.email': 'Email',
     'contact.subject': 'Subject',
-    'contact.reason': 'Reason',
+    'contact.reason': 'Reason for your message',
     'contact.reason.job': 'Job offer',
     'contact.reason.project': 'Project',
     'contact.reason.other': 'Other',
@@ -347,6 +349,8 @@ export const ui = {
     'blog.homeTitle': 'Latest posts',
     'blog.homeSubtitle': 'What I have been writing about SOC, Blue Team and automation',
     'blog.viewAll': 'View all posts',
+    'blog.showMore': 'Show more posts ({n})',
+    'blog.showLess': 'Show fewer posts',
   },
 
   ca: {
@@ -452,7 +456,7 @@ export const ui = {
     'contact.name': 'Nom',
     'contact.email': 'Email',
     'contact.subject': 'Assumpte',
-    'contact.reason': 'Motiu',
+    'contact.reason': 'Motiu del missatge',
     'contact.reason.job': 'Oferta de feina',
     'contact.reason.project': 'Projecte',
     'contact.reason.other': 'Altre',
@@ -510,6 +514,8 @@ export const ui = {
     'blog.homeTitle': 'Últimes entrades',
     'blog.homeSubtitle': 'El que he escrit darrerament sobre SOC, Blue Team i automatització',
     'blog.viewAll': 'Veure totes les entrades',
+    'blog.showMore': 'Veure més entrades ({n})',
+    'blog.showLess': "Veure'n menys",
   },
 } as const;
 

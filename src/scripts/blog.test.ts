@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { initBlogList, initStaticBlogFilters, escapeHtml, safeUrl, formatDate } from './blog';
+import { initBlogList, initStaticBlogFilters, BLOG_PAGE_SIZE, escapeHtml, safeUrl, formatDate } from './blog';
 
 function setupGrid(overrides: Partial<Record<string, string>> = {}) {
   document.body.innerHTML = `
@@ -250,6 +250,67 @@ describe('initStaticBlogFilters()', () => {
     const filters = document.getElementById('blog-filters')!;
 
     expect(() => filters.click()).not.toThrow();
+  });
+});
+
+describe('listado progresivo (initStaticBlogFilters + #blog-show-more)', () => {
+  /** n articulos: los pares "python", los impares "soc". */
+  function setup(n: number) {
+    const arts = Array.from({ length: n }, (_, i) => `<article data-category="${i % 2 ? 'soc' : 'python'}"><h2>P${i}</h2></article>`).join('');
+    document.body.innerHTML = `
+      <div id="blog-filters">
+        <button type="button" class="blog-filter-btn project-filter-btn is-active" data-filter="all">Todos</button>
+        <button type="button" class="blog-filter-btn project-filter-btn" data-filter="python">python</button>
+      </div>
+      <div id="blog-grid">${arts}</div>
+      <div id="blog-show-more-wrap" class="hidden">
+        <button id="blog-show-more" aria-expanded="false" data-label-more="Ver mas ({n})" data-label-less="Ver menos">x</button>
+      </div>`;
+    initStaticBlogFilters();
+  }
+  const hiddenCount = () => document.querySelectorAll('#blog-grid article.hidden').length;
+  const btn = () => document.getElementById('blog-show-more') as HTMLButtonElement;
+  const wrap = () => document.getElementById('blog-show-more-wrap')!;
+
+  it('rama larga: oculta el exceso (siguen en el DOM) y ofrece "Ver mas (N)"', () => {
+    setup(30);
+    expect(document.querySelectorAll('#blog-grid article')).toHaveLength(30);
+    expect(hiddenCount()).toBe(30 - BLOG_PAGE_SIZE);
+    expect(wrap().classList.contains('hidden')).toBe(false);
+    expect(btn().textContent).toBe('Ver mas (18)');
+    expect(btn().getAttribute('aria-expanded')).toBe('false');
+  });
+
+  it('cada pulsacion revela otras 12; al final pasa a "Ver menos" y contrae', () => {
+    setup(30);
+    btn().click();
+    expect(hiddenCount()).toBe(6);
+    expect(btn().textContent).toBe('Ver mas (6)');
+    btn().click();
+    expect(hiddenCount()).toBe(0);
+    expect(btn().textContent).toBe('Ver menos');
+    expect(btn().getAttribute('aria-expanded')).toBe('true');
+    btn().click();
+    expect(hiddenCount()).toBe(30 - BLOG_PAGE_SIZE);
+    expect(btn().getAttribute('aria-expanded')).toBe('false');
+  });
+
+  it('rama corta: con <= 12 entradas no hay boton ni se oculta nada', () => {
+    setup(BLOG_PAGE_SIZE);
+    expect(hiddenCount()).toBe(0);
+    expect(wrap().classList.contains('hidden')).toBe(true);
+  });
+
+  it('cambiar de categoria reinicia el limite y cuenta solo las de esa categoria', () => {
+    setup(40);
+    btn().click();
+    expect(hiddenCount()).toBe(40 - 2 * BLOG_PAGE_SIZE);
+    document.querySelector<HTMLButtonElement>('[data-filter="python"]')!.click();
+    // 20 "python": 12 visibles, 8 ocultas + las 20 "soc" ocultas
+    expect(hiddenCount()).toBe(28);
+    expect(btn().textContent).toBe('Ver mas (8)');
+    document.querySelector<HTMLButtonElement>('[data-filter="all"]')!.click();
+    expect(hiddenCount()).toBe(40 - BLOG_PAGE_SIZE);
   });
 });
 

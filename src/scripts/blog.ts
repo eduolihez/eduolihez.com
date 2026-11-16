@@ -146,6 +146,68 @@ export function initBlogList(): void {
   loadPosts();
 }
 
+/** Entradas que se ven de golpe en el listado; "Ver mas" revela otras tantas. */
+export const BLOG_PAGE_SIZE = 12;
+
+/**
+ * Vista del listado: filtro por categoria + limite progresivo. TODAS las
+ * tarjetas siguen en el DOM (SEO); aqui solo se alterna `hidden`. Sin JS no
+ * corre y se ven todas. Cambiar de categoria reinicia el limite. El boton
+ * "Ver mas" (#blog-show-more, dentro de #blog-show-more-wrap) sigue el patron
+ * de Projects: aria-expanded, y "Ver menos" al mostrar todo (asi el foco no se
+ * pierde cuando ya no queda nada que revelar).
+ */
+function bindBlogView(filters: HTMLElement, grid: HTMLElement): void {
+  const wrap = document.getElementById('blog-show-more-wrap');
+  const btn = document.getElementById('blog-show-more');
+  const labelMore = btn?.dataset.labelMore ?? btn?.textContent ?? '';
+  const labelLess = btn?.dataset.labelLess ?? labelMore;
+  let filter = 'all';
+  let shown = BLOG_PAGE_SIZE;
+  let remaining = 0;
+
+  function apply(): void {
+    let matching = 0;
+    grid.querySelectorAll<HTMLElement>('article').forEach((cardEl) => {
+      const ok = filter === 'all' || cardEl.dataset.category === filter;
+      if (ok) matching += 1;
+      cardEl.classList.toggle('hidden', !ok || matching > shown);
+    });
+    remaining = Math.max(0, matching - shown);
+    wrap?.classList.toggle('hidden', matching <= BLOG_PAGE_SIZE);
+    if (btn) {
+      btn.textContent = remaining === 0 ? labelLess : labelMore.replace('{n}', String(remaining));
+      btn.setAttribute('aria-expanded', String(remaining === 0));
+    }
+  }
+
+  filters.addEventListener('click', (e) => {
+    const target = (e.target as HTMLElement).closest('.blog-filter-btn') as HTMLButtonElement | null;
+    if (!target) return;
+    filters.querySelectorAll('.blog-filter-btn').forEach((b) => {
+      b.className = FILTER_BASE;
+    });
+    target.className = `${FILTER_BASE} ${FILTER_ACTIVE}`;
+    filter = target.dataset.filter || 'all';
+    shown = BLOG_PAGE_SIZE;
+    apply();
+  });
+
+  if (btn) {
+    btn.onclick = () => {
+      if (remaining > 0) {
+        shown += BLOG_PAGE_SIZE;
+      } else {
+        shown = BLOG_PAGE_SIZE;
+        // Al contraer, la pagina vuelve al inicio del listado.
+        grid.scrollIntoView?.({ block: 'start' });
+      }
+      apply();
+    };
+  }
+  apply();
+}
+
 /**
  * Construye los chips de filtro por categoria y engancha el click que
  * muestra/oculta tarjetas. Mismo patron que el filtro de /projects/: un
@@ -161,7 +223,7 @@ function initTagFilters(filters: HTMLElement, grid: HTMLElement, posts: Post[], 
   const categories = [...new Set(posts.map((p) => p.category).filter((c): c is string => Boolean(c)))].sort((a, b) =>
     a.localeCompare(b)
   );
-  if (categories.length === 0) return;
+  if (categories.length === 0) return bindBlogView(filters, grid);
 
   const baseClass = FILTER_BASE;
   const activeClass = FILTER_ACTIVE;
@@ -181,20 +243,7 @@ function initTagFilters(filters: HTMLElement, grid: HTMLElement, posts: Post[], 
   filters.classList.remove('hidden');
   filters.classList.add('flex');
 
-  filters.addEventListener('click', (e) => {
-    const btn = (e.target as HTMLElement).closest('.blog-filter-btn') as HTMLButtonElement | null;
-    if (!btn) return;
-
-    filters.querySelectorAll('.blog-filter-btn').forEach((b) => {
-      b.className = `${baseClass} ${inactiveClass}`.trim();
-    });
-    btn.className = `${baseClass} ${activeClass}`.trim();
-
-    const value = btn.dataset.filter || 'all';
-    grid.querySelectorAll<HTMLElement>('article[data-category]').forEach((cardEl) => {
-      cardEl.classList.toggle('hidden', value !== 'all' && cardEl.dataset.category !== value);
-    });
-  });
+  bindBlogView(filters, grid);
 }
 
 /**
@@ -210,24 +259,7 @@ export function initStaticBlogFilters(): void {
   const grid = document.getElementById('blog-grid');
   if (!filters || !grid) return;
 
-  const baseClass = FILTER_BASE;
-  const activeClass = FILTER_ACTIVE;
-  const inactiveClass = '';
-
-  filters.addEventListener('click', (e) => {
-    const btn = (e.target as HTMLElement).closest('.blog-filter-btn') as HTMLButtonElement | null;
-    if (!btn) return;
-
-    filters.querySelectorAll('.blog-filter-btn').forEach((b) => {
-      b.className = `${baseClass} ${inactiveClass}`.trim();
-    });
-    btn.className = `${baseClass} ${activeClass}`.trim();
-
-    const value = btn.dataset.filter || 'all';
-    grid.querySelectorAll<HTMLElement>('article[data-category]').forEach((cardEl) => {
-      cardEl.classList.toggle('hidden', value !== 'all' && cardEl.dataset.category !== value);
-    });
-  });
+  bindBlogView(filters, grid);
 }
 
 /** Tarjeta de UN articulo. Construida con nodos, nunca con innerHTML. */

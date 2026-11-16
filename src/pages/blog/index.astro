@@ -87,7 +87,7 @@ const blogIndex = {
         </div>
         <a
           href="/blog/rss.xml"
-          class="inline-flex min-h-11 items-center gap-1.5 rounded-md border border-bg-border px-3 py-1.5 font-mono text-xs text-text-muted transition hover:border-accent/40 hover:text-accent"
+          class="inline-flex min-h-11 items-center px-1 font-mono text-xs text-text-muted underline decoration-bg-border underline-offset-4 transition hover:text-accent hover:decoration-accent"
         >
           RSS
         </a>
@@ -138,6 +138,19 @@ const blogIndex = {
             </article>
           );
         })}
+      </div>
+
+      <div id="blog-show-more-wrap" class="mt-6 flex hidden justify-center">
+        <button
+          type="button"
+          id="blog-show-more"
+          aria-expanded="false"
+          data-label-more={t('blog.showMore')}
+          data-label-less={t('blog.showLess')}
+          class="btn-ghost min-h-11 cursor-pointer"
+        >
+          {t('blog.showMore')}
+        </button>
       </div>
     </div>
   </section>

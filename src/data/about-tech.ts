@@ -95,9 +95,9 @@ export const techSections: TechSection[] = [
           ca: 'Res de tercers',
         },
         detail: {
-          es: 'Sin CDN, sin Google Fonts, sin etiquetas de analítica externa. Las tipografías van autoalojadas con subset latino. Cada dominio que se quita es un tercero menos que puede caerse, cambiar el archivo que sirve o registrar la IP del visitante.',
-          en: 'No CDN, no Google Fonts, no external analytics tags. Typefaces are self-hosted with a Latin subset. Every domain removed is one less third party that can go down, swap the file it serves, or log the visitor IP.',
-          ca: "Sense CDN, sense Google Fonts, sense etiquetes d'analítica externa. Les tipografies van autoallotjades amb subset llatí. Cada domini que es treu és un tercer menys que pot caure, canviar el fitxer que serveix o registrar la IP del visitant.",
+          es: 'Sin CDN, sin Google Fonts, sin etiquetas de analítica de terceros en el código (salvo lo que Cloudflare añade al servir, más abajo). Las tipografías van autoalojadas con subset latino. Cada dominio que se quita es un tercero menos que puede caerse, cambiar el archivo que sirve o registrar la IP del visitante.',
+          en: 'No CDN, no Google Fonts, no third-party analytics tags in the code (apart from what Cloudflare adds when serving, below). Typefaces are self-hosted with a Latin subset. Every domain removed is one less third party that can go down, swap the file it serves, or log the visitor IP.',
+          ca: "Sense CDN, sense Google Fonts, sense etiquetes d'analítica de tercers al codi (llevat del que Cloudflare afegeix en servir, més avall). Les tipografies van autoallotjades amb subset llatí. Cada domini que es treu és un tercer menys que pot caure, canviar el fitxer que serveix o registrar la IP del visitant.",
         },
       },
       {
@@ -397,9 +397,9 @@ export const techSections: TechSection[] = [
           ca: 'Cloudflare davant del lloc',
         },
         detail: {
-          es: 'El sitio pasa por Cloudflare como proxy, que puede dar estadísticas agregadas sin cookies. Esta web no incluye ningún script de analítica de Cloudflare.',
-          en: 'The site is served through Cloudflare as a proxy, which can provide aggregate statistics without cookies. This site includes no Cloudflare analytics script.',
-          ca: 'El lloc passa per Cloudflare com a proxy, que pot donar estadístiques agregades sense galetes. Aquesta web no inclou cap script d\'analítica de Cloudflare.',
+          es: 'El sitio pasa por Cloudflare, que añade su propia analítica web: un recuento agregado de visitas, sin cookies. No está en el código de esta web; la inyecta Cloudflare al servir las páginas.',
+          en: 'The site goes through Cloudflare, which adds its own web analytics: an aggregate visit count, no cookies. It is not in this site\'s code; Cloudflare injects it when serving the pages.',
+          ca: 'El lloc passa per Cloudflare, que hi afegeix la seva pròpia analítica web: un recompte agregat de visites, sense galetes. No és al codi d\'aquesta web; la injecta Cloudflare en servir les pàgines.',
         },
       },
     ],

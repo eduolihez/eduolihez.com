@@ -22,18 +22,21 @@ async function recordThemeAtBody(page) {
 test.describe('sistema en oscuro', () => {
   test.use({ colorScheme: 'dark' });
 
-  test('el primer pintado ya es oscuro (sin destello)', async ({ page }) => {
+  test('el primer pintado ya es oscuro por el sistema (sin destello)', async ({ page }) => {
     await recordThemeAtBody(page);
     await page.goto('/admin/index.php');
-    expect(await page.evaluate(() => window.__themeAtBody)).toBe('dark');
-    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    // Sin eleccion guardada theme.js no fija data-theme: el CSS sigue al sistema.
+    expect(await page.evaluate(() => window.__themeAtBody)).toBeNull();
+    await expect(page.locator('html')).not.toHaveAttribute('data-theme', /.*/);
+    expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe('rgb(11, 18, 32)');
     await expect(page.locator('#theme-toggle')).toHaveAttribute('aria-pressed', 'true');
   });
 
   test('un valor guardado invalido cae en la preferencia del sistema', async ({ page }) => {
-    await page.addInitScript(() => localStorage.setItem('admin-theme', 'morado'));
+    await page.addInitScript(() => localStorage.setItem('theme', 'morado'));
     await page.goto('/admin/index.php');
-    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await expect(page.locator('html')).not.toHaveAttribute('data-theme', /.*/);
+    expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe('rgb(11, 18, 32)');
   });
 });
 
@@ -43,26 +46,26 @@ test.describe('sistema en claro', () => {
   test('el primer pintado es claro', async ({ page }) => {
     await recordThemeAtBody(page);
     await page.goto('/admin/index.php');
-    expect(await page.evaluate(() => window.__themeAtBody)).toBe('light');
+    expect(await page.evaluate(() => window.__themeAtBody)).toBeNull();
     await expect(page.locator('#theme-toggle')).toHaveAttribute('aria-pressed', 'false');
   });
 
   test('un valor guardado invalido cae en la preferencia del sistema', async ({ page }) => {
-    await page.addInitScript(() => localStorage.setItem('admin-theme', '"><img src=x>'));
+    await page.addInitScript(() => localStorage.setItem('theme', '"><img src=x>'));
     await page.goto('/admin/index.php');
-    await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+    await expect(page.locator('html')).not.toHaveAttribute('data-theme', /.*/);
   });
 
   test('el interruptor alterna, actualiza aria-pressed y persiste al recargar', async ({ page }) => {
     await page.goto('/admin/index.php');
     const html = page.locator('html');
     const toggle = page.locator('#theme-toggle');
-    await expect(html).toHaveAttribute('data-theme', 'light');
+    await expect(html).not.toHaveAttribute('data-theme', /.*/);
 
     await toggle.click();
     await expect(html).toHaveAttribute('data-theme', 'dark');
     await expect(toggle).toHaveAttribute('aria-pressed', 'true');
-    expect(await page.evaluate(() => localStorage.getItem('admin-theme'))).toBe('dark');
+    expect(await page.evaluate(() => localStorage.getItem('theme'))).toBe('dark');
 
     // El valor guardado manda sobre la preferencia del sistema, tambien en otra pagina.
     await page.goto('/admin/messages.php?space=global');
@@ -74,6 +77,6 @@ test.describe('sistema en claro', () => {
     await expect(toggle).toHaveAttribute('aria-pressed', 'false');
     await page.reload();
     await expect(html).toHaveAttribute('data-theme', 'light');
-    expect(await page.evaluate(() => localStorage.getItem('admin-theme'))).toBe('light');
+    expect(await page.evaluate(() => localStorage.getItem('theme'))).toBe('light');
   });
 });

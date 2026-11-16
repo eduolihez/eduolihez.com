@@ -38,7 +38,10 @@ for (const theme of ['light', 'dark']) {
 
         const html = await page.content();
         expect(html.match(PHP_WARNING)?.[0] ?? null, 'aviso PHP en el HTML').toBeNull();
-        expect(await page.locator('html').getAttribute('data-theme')).toBe(theme);
+        // Sin eleccion guardada no hay data-theme: el CSS sigue al sistema.
+        expect(await page.locator('html').getAttribute('data-theme')).toBeNull();
+        expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor))
+          .toBe(theme === 'dark' ? 'rgb(11, 18, 32)' : 'rgb(243, 245, 248)');
         await expect(page.locator('h1')).toHaveCount(1);
         await expect(page.locator('.menu-icon svg svg')).toHaveCount(0);
         await expect(page.locator('.menu-icon > svg').first()).toBeVisible();

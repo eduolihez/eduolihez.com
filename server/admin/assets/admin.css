@@ -1037,3 +1037,7 @@
     table.stack tr.msg-row a { display: inline-flex; align-items: center; min-height: 44px; }
     table.stack tr.msg-row.is-unread { border-left: 3px solid var(--accent); }
   }
+
+/* T11 · visitantes con cookie opt-in (analytics.php) */
+.t11-optin .t11-note { margin: 0 0 12px; color: var(--muted); font-size: .9em; }
+.t11-optin .grid4 { margin: 0; }

@@ -422,6 +422,54 @@ admin_header('Analítica', 'analytics.php');
   </div>
 </div>
 
+<?php
+// T11 · Visitantes con cookie opt-in (eo_vid). Solo lectura. Si la columna
+// visitor_id aun no esta migrada, la seccion no se pinta.
+$hasVisitorCol = q_int(
+    "SELECT COUNT(*) FROM information_schema.COLUMNS
+     WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'visits' AND COLUMN_NAME = 'visitor_id'"
+) > 0;
+if ($hasVisitorCol):
+    $optVisits = q_int(
+        "SELECT COUNT(*) FROM visits WHERE $botFilter AND visitor_id IS NOT NULL
+         AND visited_at > (NOW() - INTERVAL ? DAY)",
+        [$days]
+    );
+    $optVisitors = q_int(
+        "SELECT COUNT(DISTINCT visitor_id) FROM visits WHERE $botFilter AND visitor_id IS NOT NULL
+         AND visited_at > (NOW() - INTERVAL ? DAY)",
+        [$days]
+    );
+    // "Nuevo": su primera visita registrada cae dentro del rango.
+    $optNew = q_int(
+        "SELECT COUNT(*) FROM (
+           SELECT visitor_id, MIN(visited_at) AS first_at FROM visits
+           WHERE $botFilter AND visitor_id IS NOT NULL
+           GROUP BY visitor_id
+           HAVING MAX(visited_at) > (NOW() - INTERVAL ? DAY)
+              AND first_at > (NOW() - INTERVAL ? DAY)
+         ) t",
+        [$days, $days]
+    );
+    $optReturning = max(0, $optVisitors - $optNew);
+    $optPerVisitor = $optVisitors > 0 ? round($optVisits / $optVisitors, 1) : 0;
+?>
+<h2>Visitantes con cookie (opt-in)</h2>
+<div class="card t11-optin">
+  <p class="t11-note">Solo cuenta a quien aceptó la cookie de analítica. Es una muestra sesgada, no el total de visitantes.</p>
+  <?php if ($optVisitors === 0): ?>
+    <div class="empty">Nadie ha aceptado la cookie en este rango. Los datos aparecerán cuando alguien pulse «Aceptar analítica» en el banner.</div>
+  <?php else: ?>
+    <div class="grid4">
+      <div class="stat"><div class="num"><?= number_format($optVisitors) ?></div><div class="lbl">Visitantes con consentimiento</div></div>
+      <div class="stat"><div class="num cyan"><?= number_format($optNew) ?></div><div class="lbl">Nuevos<br><span class="faint">primera visita en el rango</span></div></div>
+      <div class="stat"><div class="num violet"><?= number_format($optReturning) ?></div><div class="lbl">Recurrentes<br><span class="faint">ya habían venido antes</span></div></div>
+      <div class="stat"><div class="num"><?= e((string) $optPerVisitor) ?></div><div class="lbl">Visitas por visitante<br><span class="faint"><?= number_format($optVisits) ?> visitas con cookie</span></div></div>
+    </div>
+  <?php endif; ?>
+</div>
+<?php endif; ?>
+
 <h2>Visitas por día</h2>
 <div class="card">
   <?php if (!array_sum(array_column($daily, 'c'))): ?>

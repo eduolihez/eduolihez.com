@@ -63,6 +63,7 @@ function page_spaces(string $page): array
     static $map = [
         'index.php'          => [SPACE_GLOBAL, SPACE_SITE, SPACE_PHISHLAB, '*'],
         'messages.php'       => [SPACE_GLOBAL, SPACE_SITE],
+        'revisar.php'        => [SPACE_SITE],
         'analytics.php'      => [SPACE_GLOBAL, SPACE_SITE, SPACE_PHISHLAB, '*'],
         'projects.php'       => [SPACE_SITE],
         'certifications.php' => [SPACE_SITE],
@@ -196,7 +197,7 @@ function space_home(string $space): string
 
 /**
  * Menu lateral de un espacio. $counts (claves opcionales): unread, projects,
- * certs, posts, apps, lab_users. Devuelve grupos con items
+ * certs, posts, apps, lab_users, review. Devuelve grupos con items
  * ['page','href','label','icon','badge','badge_type'].
  */
 function space_nav(string $space, array $counts): array
@@ -240,6 +241,7 @@ function space_nav(string $space, array $counts): array
             ]],
             ['label' => 'Actividad', 'items' => [
                 $item('messages.php', 'Mensajes', 'mail', $count('unread'), 'alert'),
+                $item('revisar.php', 'Revisar', 'shield', $count('review')),
                 $item('analytics.php', 'Analítica', 'chart'),
             ]],
         ];

@@ -372,11 +372,13 @@ show_flash();
 // "Hoy": primero lo que pide accion (solo con datos que esta pagina ya
 // calcula), luego metricas en una tabla compacta.
 $certsHidden = max(0, $certsTotal - $certs);
+$certsNoLink = count_of("SELECT COUNT(*) FROM certifications WHERE credential_url IS NULL OR credential_url = ''");
 $todo = [
     ['n' => $unread, 'title' => 'Mensajes sin leer', 'sub' => number_format($msgTotal) . ' en total', 'href' => 'messages.php?space=site', 'cta' => 'Leer'],
     ['n' => $postsDraft, 'title' => 'Borradores del blog', 'sub' => $postsVisible . ' entradas publicadas', 'href' => 'posts.php?space=site', 'cta' => 'Revisar'],
     ['n' => $drafts, 'title' => 'Proyectos sin publicar', 'sub' => $published . ' publicados', 'href' => 'projects.php?space=site', 'cta' => 'Revisar'],
     ['n' => $certsHidden, 'title' => 'Certificaciones ocultas', 'sub' => $certs . ' visibles', 'href' => 'certifications.php?space=site', 'cta' => 'Revisar'],
+    ['n' => $certsNoLink, 'title' => 'Certificaciones sin enlace de verificación', 'sub' => 'Añade la URL de la credencial', 'href' => 'revisar.php?space=site', 'cta' => 'Revisar'],
 ];
 $pending = array_values(array_filter($todo, static fn(array $t): bool => $t['n'] > 0));
 $failedTxt = $failedLogins === null ? 'no disponible' : (string) $failedLogins;

@@ -5,7 +5,7 @@ const { PHP_WARNING, menuLabels, expectActive, expectSpace, followLink } = requi
 
 const MENUS = {
   global: ['Hoy', 'Bandeja', 'Analítica', 'Seguridad', 'Ajustes', 'Backup', 'Integraciones', 'Gestionar apps'],
-  site: ['Hoy', 'Proyectos', 'Certificaciones', 'Blog', 'Mensajes', 'Analítica'],
+  site: ['Hoy', 'Proyectos', 'Certificaciones', 'Blog', 'Mensajes', 'Revisar', 'Analítica'],
   phishlab: ['Hoy', 'Usuarios'],
   app: ['Hoy'],
 };
@@ -46,6 +46,7 @@ const SPACE_CASES = [
   { url: 'certifications.php?space=site', space: 'eduolihez.com', menu: MENUS.site, active: 'Certificaciones' },
   { url: 'posts.php?space=site', space: 'eduolihez.com', menu: MENUS.site, active: 'Blog' },
   { url: 'messages.php?space=site', space: 'eduolihez.com', menu: MENUS.site, active: 'Mensajes' },
+  { url: 'revisar.php?space=site', space: 'eduolihez.com', menu: MENUS.site, active: 'Revisar' },
   { url: 'analytics.php?space=site', space: 'eduolihez.com', menu: MENUS.site, active: 'Analítica' },
   { url: 'messages.php?space=global', space: 'Global', menu: MENUS.global, active: 'Bandeja' },
   { url: 'apps.php?space=global', space: 'Global', menu: MENUS.global, active: 'Gestionar apps' },
@@ -126,4 +127,14 @@ test('app-edit.php vive en Global y marca "Gestionar apps"', async ({ page }) =>
   await page.goto('/admin/app-edit.php');
   await expectSpace(page, 'Global');
   await expectActive(page, 'Gestionar apps');
+});
+
+test('Revisar lista certificaciones sin enlace y mensajes sin leer, sin inline', async ({ page }) => {
+  await page.goto('/admin/revisar.php?space=site');
+  await expect(page.locator('h1')).toHaveText(/Revisar/);
+  await expect(page.locator('#rev-certs')).toBeVisible();
+  await expect(page.locator('#rev-msgs')).toBeVisible();
+  // Cada seccion muestra filas con accion o una frase de estado vacio.
+  await expect(page.locator('.row2 .today-item a.today-action, .row2 .today-ok').first()).toBeVisible();
+  expect(await page.content()).not.toMatch(PHP_WARNING);
 });

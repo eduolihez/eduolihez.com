@@ -171,7 +171,7 @@ final class SpacesTest extends TestCase
     public function testSpaceNavSiteListaExacta(): void
     {
         $this->assertSame(
-            ['index.php', 'projects.php', 'certifications.php', 'posts.php', 'messages.php', 'analytics.php'],
+            ['index.php', 'projects.php', 'certifications.php', 'posts.php', 'messages.php', 'revisar.php', 'analytics.php'],
             $this->navPages('site')
         );
     }

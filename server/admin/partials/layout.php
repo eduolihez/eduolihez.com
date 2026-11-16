@@ -113,6 +113,7 @@ function admin_header(string $title, string $active = ''): void
         $counts['projects'] = $countSafe("SELECT COUNT(*) FROM projects WHERE status = 'published'");
         $counts['certs']    = $countSafe('SELECT COUNT(*) FROM certifications WHERE visible = 1');
         $counts['posts']    = $countSafe('SELECT COUNT(*) FROM posts WHERE visible = 1');
+        $counts['review']   = $countSafe("SELECT COUNT(*) FROM certifications WHERE credential_url IS NULL OR credential_url = ''");
     } elseif ($space === SPACE_PHISHLAB) {
         $counts['lab_users'] = $countSafe('SELECT COUNT(*) FROM lab_users');
     }
@@ -169,6 +170,10 @@ function admin_header(string $title, string $active = ''): void
   Los .woff2 son los mismos que usa el sitio publico (Inter Variable y
   JetBrains Mono Variable, subconjunto latino, licencia OFL). Se copian a
   assets/fonts/ para que el panel siga siendo autonomo y sin compilacion.
+  Peso (woff2): latin 47 KB + 39 KB; latin-ext 83 KB (Inter) + 15 KB (JetBrains Mono).
+  Cada @font-face lleva unicode-range: el latin-ext solo se descarga si la
+  pagina muestra un caracter fuera del latin (p. ej. un nombre con "ł" o "ő"),
+  asi que las paginas en castellano/catalan no pagan esos 98 KB.
 */ ?>
 <?php /* Sincrono y antes del CSS: fija data-theme sin destello (CSP: script-src 'self'). */ ?>
 <script src="<?= e(asset_url('theme.js')) ?>"></script>

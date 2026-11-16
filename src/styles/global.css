@@ -994,3 +994,49 @@
 .prose tbody tr:hover {
   background: var(--color-bg-card);
 }
+
+/* T2 - Shell "Expediente": paleta y modales sobrios (sin blur decorativo, sin
+   halo de color, una sola familia cromatica, objetivos >= 44 px). Sobrescribe
+   reglas de arriba; admin.css tiene su propia copia (T7a la sincroniza). */
+.palette-backdrop,
+.modal-backdrop {
+  backdrop-filter: none;
+}
+.palette-panel {
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow-card);
+}
+.palette-profile {
+  background: var(--color-bg-soft);
+}
+.palette-avatar {
+  border-radius: 0.5rem;
+}
+[data-kind='go'],
+[data-kind='pages'],
+[data-kind='actions'],
+[data-kind='language'],
+[data-kind='links'] {
+  --kind: var(--color-accent);
+}
+.palette-input {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+}
+.palette-input:focus-visible {
+  box-shadow:
+    inset 0 0 0 2px var(--color-text),
+    inset 0 0 0 4px var(--mark);
+}
+.palette-option {
+  min-height: 2.75rem;
+}
+.palette-option[aria-selected='true'] {
+  box-shadow: inset 0 0 0 1px var(--color-accent);
+}
+.palette-option[aria-selected='true']::before {
+  display: none;
+}
+.palette-option[aria-selected='true']::after {
+  color: var(--color-text-muted);
+}

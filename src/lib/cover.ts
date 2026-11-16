@@ -24,12 +24,12 @@ const PAD = 64;
 // en Node durante el build, fuera del navegador, asi que no hay CSS del que
 // leer var(--color-*).
 const COLORS = {
-  bg: '#0a0e14',
-  bgCard: '#141a24',
-  border: '#1f2733',
-  textTitle: '#f0f3f6',
-  textMuted: '#9aa7b8',
-  accent: '#4ade80',
+  bg: '#0b1220',
+  bgCard: '#111a2c',
+  border: '#1e2a40',
+  textTitle: '#f3f6fa',
+  textMuted: '#9aa8bd',
+  accent: '#8fb0ff',
 };
 
 /**

@@ -25,17 +25,17 @@ const settingsUrl = api(`/api/settings.php?lang=${lang}`);
 
 <div
   id="site-announcement"
-  class="hidden border-b border-accent/25 bg-accent/10 text-sm"
+  class="hidden border-b border-on-ink/15 bg-ink text-sm text-on-ink"
   data-settings={settingsUrl}
   role="status"
 >
   <div class="container-page flex items-center justify-between gap-4 py-2">
-    <div id="ann-content" class="min-w-0 flex-1 text-center text-accent leading-normal">
+    <div id="ann-content" class="min-w-0 flex-1 text-center leading-normal">
     </div>
     <button
       id="ann-close"
       type="button"
-      class="shrink-0 rounded-sm p-1 text-accent/70 transition hover:text-accent"
+      class="-my-1 -mr-2 inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-on-ink/80 transition hover:text-on-ink"
       aria-label={t('announcement.close')}
     >
       <svg class="h-4 w-4" viewBox="0 0 24 24" aria-hidden="true">
@@ -66,11 +66,11 @@ const settingsUrl = api(`/api/settings.php?lang=${lang}`);
     html = html.replace(/__(.*?)__/g, '<strong>$1</strong>');
 
     // Cursiva: *texto*
-    html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
-    html = html.replace(/_(.*?)_/g, '<em>$1</em>');
+    html = html.replace(/\*(.*?)\*/g, '<em class="not-italic font-semibold">$1</em>');
+    html = html.replace(/_(.*?)_/g, '<em class="not-italic font-semibold">$1</em>');
 
     // Código: `texto`
-    html = html.replace(/`(.*?)`/g, '<code class="bg-accent/20 px-1.5 py-0.5 rounded-sm text-xs font-mono font-bold">$1</code>');
+    html = html.replace(/`(.*?)`/g, '<code class="bg-on-ink/15 px-1.5 py-0.5 rounded-sm text-xs font-mono font-bold">$1</code>');
 
     // Enlaces: [texto](url)
     html = html.replace(/\[(.*?)\]\((.*?)\)/g, (match, text, url) => {
@@ -78,7 +78,7 @@ const settingsUrl = api(`/api/settings.php?lang=${lang}`);
       if (/^(https?:\/\/|\/)/i.test(cleanUrl)) {
         const isExternal = cleanUrl.startsWith('http');
         const target = isExternal ? ' target="_blank" rel="noopener noreferrer"' : '';
-        return `<a href="${cleanUrl}" class="underline font-semibold hover:text-accent-hover"${target}>${text}</a>`;
+        return `<a href="${cleanUrl}" class="underline underline-offset-2 font-semibold hover:text-mark"${target}>${text}</a>`;
       }
       return text;
     });

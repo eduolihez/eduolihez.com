@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { beforeEach, describe, expect, it } from 'vitest';
 import {
   THEME_STORAGE_KEY,
@@ -164,5 +166,28 @@ describe('initThemeToggle', () => {
 
   it('does nothing when there is no toggle in the page', () => {
     expect(() => initThemeToggle()).not.toThrow();
+  });
+});
+
+describe('theme-color alignment', () => {
+  const read = (f: string) => readFileSync(resolve(process.cwd(), f), 'utf8');
+  const tokens = read('src/styles/tokens.css');
+  const light = /:root\s*\{[^}]*?--bg:\s*(#[0-9a-f]{6})/i.exec(tokens)?.[1];
+  const dark = /data-theme='dark'\]\s*\{[^}]*?--bg:\s*(#[0-9a-f]{6})/i.exec(tokens)?.[1];
+
+  it('reads both --bg values from tokens.css', () => {
+    expect(light).toBeTruthy();
+    expect(dark).toBeTruthy();
+  });
+
+  it('matches --bg in BaseLayout, theme-init.js, theme.ts and cover.ts', () => {
+    expect(read('src/layouts/BaseLayout.astro')).toContain(`name="theme-color" content="${light}"`);
+    const init = read('public/theme-init.js');
+    expect(init).toContain(`'${light}'`);
+    expect(init).toContain(`'${dark}'`);
+    const ts = read('src/scripts/theme.ts');
+    expect(ts).toContain(`light: '${light}'`);
+    expect(ts).toContain(`dark: '${dark}'`);
+    expect(read('src/lib/cover.ts')).toContain(`bg: '${dark}'`);
   });
 });

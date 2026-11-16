@@ -21,5 +21,5 @@
     }
   }
   var meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute('content', theme === 'dark' ? '#0a0e14' : '#f5f6f3');
+  if (meta) meta.setAttribute('content', theme === 'dark' ? '#0b1220' : '#f3f5f8');
 })();

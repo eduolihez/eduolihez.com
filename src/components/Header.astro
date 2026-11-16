@@ -55,7 +55,7 @@ const flagSvgs = {
 ---
 
 <header
-  class="fixed inset-x-0 top-0 z-50 border-b border-bg-border/60 bg-bg/80 backdrop-blur-md"
+  class="fixed inset-x-0 top-0 z-50 border-b border-bg-border bg-bg"
 >
   <!-- Aviso opcional, controlado desde /admin -> Ajustes. Va DENTRO de la
        cabecera fija: si estuviera fuera, la cabecera lo taparia al estar
@@ -63,15 +63,15 @@ const flagSvgs = {
   <Announcement lang={lang} />
 
   <nav
-    class="container-page flex h-14 items-center justify-between"
+    class="container-page flex h-16 items-center justify-between lg:h-14"
     aria-label="Principal"
   >
     <a
       href={base}
-      class="mr-4 shrink-0 font-mono text-sm font-semibold tracking-tight text-text-title"
+      class="mr-4 inline-flex min-h-11 shrink-0 items-center rounded-md font-display text-base font-bold tracking-tight text-text-title"
       aria-label={`EO // security — ${SITE.shortName}, ${t('nav.about')}`}
     >
-      EO <span class="text-accent">//</span> <span class="font-medium text-text-muted">security</span>
+      EO&nbsp;<span class="text-accent">//</span> <span class="ml-1 font-medium text-text-muted">security</span>
     </a>
 
     {/* lg (1024px), no md (768px): a 768px el logo + 7 enlaces + icono de
@@ -84,7 +84,7 @@ const flagSvgs = {
           <li>
             <a
               href={item.href}
-              class="rounded-md px-2.5 py-2 text-sm text-text-muted transition hover:text-text"
+              class="inline-flex min-h-10 items-center rounded-md px-2.5 text-sm font-medium text-text-muted transition hover:text-text"
             >
               {item.label}
             </a>
@@ -138,7 +138,7 @@ const flagSvgs = {
         </button>
         <ul
           id="lang-menu"
-          class="absolute right-0 mt-1 hidden min-w-[9rem] overflow-hidden rounded-md border border-bg-border bg-bg-card py-1 shadow-xl"
+          class="absolute right-0 mt-2 hidden min-w-[10rem] rounded-md border border-bg-border bg-bg-card p-1 shadow-xl"
           role="menu"
         >
           {
@@ -147,7 +147,7 @@ const flagSvgs = {
                 <a
                   role="menuitem"
                   href={l.href}
-                  class={`flex items-center px-3 py-2 text-sm transition hover:bg-bg-soft ${
+                  class={`flex min-h-11 items-center rounded-sm px-3 py-2 text-sm transition hover:bg-bg-soft ${
                     l.code === lang ? 'text-accent' : 'text-text-muted hover:text-text'
                   }`}
                 >
@@ -165,7 +165,7 @@ const flagSvgs = {
       <button
         id="menu-toggle"
         type="button"
-        class="inline-flex items-center justify-center rounded-md p-2 text-text-muted transition hover:text-text lg:hidden"
+        class="bar-btn inline-flex lg:hidden"
         aria-label={t('nav.menu')}
         aria-expanded="false"
         aria-controls="mobile-menu"
@@ -178,14 +178,14 @@ const flagSvgs = {
   </nav>
 
   <!-- Menu movil -->
-  <div id="mobile-menu" class="hidden border-t border-bg-border bg-bg lg:hidden">
-    <ul class="container-page space-y-1 py-4">
+  <div id="mobile-menu" class="hidden max-h-[calc(100dvh-4rem)] overflow-y-auto border-t border-bg-border bg-bg lg:hidden">
+    <ul class="container-page space-y-1 p-1 py-4">
       {
         nav.map((item) => (
           <li>
             <a
               href={item.href}
-              class="mobile-link block rounded-md px-3 py-2.5 text-base text-text-muted transition hover:bg-bg-soft hover:text-text"
+              class="mobile-link flex min-h-12 items-center rounded-md px-3 text-base font-medium text-text-muted transition hover:bg-bg-soft hover:text-text"
             >
               {item.label}
             </a>
@@ -202,6 +202,8 @@ const flagSvgs = {
     align-items: center;
     justify-content: center;
     border-radius: 0.5rem;
+    min-height: 2.75rem;
+    min-width: 2.75rem;
     border: 1px solid var(--color-bg-border);
     background: var(--color-bg-card);
     color: var(--color-text-muted);
@@ -214,6 +216,12 @@ const flagSvgs = {
     border-color: var(--color-bg-border-hover);
     color: var(--color-text);
   }
+  @media (min-width: 1024px) {
+    .bar-btn {
+      min-height: 2.25rem;
+      min-width: 2.25rem;
+    }
+  }
   .bar-btn:active {
     transform: scale(0.96);
   }
@@ -225,9 +233,10 @@ const flagSvgs = {
     const menuToggle = document.getElementById('menu-toggle');
     const menu = document.getElementById('mobile-menu');
     if (menuToggle && menu) {
-      const close = () => {
+      const close = (returnFocus = false) => {
         menu.classList.add('hidden');
         menuToggle.setAttribute('aria-expanded', 'false');
+        if (returnFocus) menuToggle.focus();
       };
       menuToggle.addEventListener('click', () => {
         const open = !menu.classList.contains('hidden');
@@ -237,15 +246,26 @@ const flagSvgs = {
           menuToggle.setAttribute('aria-expanded', 'true');
         }
       });
-      menu.querySelectorAll('.mobile-link').forEach((l) => l.addEventListener('click', close));
+      menu.querySelectorAll('.mobile-link').forEach((l) => l.addEventListener('click', () => close()));
+      // Esc cierra el menu y devuelve el foco al boton; el foco que sale del
+      // menu (Tab/Shift+Tab fuera del boton y de los enlaces) tambien lo cierra.
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !menu.classList.contains('hidden')) close(true);
+      });
+      const wrap = menu.parentElement;
+      wrap?.addEventListener('focusout', (e) => {
+        const next = e.relatedTarget as Node | null;
+        if (next && !wrap.contains(next)) close();
+      });
     }
 
     const langToggle = document.getElementById('lang-toggle');
     const langMenu = document.getElementById('lang-menu');
     if (langToggle && langMenu) {
-      const closeLang = () => {
+      const closeLang = (returnFocus = false) => {
         langMenu.classList.add('hidden');
         langToggle.setAttribute('aria-expanded', 'false');
+        if (returnFocus === true) langToggle.focus();
       };
       langToggle.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -257,9 +277,14 @@ const flagSvgs = {
         }
       });
       // Cierra al hacer clic fuera o con Escape.
-      document.addEventListener('click', closeLang);
+      document.addEventListener('click', () => closeLang());
       document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closeLang();
+        if (e.key === 'Escape' && !langMenu.classList.contains('hidden')) closeLang(true);
+      });
+      // Tab fuera del selector lo cierra (si no, queda abierto tapando contenido).
+      langMenu.parentElement?.addEventListener('focusout', (e) => {
+        const next = e.relatedTarget as Node | null;
+        if (next && !langMenu.parentElement!.contains(next)) closeLang();
       });
     }
   }

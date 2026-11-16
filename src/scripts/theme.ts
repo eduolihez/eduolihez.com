@@ -12,8 +12,8 @@ export const THEME_STORAGE_KEY = 'theme';
 
 /** Mismos valores que --color-bg en tokens.css (barra del navegador movil). */
 const THEME_COLOR: Record<EffectiveTheme, string> = {
-  light: '#f5f6f3',
-  dark: '#0a0e14',
+  light: '#f3f5f8',
+  dark: '#0b1220',
 };
 
 export function getStoredTheme(): ThemePreference {

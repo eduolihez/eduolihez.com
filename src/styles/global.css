@@ -1742,3 +1742,18 @@ a.post-row:hover .post-title {
   font-weight: 600;
   letter-spacing: 0.02em;
 }
+
+/* T15: insignias altas/estrechas usan todo el alto; tarjetas de proyecto igualadas por fila. */
+.cert-badge {
+  padding: 2px;
+}
+.cert-badge-img {
+  width: auto;
+  max-width: 100%;
+  height: 100%;
+}
+@media (min-width: 768px) {
+  #projects-grid {
+    align-items: stretch;
+  }
+}

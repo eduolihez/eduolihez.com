@@ -39,7 +39,16 @@ export const DEFAULT_LIMIT = 8;
  * sin logo. Dos o mas palabras: iniciales de las dos primeras ("Trend Micro" ->
  * "TM"); una sola: sus dos primeras letras ("Cisco" -> "CI").
  */
+const KNOWN_INITIALS: Record<string, string> = {
+  fortinet: 'FN',
+  linkedin: 'LI',
+  tryhackme: 'TH',
+  'trend micro': 'TM',
+};
+
 export function issuerInitials(issuer: string | undefined): string {
+  const known = KNOWN_INITIALS[(issuer || '').trim().toLowerCase()];
+  if (known) return known;
   const words = (issuer || '').match(/[\p{L}\p{N}]+/gu) || [];
   if (!words.length) return '·';
   const letters = words.length > 1 ? words[0][0] + words[1][0] : words[0].slice(0, 2);

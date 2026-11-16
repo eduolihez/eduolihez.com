@@ -139,7 +139,11 @@ describe('initCerts()', () => {
 
   it('issuerInitials: dos palabras, una palabra, vacio', () => {
     expect(issuerInitials('Trend Micro')).toBe('TM');
-    expect(issuerInitials('tryhackme')).toBe('TR');
+    expect(issuerInitials('Fortinet')).toBe('FN');
+    expect(issuerInitials(' TryHackMe ')).toBe('TH');
+    expect(issuerInitials('LinkedIn')).toBe('LI');
+    expect(issuerInitials('Cisco')).toBe('CI');
+    expect(issuerInitials('Palo Alto')).toBe('PA');
     expect(issuerInitials('X')).toBe('X');
     expect(issuerInitials('')).toBe('·');
     expect(issuerInitials(undefined)).toBe('·');

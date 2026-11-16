@@ -1,0 +1,2045 @@
+{
+  "files": {
+    "dist/llms.txt": {
+      "sha256": "493a5d7f3fca22dd5ce6fa04cdbf8702e598e6b01b5c12bf151924ca5bdc8798",
+      "bytes": 26033
+    },
+    "dist/sitemap.xml": {
+      "sha256": "76e3394481aade5fc0372b245bdfa95580de4c2acd81de214268a361b86d856f",
+      "bytes": 8527
+    }
+  },
+  "pages": {
+    "es": {
+      "jsonLd": [
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "Person",
+              "@id": "https://eduolihez.com/#person",
+              "name": "Eduardo Olivares Hernández",
+              "alternateName": [
+                "Edu Olivares",
+                "eduolihez",
+                "Eduardo Olivares",
+                "Edu Olivares Hernández",
+                "Eduardo Olivares Hernández"
+              ],
+              "givenName": "Eduardo",
+              "familyName": "Olivares Hernández",
+              "jobTitle": "Cybersecurity Analyst · SOC · Cloud Security & IAM · Email & Collaboration Security · AI Security & LLM Red Teaming",
+              "description": "Analista de ciberseguridad en Barcelona (vive en Badalona), especializado en seguridad cloud, gestión de identidades y accesos (IAM) y seguridad del correo y la colaboración, con la seguridad de la IA como línea transversal (red teaming de chatbots LLM). En Dagram hace triaje de alertas en Trend Micro Vision One, automatiza informes de seguridad con Python y da soporte de IAM. Certificado por Trend Micro, Fortinet y Microsoft.",
+              "url": "https://eduolihez.com",
+              "image": {
+                "@type": "ImageObject",
+                "url": "https://eduolihez.com/img/eduardo.webp",
+                "caption": "Eduardo Olivares Hernández, Cybersecurity Analyst · SOC · Cloud Security & IAM · Email & Collaboration Security · AI Security & LLM Red Teaming"
+              },
+              "email": "eduardo@eduolihez.com",
+              "nationality": {
+                "@type": "Country",
+                "name": "España"
+              },
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Badalona",
+                "addressRegion": "Barcelona",
+                "postalCode": "08911",
+                "addressCountry": "ES"
+              },
+              "homeLocation": {
+                "@type": "Place",
+                "name": "Badalona, Barcelona",
+                "address": {
+                  "@type": "PostalAddress",
+                  "addressLocality": "Badalona",
+                  "addressRegion": "Barcelona",
+                  "addressCountry": "ES"
+                },
+                "geo": {
+                  "@type": "GeoCoordinates",
+                  "latitude": 41.45,
+                  "longitude": 2.2474
+                }
+              },
+              "workLocation": [
+                {
+                  "@type": "Place",
+                  "name": "Badalona"
+                },
+                {
+                  "@type": "Place",
+                  "name": "Barcelona"
+                },
+                {
+                  "@type": "Place",
+                  "name": "Área Metropolitana de Barcelona"
+                },
+                {
+                  "@type": "Place",
+                  "name": "Cataluña"
+                },
+                {
+                  "@type": "Place",
+                  "name": "España"
+                },
+                {
+                  "@type": "Place",
+                  "name": "Remoto / Teletrabajo"
+                }
+              ],
+              "knowsAbout": [
+                "Cloud Security",
+                "Gestión de identidades y accesos (IAM)",
+                "Seguridad del correo y la colaboración (Email & Collaboration Security)",
+                "Security Operations Center (SOC)",
+                "Blue Team",
+                "Detección de amenazas",
+                "Respuesta a incidentes",
+                "SIEM y XDR",
+                "Trend Micro Vision One",
+                "Fortinet FortiGate y FortiAnalyzer",
+                "Simulación de phishing y concienciación en seguridad (SAT)",
+                "Threat Intelligence",
+                "Seguridad de la IA (AI Security)",
+                "Red teaming de chatbots LLM",
+                "OWASP Top 10 para aplicaciones LLM",
+                "MITRE ATLAS y NIST AI RMF",
+                "Pentesting y OWASP",
+                "Automatización de seguridad con Python",
+                "Inteligencia artificial aplicada a ciberseguridad",
+                "Active Directory y Windows Server",
+                "Cloud Security",
+                "Identity & Access Management (IAM)",
+                "Email & Collaboration Security",
+                "Security Awareness (SAT)",
+                "Phishing Simulation",
+                "AI Security",
+                "LLM Red Teaming",
+                "Prompt Injection",
+                "OWASP Top 10 for LLM Apps",
+                "MITRE ATLAS",
+                "NIST AI RMF",
+                "OWASP",
+                "Penetration Testing",
+                "Red Teaming",
+                "Web Application Security",
+                "Threat Detection",
+                "Incident Response",
+                "XDR / SIEM",
+                "Threat Intelligence",
+                "Trend Micro Vision One",
+                "Fortinet (FortiGate/FortiAnalyzer)",
+                "Vulnerability Management",
+                "Criptografía",
+                "Análisis de Phishing",
+                "Python",
+                "JavaScript",
+                "TypeScript",
+                "Rust",
+                "SQL",
+                "Bash",
+                "Machine Learning",
+                "Prompt Engineering",
+                "ONNX",
+                "Azure AI",
+                "Active Directory",
+                "Windows Server",
+                "Linux",
+                "Redes",
+                "Firewalls",
+                "Next.js",
+                "Tailwind CSS",
+                "SQLite",
+                "Git",
+                "Chrome Extensions"
+              ],
+              "knowsLanguage": [
+                {
+                  "@type": "Language",
+                  "name": "Español",
+                  "alternateName": "es"
+                },
+                {
+                  "@type": "Language",
+                  "name": "Catalán",
+                  "alternateName": "ca"
+                },
+                {
+                  "@type": "Language",
+                  "name": "Inglés",
+                  "alternateName": "en"
+                }
+              ],
+              "worksFor": {
+                "@type": "Organization",
+                "name": "Dagram"
+              },
+              "hasOccupation": {
+                "@type": "Occupation",
+                "name": "Cybersecurity Analyst (SOC, Cloud Security & IAM)",
+                "occupationalCategory": "15-1212.00",
+                "occupationLocation": {
+                  "@type": "City",
+                  "name": "Barcelona",
+                  "address": {
+                    "@type": "PostalAddress",
+                    "addressLocality": "Barcelona",
+                    "addressRegion": "Cataluña",
+                    "addressCountry": "ES"
+                  }
+                },
+                "skills": "Cloud Security, Gestión de identidades y accesos (IAM), Seguridad del correo y la colaboración (Email & Collaboration Security), Security Operations Center (SOC), Blue Team, Detección de amenazas, Respuesta a incidentes, SIEM y XDR, Trend Micro Vision One, Fortinet FortiGate y FortiAnalyzer, Simulación de phishing y concienciación en seguridad (SAT), Threat Intelligence, Seguridad de la IA (AI Security), Red teaming de chatbots LLM, OWASP Top 10 para aplicaciones LLM, MITRE ATLAS y NIST AI RMF, Pentesting y OWASP, Automatización de seguridad con Python, Inteligencia artificial aplicada a ciberseguridad, Active Directory y Windows Server"
+              },
+              "hasOccupationalExperience": [
+                {
+                  "@type": "OrganizationRole",
+                  "roleName": "Analista de Ciberseguridad",
+                  "description": "Triaje diario de alertas de Trend Micro Vision One (TrendAI), con IA para acelerar la investigación. Automaticé con Python los informes de amenazas, vulnerabilidades y el informe mensual: lo que antes llevaba semanas de trabajo manual se genera ahora en menos de 1 hora. Diseño y ejecuto las campañas de phishing simulado y el programa de concienciación (SAT), doy soporte en gestión de identidades y accesos (altas, bajas y revisiones de permisos) y contengo y remedio las amenazas confirmadas, con SOPs y documentación de cumplimiento para auditorías.",
+                  "startDate": "2026-04-01",
+                  "worksFor": {
+                    "@type": "Organization",
+                    "name": "Dagram"
+                  }
+                },
+                {
+                  "@type": "OrganizationRole",
+                  "roleName": "Técnico de Ciberseguridad (N1/N2)",
+                  "description": "Configuración y gestión de firewalls FortiGate y FortiAnalyzer para la seguridad de red centralizada en distintos entornos de cliente. Scripts en Python a medida para informes de seguridad y análisis de logs, que mejoraron la eficiencia operativa del SOC. Implantación de políticas de seguridad y ejecución de protocolos de respuesta a incidentes en entornos corporativos. Este trabajo me llevó al puesto de Analista de Ciberseguridad cuatro meses después.",
+                  "startDate": "2026-01-01",
+                  "endDate": "2026-04-01",
+                  "worksFor": {
+                    "@type": "Organization",
+                    "name": "Dagram"
+                  }
+                },
+                {
+                  "@type": "OrganizationRole",
+                  "roleName": "Técnico IT",
+                  "description": "Soporte técnico a más de 100 usuarios, resolviendo la mayoría de incidencias en menos de 24 horas. Administración de Active Directory y de la red local (LAN). Scripts en Python para quitarme de encima las tareas repetitivas.",
+                  "startDate": "2024-10-01",
+                  "endDate": "2025-04-01",
+                  "worksFor": {
+                    "@type": "Organization",
+                    "name": "Institució Cultural Laietània"
+                  }
+                },
+                {
+                  "@type": "OrganizationRole",
+                  "roleName": "Instructor de Fitness",
+                  "description": "Dirección de grupos de hasta 13 personas en sesiones de alta intensidad. Aprendí a tomar decisiones rápidas cuando algo sale mal y a explicar lo mismo de tres maneras según quién escuche, algo que uso a diario al redactar informes de seguridad para lectores técnicos y no técnicos.",
+                  "startDate": "2024-05-01",
+                  "endDate": "2024-09-01",
+                  "worksFor": {
+                    "@type": "Organization",
+                    "name": "Escola del Vent"
+                  }
+                }
+              ],
+              "hasCredential": [
+                {
+                  "@type": "EducationalOccupationalCredential",
+                  "name": "Trend Micro Vision One Cloud Security Foundation",
+                  "credentialCategory": "certificate",
+                  "recognizedBy": {
+                    "@type": "Organization",
+                    "name": "Trend Micro"
+                  },
+                  "dateCreated": "2024"
+                },
+                {
+                  "@type": "EducationalOccupationalCredential",
+                  "name": "Trend Micro Vision One Identity Security Foundation",
+                  "credentialCategory": "certificate",
+                  "recognizedBy": {
+                    "@type": "Organization",
+                    "name": "Trend Micro"
+                  },
+                  "dateCreated": "2024"
+                },
+                {
+                  "@type": "EducationalOccupationalCredential",
+                  "name": "Trend Micro Vision One Email & Collaboration Security Foundation",
+                  "credentialCategory": "certificate",
+                  "recognizedBy": {
+                    "@type": "Organization",
+                    "name": "Trend Micro"
+                  },
+                  "dateCreated": "2024"
+                },
+                {
+                  "@type": "EducationalOccupationalCredential",
+                  "name": "Trend Micro Vision One Security Operations (SecOps) Foundation",
+                  "credentialCategory": "certificate",
+                  "recognizedBy": {
+                    "@type": "Organization",
+                    "name": "Trend Micro"
+                  },
+                  "dateCreated": "2024"
+                },
+                {
+                  "@type": "EducationalOccupationalCredential",
+                  "name": "Trend Micro Vision One Platform — Advanced",
+                  "credentialCategory": "certificate",
+                  "recognizedBy": {
+                    "@type": "Organization",
+                    "name": "Trend Micro"
+                  },
+                  "dateCreated": "2024"
+                },
+                {
+                  "@type": "EducationalOccupationalCredential",
+                  "name": "Trend Micro Vision One AI Security Foundation",
+                  "credentialCategory": "certificate",
+                  "recognizedBy": {
+                    "@type": "Organization",
+                    "name": "Trend Micro"
+                  }
+                },
+                {
+                  "@type": "EducationalOccupationalCredential",
+                  "name": "Trend Micro Vision One Threat Intelligence Foundation",
+                  "credentialCategory": "certificate",
+                  "recognizedBy": {
+                    "@type": "Organization",
+                    "name": "Trend Micro"
+                  }
+                },
+                {
+                  "@type": "EducationalOccupationalCredential",
+                  "name": "Fortinet NSE 3 Certified in Cybersecurity",
+                  "credentialCategory": "certificate",
+                  "recognizedBy": {
+                    "@type": "Organization",
+                    "name": "Fortinet"
+                  },
+                  "dateCreated": "2026"
+                },
+                {
+                  "@type": "EducationalOccupationalCredential",
+                  "name": "Fortinet Certified Associate Cybersecurity",
+                  "credentialCategory": "certificate",
+                  "recognizedBy": {
+                    "@type": "Organization",
+                    "name": "Fortinet"
+                  }
+                },
+                {
+                  "@type": "EducationalOccupationalCredential",
+                  "name": "Fortinet FortiGate 7.6 Operator",
+                  "credentialCategory": "certificate",
+                  "recognizedBy": {
+                    "@type": "Organization",
+                    "name": "Fortinet"
+                  },
+                  "dateCreated": "2026"
+                },
+                {
+                  "@type": "EducationalOccupationalCredential",
+                  "name": "Microsoft Certified: Azure AI Fundamentals",
+                  "credentialCategory": "certificate",
+                  "recognizedBy": {
+                    "@type": "Organization",
+                    "name": "Microsoft"
+                  },
+                  "dateCreated": "2026"
+                },
+                {
+                  "@type": "EducationalOccupationalCredential",
+                  "name": "IT Specialist - Python",
+                  "credentialCategory": "certificate",
+                  "recognizedBy": {
+                    "@type": "Organization",
+                    "name": "Certiport"
+                  }
+                },
+                {
+                  "@type": "EducationalOccupationalCredential",
+                  "name": "First Certificate in English (B2)",
+                  "credentialCategory": "certificate",
+                  "recognizedBy": {
+                    "@type": "Organization",
+                    "name": "Cambridge English"
+                  },
+                  "dateCreated": "2021"
+                }
+              ],
+              "alumniOf": [
+                {
+                  "@type": "EducationalOrganization",
+                  "name": "Col·legi Cultural"
+                },
+                {
+                  "@type": "EducationalOrganization",
+                  "name": "Col·legi Cultural"
+                }
+              ],
+              "award": [
+                "Ganador de la 8a Hackathon TecnoCampus"
+              ],
+              "sameAs": [
+                "https://www.linkedin.com/in/eduolihez/",
+                "https://github.com/eduolihez",
+                "https://eduolihez.github.io/",
+                "https://www.youtube.com/@eduolihez",
+                "https://www.credly.com/users/eduolihez"
+              ]
+            },
+            {
+              "@type": "WebSite",
+              "@id": "https://eduolihez.com/#website",
+              "url": "https://eduolihez.com",
+              "name": "Eduardo Olivares Hernández — Analista SOC y de Ciberseguridad en Barcelona y Badalona",
+              "description": "Analista de ciberseguridad en Barcelona (vive en Badalona), especializado en seguridad cloud, gestión de identidades y accesos (IAM) y seguridad del correo y la colaboración, con la seguridad de la IA como línea transversal (red teaming de chatbots LLM). En Dagram hace triaje de alertas en Trend Micro Vision One, automatiza informes de seguridad con Python y da soporte de IAM. Certificado por Trend Micro, Fortinet y Microsoft.",
+              "inLanguage": "es",
+              "publisher": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "copyrightHolder": {
+                "@id": "https://eduolihez.com/#person"
+              }
+            },
+            {
+              "@type": "ProfilePage",
+              "@id": "https://eduolihez.com/#profile",
+              "url": "https://eduolihez.com/",
+              "name": "Eduardo Olivares | Analista SOC en Barcelona y Badalona",
+              "description": "Analista de ciberseguridad SOC en Barcelona y Badalona: detección de amenazas, Cloud Security, IAM y seguridad de la IA. Trend Micro Vision One y Fortinet.",
+              "inLanguage": "es",
+              "isPartOf": {
+                "@id": "https://eduolihez.com/#website"
+              },
+              "about": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "mainEntity": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "primaryImageOfPage": {
+                "@type": "ImageObject",
+                "url": "https://eduolihez.com/og/es.png"
+              },
+              "dateCreated": "2026-07-25T00:00:00+02:00",
+              "dateModified": "2026-11-16T10:08:16.895Z"
+            },
+            {
+              "@type": "SoftwareSourceCode",
+              "@id": "https://eduolihez.com/#software-blue-team-hub",
+              "name": "Blue Team Hub",
+              "description": "Herramientas gratuitas y 100% client-side para analistas SOC: IOC Defanger, analizador de cabeceras de correo (SPF/DKIM/DMARC), reglas YARA y playbooks de respuesta a incidentes.",
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "url": "https://eduolihez.github.io/",
+              "codeRepository": "https://github.com/eduolihez/eduolihez.github.io"
+            },
+            {
+              "@type": "SoftwareSourceCode",
+              "@id": "https://eduolihez.com/#software-phishlab",
+              "name": "PhishLab",
+              "description": "Plantillas para simulaciones de phishing autorizadas por contrato, con exportación para GoPhish y checklist de autorización.",
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "url": "https://eduolihez.com/projects/phishlab/",
+              "codeRepository": "https://github.com/eduolihez/phishlab"
+            },
+            {
+              "@type": "SoftwareSourceCode",
+              "@id": "https://eduolihez.com/#software-phishing-triage",
+              "name": "Phishing triage by classifier disagreement",
+              "description": "Investigación sobre 7.822 correos reales: la incertidumbre del propio ensemble prioriza mejor que el desacuerdo entre clasificadores.",
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "url": "https://github.com/eduolihez/phishing-triage",
+              "codeRepository": "https://github.com/eduolihez/phishing-triage"
+            },
+            {
+              "@type": "SoftwareSourceCode",
+              "@id": "https://eduolihez.com/#software-kev-digest",
+              "name": "KEV Digest",
+              "description": "Vigilancia automatizada del catálogo CISA KEV cada tres horas sobre GitHub Actions, con las vulnerabilidades usadas en ransomware marcadas aparte.",
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "url": "https://github.com/eduolihez/kev-digest",
+              "codeRepository": "https://github.com/eduolihez/kev-digest"
+            },
+            {
+              "@type": "SoftwareSourceCode",
+              "@id": "https://eduolihez.com/#software-crem-report-generator",
+              "name": "CREM Report Generator",
+              "description": "Generador no oficial de informes de riesgo y exposición para Trend Micro Vision One, con enriquecimiento de CVEs (NVD, CISA KEV, EPSS).",
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "url": "https://github.com/eduolihez/vision-one-crem-report-generator",
+              "codeRepository": "https://github.com/eduolihez/vision-one-crem-report-generator"
+            },
+            {
+              "@type": "SoftwareSourceCode",
+              "@id": "https://eduolihez.com/#software-llm-chatbot-pentest",
+              "name": "llm-chatbot-pentest",
+              "description": "Red-teaming autónomo de chatbots LLM según el OWASP Top 10 para aplicaciones LLM, con juez LLM e informe reproducible. Solo uso autorizado.",
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "url": "https://github.com/eduolihez/llm-chatbot-pentest",
+              "codeRepository": "https://github.com/eduolihez/llm-chatbot-pentest"
+            },
+            {
+              "@type": "SoftwareSourceCode",
+              "@id": "https://eduolihez.com/#software-vigia",
+              "name": "Vigia",
+              "description": "Agente OSINT de superficie de ataque externa (EASM) con un LLM local; hallazgos con evidencia, priorizados con CISA KEV y FIRST EPSS.",
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "url": "https://github.com/eduolihez/vigia",
+              "codeRepository": "https://github.com/eduolihez/vigia"
+            },
+            {
+              "@type": "SoftwareSourceCode",
+              "@id": "https://eduolihez.com/#software-northgate-browser",
+              "name": "NorthGate Browser",
+              "description": "Navegador centrado en la privacidad (fork de Mullvad Browser / Firefox) con clasificador de phishing en el dispositivo.",
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "url": "https://github.com/eduolihez/northgate-browser",
+              "codeRepository": "https://github.com/eduolihez/northgate-browser",
+              "creativeWorkStatus": "In development"
+            },
+            {
+              "@type": "SoftwareSourceCode",
+              "@id": "https://eduolihez.com/#software-bincat",
+              "name": "BinCat",
+              "description": "SDK en Python y panel Flask para emitir, validar y revocar tokens Fernet y JWT con registro de auditoría.",
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "url": "https://github.com/eduolihez/BinCat",
+              "codeRepository": "https://github.com/eduolihez/BinCat"
+            },
+            {
+              "@type": "SoftwareApplication",
+              "@id": "https://eduolihez.com/#software-password-centinel",
+              "name": "Password Centinel",
+              "description": "Gestor de contraseñas 100% local (AES-256-GCM, TOTP/2FA, comprobación de filtraciones con Have I Been Pwned).",
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "url": "https://eduolihez.com/apps/password-centinel/",
+              "applicationCategory": "BrowserApplication"
+            },
+            {
+              "@type": "SoftwareApplication",
+              "@id": "https://eduolihez.com/#software-prompt-master",
+              "name": "PromptMaster",
+              "description": "Extensión de navegador que mejora prompts para ChatGPT, Claude, Gemini y otras plataformas de IA.",
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "url": "https://eduolihez.com/apps/prompt-master/",
+              "applicationCategory": "BrowserApplication"
+            },
+            {
+              "@type": "SoftwareApplication",
+              "@id": "https://eduolihez.com/#software-nowait",
+              "name": "NoWait",
+              "description": "Extensión que evita acortadores de enlaces y páginas de espera (Linkvertise, ouo.io, adf.ly y 90+ sitios más).",
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "url": "https://eduolihez.com/apps/nowait/",
+              "applicationCategory": "BrowserApplication"
+            },
+            {
+              "@type": "SoftwareApplication",
+              "@id": "https://eduolihez.com/#software-followguard",
+              "name": "FollowGuard",
+              "description": "Herramienta de ciberinteligencia que analiza interacciones en redes sociales para detectar perfiles falsos y automatizados.",
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "url": "https://eduolihez.com/projects/followguard/",
+              "applicationCategory": "SecurityApplication"
+            },
+            {
+              "@type": "SoftwareApplication",
+              "@id": "https://eduolihez.com/#software-fluence",
+              "name": "Fluence",
+              "description": "Asistente de escritorio para el crecimiento orgánico en Instagram; procesado local, sin servidores propios.",
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "url": "https://eduolihez.com/projects/fluence/",
+              "applicationCategory": "DesktopEnhancementApplication"
+            },
+            {
+              "@type": "FAQPage",
+              "@id": "https://eduolihez.com/#faq",
+              "inLanguage": "es",
+              "isPartOf": {
+                "@id": "https://eduolihez.com/#website"
+              },
+              "mainEntity": [
+                {
+                  "@type": "Question",
+                  "name": "¿Quién es Eduardo Olivares?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Eduardo Olivares Hernández es analista de ciberseguridad en Barcelona, especializado en seguridad cloud, gestión de identidades y accesos (IAM) y seguridad del correo y la colaboración. Trabaja en Dagram, donde hace triaje de alertas en Trend Micro Vision One, automatiza informes de seguridad con Python y da soporte de IAM. Además trabaja la seguridad de la IA (red teaming de chatbots LLM). Tiene certificaciones de Trend Micro, Fortinet y Microsoft."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "¿Qué experiencia tiene Eduardo Olivares en Cloud Security e IAM?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Tiene las certificaciones Cloud Security, Identity Security y Email & Collaboration Security Foundation de Trend Micro Vision One. En Dagram da soporte de gestión de identidades y accesos (altas, bajas y revisiones de permisos) y dirige las campañas de phishing simulado y el programa de concienciación. La seguridad cloud e IAM es el área en la que se está especializando."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "¿Dónde trabaja Eduardo Olivares? ¿Trabaja en Barcelona o en remoto?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Trabaja en Barcelona y vive en Badalona, en el área metropolitana. Está abierto a puestos presenciales o híbridos en Barcelona y a trabajo en remoto."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "¿Qué experiencia tiene Eduardo Olivares en seguridad de la IA y red teaming de LLM?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Aborda la seguridad de la IA desde los dos lados. En ofensiva, creó llm-chatbot-pentest, una herramienta de código abierto para el red teaming autónomo de chatbots LLM: identifica el objetivo, genera payloads alineados con el OWASP Top 10 para aplicaciones LLM, los puntúa con un modelo juez independiente y no se ejecuta sin autorización explícita y un alcance definido. En defensa, trabaja los riesgos de la IA que llegan a un SOC: inyección de prompts, fuga de datos por asistentes de IA, shadow AI y los permisos que se dan a los agentes. Sus referencias son OWASP Top 10 para LLM, MITRE ATLAS y NIST AI RMF."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "¿Qué estudia Eduardo Olivares y hacia dónde quiere evolucionar?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Está terminando el ciclo superior de Administración de Sistemas Informáticos en Red con itinerario de Ciberseguridad (previsto para 2027) en el Col·legi Cultural, y después planea estudiar Ingeniería Informática. A largo plazo quiere especializarse en seguridad cloud e IAM, con la seguridad de la IA presente en ambas, y llegar a liderar un equipo de seguridad."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "¿Qué hace exactamente un analista SOC?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Un analista SOC (Security Operations Center) vigila de forma continua los sistemas de una organización para detectar ataques. Su día a día es triar alertas de las plataformas XDR y SIEM, investigar cuáles son amenazas reales, contener los incidentes y documentar lo ocurrido para que no se repita."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "¿Con qué tecnologías y herramientas de seguridad trabaja?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "En el día a día: Trend Micro Vision One (XDR), FortiGate y FortiAnalyzer de Fortinet, fuentes de Threat Intelligence y Active Directory. Automatiza informes con Python: los informes de amenazas, vulnerabilidades y el mensual, que antes llevaban semanas de trabajo manual, se generan ahora en menos de 1 hora. También aplica IA al análisis de amenazas y a la detección de phishing."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "¿Qué certificaciones de ciberseguridad tiene?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "En Trend Micro Vision One tiene las Foundation de Cloud Security, Identity Security, Email & Collaboration Security, SecOps, AI Security y Threat Intelligence, además de Platform Advanced. En Fortinet, NSE 3 y FortiGate 7.6 Operator; en Microsoft, Azure AI Fundamentals (AI-900). El listado completo y verificable está en la sección de certificaciones de la web."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "¿Está disponible para nuevas oportunidades laborales?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Si está abierto a ofertas, verás un indicador verde de \"Disponible\" junto a su foto en la página principal. La vía más rápida para contactarle es el formulario de esta web o LinkedIn; suele responder en menos de 48 horas."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "¿En qué idiomas trabaja?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Español y catalán como lenguas nativas, e inglés con nivel B2, suficiente para documentación técnica, informes y reuniones con equipos internacionales. Esta web está disponible en los tres idiomas."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "¿Cómo puedo contactar con él?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Mediante el formulario de contacto de esta misma web, por correo a eduardo@eduolihez.com o a través de su perfil de LinkedIn. También puedes descargar su tarjeta de contacto (vCard) desde la sección de contacto."
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "jsonLdSha256": [
+        "a45812eebac6d011c947602e4b3a104b8bd9487ac8d2ef600cd420e2eb6132bc"
+      ],
+      "detailsCount": 11
+    },
+    "en": {
+      "jsonLd": [
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "Person",
+              "@id": "https://eduolihez.com/#person",
+              "name": "Eduardo Olivares Hernández",
+              "alternateName": [
+                "Edu Olivares",
+                "eduolihez",
+                "Eduardo Olivares",
+                "Edu Olivares Hernández",
+                "Eduardo Olivares Hernández"
+              ],
+              "givenName": "Eduardo",
+              "familyName": "Olivares Hernández",
+              "jobTitle": "Cybersecurity Analyst · SOC · Cloud Security & IAM · Email & Collaboration Security · AI Security & LLM Red Teaming",
+              "description": "Cybersecurity analyst in Barcelona, Spain (based in Badalona), focused on cloud security, identity and access management (IAM) and email and collaboration security, with AI security (LLM chatbot red teaming) running through all of it. At Dagram he triages alerts in Trend Micro Vision One, automates security reporting with Python and supports IAM work. Certified by Trend Micro, Fortinet and Microsoft.",
+              "url": "https://eduolihez.com",
+              "image": {
+                "@type": "ImageObject",
+                "url": "https://eduolihez.com/img/eduardo.webp",
+                "caption": "Eduardo Olivares Hernández, Cybersecurity Analyst · SOC · Cloud Security & IAM · Email & Collaboration Security · AI Security & LLM Red Teaming"
+              },
+              "email": "eduardo@eduolihez.com",
+              "nationality": {
+                "@type": "Country",
+                "name": "España"
+              },
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Badalona",
+                "addressRegion": "Barcelona",
+                "postalCode": "08911",
+                "addressCountry": "ES"
+              },
+              "homeLocation": {
+                "@type": "Place",
+                "name": "Badalona, Barcelona",
+                "address": {
+                  "@type": "PostalAddress",
+                  "addressLocality": "Badalona",
+                  "addressRegion": "Barcelona",
+                  "addressCountry": "ES"
+                },
+                "geo": {
+                  "@type": "GeoCoordinates",
+                  "latitude": 41.45,
+                  "longitude": 2.2474
+                }
+              },
+              "workLocation": [
+                {
+                  "@type": "Place",
+                  "name": "Badalona"
+                },
+                {
+                  "@type": "Place",
+                  "name": "Barcelona"
+                },
+                {
+                  "@type": "Place",
+                  "name": "Área Metropolitana de Barcelona"
+                },
+                {
+                  "@type": "Place",
+                  "name": "Cataluña"
+                },
+                {
+                  "@type": "Place",
+                  "name": "España"
+                },
+                {
+                  "@type": "Place",
+                  "name": "Remoto / Teletrabajo"
+                }
+              ],
+              "knowsAbout": [
+                "Cloud Security",
+                "Gestión de identidades y accesos (IAM)",
+                "Seguridad del correo y la colaboración (Email & Collaboration Security)",
+                "Security Operations Center (SOC)",
+                "Blue Team",
+                "Detección de amenazas",
+                "Respuesta a incidentes",
+                "SIEM y XDR",
+                "Trend Micro Vision One",
+                "Fortinet FortiGate y FortiAnalyzer",
+                "Simulación de phishing y concienciación en seguridad (SAT)",
+                "Threat Intelligence",
+                "Seguridad de la IA (AI Security)",
+                "Red teaming de chatbots LLM",
+                "OWASP Top 10 para aplicaciones LLM",
+                "MITRE ATLAS y NIST AI RMF",
+                "Pentesting y OWASP",
+                "Automatización de seguridad con Python",
+                "Inteligencia artificial aplicada a ciberseguridad",
+                "Active Directory y Windows Server",
+                "Cloud Security",
+                "Identity & Access Management (IAM)",
+                "Email & Collaboration Security",
+                "Security Awareness (SAT)",
+                "Phishing Simulation",
+                "AI Security",
+                "LLM Red Teaming",
+                "Prompt Injection",
+                "OWASP Top 10 for LLM Apps",
+                "MITRE ATLAS",
+                "NIST AI RMF",
+                "OWASP",
+                "Penetration Testing",
+                "Red Teaming",
+                "Web Application Security",
+                "Threat Detection",
+                "Incident Response",
+                "XDR / SIEM",
+                "Threat Intelligence",
+                "Trend Micro Vision One",
+                "Fortinet (FortiGate/FortiAnalyzer)",
+                "Vulnerability Management",
+                "Criptografía",
+                "Análisis de Phishing",
+                "Python",
+                "JavaScript",
+                "TypeScript",
+                "Rust",
+                "SQL",
+                "Bash",
+                "Machine Learning",
+                "Prompt Engineering",
+                "ONNX",
+                "Azure AI",
+                "Active Directory",
+                "Windows Server",
+                "Linux",
+                "Redes",
+                "Firewalls",
+                "Next.js",
+                "Tailwind CSS",
+                "SQLite",
+                "Git",
+                "Chrome Extensions"
+              ],
+              "knowsLanguage": [
+                {
+                  "@type": "Language",
+                  "name": "Español",
+                  "alternateName": "es"
+                },
+                {
+                  "@type": "Language",
+                  "name": "Catalán",
+                  "alternateName": "ca"
+                },
+                {
+                  "@type": "Language",
+                  "name": "Inglés",
+                  "alternateName": "en"
+                }
+              ],
+              "worksFor": {
+                "@type": "Organization",
+                "name": "Dagram"
+              },
+              "hasOccupation": {
+                "@type": "Occupation",
+                "name": "Cybersecurity Analyst (SOC, Cloud Security & IAM)",
+                "occupationalCategory": "15-1212.00",
+                "occupationLocation": {
+                  "@type": "City",
+                  "name": "Barcelona",
+                  "address": {
+                    "@type": "PostalAddress",
+                    "addressLocality": "Barcelona",
+                    "addressRegion": "Cataluña",
+                    "addressCountry": "ES"
+                  }
+                },
+                "skills": "Cloud Security, Gestión de identidades y accesos (IAM), Seguridad del correo y la colaboración (Email & Collaboration Security), Security Operations Center (SOC), Blue Team, Detección de amenazas, Respuesta a incidentes, SIEM y XDR, Trend Micro Vision One, Fortinet FortiGate y FortiAnalyzer, Simulación de phishing y concienciación en seguridad (SAT), Threat Intelligence, Seguridad de la IA (AI Security), Red teaming de chatbots LLM, OWASP Top 10 para aplicaciones LLM, MITRE ATLAS y NIST AI RMF, Pentesting y OWASP, Automatización de seguridad con Python, Inteligencia artificial aplicada a ciberseguridad, Active Directory y Windows Server"
+              },
+              "hasOccupationalExperience": [
+                {
+                  "@type": "OrganizationRole",
+                  "roleName": "Cybersecurity Analyst",
+                  "description": "Daily triage of Trend Micro Vision One (TrendAI) alerts, using AI to speed up investigations. I automated the threat, vulnerability and monthly reports in Python: work that used to take weeks by hand now runs in under 1 hour. I design and run the phishing simulation campaigns and the security awareness training (SAT) program, support identity and access management (onboarding, offboarding and access reviews), and contain and remediate confirmed threats, with SOPs and compliance documentation ready for audits.",
+                  "startDate": "2026-04-01",
+                  "worksFor": {
+                    "@type": "Organization",
+                    "name": "Dagram"
+                  }
+                },
+                {
+                  "@type": "OrganizationRole",
+                  "roleName": "Cybersecurity Technician (L1/L2)",
+                  "description": "Configured and managed FortiGate firewalls and FortiAnalyzer for centralized network security across client environments. Built custom Python scripts for automated security reporting and log analysis, increasing SOC operational efficiency. Implemented security policies and executed incident response protocols in corporate environments. That work is what got me moved up to Cybersecurity Analyst four months in.",
+                  "startDate": "2026-01-01",
+                  "endDate": "2026-04-01",
+                  "worksFor": {
+                    "@type": "Organization",
+                    "name": "Dagram"
+                  }
+                },
+                {
+                  "@type": "OrganizationRole",
+                  "roleName": "IT Technician",
+                  "description": "Technical support for 100+ users, resolving most issues in under 24 hours. Managed Active Directory and the LAN. Wrote Python scripts to get repetitive tasks off my plate.",
+                  "startDate": "2024-10-01",
+                  "endDate": "2025-04-01",
+                  "worksFor": {
+                    "@type": "Organization",
+                    "name": "Institució Cultural Laietània"
+                  }
+                },
+                {
+                  "@type": "OrganizationRole",
+                  "roleName": "Fitness Instructor",
+                  "description": "Led groups of up to 13 people through high-intensity sessions. Learned to make fast calls when something goes wrong and to explain the same thing three different ways depending on who is listening, something I use every day writing security reports for technical and non-technical readers.",
+                  "startDate": "2024-05-01",
+                  "endDate": "2024-09-01",
+                  "worksFor": {
+                    "@type": "Organization",
+                    "name": "Escola del Vent"
+                  }
+                }
+              ],
+              "hasCredential": [
+                {
+                  "@type": "EducationalOccupationalCredential",
+                  "name": "Trend Micro Vision One Cloud Security Foundation",
+                  "credentialCategory": "certificate",
+                  "recognizedBy": {
+                    "@type": "Organization",
+                    "name": "Trend Micro"
+                  },
+                  "dateCreated": "2024"
+                },
+                {
+                  "@type": "EducationalOccupationalCredential",
+                  "name": "Trend Micro Vision One Identity Security Foundation",
+                  "credentialCategory": "certificate",
+                  "recognizedBy": {
+                    "@type": "Organization",
+                    "name": "Trend Micro"
+                  },
+                  "dateCreated": "2024"
+                },
+                {
+                  "@type": "EducationalOccupationalCredential",
+                  "name": "Trend Micro Vision One Email & Collaboration Security Foundation",
+                  "credentialCategory": "certificate",
+                  "recognizedBy": {
+                    "@type": "Organization",
+                    "name": "Trend Micro"
+                  },
+                  "dateCreated": "2024"
+                },
+                {
+                  "@type": "EducationalOccupationalCredential",
+                  "name": "Trend Micro Vision One Security Operations (SecOps) Foundation",
+                  "credentialCategory": "certificate",
+                  "recognizedBy": {
+                    "@type": "Organization",
+                    "name": "Trend Micro"
+                  },
+                  "dateCreated": "2024"
+                },
+                {
+                  "@type": "EducationalOccupationalCredential",
+                  "name": "Trend Micro Vision One Platform — Advanced",
+                  "credentialCategory": "certificate",
+                  "recognizedBy": {
+                    "@type": "Organization",
+                    "name": "Trend Micro"
+                  },
+                  "dateCreated": "2024"
+                },
+                {
+                  "@type": "EducationalOccupationalCredential",
+                  "name": "Trend Micro Vision One AI Security Foundation",
+                  "credentialCategory": "certificate",
+                  "recognizedBy": {
+                    "@type": "Organization",
+                    "name": "Trend Micro"
+                  }
+                },
+                {
+                  "@type": "EducationalOccupationalCredential",
+                  "name": "Trend Micro Vision One Threat Intelligence Foundation",
+                  "credentialCategory": "certificate",
+                  "recognizedBy": {
+                    "@type": "Organization",
+                    "name": "Trend Micro"
+                  }
+                },
+                {
+                  "@type": "EducationalOccupationalCredential",
+                  "name": "Fortinet NSE 3 Certified in Cybersecurity",
+                  "credentialCategory": "certificate",
+                  "recognizedBy": {
+                    "@type": "Organization",
+                    "name": "Fortinet"
+                  },
+                  "dateCreated": "2026"
+                },
+                {
+                  "@type": "EducationalOccupationalCredential",
+                  "name": "Fortinet Certified Associate Cybersecurity",
+                  "credentialCategory": "certificate",
+                  "recognizedBy": {
+                    "@type": "Organization",
+                    "name": "Fortinet"
+                  }
+                },
+                {
+                  "@type": "EducationalOccupationalCredential",
+                  "name": "Fortinet FortiGate 7.6 Operator",
+                  "credentialCategory": "certificate",
+                  "recognizedBy": {
+                    "@type": "Organization",
+                    "name": "Fortinet"
+                  },
+                  "dateCreated": "2026"
+                },
+                {
+                  "@type": "EducationalOccupationalCredential",
+                  "name": "Microsoft Certified: Azure AI Fundamentals",
+                  "credentialCategory": "certificate",
+                  "recognizedBy": {
+                    "@type": "Organization",
+                    "name": "Microsoft"
+                  },
+                  "dateCreated": "2026"
+                },
+                {
+                  "@type": "EducationalOccupationalCredential",
+                  "name": "IT Specialist - Python",
+                  "credentialCategory": "certificate",
+                  "recognizedBy": {
+                    "@type": "Organization",
+                    "name": "Certiport"
+                  }
+                },
+                {
+                  "@type": "EducationalOccupationalCredential",
+                  "name": "First Certificate in English (B2)",
+                  "credentialCategory": "certificate",
+                  "recognizedBy": {
+                    "@type": "Organization",
+                    "name": "Cambridge English"
+                  },
+                  "dateCreated": "2021"
+                }
+              ],
+              "alumniOf": [
+                {
+                  "@type": "EducationalOrganization",
+                  "name": "Col·legi Cultural"
+                },
+                {
+                  "@type": "EducationalOrganization",
+                  "name": "Col·legi Cultural"
+                }
+              ],
+              "award": [
+                "Ganador de la 8a Hackathon TecnoCampus"
+              ],
+              "sameAs": [
+                "https://www.linkedin.com/in/eduolihez/",
+                "https://github.com/eduolihez",
+                "https://eduolihez.github.io/",
+                "https://www.youtube.com/@eduolihez",
+                "https://www.credly.com/users/eduolihez"
+              ]
+            },
+            {
+              "@type": "WebSite",
+              "@id": "https://eduolihez.com/#website",
+              "url": "https://eduolihez.com",
+              "name": "Eduardo Olivares Hernández — SOC & Cybersecurity Analyst in Barcelona and Badalona",
+              "description": "Cybersecurity analyst in Barcelona, Spain (based in Badalona), focused on cloud security, identity and access management (IAM) and email and collaboration security, with AI security (LLM chatbot red teaming) running through all of it. At Dagram he triages alerts in Trend Micro Vision One, automates security reporting with Python and supports IAM work. Certified by Trend Micro, Fortinet and Microsoft.",
+              "inLanguage": "en",
+              "publisher": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "copyrightHolder": {
+                "@id": "https://eduolihez.com/#person"
+              }
+            },
+            {
+              "@type": "ProfilePage",
+              "@id": "https://eduolihez.com/en/#profile",
+              "url": "https://eduolihez.com/en/",
+              "name": "Eduardo Olivares | SOC Analyst in Barcelona & Badalona",
+              "description": "SOC and cybersecurity analyst in Barcelona and Badalona, Spain: threat detection, cloud security, IAM and AI security. Trend Micro Vision One and Fortinet.",
+              "inLanguage": "en",
+              "isPartOf": {
+                "@id": "https://eduolihez.com/#website"
+              },
+              "about": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "mainEntity": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "primaryImageOfPage": {
+                "@type": "ImageObject",
+                "url": "https://eduolihez.com/og/en.png"
+              },
+              "dateCreated": "2026-07-25T00:00:00+02:00",
+              "dateModified": "2026-11-16T10:08:15.256Z"
+            },
+            {
+              "@type": "SoftwareSourceCode",
+              "@id": "https://eduolihez.com/#software-blue-team-hub",
+              "name": "Blue Team Hub",
+              "description": "Free, 100% client-side tools for SOC analysts: IOC defanger, email header analyser (SPF/DKIM/DMARC), YARA rule generator and incident response playbooks.",
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "url": "https://eduolihez.github.io/",
+              "codeRepository": "https://github.com/eduolihez/eduolihez.github.io"
+            },
+            {
+              "@type": "SoftwareSourceCode",
+              "@id": "https://eduolihez.com/#software-phishlab",
+              "name": "PhishLab",
+              "description": "Templates for contract-authorised phishing simulations, with GoPhish export and an authorisation checklist.",
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "url": "https://eduolihez.com/projects/phishlab/",
+              "codeRepository": "https://github.com/eduolihez/phishlab"
+            },
+            {
+              "@type": "SoftwareSourceCode",
+              "@id": "https://eduolihez.com/#software-phishing-triage",
+              "name": "Phishing triage by classifier disagreement",
+              "description": "Research on 7,822 real emails: the ensemble's own uncertainty prioritises better than classifier disagreement.",
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "url": "https://github.com/eduolihez/phishing-triage",
+              "codeRepository": "https://github.com/eduolihez/phishing-triage"
+            },
+            {
+              "@type": "SoftwareSourceCode",
+              "@id": "https://eduolihez.com/#software-kev-digest",
+              "name": "KEV Digest",
+              "description": "Automated CISA KEV catalogue monitoring every three hours on GitHub Actions, with ransomware-linked vulnerabilities flagged separately.",
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "url": "https://github.com/eduolihez/kev-digest",
+              "codeRepository": "https://github.com/eduolihez/kev-digest"
+            },
+            {
+              "@type": "SoftwareSourceCode",
+              "@id": "https://eduolihez.com/#software-crem-report-generator",
+              "name": "CREM Report Generator",
+              "description": "Unofficial risk and exposure report generator for Trend Micro Vision One, with CVE enrichment (NVD, CISA KEV, EPSS).",
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "url": "https://github.com/eduolihez/vision-one-crem-report-generator",
+              "codeRepository": "https://github.com/eduolihez/vision-one-crem-report-generator"
+            },
+            {
+              "@type": "SoftwareSourceCode",
+              "@id": "https://eduolihez.com/#software-llm-chatbot-pentest",
+              "name": "llm-chatbot-pentest",
+              "description": "Autonomous red-teaming of LLM chatbots against the OWASP Top 10 for LLM applications, with an LLM judge and a reproducible report. Authorised use only.",
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "url": "https://github.com/eduolihez/llm-chatbot-pentest",
+              "codeRepository": "https://github.com/eduolihez/llm-chatbot-pentest"
+            },
+            {
+              "@type": "SoftwareSourceCode",
+              "@id": "https://eduolihez.com/#software-vigia",
+              "name": "Vigia",
+              "description": "External attack surface (EASM) OSINT agent with a local LLM; evidence-backed findings prioritised with CISA KEV and FIRST EPSS.",
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "url": "https://github.com/eduolihez/vigia",
+              "codeRepository": "https://github.com/eduolihez/vigia"
+            },
+            {
+              "@type": "SoftwareSourceCode",
+              "@id": "https://eduolihez.com/#software-northgate-browser",
+              "name": "NorthGate Browser",
+              "description": "Privacy-focused browser (Mullvad Browser / Firefox fork) with an on-device phishing classifier.",
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "url": "https://github.com/eduolihez/northgate-browser",
+              "codeRepository": "https://github.com/eduolihez/northgate-browser",
+              "creativeWorkStatus": "In development"
+            },
+            {
+              "@type": "SoftwareSourceCode",
+              "@id": "https://eduolihez.com/#software-bincat",
+              "name": "BinCat",
+              "description": "Python SDK and Flask dashboard to issue, validate and revoke Fernet and JWT tokens with an audit log.",
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "url": "https://github.com/eduolihez/BinCat",
+              "codeRepository": "https://github.com/eduolihez/BinCat"
+            },
+            {
+              "@type": "SoftwareApplication",
+              "@id": "https://eduolihez.com/#software-password-centinel",
+              "name": "Password Centinel",
+              "description": "100% local password manager (AES-256-GCM, TOTP/2FA, breach checks via Have I Been Pwned).",
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "url": "https://eduolihez.com/apps/password-centinel/",
+              "applicationCategory": "BrowserApplication"
+            },
+            {
+              "@type": "SoftwareApplication",
+              "@id": "https://eduolihez.com/#software-prompt-master",
+              "name": "PromptMaster",
+              "description": "Browser extension that improves prompts for ChatGPT, Claude, Gemini and other AI platforms.",
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "url": "https://eduolihez.com/apps/prompt-master/",
+              "applicationCategory": "BrowserApplication"
+            },
+            {
+              "@type": "SoftwareApplication",
+              "@id": "https://eduolihez.com/#software-nowait",
+              "name": "NoWait",
+              "description": "Extension that skips link shorteners and wait pages (Linkvertise, ouo.io, adf.ly and 90+ more sites).",
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "url": "https://eduolihez.com/apps/nowait/",
+              "applicationCategory": "BrowserApplication"
+            },
+            {
+              "@type": "SoftwareApplication",
+              "@id": "https://eduolihez.com/#software-followguard",
+              "name": "FollowGuard",
+              "description": "Cyber-intelligence tool that analyses social media interactions to detect fake and automated profiles.",
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "url": "https://eduolihez.com/projects/followguard/",
+              "applicationCategory": "SecurityApplication"
+            },
+            {
+              "@type": "SoftwareApplication",
+              "@id": "https://eduolihez.com/#software-fluence",
+              "name": "Fluence",
+              "description": "Desktop assistant for organic Instagram growth; local processing, no servers of its own.",
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "url": "https://eduolihez.com/projects/fluence/",
+              "applicationCategory": "DesktopEnhancementApplication"
+            },
+            {
+              "@type": "FAQPage",
+              "@id": "https://eduolihez.com/en/#faq",
+              "inLanguage": "en",
+              "isPartOf": {
+                "@id": "https://eduolihez.com/#website"
+              },
+              "mainEntity": [
+                {
+                  "@type": "Question",
+                  "name": "Who is Eduardo Olivares?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Eduardo Olivares Hernández is a cybersecurity analyst in Barcelona, Spain, focused on cloud security, identity and access management (IAM) and email and collaboration security. He works at Dagram, where he triages alerts in Trend Micro Vision One, automates security reporting with Python and supports IAM work. He also works on AI security (LLM chatbot red teaming). He holds certifications from Trend Micro, Fortinet and Microsoft."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "What experience does Eduardo Olivares have in cloud security and IAM?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "He holds the Trend Micro Vision One Cloud Security, Identity Security and Email & Collaboration Security Foundation certifications. At Dagram he supports identity and access management (onboarding, offboarding and access reviews) and runs the phishing simulation campaigns and the security awareness program. Cloud security and IAM is the area he is specializing in."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Where is Eduardo Olivares based? Does he work in Barcelona or remotely?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "He works in Barcelona and lives in Badalona, in the Barcelona metropolitan area. He is open to on-site or hybrid roles in Barcelona and to remote work."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "What experience does Eduardo Olivares have in AI security and LLM red teaming?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "He approaches AI security from both sides. Offensively, he built llm-chatbot-pentest, an open-source tool for autonomous red teaming of LLM chatbots: it fingerprints the target, generates payloads mapped to the OWASP Top 10 for LLM Applications, scores them with an independent judge model, and will not run without explicit authorization and a defined scope. Defensively, he works on the AI risks that reach a SOC: prompt injection, data leakage through AI assistants, shadow AI and the permissions handed to AI agents. His references are the OWASP Top 10 for LLM Applications, MITRE ATLAS and NIST AI RMF."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "What does Eduardo Olivares study and where does he want to go professionally?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "He is finishing an Associate Degree in Network Systems Administration with a Cybersecurity track (expected 2027) at Col·legi Cultural, and then plans to study Computer Engineering. Long term, he wants to specialize in cloud security and IAM, with AI security running through both, and eventually lead a security team."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "What does a SOC analyst actually do?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "A SOC (Security Operations Center) analyst continuously monitors an organisation’s systems to detect attacks. Day to day that means triaging alerts from XDR and SIEM platforms, investigating which ones are real threats, containing incidents and documenting what happened so it does not repeat."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Which security technologies and tools does he work with?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Day to day: Trend Micro Vision One (XDR), Fortinet FortiGate and FortiAnalyzer, Threat Intelligence feeds and Active Directory. He automates reporting with Python: the threat, vulnerability and monthly reports that used to take weeks of manual work now run in under 1 hour. He also applies AI to threat analysis and phishing detection."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "What cybersecurity certifications does he hold?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "In Trend Micro Vision One he holds the Cloud Security, Identity Security, Email & Collaboration Security, SecOps, AI Security and Threat Intelligence Foundation certifications, plus Platform Advanced. From Fortinet, NSE 3 and FortiGate 7.6 Operator; from Microsoft, Azure AI Fundamentals (AI-900). The full, verifiable list is in the certifications section of this site."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Is he available for new job opportunities?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "If he is open to offers, a green \"Open to work\" badge appears next to his photo on the home page. The fastest way to reach him is the contact form on this site or LinkedIn; he usually replies within 48 hours."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Which languages does he work in?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Spanish and Catalan as native languages, and English at B2 level, enough for technical documentation, reports and meetings with international teams. This site is available in all three languages."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "How can I get in touch?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Through the contact form on this site, by email at eduardo@eduolihez.com, or via his LinkedIn profile. You can also download his contact card (vCard) from the contact section."
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "jsonLdSha256": [
+        "99dac8df8700a907419a7a2375bd8629533e70fee8366482368308bb2d56b4ad"
+      ],
+      "detailsCount": 11
+    },
+    "ca": {
+      "jsonLd": [
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "Person",
+              "@id": "https://eduolihez.com/#person",
+              "name": "Eduardo Olivares Hernández",
+              "alternateName": [
+                "Edu Olivares",
+                "eduolihez",
+                "Eduardo Olivares",
+                "Edu Olivares Hernández",
+                "Eduardo Olivares Hernández"
+              ],
+              "givenName": "Eduardo",
+              "familyName": "Olivares Hernández",
+              "jobTitle": "Cybersecurity Analyst · SOC · Cloud Security & IAM · Email & Collaboration Security · AI Security & LLM Red Teaming",
+              "description": "Analista de ciberseguretat a Barcelona (viu a Badalona), especialitzat en seguretat cloud, gestió d'identitats i accessos (IAM) i seguretat del correu i la col·laboració, amb la seguretat de la IA com a línia transversal (red teaming de chatbots LLM). A Dagram fa triatge d'alertes a Trend Micro Vision One, automatitza informes de seguretat amb Python i dona suport d'IAM. Certificat per Trend Micro, Fortinet i Microsoft.",
+              "url": "https://eduolihez.com",
+              "image": {
+                "@type": "ImageObject",
+                "url": "https://eduolihez.com/img/eduardo.webp",
+                "caption": "Eduardo Olivares Hernández, Cybersecurity Analyst · SOC · Cloud Security & IAM · Email & Collaboration Security · AI Security & LLM Red Teaming"
+              },
+              "email": "eduardo@eduolihez.com",
+              "nationality": {
+                "@type": "Country",
+                "name": "España"
+              },
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Badalona",
+                "addressRegion": "Barcelona",
+                "postalCode": "08911",
+                "addressCountry": "ES"
+              },
+              "homeLocation": {
+                "@type": "Place",
+                "name": "Badalona, Barcelona",
+                "address": {
+                  "@type": "PostalAddress",
+                  "addressLocality": "Badalona",
+                  "addressRegion": "Barcelona",
+                  "addressCountry": "ES"
+                },
+                "geo": {
+                  "@type": "GeoCoordinates",
+                  "latitude": 41.45,
+                  "longitude": 2.2474
+                }
+              },
+              "workLocation": [
+                {
+                  "@type": "Place",
+                  "name": "Badalona"
+                },
+                {
+                  "@type": "Place",
+                  "name": "Barcelona"
+                },
+                {
+                  "@type": "Place",
+                  "name": "Área Metropolitana de Barcelona"
+                },
+                {
+                  "@type": "Place",
+                  "name": "Cataluña"
+                },
+                {
+                  "@type": "Place",
+                  "name": "España"
+                },
+                {
+                  "@type": "Place",
+                  "name": "Remoto / Teletrabajo"
+                }
+              ],
+              "knowsAbout": [
+                "Cloud Security",
+                "Gestión de identidades y accesos (IAM)",
+                "Seguridad del correo y la colaboración (Email & Collaboration Security)",
+                "Security Operations Center (SOC)",
+                "Blue Team",
+                "Detección de amenazas",
+                "Respuesta a incidentes",
+                "SIEM y XDR",
+                "Trend Micro Vision One",
+                "Fortinet FortiGate y FortiAnalyzer",
+                "Simulación de phishing y concienciación en seguridad (SAT)",
+                "Threat Intelligence",
+                "Seguridad de la IA (AI Security)",
+                "Red teaming de chatbots LLM",
+                "OWASP Top 10 para aplicaciones LLM",
+                "MITRE ATLAS y NIST AI RMF",
+                "Pentesting y OWASP",
+                "Automatización de seguridad con Python",
+                "Inteligencia artificial aplicada a ciberseguridad",
+                "Active Directory y Windows Server",
+                "Cloud Security",
+                "Identity & Access Management (IAM)",
+                "Email & Collaboration Security",
+                "Security Awareness (SAT)",
+                "Phishing Simulation",
+                "AI Security",
+                "LLM Red Teaming",
+                "Prompt Injection",
+                "OWASP Top 10 for LLM Apps",
+                "MITRE ATLAS",
+                "NIST AI RMF",
+                "OWASP",
+                "Penetration Testing",
+                "Red Teaming",
+                "Web Application Security",
+                "Threat Detection",
+                "Incident Response",
+                "XDR / SIEM",
+                "Threat Intelligence",
+                "Trend Micro Vision One",
+                "Fortinet (FortiGate/FortiAnalyzer)",
+                "Vulnerability Management",
+                "Criptografía",
+                "Análisis de Phishing",
+                "Python",
+                "JavaScript",
+                "TypeScript",
+                "Rust",
+                "SQL",
+                "Bash",
+                "Machine Learning",
+                "Prompt Engineering",
+                "ONNX",
+                "Azure AI",
+                "Active Directory",
+                "Windows Server",
+                "Linux",
+                "Redes",
+                "Firewalls",
+                "Next.js",
+                "Tailwind CSS",
+                "SQLite",
+                "Git",
+                "Chrome Extensions"
+              ],
+              "knowsLanguage": [
+                {
+                  "@type": "Language",
+                  "name": "Español",
+                  "alternateName": "es"
+                },
+                {
+                  "@type": "Language",
+                  "name": "Catalán",
+                  "alternateName": "ca"
+                },
+                {
+                  "@type": "Language",
+                  "name": "Inglés",
+                  "alternateName": "en"
+                }
+              ],
+              "worksFor": {
+                "@type": "Organization",
+                "name": "Dagram"
+              },
+              "hasOccupation": {
+                "@type": "Occupation",
+                "name": "Cybersecurity Analyst (SOC, Cloud Security & IAM)",
+                "occupationalCategory": "15-1212.00",
+                "occupationLocation": {
+                  "@type": "City",
+                  "name": "Barcelona",
+                  "address": {
+                    "@type": "PostalAddress",
+                    "addressLocality": "Barcelona",
+                    "addressRegion": "Cataluña",
+                    "addressCountry": "ES"
+                  }
+                },
+                "skills": "Cloud Security, Gestión de identidades y accesos (IAM), Seguridad del correo y la colaboración (Email & Collaboration Security), Security Operations Center (SOC), Blue Team, Detección de amenazas, Respuesta a incidentes, SIEM y XDR, Trend Micro Vision One, Fortinet FortiGate y FortiAnalyzer, Simulación de phishing y concienciación en seguridad (SAT), Threat Intelligence, Seguridad de la IA (AI Security), Red teaming de chatbots LLM, OWASP Top 10 para aplicaciones LLM, MITRE ATLAS y NIST AI RMF, Pentesting y OWASP, Automatización de seguridad con Python, Inteligencia artificial aplicada a ciberseguridad, Active Directory y Windows Server"
+              },
+              "hasOccupationalExperience": [
+                {
+                  "@type": "OrganizationRole",
+                  "roleName": "Analista de Ciberseguretat",
+                  "description": "Triatge diari d'alertes de Trend Micro Vision One (TrendAI), amb IA per accelerar la investigació. Vaig automatitzar amb Python els informes d'amenaces, de vulnerabilitats i l'informe mensual: el que abans portava setmanes de feina manual ara es genera en menys d'1 hora. Dissenyo i executo les campanyes de phishing simulat i el programa de conscienciació (SAT), dono suport en gestió d'identitats i accessos (altes, baixes i revisions de permisos) i continc i remedio les amenaces confirmades, amb SOPs i documentació de compliment per a auditories.",
+                  "startDate": "2026-04-01",
+                  "worksFor": {
+                    "@type": "Organization",
+                    "name": "Dagram"
+                  }
+                },
+                {
+                  "@type": "OrganizationRole",
+                  "roleName": "Tècnic de Ciberseguretat (N1/N2)",
+                  "description": "Configuració i gestió de tallafocs FortiGate i FortiAnalyzer per a la seguretat de xarxa centralitzada en diferents entorns de client. Scripts en Python a mida per a informes de seguretat i anàlisi de logs, que van millorar l'eficiència operativa del SOC. Implantació de polítiques de seguretat i execució de protocols de resposta a incidents en entorns corporatius. Aquesta feina em va portar al lloc d'Analista de Ciberseguretat quatre mesos després.",
+                  "startDate": "2026-01-01",
+                  "endDate": "2026-04-01",
+                  "worksFor": {
+                    "@type": "Organization",
+                    "name": "Dagram"
+                  }
+                },
+                {
+                  "@type": "OrganizationRole",
+                  "roleName": "Tècnic IT",
+                  "description": "Suport tècnic a més de 100 usuaris, resolent la majoria d'incidències en menys de 24 hores. Administració d'Active Directory i de la xarxa local (LAN). Scripts en Python per treure'm de sobre les tasques repetitives.",
+                  "startDate": "2024-10-01",
+                  "endDate": "2025-04-01",
+                  "worksFor": {
+                    "@type": "Organization",
+                    "name": "Institució Cultural Laietània"
+                  }
+                },
+                {
+                  "@type": "OrganizationRole",
+                  "roleName": "Instructor de Fitness",
+                  "description": "Direcció de grups de fins a 13 persones en sessions d'alta intensitat. Vaig aprendre a prendre decisions ràpides quan alguna cosa va malament i a explicar el mateix de tres maneres segons qui escolti, cosa que faig servir cada dia en redactar informes de seguretat per a lectors tècnics i no tècnics.",
+                  "startDate": "2024-05-01",
+                  "endDate": "2024-09-01",
+                  "worksFor": {
+                    "@type": "Organization",
+                    "name": "Escola del Vent"
+                  }
+                }
+              ],
+              "hasCredential": [
+                {
+                  "@type": "EducationalOccupationalCredential",
+                  "name": "Trend Micro Vision One Cloud Security Foundation",
+                  "credentialCategory": "certificate",
+                  "recognizedBy": {
+                    "@type": "Organization",
+                    "name": "Trend Micro"
+                  },
+                  "dateCreated": "2024"
+                },
+                {
+                  "@type": "EducationalOccupationalCredential",
+                  "name": "Trend Micro Vision One Identity Security Foundation",
+                  "credentialCategory": "certificate",
+                  "recognizedBy": {
+                    "@type": "Organization",
+                    "name": "Trend Micro"
+                  },
+                  "dateCreated": "2024"
+                },
+                {
+                  "@type": "EducationalOccupationalCredential",
+                  "name": "Trend Micro Vision One Email & Collaboration Security Foundation",
+                  "credentialCategory": "certificate",
+                  "recognizedBy": {
+                    "@type": "Organization",
+                    "name": "Trend Micro"
+                  },
+                  "dateCreated": "2024"
+                },
+                {
+                  "@type": "EducationalOccupationalCredential",
+                  "name": "Trend Micro Vision One Security Operations (SecOps) Foundation",
+                  "credentialCategory": "certificate",
+                  "recognizedBy": {
+                    "@type": "Organization",
+                    "name": "Trend Micro"
+                  },
+                  "dateCreated": "2024"
+                },
+                {
+                  "@type": "EducationalOccupationalCredential",
+                  "name": "Trend Micro Vision One Platform — Advanced",
+                  "credentialCategory": "certificate",
+                  "recognizedBy": {
+                    "@type": "Organization",
+                    "name": "Trend Micro"
+                  },
+                  "dateCreated": "2024"
+                },
+                {
+                  "@type": "EducationalOccupationalCredential",
+                  "name": "Trend Micro Vision One AI Security Foundation",
+                  "credentialCategory": "certificate",
+                  "recognizedBy": {
+                    "@type": "Organization",
+                    "name": "Trend Micro"
+                  }
+                },
+                {
+                  "@type": "EducationalOccupationalCredential",
+                  "name": "Trend Micro Vision One Threat Intelligence Foundation",
+                  "credentialCategory": "certificate",
+                  "recognizedBy": {
+                    "@type": "Organization",
+                    "name": "Trend Micro"
+                  }
+                },
+                {
+                  "@type": "EducationalOccupationalCredential",
+                  "name": "Fortinet NSE 3 Certified in Cybersecurity",
+                  "credentialCategory": "certificate",
+                  "recognizedBy": {
+                    "@type": "Organization",
+                    "name": "Fortinet"
+                  },
+                  "dateCreated": "2026"
+                },
+                {
+                  "@type": "EducationalOccupationalCredential",
+                  "name": "Fortinet Certified Associate Cybersecurity",
+                  "credentialCategory": "certificate",
+                  "recognizedBy": {
+                    "@type": "Organization",
+                    "name": "Fortinet"
+                  }
+                },
+                {
+                  "@type": "EducationalOccupationalCredential",
+                  "name": "Fortinet FortiGate 7.6 Operator",
+                  "credentialCategory": "certificate",
+                  "recognizedBy": {
+                    "@type": "Organization",
+                    "name": "Fortinet"
+                  },
+                  "dateCreated": "2026"
+                },
+                {
+                  "@type": "EducationalOccupationalCredential",
+                  "name": "Microsoft Certified: Azure AI Fundamentals",
+                  "credentialCategory": "certificate",
+                  "recognizedBy": {
+                    "@type": "Organization",
+                    "name": "Microsoft"
+                  },
+                  "dateCreated": "2026"
+                },
+                {
+                  "@type": "EducationalOccupationalCredential",
+                  "name": "IT Specialist - Python",
+                  "credentialCategory": "certificate",
+                  "recognizedBy": {
+                    "@type": "Organization",
+                    "name": "Certiport"
+                  }
+                },
+                {
+                  "@type": "EducationalOccupationalCredential",
+                  "name": "First Certificate in English (B2)",
+                  "credentialCategory": "certificate",
+                  "recognizedBy": {
+                    "@type": "Organization",
+                    "name": "Cambridge English"
+                  },
+                  "dateCreated": "2021"
+                }
+              ],
+              "alumniOf": [
+                {
+                  "@type": "EducationalOrganization",
+                  "name": "Col·legi Cultural"
+                },
+                {
+                  "@type": "EducationalOrganization",
+                  "name": "Col·legi Cultural"
+                }
+              ],
+              "award": [
+                "Ganador de la 8a Hackathon TecnoCampus"
+              ],
+              "sameAs": [
+                "https://www.linkedin.com/in/eduolihez/",
+                "https://github.com/eduolihez",
+                "https://eduolihez.github.io/",
+                "https://www.youtube.com/@eduolihez",
+                "https://www.credly.com/users/eduolihez"
+              ]
+            },
+            {
+              "@type": "WebSite",
+              "@id": "https://eduolihez.com/#website",
+              "url": "https://eduolihez.com",
+              "name": "Eduardo Olivares Hernández — Analista SOC i de Ciberseguretat a Barcelona i Badalona",
+              "description": "Analista de ciberseguretat a Barcelona (viu a Badalona), especialitzat en seguretat cloud, gestió d'identitats i accessos (IAM) i seguretat del correu i la col·laboració, amb la seguretat de la IA com a línia transversal (red teaming de chatbots LLM). A Dagram fa triatge d'alertes a Trend Micro Vision One, automatitza informes de seguretat amb Python i dona suport d'IAM. Certificat per Trend Micro, Fortinet i Microsoft.",
+              "inLanguage": "ca",
+              "publisher": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "copyrightHolder": {
+                "@id": "https://eduolihez.com/#person"
+              }
+            },
+            {
+              "@type": "ProfilePage",
+              "@id": "https://eduolihez.com/ca/#profile",
+              "url": "https://eduolihez.com/ca/",
+              "name": "Eduardo Olivares | Analista SOC a Barcelona i Badalona",
+              "description": "Analista de ciberseguretat SOC a Barcelona i Badalona: detecció d'amenaces, Cloud Security, IAM i seguretat de la IA. Trend Micro Vision One i Fortinet.",
+              "inLanguage": "ca",
+              "isPartOf": {
+                "@id": "https://eduolihez.com/#website"
+              },
+              "about": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "mainEntity": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "primaryImageOfPage": {
+                "@type": "ImageObject",
+                "url": "https://eduolihez.com/og/ca.png"
+              },
+              "dateCreated": "2026-07-25T00:00:00+02:00",
+              "dateModified": "2026-11-16T10:08:12.531Z"
+            },
+            {
+              "@type": "SoftwareSourceCode",
+              "@id": "https://eduolihez.com/#software-blue-team-hub",
+              "name": "Blue Team Hub",
+              "description": "Herramientas gratuitas y 100% client-side para analistas SOC: IOC Defanger, analizador de cabeceras de correo (SPF/DKIM/DMARC), reglas YARA y playbooks de respuesta a incidentes.",
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "url": "https://eduolihez.github.io/",
+              "codeRepository": "https://github.com/eduolihez/eduolihez.github.io"
+            },
+            {
+              "@type": "SoftwareSourceCode",
+              "@id": "https://eduolihez.com/#software-phishlab",
+              "name": "PhishLab",
+              "description": "Plantillas para simulaciones de phishing autorizadas por contrato, con exportación para GoPhish y checklist de autorización.",
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "url": "https://eduolihez.com/projects/phishlab/",
+              "codeRepository": "https://github.com/eduolihez/phishlab"
+            },
+            {
+              "@type": "SoftwareSourceCode",
+              "@id": "https://eduolihez.com/#software-phishing-triage",
+              "name": "Phishing triage by classifier disagreement",
+              "description": "Investigación sobre 7.822 correos reales: la incertidumbre del propio ensemble prioriza mejor que el desacuerdo entre clasificadores.",
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "url": "https://github.com/eduolihez/phishing-triage",
+              "codeRepository": "https://github.com/eduolihez/phishing-triage"
+            },
+            {
+              "@type": "SoftwareSourceCode",
+              "@id": "https://eduolihez.com/#software-kev-digest",
+              "name": "KEV Digest",
+              "description": "Vigilancia automatizada del catálogo CISA KEV cada tres horas sobre GitHub Actions, con las vulnerabilidades usadas en ransomware marcadas aparte.",
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "url": "https://github.com/eduolihez/kev-digest",
+              "codeRepository": "https://github.com/eduolihez/kev-digest"
+            },
+            {
+              "@type": "SoftwareSourceCode",
+              "@id": "https://eduolihez.com/#software-crem-report-generator",
+              "name": "CREM Report Generator",
+              "description": "Generador no oficial de informes de riesgo y exposición para Trend Micro Vision One, con enriquecimiento de CVEs (NVD, CISA KEV, EPSS).",
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "url": "https://github.com/eduolihez/vision-one-crem-report-generator",
+              "codeRepository": "https://github.com/eduolihez/vision-one-crem-report-generator"
+            },
+            {
+              "@type": "SoftwareSourceCode",
+              "@id": "https://eduolihez.com/#software-llm-chatbot-pentest",
+              "name": "llm-chatbot-pentest",
+              "description": "Red-teaming autónomo de chatbots LLM según el OWASP Top 10 para aplicaciones LLM, con juez LLM e informe reproducible. Solo uso autorizado.",
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "url": "https://github.com/eduolihez/llm-chatbot-pentest",
+              "codeRepository": "https://github.com/eduolihez/llm-chatbot-pentest"
+            },
+            {
+              "@type": "SoftwareSourceCode",
+              "@id": "https://eduolihez.com/#software-vigia",
+              "name": "Vigia",
+              "description": "Agente OSINT de superficie de ataque externa (EASM) con un LLM local; hallazgos con evidencia, priorizados con CISA KEV y FIRST EPSS.",
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "url": "https://github.com/eduolihez/vigia",
+              "codeRepository": "https://github.com/eduolihez/vigia"
+            },
+            {
+              "@type": "SoftwareSourceCode",
+              "@id": "https://eduolihez.com/#software-northgate-browser",
+              "name": "NorthGate Browser",
+              "description": "Navegador centrado en la privacidad (fork de Mullvad Browser / Firefox) con clasificador de phishing en el dispositivo.",
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "url": "https://github.com/eduolihez/northgate-browser",
+              "codeRepository": "https://github.com/eduolihez/northgate-browser",
+              "creativeWorkStatus": "In development"
+            },
+            {
+              "@type": "SoftwareSourceCode",
+              "@id": "https://eduolihez.com/#software-bincat",
+              "name": "BinCat",
+              "description": "SDK en Python y panel Flask para emitir, validar y revocar tokens Fernet y JWT con registro de auditoría.",
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "url": "https://github.com/eduolihez/BinCat",
+              "codeRepository": "https://github.com/eduolihez/BinCat"
+            },
+            {
+              "@type": "SoftwareApplication",
+              "@id": "https://eduolihez.com/#software-password-centinel",
+              "name": "Password Centinel",
+              "description": "Gestor de contraseñas 100% local (AES-256-GCM, TOTP/2FA, comprobación de filtraciones con Have I Been Pwned).",
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "url": "https://eduolihez.com/apps/password-centinel/",
+              "applicationCategory": "BrowserApplication"
+            },
+            {
+              "@type": "SoftwareApplication",
+              "@id": "https://eduolihez.com/#software-prompt-master",
+              "name": "PromptMaster",
+              "description": "Extensión de navegador que mejora prompts para ChatGPT, Claude, Gemini y otras plataformas de IA.",
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "url": "https://eduolihez.com/apps/prompt-master/",
+              "applicationCategory": "BrowserApplication"
+            },
+            {
+              "@type": "SoftwareApplication",
+              "@id": "https://eduolihez.com/#software-nowait",
+              "name": "NoWait",
+              "description": "Extensión que evita acortadores de enlaces y páginas de espera (Linkvertise, ouo.io, adf.ly y 90+ sitios más).",
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "url": "https://eduolihez.com/apps/nowait/",
+              "applicationCategory": "BrowserApplication"
+            },
+            {
+              "@type": "SoftwareApplication",
+              "@id": "https://eduolihez.com/#software-followguard",
+              "name": "FollowGuard",
+              "description": "Herramienta de ciberinteligencia que analiza interacciones en redes sociales para detectar perfiles falsos y automatizados.",
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "url": "https://eduolihez.com/projects/followguard/",
+              "applicationCategory": "SecurityApplication"
+            },
+            {
+              "@type": "SoftwareApplication",
+              "@id": "https://eduolihez.com/#software-fluence",
+              "name": "Fluence",
+              "description": "Asistente de escritorio para el crecimiento orgánico en Instagram; procesado local, sin servidores propios.",
+              "author": {
+                "@id": "https://eduolihez.com/#person"
+              },
+              "url": "https://eduolihez.com/projects/fluence/",
+              "applicationCategory": "DesktopEnhancementApplication"
+            },
+            {
+              "@type": "FAQPage",
+              "@id": "https://eduolihez.com/ca/#faq",
+              "inLanguage": "ca",
+              "isPartOf": {
+                "@id": "https://eduolihez.com/#website"
+              },
+              "mainEntity": [
+                {
+                  "@type": "Question",
+                  "name": "Qui és Eduardo Olivares?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Eduardo Olivares Hernández és analista de ciberseguretat a Barcelona, especialitzat en seguretat cloud, gestió d'identitats i accessos (IAM) i seguretat del correu i la col·laboració. Treballa a Dagram, on fa triatge d'alertes a Trend Micro Vision One, automatitza informes de seguretat amb Python i dona suport d'IAM. També treballa la seguretat de la IA (red teaming de chatbots LLM). Té certificacions de Trend Micro, Fortinet i Microsoft."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Quina experiència té Eduardo Olivares en Cloud Security i IAM?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Té les certificacions Cloud Security, Identity Security i Email & Collaboration Security Foundation de Trend Micro Vision One. A Dagram dona suport de gestió d'identitats i accessos (altes, baixes i revisions de permisos) i dirigeix les campanyes de phishing simulat i el programa de conscienciació. La seguretat cloud i IAM és l'àrea en què s'està especialitzant."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "On treballa Eduardo Olivares? Treballa a Barcelona o en remot?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Treballa a Barcelona i viu a Badalona, a l'àrea metropolitana. Està obert a llocs presencials o híbrids a Barcelona i a treball en remot."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Quina experiència té Eduardo Olivares en seguretat de la IA i red teaming de LLM?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Aborda la seguretat de la IA des dels dos costats. En ofensiva, va crear llm-chatbot-pentest, una eina de codi obert per al red teaming autònom de chatbots LLM: identifica l'objectiu, genera payloads alineats amb l'OWASP Top 10 per a aplicacions LLM, els puntua amb un model jutge independent i no s'executa sense autorització explícita i un abast definit. En defensa, treballa els riscos de la IA que arriben a un SOC: injecció de prompts, fuita de dades per assistents d'IA, shadow AI i els permisos que es donen als agents. Les seves referències són l'OWASP Top 10 per a LLM, MITRE ATLAS i NIST AI RMF."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Què estudia Eduardo Olivares i cap a on vol evolucionar?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Està acabant el cicle superior d'Administració de Sistemes Informàtics en Xarxa amb itinerari de Ciberseguretat (previst per al 2027) al Col·legi Cultural, i després planeja estudiar Enginyeria Informàtica. A llarg termini vol especialitzar-se en seguretat cloud i IAM, amb la seguretat de la IA present en totes dues, i arribar a liderar un equip de seguretat."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Què fa exactament un analista SOC?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Un analista SOC (Security Operations Center) vigila de manera continua els sistemes d'una organització per detectar atacs. El seu dia a dia és triar alertes de les plataformes XDR i SIEM, investigar quines són amenaces reals, contenir els incidents i documentar el que ha passat perquè no es repeteixi."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Amb quines tecnologies i eines de seguretat treballa?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "En el dia a dia: Trend Micro Vision One (XDR), FortiGate i FortiAnalyzer de Fortinet, fonts de Threat Intelligence i Active Directory. Automatitza informes amb Python: els informes d'amenaces, de vulnerabilitats i el mensual, que abans portaven setmanes de feina manual, ara es generen en menys d'1 hora. També aplica IA a l'anàlisi d'amenaces i a la detecció de phishing."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Quines certificacions de ciberseguretat té?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "A Trend Micro Vision One té les Foundation de Cloud Security, Identity Security, Email & Collaboration Security, SecOps, AI Security i Threat Intelligence, a més de Platform Advanced. A Fortinet, NSE 3 i FortiGate 7.6 Operator; a Microsoft, Azure AI Fundamentals (AI-900). El llistat complet i verificable és a la secció de certificacions del web."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Està disponible per a noves oportunitats laborals?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Si està obert a ofertes, veuràs un indicador verd de \"Disponible\" al costat de la seva foto a la pàgina principal. La via més ràpida per contactar-lo és el formulari del web o LinkedIn; sol respondre en menys de 48 hores."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "En quins idiomes treballa?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Espanyol i català com a llengües natives, i anglès amb nivell B2, suficient per a documentació tècnica, informes i reunions amb equips internacionals. Aquest web està disponible en els tres idiomes."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Com puc contactar amb ell?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Mitjançant el formulari de contacte del web, per correu a eduardo@eduolihez.com o a través del seu perfil de LinkedIn. També pots descarregar la seva targeta de contacte (vCard) des de la secció de contacte."
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "jsonLdSha256": [
+        "393c6d7d12d27fd9439ab322dd73fbaf7b43713c56f50ec84a2734f1741ffe61"
+      ],
+      "detailsCount": 11
+    }
+  }
+}

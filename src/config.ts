@@ -214,3 +214,72 @@ export function api(path: string): string {
   const clean = path.startsWith('/') ? path : `/${path}`;
   return `${base}${clean}`;
 }
+
+/** Fuente verificable que respalda una afirmacion del hero. */
+export interface Evidence {
+  id: string;
+  kind: 'credential' | 'file' | 'repo';
+  label: string;
+  href: string;
+  year?: string;
+}
+
+/**
+ * Evidencias del hero ("cada afirmacion tiene un archivo"). Los `href` locales
+ * deben existir en /public; los externos, ser https. `year` solo si ya consta
+ * en `credentials` (no se inventa). Lo comprueba src/test/evidence.test.ts.
+ */
+export const evidence: Evidence[] = [
+  {
+    id: 'E-01',
+    kind: 'credential',
+    label: 'Microsoft Azure AI Fundamentals',
+    href: 'https://www.credly.com/badges/3010ded8-d149-438c-b041-0da42fc58d09',
+    year: '2026',
+  },
+  {
+    id: 'E-02',
+    kind: 'credential',
+    label: 'Fortinet NSE',
+    href: 'https://www.credly.com/users/eduolihez',
+  },
+  {
+    id: 'E-03',
+    kind: 'file',
+    label: 'Trend Vision One Platform Advanced',
+    href: '/certificaciones/TrendAI/TrendAI%20Vision%20One%20Platform%20Advanced.pdf',
+    year: '2024',
+  },
+  {
+    id: 'E-04',
+    kind: 'file',
+    label: 'TryHackMe Pre-Security',
+    href: '/certificaciones/THM-R3JSJHVXSI.pdf',
+  },
+];
+
+/**
+ * Valida una lista de evidencias. Devuelve los errores (vacio = valida).
+ * `fileExists` recibe la ruta local ya decodificada (sin `%20`).
+ */
+export function validateEvidence(
+  list: readonly Evidence[],
+  fileExists: (path: string) => boolean,
+): string[] {
+  const errors: string[] = [];
+  const seen = new Set<string>();
+  for (const e of list) {
+    if (!/^E-\d\d$/.test(e.id)) errors.push(`${e.id}: id con formato invalido`);
+    if (seen.has(e.id)) errors.push(`${e.id}: id duplicado`);
+    seen.add(e.id);
+    if (!e.label) errors.push(`${e.id}: falta label`);
+    if (!e.href) {
+      errors.push(`${e.id}: falta href`);
+    } else if (e.href.startsWith('/')) {
+      if (!fileExists(decodeURIComponent(e.href))) errors.push(`${e.id}: no existe ${e.href}`);
+    } else if (!e.href.startsWith('https://')) {
+      errors.push(`${e.id}: href externo debe ser https`);
+    }
+  }
+  return errors;
+}

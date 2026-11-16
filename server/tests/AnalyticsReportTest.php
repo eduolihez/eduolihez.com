@@ -44,4 +44,45 @@ final class AnalyticsReportTest extends TestCase
         $this->assertFalse($r['few']);
         $this->assertNull($r['deep_pct']);
     }
+
+    /** @dataProvider readingPathProvider */
+    public function testReadingPathRegexp(string $path, bool $isPost): void
+    {
+        $this->assertSame($isPost, (bool) preg_match('#' . READING_PATH_REGEXP . '#', $path));
+    }
+
+    public static function readingPathProvider(): array
+    {
+        return [
+            'post es' => ['/blog/post/a-b/', true],
+            'post en' => ['/en/blog/post/x/', true],
+            'post ca sin barra' => ['/ca/blog/post/x', true],
+            'indice' => ['/blog/', false],
+            'indice en' => ['/en/blog/', false],
+            'molde legacy' => ['/blog/post/', false],
+            'rss' => ['/blog/rss.xml', false],
+            'translations' => ['/blog/translations.json', false],
+            'portada' => ['/blog/covers/x.png', false],
+            'otro idioma' => ['/fr/blog/post/x/', false],
+        ];
+    }
+
+    public function testMissingTableByErrorInfo(): void
+    {
+        $e = new PDOException('x');
+        $e->errorInfo = ['42S02', 1146, "Table 'site_events' doesn't exist"];
+        $this->assertTrue(is_missing_table($e));
+        $e2 = new PDOException('x');
+        $e2->errorInfo = ['HY000', 1146, ''];
+        $this->assertTrue(is_missing_table($e2));
+    }
+
+    public function testOtherErrorsAreNotMissingTable(): void
+    {
+        $e = new PDOException('x');
+        $e->errorInfo = ['42S22', 1054, 'Unknown column'];
+        $this->assertFalse(is_missing_table($e));
+        $this->assertFalse(is_missing_table(new PDOException('sin info')));
+        $this->assertFalse(is_missing_table(new RuntimeException('x', 0)));
+    }
 }

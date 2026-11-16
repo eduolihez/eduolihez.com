@@ -346,13 +346,13 @@ $viewports = q_rows(
 );
 
 // --- Lectura por post (sobre visits) -----------------------------------------
-// Rutas /blog/<slug>/ (+ /en y /ca); los indices /blog/ no casan.
+// Solo rutas de post /blog/post/<slug>/ (+ /en y /ca): ver READING_PATH_REGEXP.
 $readingRows = q_rows(
     "SELECT path, COUNT(*) AS c, COUNT(scroll_pct) AS scroll_n,
             SUM(scroll_pct >= " . READING_DEEP_SCROLL . ") AS deep,
             AVG(duration_s) AS dur, AVG(scroll_pct) AS scr
      FROM visits
-     WHERE $botFilter AND path REGEXP '^(/(en|ca))?/blog/[^/]+/?$'
+     WHERE $botFilter AND path REGEXP '" . READING_PATH_REGEXP . "'
        AND visited_at > (NOW() - INTERVAL ? DAY)
      GROUP BY path ORDER BY c DESC LIMIT 20",
     [$days]
@@ -372,7 +372,8 @@ foreach ($readingRows as $r) {
 // La tabla puede no existir aun (migracion pendiente): q_rows() se traga el
 // error y no distingue "vacio" de "falta la tabla", asi que aqui se captura
 // aparte. La tabla no tiene app_id: solo se filtra por bots y rango.
-$eventsMissing = false;
+$eventsMissing = false; // tabla inexistente (42S02/1146)
+$eventsError = false;   // cualquier otro fallo (queda en error_log)
 $eventTotals = $eventTargets = $notFound = [];
 $evBot = $withBots ? '1=1' : 'is_bot = 0';
 try {
@@ -402,9 +403,15 @@ try {
         [$days]
     );
 } catch (Throwable $e) {
-    $eventsMissing = true;
+    error_log('admin/analytics.php eventos: ' . $e->getMessage());
+    $eventsMissing = is_missing_table($e);
+    $eventsError = !$eventsMissing;
     $eventTotals = $eventTargets = $notFound = [];
 }
+$eventsUnavailable = $eventsMissing || $eventsError;
+$eventsUnavailableMsg = $eventsMissing
+    ? 'Aún no hay datos de eventos (falta aplicar la migración).'
+    : 'No se pudieron cargar los eventos (detalle en el log del servidor).';
 $targetsByName = [];
 foreach ($eventTargets as $r) {
     $targetsByName[$r['name']][] = $r;
@@ -741,8 +748,9 @@ if ($hasVisitorCol):
 </p>
 
 <h2>Eventos</h2>
-<?php if ($eventsMissing): ?>
-  <div class="card"><div class="empty">Aún no hay datos de eventos (falta aplicar la migración).</div></div>
+<p class="hint">Eventos y 404 no se filtran por espacio ni por app: son de toda la web.</p>
+<?php if ($eventsUnavailable): ?>
+  <div class="card"><div class="empty"><?= e($eventsUnavailableMsg) ?></div></div>
 <?php else: ?>
   <div class="row2">
     <div>
@@ -788,8 +796,8 @@ if ($hasVisitorCol):
     <table>
       <thead><tr><th>Ruta</th><th class="text-right">Veces</th><th class="text-right">Última vez</th></tr></thead>
       <tbody>
-        <?php if ($eventsMissing): ?>
-          <tr><td colspan="3" class="empty">Aún no hay datos de eventos (falta aplicar la migración).</td></tr>
+        <?php if ($eventsUnavailable): ?>
+          <tr><td colspan="3" class="empty"><?= e($eventsUnavailableMsg) ?></td></tr>
         <?php elseif (!$notFound): ?>
           <tr><td colspan="3" class="empty">Sin 404 registrados en este rango.</td></tr>
         <?php endif; ?>

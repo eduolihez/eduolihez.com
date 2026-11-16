@@ -4,6 +4,14 @@
  * (lectura por post). Sin DB: recibe los agregados ya calculados.
  */
 
+/**
+ * Rutas de post para "Lectura por post" (MySQL REGEXP; tambien vale en PCRE).
+ * Los posts viven en /blog/post/<slug>/ (+ /en y /ca). Fuera quedan el indice
+ * /blog/, el molde legacy /blog/post/ (?slug=, sin slug en la ruta), rss.xml,
+ * translations.json y /blog/covers/.
+ */
+const READING_PATH_REGEXP = '^(/(en|ca))?/blog/post/[^/]+/?$';
+
 /** Visitas minimas para dar un porcentaje fiable en la lectura por post. */
 const READING_MIN_VISITS = 5;
 
@@ -32,4 +40,20 @@ function reading_summary(int $visits, int $scrollN, int $deep, ?float $avgDur, ?
         'avg_scroll'   => $avgScroll === null ? null : (int) round($avgScroll),
         'deep_pct'     => ($few || $scrollN <= 0) ? null : (int) round(($deep / $scrollN) * 100),
     ];
+}
+
+/**
+ * true si el error es "la tabla no existe" (SQLSTATE 42S02 / MySQL 1146):
+ * migracion pendiente. Cualquier otro error es un fallo real.
+ */
+function is_missing_table(Throwable $e): bool
+{
+    if (!$e instanceof PDOException) {
+        return false;
+    }
+    $info = $e->errorInfo ?? null;
+    if (is_array($info) && (($info[0] ?? '') === '42S02' || (int) ($info[1] ?? 0) === 1146)) {
+        return true;
+    }
+    return (string) $e->getCode() === '42S02';
 }

@@ -442,71 +442,14 @@ $langLabels    = ['es' => 'Espanol', 'en' => 'Ingles', 'ca' => 'Catalan', '?' =>
 $viewportLabels = ['xs' => '< 480 px', 'sm' => '480–767 px', 'md' => '768–1023 px',
                     'lg' => '1024–1439 px', 'xl' => '≥ 1440 px', '?' => 'Desconocido'];
 
-admin_header('Analítica', 'analytics.php');
-// Sub-dashboard (docs/designs/admin-dashboard.md): estilos compartidos en
-// partials/layout.php (bloque ".subdash"), reutilizados por todas las
-// paginas re-skinadas de la Entrega 2 -- no se duplican aqui.
-?>
-<?php ob_start(); ?>
-    <?php foreach ($allowedDays as $d): ?>
-      <a class="btn <?= $d === $days ? '' : 'ghost' ?> sm"
-         href="?days=<?= $d ?><?= $withBots ? '&bots=1' : '' ?><?= e($appQs) ?>"><?= $d === 1 ? '24 h' : $d . 'd' ?></a>
-    <?php endforeach; ?>
-    <a class="btn ghost sm" href="?days=<?= $days ?><?= $withBots ? '' : '&bots=1' ?><?= e($appQs) ?>">
-      <?= $withBots ? '✓ Bots incluidos' : 'Incluir bots' ?>
-    </a>
-    <a class="btn ghost sm" href="?days=<?= $days ?>&amp;export=csv<?= e($appQs) ?>">Exportar CSV</a>
-<?php page_header('Analítica', '', ob_get_clean(), $appName !== null ? '— ' . $appName : ''); ?>
-<?php if ($appSlug !== '' && $appId === null): ?>
-  <p class="hint" style="color:var(--warn);">
-    No se encontro ninguna app con slug "<?= e($appSlug) ?>" — mostrando datos de todas las apps.
-  </p>
-<?php endif; ?>
 
-<div class="grid4">
-  <div class="card stat">
-    <div class="num"><?= number_format($inRange) ?><?= delta_badge($inRange, $prevRange) ?></div>
-    <div class="lbl">Visitas (<?= $days === 1 ? '24 h' : $days . ' días' ?>)<br><span class="faint">vs. periodo anterior</span></div>
-  </div>
-  <div class="card stat">
-    <div class="num cyan"><?= number_format($uniques) ?><?= delta_badge($uniques, $prevUniques) ?></div>
-    <div class="lbl">Visitantes unicos<br><span class="faint"><?= $perVisitor ?> paginas por visitante</span></div>
-  </div>
-  <div class="card stat">
-    <div class="num violet"><?= number_format($today) ?></div>
-    <div class="lbl">Hoy<br><span class="faint">
-      <?php if ($bestDay): ?>mejor dia: <?= e(date('d/m', strtotime($bestDay['d']))) ?> (<?= $bestDay['c'] ?>)<?php endif; ?>
-    </span></div>
-  </div>
-  <div class="card stat">
-    <div class="num warn"><?= number_format($botCount) ?></div>
-    <div class="lbl">Visitas de bots<br><span class="faint"><?= number_format($total) ?> humanas en total</span></div>
-  </div>
-</div>
-
-<div class="grid4">
-  <div class="card stat">
-    <div class="num"><?= $bounceRate ?>%</div>
-    <div class="lbl">Rebote<br><span class="faint">sesiones de una sola página</span></div>
-  </div>
-  <div class="card stat">
-    <div class="num cyan"><?= $avgDuration >= 60 ? sprintf('%d:%02d', (int) ($avgDuration / 60), (int) $avgDuration % 60) : round($avgDuration) . 's' ?></div>
-    <div class="lbl">Duración media<br><span class="faint">tiempo visible en pantalla</span></div>
-  </div>
-  <div class="card stat">
-    <div class="num violet"><?= round($avgScroll) ?>%</div>
-    <div class="lbl">Scroll medio<br><span class="faint">profundidad alcanzada</span></div>
-  </div>
-</div>
-
-<?php
 // T11 · Visitantes con cookie opt-in (eo_vid). Solo lectura. Si la columna
-// visitor_id aun no esta migrada, la seccion no se pinta.
+// visitor_id aun no esta migrada, la tarjeta no se pinta.
 $hasVisitorCol = q_int(
     "SELECT COUNT(*) FROM information_schema.COLUMNS
      WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'visits' AND COLUMN_NAME = 'visitor_id'"
 ) > 0;
-if ($hasVisitorCol):
+if ($hasVisitorCol) {
     $optVisits = q_int(
         "SELECT COUNT(*) FROM visits WHERE $botFilter AND visitor_id IS NOT NULL
          AND visited_at > (NOW() - INTERVAL ? DAY)",
@@ -530,151 +473,139 @@ if ($hasVisitorCol):
     );
     $optReturning = max(0, $optVisitors - $optNew);
     $optPerVisitor = $optVisitors > 0 ? round($optVisits / $optVisitors, 1) : 0;
+}
+
+/**
+ * Tabla larga: las 10 primeras filas a la vista y el resto dentro de un
+ * <details> nativo (sin JS). $rowHtml devuelve el <tr> ya escapado.
+ */
+function long_table(string $theadHtml, array $rows, callable $rowHtml, string $emptyRowHtml): string
+{
+    $table = static function (array $part, string $body = '') use ($theadHtml, $rowHtml): string {
+        foreach ($part as $r) {
+            $body .= $rowHtml($r);
+        }
+        return '<div class="scroll-x"><table><thead>' . $theadHtml . '</thead><tbody>' . $body . '</tbody></table></div>';
+    };
+    if (!$rows) {
+        return $table([], $emptyRowHtml);
+    }
+    $html = $table(array_slice($rows, 0, 10));
+    if (count($rows) > 10) {
+        $html .= '<details class="more-rows"><summary>Ver todo (' . count($rows) . ')</summary>'
+            . $table(array_slice($rows, 10)) . '</details>';
+    }
+    return $html;
+}
+
+// Enlaces del filtro: el rango conserva bots y espacio ($appQs); todo se
+// escapa con e() al pintarlo, asi que los & salen como &amp;.
+$botsQs   = $withBots ? '&bots=1' : '';
+$rangeUrl = static fn(int $d): string => '?days=' . $d . $botsQs . $appQs;
+// El CSV no lleva bots=1: su consulta ya exporta todas las filas (bots
+// incluidos) con la columna "Bot", asi que el filtro no cambiaria nada.
+$csvUrl   = '?days=' . $days . '&export=csv' . $appQs;
+
+$sections = [
+    ['id' => 'resumen',        'label' => 'Resumen'],
+    ['id' => 'audiencia',      'label' => 'Audiencia'],
+    ['id' => 'contenido',      'label' => 'Contenido'],
+    ['id' => 'adquisicion',    'label' => 'Adquisición'],
+    ['id' => 'comportamiento', 'label' => 'Comportamiento'],
+    ['id' => 'bots',           'label' => 'Bots'],
+];
+
+admin_header('Analítica', 'analytics.php');
+page_header(
+    'Analítica', '',
+    '<a class="btn ghost sm" href="' . e($csvUrl) . '">Exportar CSV</a>',
+    $appName !== null ? '— ' . $appName : ''
+);
 ?>
-<h2>Visitantes con cookie (opt-in)</h2>
-<div class="card t11-optin">
-  <p class="t11-note">Solo cuenta a quien aceptó la cookie de analítica. Es una muestra sesgada, no el total de visitantes.</p>
-  <?php if ($optVisitors === 0): ?>
-    <div class="empty">Nadie ha aceptado la cookie en este rango. Los datos aparecerán cuando alguien pulse «Aceptar analítica» en el banner.</div>
-  <?php else: ?>
-    <div class="grid4">
-      <div class="stat"><div class="num"><?= number_format($optVisitors) ?></div><div class="lbl">Visitantes con consentimiento</div></div>
-      <div class="stat"><div class="num cyan"><?= number_format($optNew) ?></div><div class="lbl">Nuevos<br><span class="faint">primera visita en el rango</span></div></div>
-      <div class="stat"><div class="num violet"><?= number_format($optReturning) ?></div><div class="lbl">Recurrentes<br><span class="faint">ya habían venido antes</span></div></div>
-      <div class="stat"><div class="num"><?= e((string) $optPerVisitor) ?></div><div class="lbl">Visitas por visitante<br><span class="faint"><?= number_format($optVisits) ?> visitas con cookie</span></div></div>
-    </div>
-  <?php endif; ?>
-</div>
+<?php if ($appSlug !== '' && $appId === null): ?>
+  <p class="hint" style="color:var(--warn);">
+    No se encontro ninguna app con slug "<?= e($appSlug) ?>" — mostrando datos de todas las apps.
+  </p>
 <?php endif; ?>
 
-<h2>Visitas por día</h2>
-<div class="card">
-  <?php if (!array_sum(array_column($daily, 'c'))): ?>
-    <div class="empty">Sin datos de visitas en este rango.</div>
-  <?php else: ?>
-    <div class="chart">
-      <?php foreach ($daily as $r): ?>
-        <?php $h = (int) round(($r['c'] / $maxDay) * 120); ?>
-        <div class="col">
-          <div class="val"><?= $r['c'] ?: '' ?></div>
-          <div class="bar-v" style="height:<?= max(3, $h) ?>px"
-               title="<?= e($r['d']) ?>: <?= $r['c'] ?> visitas · <?= $r['u'] ?> unicos"></div>
-          <div class="tick"><?= e(date('d/m', strtotime($r['d']))) ?></div>
-        </div>
-      <?php endforeach; ?>
-    </div>
-    <p class="hint">Pasa el ratón por una barra para ver visitas y visitantes únicos de ese día.</p>
-  <?php endif; ?>
-</div>
+<?php ob_start(); ?>
+  <div class="seg" role="group" aria-label="Periodo">
+    <?php foreach ($allowedDays as $d): ?>
+      <a href="<?= e($rangeUrl($d)) ?>"<?= $d === $days ? ' aria-current="true"' : '' ?>><?= $d === 1 ? '24 h' : $d . 'd' ?></a>
+    <?php endforeach; ?>
+  </div>
+  <input type="hidden" name="days" value="<?= e((string) $days) ?>">
+  <input type="hidden" name="space" value="<?= e(admin_space()) ?>">
+  <label class="toggle"><input type="checkbox" name="bots" value="1"<?= $withBots ? ' checked' : '' ?>> Incluir bots</label>
+  <button type="submit" class="btn sm">Aplicar</button>
+<?php $filterHtml = ob_get_clean(); ?>
+<form method="get" action="">
+  <?= filter_bar($filterHtml, 'Filtros') ?>
+</form>
+<?= section_nav($sections) ?>
 
-<div class="row2">
-  <div>
-    <h2>Franja horaria</h2>
-    <div class="card">
-      <div class="chart" style="height:110px;">
-        <?php foreach ($byHour as $h => $c): ?>
+<section id="resumen" class="page-section">
+  <div class="section-title"><h2>Resumen</h2><span>Visitas, visitantes y calidad de la visita en el periodo.</span></div>
+  <div class="grid4">
+    <div class="card stat">
+      <div class="num"><?= number_format($inRange) ?><?= delta_badge($inRange, $prevRange) ?></div>
+      <div class="lbl">Visitas (<?= $days === 1 ? '24 h' : $days . ' días' ?>)<br><span class="faint">vs. periodo anterior</span></div>
+    </div>
+    <div class="card stat">
+      <div class="num cyan"><?= number_format($uniques) ?><?= delta_badge($uniques, $prevUniques) ?></div>
+      <div class="lbl">Visitantes unicos<br><span class="faint"><?= $perVisitor ?> paginas por visitante</span></div>
+    </div>
+    <div class="card stat">
+      <div class="num violet"><?= number_format($today) ?></div>
+      <div class="lbl">Hoy<br><span class="faint">
+        <?php if ($bestDay): ?>mejor dia: <?= e(date('d/m', strtotime($bestDay['d']))) ?> (<?= $bestDay['c'] ?>)<?php endif; ?>
+      </span></div>
+    </div>
+    <div class="card stat">
+      <div class="num warn"><?= number_format($botCount) ?></div>
+      <div class="lbl">Visitas de bots<br><span class="faint"><?= number_format($total) ?> humanas en total</span></div>
+    </div>
+  </div>
+
+  <div class="grid4">
+    <div class="card stat">
+      <div class="num"><?= $bounceRate ?>%</div>
+      <div class="lbl">Rebote<br><span class="faint">sesiones de una sola página</span></div>
+    </div>
+    <div class="card stat">
+      <div class="num cyan"><?= $avgDuration >= 60 ? sprintf('%d:%02d', (int) ($avgDuration / 60), (int) $avgDuration % 60) : round($avgDuration) . 's' ?></div>
+      <div class="lbl">Duración media<br><span class="faint">tiempo visible en pantalla</span></div>
+    </div>
+    <div class="card stat">
+      <div class="num violet"><?= round($avgScroll) ?>%</div>
+      <div class="lbl">Scroll medio<br><span class="faint">profundidad alcanzada</span></div>
+    </div>
+  </div>
+
+  <?= card_open('Visitas por día', $chartDays < $days ? 'últimos ' . $chartDays . ' días' : '') ?>
+    <?php if (!array_sum(array_column($daily, 'c'))): ?>
+      <div class="empty">Sin datos de visitas en este rango.</div>
+    <?php else: ?>
+      <div class="chart">
+        <?php foreach ($daily as $r): ?>
+          <?php $h = (int) round(($r['c'] / $maxDay) * 120); ?>
           <div class="col">
-            <div class="bar-v" style="height:<?= max(3, (int) round(($c / $maxHour) * 80)) ?>px; background:var(--cyan);"
-                 title="<?= $h ?>:00 — <?= $c ?> visitas"></div>
-            <div class="tick"><?= $h % 3 === 0 ? $h : '' ?></div>
+            <div class="val"><?= $r['c'] ?: '' ?></div>
+            <div class="bar-v" style="height:<?= max(3, $h) ?>px"
+                 title="<?= e($r['d']) ?>: <?= $r['c'] ?> visitas · <?= $r['u'] ?> unicos"></div>
+            <div class="tick"><?= e(date('d/m', strtotime($r['d']))) ?></div>
           </div>
         <?php endforeach; ?>
       </div>
-      <p class="hint">Hora local del servidor (<?= e(date_default_timezone_get()) ?>).</p>
-    </div>
-  </div>
-  <div>
-    <h2>Día de la semana</h2>
-    <div class="card">
-      <?php foreach ($dowNames as $i => $name): ?>
-        <?php bar_row($name, $byDow[$i], $maxDow, 'violet'); ?>
-      <?php endforeach; ?>
-    </div>
-  </div>
-</div>
+      <p class="hint">Pasa el ratón por una barra para ver visitas y visitantes únicos de ese día.</p>
+    <?php endif; ?>
+  <?= card_close() ?>
+</section>
 
-<div class="row2">
-  <div>
-    <h2>Canales de trafico</h2>
-    <div class="card">
-      <?php if (!$channels): ?><div class="empty">Sin datos.</div><?php endif; ?>
-      <?php foreach ($channels as $name => $c): ?>
-        <?php bar_row($name, $c, $maxChannel, 'green',
-            $inRange > 0 ? round(($c / $inRange) * 100) . '%' : ''); ?>
-      <?php endforeach; ?>
-      <p class="hint">"IA / Chatbots" agrupa visitas llegadas desde ChatGPT, Claude, Perplexity,
-        Gemini y Copilot: es la señal de que las IAs te están citando.</p>
-    </div>
-  </div>
-  <div>
-    <h2>Idioma de la página</h2>
-    <div class="card">
-      <?php if (!$langs): ?><div class="empty">Sin datos.</div><?php endif; ?>
-      <?php foreach ($langs as $r): ?>
-        <?php bar_row($langLabels[$r['k']] ?? $r['k'], (int) $r['c'], $maxLang, 'green',
-            $inRange > 0 ? round(((int) $r['c'] / $inRange) * 100) . '%' : ''); ?>
-      <?php endforeach; ?>
-    </div>
-  </div>
-</div>
-
-<div class="row2">
-  <div>
-    <h2>Idioma del navegador</h2>
-    <div class="card">
-      <?php if (!$browserLangs): ?><div class="empty">Sin datos.</div><?php endif; ?>
-      <?php foreach ($browserLangs as $r): ?>
-        <?php bar_row($langLabels[$r['k']] ?? strtoupper((string) $r['k']), (int) $r['c'], $maxBroLang, ''); ?>
-      <?php endforeach; ?>
-      <p class="hint">Idioma declarado por el navegador, no el de la página servida:
-        una demanda visible de un idioma que aún no ofreces se vería aquí.</p>
-    </div>
-  </div>
-  <div>
-    <h2>Tamano de pantalla</h2>
-    <div class="card">
-      <?php if (!$viewports): ?><div class="empty">Sin datos.</div><?php endif; ?>
-      <?php foreach ($viewports as $r): ?>
-        <?php bar_row($viewportLabels[$r['k']] ?? $r['k'], (int) $r['c'], $maxViewport, 'violet'); ?>
-      <?php endforeach; ?>
-    </div>
-  </div>
-</div>
-
-<div class="row2">
-  <div>
-    <h2>Páginas de entrada</h2>
-    <div class="card">
-      <?php if (!$entryPages): ?><div class="empty">Sin datos.</div><?php endif; ?>
-      <?php foreach ($entryPages as $r): ?>
-        <?php bar_row($r['path'], (int) $r['c'], $maxEntry, 'green'); ?>
-      <?php endforeach; ?>
-    </div>
-  </div>
-  <div>
-    <h2>Páginas de salida</h2>
-    <div class="card">
-      <?php if (!$exitPages): ?><div class="empty">Sin datos.</div><?php endif; ?>
-      <?php foreach ($exitPages as $r): ?>
-        <?php bar_row($r['path'], (int) $r['c'], $maxExit, 'violet'); ?>
-      <?php endforeach; ?>
-    </div>
-  </div>
-</div>
-
-<div class="row2">
-  <div>
-    <h2>Páginas más vistas</h2>
-    <div class="card">
-      <?php if (!$topPages): ?><div class="empty">Sin datos.</div><?php endif; ?>
-      <?php foreach ($topPages as $r): ?>
-        <?php bar_row($r['path'], (int) $r['c'], $maxPage, 'green'); ?>
-      <?php endforeach; ?>
-    </div>
-  </div>
-  <div>
-    <h2>Paises</h2>
-    <div class="card">
+<section id="audiencia" class="page-section">
+  <div class="section-title"><h2>Audiencia</h2><span>Quién visita: país, idioma, pantalla y dispositivo.</span></div>
+  <div class="row2">
+    <?= card_open('Países') ?>
       <?php if (!$countries): ?>
         <div class="empty">Sin datos de país. Requiere que el tráfico pase por Cloudflare
           (cabecera CF-IPCountry).</div>
@@ -685,76 +616,207 @@ if ($hasVisitorCol):
             (int) $r['c'], $maxCty, 'violet'
         ); ?>
       <?php endforeach; ?>
-    </div>
+    <?= card_close() ?>
+    <?= card_open('Idioma de la página') ?>
+      <?php if (!$langs): ?><div class="empty">Sin datos.</div><?php endif; ?>
+      <?php foreach ($langs as $r): ?>
+        <?php bar_row($langLabels[$r['k']] ?? $r['k'], (int) $r['c'], $maxLang, 'green',
+            $inRange > 0 ? round(((int) $r['c'] / $inRange) * 100) . '%' : ''); ?>
+      <?php endforeach; ?>
+    <?= card_close() ?>
   </div>
-</div>
 
-<div class="row3">
-  <div>
-    <h2>Dispositivos</h2>
-    <div class="card">
+  <div class="row2">
+    <?= card_open('Idioma del navegador') ?>
+      <?php if (!$browserLangs): ?><div class="empty">Sin datos.</div><?php endif; ?>
+      <?php foreach ($browserLangs as $r): ?>
+        <?php bar_row($langLabels[$r['k']] ?? strtoupper((string) $r['k']), (int) $r['c'], $maxBroLang, ''); ?>
+      <?php endforeach; ?>
+      <p class="hint">Idioma declarado por el navegador, no el de la página servida:
+        una demanda visible de un idioma que aún no ofreces se vería aquí.</p>
+    <?= card_close() ?>
+    <?= card_open('Tamaño de pantalla') ?>
+      <?php if (!$viewports): ?><div class="empty">Sin datos.</div><?php endif; ?>
+      <?php foreach ($viewports as $r): ?>
+        <?php bar_row($viewportLabels[$r['k']] ?? $r['k'], (int) $r['c'], $maxViewport, 'violet'); ?>
+      <?php endforeach; ?>
+    <?= card_close() ?>
+  </div>
+
+  <div class="row3">
+    <?= card_open('Dispositivos') ?>
       <?php if (!$devices): ?><div class="empty">Sin datos.</div><?php endif; ?>
       <?php foreach ($devices as $r): ?>
         <?php bar_row($deviceLabels[$r['k']] ?? $r['k'], (int) $r['c'], $maxDev, '',
             $inRange > 0 ? round(((int) $r['c'] / $inRange) * 100) . '%' : ''); ?>
       <?php endforeach; ?>
-    </div>
-  </div>
-  <div>
-    <h2>Navegadores</h2>
-    <div class="card">
+    <?= card_close() ?>
+    <?= card_open('Navegadores') ?>
       <?php if (!$browsers): ?><div class="empty">Sin datos.</div><?php endif; ?>
       <?php foreach ($browsers as $r): ?>
         <?php bar_row($r['k'], (int) $r['c'], $maxBro, 'green'); ?>
       <?php endforeach; ?>
-    </div>
-  </div>
-  <div>
-    <h2>Sistemas operativos</h2>
-    <div class="card">
+    <?= card_close() ?>
+    <?= card_open('Sistemas operativos') ?>
       <?php if (!$systems): ?><div class="empty">Sin datos.</div><?php endif; ?>
       <?php foreach ($systems as $r): ?>
         <?php bar_row($r['k'], (int) $r['c'], $maxSys, 'violet'); ?>
       <?php endforeach; ?>
-    </div>
+    <?= card_close() ?>
   </div>
-</div>
 
-<h2>Lectura por post</h2>
-<div class="card p-0">
-  <div class="scroll-x">
-    <table>
-      <thead><tr><th>Post</th><th class="text-right">Visitas</th><th class="text-right">Tiempo medio</th><th class="text-right">Scroll medio</th><th class="text-right">Llega al 90 %</th></tr></thead>
-      <tbody>
-        <?php if (!$reading): ?>
-          <tr><td colspan="5" class="empty">Sin visitas a posts en este rango.</td></tr>
+  <?php if ($hasVisitorCol): ?>
+    <?= card_open('Visitantes con cookie (opt-in)') ?>
+      <div class="t11-optin">
+        <p class="t11-note">Solo cuenta a quien aceptó la cookie de analítica. Es una muestra sesgada, no el total de visitantes.</p>
+        <?php if ($optVisitors === 0): ?>
+          <div class="empty">Nadie ha aceptado la cookie en este rango. Los datos aparecerán cuando alguien pulse «Aceptar analítica» en el banner.</div>
+        <?php else: ?>
+          <div class="grid4">
+            <div class="stat"><div class="num"><?= number_format($optVisitors) ?></div><div class="lbl">Visitantes con consentimiento</div></div>
+            <div class="stat"><div class="num cyan"><?= number_format($optNew) ?></div><div class="lbl">Nuevos<br><span class="faint">primera visita en el rango</span></div></div>
+            <div class="stat"><div class="num violet"><?= number_format($optReturning) ?></div><div class="lbl">Recurrentes<br><span class="faint">ya habían venido antes</span></div></div>
+            <div class="stat"><div class="num"><?= e((string) $optPerVisitor) ?></div><div class="lbl">Visitas por visitante<br><span class="faint"><?= number_format($optVisits) ?> visitas con cookie</span></div></div>
+          </div>
         <?php endif; ?>
-        <?php foreach ($reading as $r): ?>
-          <tr>
-            <td style="word-break:break-all;"><?= e($r['path']) ?></td>
-            <td class="text-right"><?= (int) $r['visits'] ?></td>
-            <td class="text-right"><?= $r['avg_duration'] === null ? '—' : e($r['avg_duration'] . 's') ?></td>
-            <td class="text-right"><?= $r['avg_scroll'] === null ? '—' : e($r['avg_scroll'] . '%') ?></td>
-            <td class="text-right"><?php if ($r['few']): ?><span class="faint">pocos datos</span><?php elseif ($r['deep_pct'] === null): ?>—<?php else: ?><?= e($r['deep_pct'] . '%') ?><?php endif; ?></td>
-          </tr>
-        <?php endforeach; ?>
-      </tbody>
-    </table>
-  </div>
-</div>
-<p class="hint" style="margin-top:.5rem;">
-  El % es sobre las visitas con scroll medido. Con menos de <?= READING_MIN_VISITS ?> visitas se marca
-  «pocos datos» para no dar un porcentaje engañoso.
-</p>
+      </div>
+    <?= card_close() ?>
+  <?php endif; ?>
+</section>
 
-<h2>Eventos</h2>
-<p class="hint">Eventos y 404 no se filtran por espacio ni por app: son de toda la web.</p>
-<?php if ($eventsUnavailable): ?>
-  <div class="card"><div class="empty"><?= e($eventsUnavailableMsg) ?></div></div>
-<?php else: ?>
+<section id="contenido" class="page-section">
+  <div class="section-title"><h2>Contenido</h2><span>Qué se lee, por dónde se entra y por dónde se sale.</span></div>
+  <div class="row3">
+    <?= card_open('Páginas más vistas') ?>
+      <?php if (!$topPages): ?><div class="empty">Sin datos.</div><?php endif; ?>
+      <?php foreach ($topPages as $r): ?>
+        <?php bar_row($r['path'], (int) $r['c'], $maxPage, 'green'); ?>
+      <?php endforeach; ?>
+    <?= card_close() ?>
+    <?= card_open('Páginas de entrada') ?>
+      <?php if (!$entryPages): ?><div class="empty">Sin datos.</div><?php endif; ?>
+      <?php foreach ($entryPages as $r): ?>
+        <?php bar_row($r['path'], (int) $r['c'], $maxEntry, 'green'); ?>
+      <?php endforeach; ?>
+    <?= card_close() ?>
+    <?= card_open('Páginas de salida') ?>
+      <?php if (!$exitPages): ?><div class="empty">Sin datos.</div><?php endif; ?>
+      <?php foreach ($exitPages as $r): ?>
+        <?php bar_row($r['path'], (int) $r['c'], $maxExit, 'violet'); ?>
+      <?php endforeach; ?>
+    <?= card_close() ?>
+  </div>
+
+  <?= card_open('Lectura por post') ?>
+    <div class="scroll-x">
+      <table>
+        <thead><tr><th>Post</th><th class="text-right">Visitas</th><th class="text-right">Tiempo medio</th><th class="text-right">Scroll medio</th><th class="text-right">Llega al 90 %</th></tr></thead>
+        <tbody>
+          <?php if (!$reading): ?>
+            <tr><td colspan="5" class="empty">Sin visitas a posts en este rango.</td></tr>
+          <?php endif; ?>
+          <?php foreach ($reading as $r): ?>
+            <tr>
+              <td style="word-break:break-all;"><?= e($r['path']) ?></td>
+              <td class="text-right"><?= (int) $r['visits'] ?></td>
+              <td class="text-right"><?= $r['avg_duration'] === null ? '—' : e($r['avg_duration'] . 's') ?></td>
+              <td class="text-right"><?= $r['avg_scroll'] === null ? '—' : e($r['avg_scroll'] . '%') ?></td>
+              <td class="text-right"><?php if ($r['few']): ?><span class="faint">pocos datos</span><?php elseif ($r['deep_pct'] === null): ?>—<?php else: ?><?= e($r['deep_pct'] . '%') ?><?php endif; ?></td>
+            </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
+    </div>
+    <p class="hint" style="margin-top:.5rem;">
+      El % es sobre las visitas con scroll medido. Con menos de <?= READING_MIN_VISITS ?> visitas se marca
+      «pocos datos» para no dar un porcentaje engañoso.
+    </p>
+  <?= card_close() ?>
+
+  <?= card_open('Páginas 404', 'toda la web') ?>
+    <?= long_table(
+        '<tr><th>Ruta</th><th class="text-right">Veces</th><th class="text-right">Última vez</th></tr>',
+        $notFound,
+        static fn(array $r): string => '<tr><td style="word-break:break-all;">' . e((string) $r['path']) . '</td>'
+            . '<td class="text-right">' . (int) $r['c'] . '</td>'
+            . '<td class="text-right">' . e(fdate((string) $r['last_at'])) . '</td></tr>',
+        '<tr><td colspan="3" class="empty">'
+            . ($eventsUnavailable ? e($eventsUnavailableMsg) : 'Sin 404 registrados en este rango.') . '</td></tr>'
+    ) ?>
+    <p class="hint" style="margin-top:.5rem;">
+      Enlaces rotos o URLs antiguas que llegan a la página de error: candidatas a redirigir.
+    </p>
+  <?= card_close() ?>
+</section>
+
+<section id="adquisicion" class="page-section">
+  <div class="section-title"><h2>Adquisición</h2><span>De dónde llega el tráfico: canales, referrers y campañas.</span></div>
+  <?= card_open('Canales de tráfico') ?>
+    <?php if (!$channels): ?><div class="empty">Sin datos.</div><?php endif; ?>
+    <?php foreach ($channels as $name => $c): ?>
+      <?php bar_row($name, $c, $maxChannel, 'green',
+          $inRange > 0 ? round(($c / $inRange) * 100) . '%' : ''); ?>
+    <?php endforeach; ?>
+    <p class="hint">"IA / Chatbots" agrupa visitas llegadas desde ChatGPT, Claude, Perplexity,
+      Gemini y Copilot: es la señal de que las IAs te están citando.</p>
+  <?= card_close() ?>
+
+  <?= card_open('Origen del tráfico (referrers)') ?>
+    <?= long_table(
+        '<tr><th>Referrer</th><th>Canal</th><th class="text-right">Visitas</th></tr>',
+        $topRefs,
+        static fn(array $r): string => '<tr><td style="word-break:break-all;">' . e($r['referrer']) . '</td>'
+            . '<td><span class="pill">' . e(referrer_channel($r['referrer'])) . '</span></td>'
+            . '<td class="text-right">' . (int) $r['c'] . '</td></tr>',
+        '<tr><td colspan="3" class="empty">Sin datos: todo el tráfico llega directo.</td></tr>'
+    ) ?>
+  <?= card_close() ?>
+
+  <?= card_open('Atribución (UTM)') ?>
+    <?= long_table(
+        '<tr><th>Origen</th><th>Medio</th><th>Campaña</th><th class="text-right">Visitas</th></tr>',
+        $utmRows,
+        static fn(array $r): string => '<tr><td>' . e((string) $r['utm_source']) . '</td>'
+            . '<td>' . e((string) ($r['utm_medium'] ?? '—')) . '</td>'
+            . '<td>' . e((string) ($r['utm_campaign'] ?? '—')) . '</td>'
+            . '<td class="text-right">' . (int) $r['c'] . '</td></tr>',
+        '<tr><td colspan="4" class="empty">Sin datos: ningún enlace de entrada trae parámetros utm_*.</td></tr>'
+    ) ?>
+    <p class="hint" style="margin-top:.5rem;">
+      De <code>utm_source</code>/<code>utm_medium</code>/<code>utm_campaign</code> en la URL de
+      aterrizaje, nunca del referrer de otra web (ese se guarda sin query, ver nota de privacidad).
+    </p>
+  <?= card_close() ?>
+</section>
+
+<section id="comportamiento" class="page-section">
+  <div class="section-title"><h2>Comportamiento</h2><span>Cuándo se visita y qué se hace en la página.</span></div>
   <div class="row2">
-    <div>
-      <div class="card p-0">
+    <?= card_open('Franja horaria') ?>
+      <div class="chart" style="height:110px;">
+        <?php foreach ($byHour as $h => $c): ?>
+          <div class="col">
+            <div class="bar-v" style="height:<?= max(3, (int) round(($c / $maxHour) * 80)) ?>px; background:var(--cyan);"
+                 title="<?= $h ?>:00 — <?= $c ?> visitas"></div>
+            <div class="tick"><?= $h % 3 === 0 ? $h : '' ?></div>
+          </div>
+        <?php endforeach; ?>
+      </div>
+      <p class="hint">Hora local del servidor (<?= e(date_default_timezone_get()) ?>).</p>
+    <?= card_close() ?>
+    <?= card_open('Día de la semana') ?>
+      <?php foreach ($dowNames as $i => $name): ?>
+        <?php bar_row($name, $byDow[$i], $maxDow, 'violet'); ?>
+      <?php endforeach; ?>
+    <?= card_close() ?>
+  </div>
+
+  <p class="hint">Eventos y 404 no se filtran por espacio ni por app: son de toda la web.</p>
+  <?php if ($eventsUnavailable): ?>
+    <?= card_open('Eventos') ?><div class="empty"><?= e($eventsUnavailableMsg) ?></div><?= card_close() ?>
+  <?php else: ?>
+    <div class="row2">
+      <?= card_open('Eventos') ?>
         <div class="scroll-x">
           <table>
             <thead><tr><th>Evento</th><th class="text-right">Total</th><th class="text-right">Sesiones</th></tr></thead>
@@ -772,10 +834,8 @@ if ($hasVisitorCol):
             </tbody>
           </table>
         </div>
-      </div>
-    </div>
-    <div>
-      <div class="card">
+      <?= card_close() ?>
+      <?= card_open('Eventos por destino') ?>
         <?php if (!$targetsByName): ?><div class="empty">Sin desglose por destino.</div><?php endif; ?>
         <?php foreach ($eventLabels as $evName => $evLabel): ?>
           <?php if (empty($targetsByName[$evName])) { continue; } ?>
@@ -785,109 +845,28 @@ if ($hasVisitorCol):
             <?php bar_row((string) $r['target'], (int) $r['c'], $maxT, 'green'); ?>
           <?php endforeach; ?>
         <?php endforeach; ?>
-      </div>
+      <?= card_close() ?>
     </div>
-  </div>
-<?php endif; ?>
+  <?php endif; ?>
+</section>
 
-<h2>Páginas 404</h2>
-<div class="card p-0">
-  <div class="scroll-x">
-    <table>
-      <thead><tr><th>Ruta</th><th class="text-right">Veces</th><th class="text-right">Última vez</th></tr></thead>
-      <tbody>
-        <?php if ($eventsUnavailable): ?>
-          <tr><td colspan="3" class="empty"><?= e($eventsUnavailableMsg) ?></td></tr>
-        <?php elseif (!$notFound): ?>
-          <tr><td colspan="3" class="empty">Sin 404 registrados en este rango.</td></tr>
-        <?php endif; ?>
-        <?php foreach ($notFound as $r): ?>
-          <tr>
-            <td style="word-break:break-all;"><?= e((string) $r['path']) ?></td>
-            <td class="text-right"><?= (int) $r['c'] ?></td>
-            <td class="text-right"><?= e(fdate((string) $r['last_at'])) ?></td>
-          </tr>
-        <?php endforeach; ?>
-      </tbody>
-    </table>
-  </div>
-</div>
-<p class="hint" style="margin-top:.5rem;">
-  Enlaces rotos o URLs antiguas que llegan a la página de error: candidatas a redirigir.
-</p>
-
-<h2>Atribucion (UTM)</h2>
-<div class="card p-0">
-  <div class="scroll-x">
-    <table>
-      <thead><tr><th>Origen</th><th>Medio</th><th>Campana</th><th class="text-right">Visitas</th></tr></thead>
-      <tbody>
-        <?php if (!$utmRows): ?>
-          <tr><td colspan="4" class="empty">Sin datos: ningún enlace de entrada trae parámetros utm_*.</td></tr>
-        <?php endif; ?>
-        <?php foreach ($utmRows as $r): ?>
-          <tr>
-            <td><?= e((string) $r['utm_source']) ?></td>
-            <td><?= e((string) ($r['utm_medium'] ?? '—')) ?></td>
-            <td><?= e((string) ($r['utm_campaign'] ?? '—')) ?></td>
-            <td class="text-right"><?= (int) $r['c'] ?></td>
-          </tr>
-        <?php endforeach; ?>
-      </tbody>
-    </table>
-  </div>
-</div>
-<p class="hint" style="margin-top:.5rem;">
-  De <code>utm_source</code>/<code>utm_medium</code>/<code>utm_campaign</code> en la URL de
-  aterrizaje, nunca del referrer de otra web (ese se guarda sin query, ver nota de privacidad).
-</p>
-
-<h2>Origen del trafico (referrers)</h2>
-<div class="card p-0">
-  <div class="scroll-x">
-    <table>
-      <thead><tr><th>Referrer</th><th>Canal</th><th class="text-right">Visitas</th></tr></thead>
-      <tbody>
-        <?php if (!$topRefs): ?>
-          <tr><td colspan="3" class="empty">Sin datos: todo el tráfico llega directo.</td></tr>
-        <?php endif; ?>
-        <?php foreach ($topRefs as $r): ?>
-          <tr>
-            <td style="word-break:break-all;"><?= e($r['referrer']) ?></td>
-            <td><span class="pill"><?= e(referrer_channel($r['referrer'])) ?></span></td>
-            <td class="text-right"><?= (int) $r['c'] ?></td>
-          </tr>
-        <?php endforeach; ?>
-      </tbody>
-    </table>
-  </div>
-</div>
-
-<h2>Bots y rastreadores</h2>
-<div class="card p-0">
-  <div class="scroll-x">
-    <table>
-      <thead><tr><th>User-Agent</th><th class="text-right">Peticiones</th></tr></thead>
-      <tbody>
-        <?php if (!$topBots): ?>
-          <tr><td colspan="2" class="empty">Sin datos: ningún bot registrado en este rango.</td></tr>
-        <?php endif; ?>
-        <?php foreach ($topBots as $r): ?>
-          <tr>
-            <td class="mono faint" style="word-break:break-all; font-size:.78rem;">
-              <?= e(mb_substr((string) $r['user_agent'], 0, 140)) ?>
-            </td>
-            <td class="text-right"><?= (int) $r['c'] ?></td>
-          </tr>
-        <?php endforeach; ?>
-      </tbody>
-    </table>
-  </div>
-</div>
-<p class="hint" style="margin-top:.5rem;">
-  Aquí verás a Googlebot, Bingbot y a los rastreadores de IA (GPTBot, ClaudeBot,
-  PerplexityBot...). Que aparezcan es buena señal: significa que te están indexando.
-</p>
+<section id="bots" class="page-section">
+  <div class="section-title"><h2>Bots</h2><span>Rastreadores y asistentes de IA que piden tus páginas.</span></div>
+  <?= card_open('Bots y rastreadores') ?>
+    <?= long_table(
+        '<tr><th>User-Agent</th><th class="text-right">Peticiones</th></tr>',
+        $topBots,
+        static fn(array $r): string => '<tr><td class="mono faint" style="word-break:break-all; font-size:.78rem;">'
+            . e(mb_substr((string) $r['user_agent'], 0, 140)) . '</td>'
+            . '<td class="text-right">' . (int) $r['c'] . '</td></tr>',
+        '<tr><td colspan="2" class="empty">Sin datos: ningún bot registrado en este rango.</td></tr>'
+    ) ?>
+    <p class="hint" style="margin-top:.5rem;">
+      Aquí verás a Googlebot, Bingbot y a los rastreadores de IA (GPTBot, ClaudeBot,
+      PerplexityBot...). Que aparezcan es buena señal: significa que te están indexando.
+    </p>
+  <?= card_close() ?>
+</section>
 
 <p class="hint mt-3">
   <strong>Privacidad:</strong> las IPs se guardan hasheadas con sal (más user-agent) y no se

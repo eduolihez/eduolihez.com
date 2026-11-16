@@ -1,5 +1,6 @@
 /* ==========================================================================
-   Tokens de diseno. Una sola fuente de verdad para el tema claro y el oscuro.
+   Tokens de diseno "Expediente". Una sola fuente de verdad para el tema claro
+   y el oscuro.
 
    Resolucion del tema (por orden):
      1. <html data-theme="light|dark">  -> eleccion explicita (public/theme-init.js
@@ -7,29 +8,39 @@
      2. Sin atributo                    -> prefers-color-scheme del sistema.
    Por defecto manda el sistema; el boton solo guarda una eleccion si se pulsa.
 
-   Los valores de texto estan calculados para WCAG AA (>= 4.5:1) sobre --bg y
-   sobre --bg-card; los acentos de texto son mas oscuros en claro que los
-   decorativos de la referencia, que no llegaban a 3:1 sobre papel.
+   Contraste (lo comprueba src/test/tokens.test.ts): texto y acento >= 4.5:1
+   sobre --bg y --bg-card; --on-mark sobre --mark >= 7:1. --accent es un azul
+   tinta porque se usa como color de texto/enlace. --mark (amarillo marcador)
+   es SOLO relleno con texto --on-mark: nunca texto amarillo sobre claro.
+   --ink es el azul noche fijo de las bandas de portada (igual en ambos temas).
    Se publican como utilidades de Tailwind en global.css (@theme inline).
    ========================================================================== */
 
 :root {
-  /* --- Claro: papel + tinta, acento verde azulado ------------------------ */
-  --bg: #f5f6f3;
-  --bg-soft: #eceee9;
+  /* --- Claro: papel tecnico gris frio + tinta azul noche ----------------- */
+  --bg: #f3f5f8;
+  --bg-soft: #e9edf2;
   --bg-card: #ffffff;
-  --bg-border: #e0e3de;
-  --bg-border-hover: #c6ccc4;
+  --bg-border: #d5dbe4;
+  --bg-border-hover: #b9c2cf;
 
-  --text: #131820;
-  --text-title: #0a0e14;
-  --text-muted: #49535f;
-  --text-faint: #5b6674;
+  --text: #101828;
+  --text-title: #0a1020;
+  --text-muted: #475467;
+  --text-faint: #5d6b7e;
 
-  --accent: #047266;
-  --accent-hover: #035c52;
-  --accent-soft: #dcf1ed;
+  --accent: #2443b0;
+  --accent-hover: #1a3390;
+  --accent-soft: #e3e9fb;
   --on-accent: #ffffff;
+
+  --mark: #f6c61b;
+  --mark-hover: #e8b70c;
+  --mark-soft: #fdf0c2;
+  --on-mark: #101828;
+
+  --ink: #0b1220;
+  --on-ink: #f3f5f8;
 
   --cyan: #0e7490;
   --violet: #6d44d8;
@@ -40,32 +51,40 @@
   --wip: #8f5608;
   --closed: #1b5cc0;
 
-  --scrim: rgb(19 24 32 / 0.55);
-  --grid-line: rgb(19 24 32 / 0.055);
-  --glow: rgb(5 122 107 / 0.16);
-  --shadow-card: 0 1px 2px rgb(19 24 32 / 0.05), 0 14px 34px -16px rgb(19 24 32 / 0.18);
-  --selection: rgb(5 122 107 / 0.18);
+  --scrim: rgb(16 24 40 / 0.55);
+  --grid-line: rgb(16 24 40 / 0.055);
+  --glow: rgb(36 67 176 / 0.1);
+  --shadow-card: 0 1px 2px rgb(16 24 40 / 0.05), 0 14px 34px -16px rgb(16 24 40 / 0.18);
+  --selection: rgb(246 198 27 / 0.45);
 
   color-scheme: light;
 }
 
-/* --- Oscuro: consola en penumbra (se conserva el negro azulado) ---------- */
+/* --- Oscuro: tinta azul noche ------------------------------------------- */
 :root[data-theme='dark'] {
-  --bg: #0a0e14;
-  --bg-soft: #0f141c;
-  --bg-card: #141a24;
-  --bg-border: #1f2733;
-  --bg-border-hover: #2b3543;
+  --bg: #0b1220;
+  --bg-soft: #0f1729;
+  --bg-card: #111a2c;
+  --bg-border: #1e2a40;
+  --bg-border-hover: #2c3a55;
 
-  --text: #e6edf3;
-  --text-title: #f0f3f6;
-  --text-muted: #9aa7b8;
-  --text-faint: #8e99ad;
+  --text: #e6ebf3;
+  --text-title: #f3f6fa;
+  --text-muted: #9aa8bd;
+  --text-faint: #8a98ae;
 
-  --accent: #2dd4bf;
-  --accent-hover: #5eead4;
-  --accent-soft: #0e3a35;
-  --on-accent: #04120f;
+  --accent: #8fb0ff;
+  --accent-hover: #b3c9ff;
+  --accent-soft: #16254a;
+  --on-accent: #0b1220;
+
+  --mark: #f6c61b;
+  --mark-hover: #ffd84d;
+  --mark-soft: #3a3112;
+  --on-mark: #101828;
+
+  --ink: #0b1220;
+  --on-ink: #f3f5f8;
 
   --cyan: #22d3ee;
   --violet: #a78bfa;
@@ -76,35 +95,44 @@
   --wip: #f59e0b;
   --closed: #60a5fa;
 
-  --scrim: rgb(3 5 8 / 0.72);
-  --grid-line: rgb(230 237 243 / 0.045);
-  --glow: rgb(45 212 191 / 0.14);
+  --scrim: rgb(3 6 12 / 0.72);
+  --grid-line: rgb(230 235 243 / 0.045);
+  --glow: rgb(143 176 255 / 0.12);
   --shadow-card: 0 1px 2px rgb(0 0 0 / 0.4), 0 14px 34px -16px rgb(0 0 0 / 0.65);
-  --selection: rgb(45 212 191 / 0.25);
+  --selection: rgb(246 198 27 / 0.3);
 
   color-scheme: dark;
 }
 
 /* Mismos valores oscuros cuando el sistema es oscuro y no hay eleccion
    explicita. Se repite el bloque (CSS no permite reutilizarlo entre un
-   selector de atributo y una media query sin un preprocesador). */
+   selector de atributo y una media query sin un preprocesador). El test de
+   tokens falla si los dos bloques oscuros dejan de ser identicos. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --bg: #0a0e14;
-    --bg-soft: #0f141c;
-    --bg-card: #141a24;
-    --bg-border: #1f2733;
-    --bg-border-hover: #2b3543;
+    --bg: #0b1220;
+    --bg-soft: #0f1729;
+    --bg-card: #111a2c;
+    --bg-border: #1e2a40;
+    --bg-border-hover: #2c3a55;
 
-    --text: #e6edf3;
-    --text-title: #f0f3f6;
-    --text-muted: #9aa7b8;
-    --text-faint: #8e99ad;
+    --text: #e6ebf3;
+    --text-title: #f3f6fa;
+    --text-muted: #9aa8bd;
+    --text-faint: #8a98ae;
 
-    --accent: #2dd4bf;
-    --accent-hover: #5eead4;
-    --accent-soft: #0e3a35;
-    --on-accent: #04120f;
+    --accent: #8fb0ff;
+    --accent-hover: #b3c9ff;
+    --accent-soft: #16254a;
+    --on-accent: #0b1220;
+
+    --mark: #f6c61b;
+    --mark-hover: #ffd84d;
+    --mark-soft: #3a3112;
+    --on-mark: #101828;
+
+    --ink: #0b1220;
+    --on-ink: #f3f5f8;
 
     --cyan: #22d3ee;
     --violet: #a78bfa;
@@ -115,11 +143,11 @@
     --wip: #f59e0b;
     --closed: #60a5fa;
 
-    --scrim: rgb(3 5 8 / 0.72);
-    --grid-line: rgb(230 237 243 / 0.045);
-    --glow: rgb(45 212 191 / 0.14);
+    --scrim: rgb(3 6 12 / 0.72);
+    --grid-line: rgb(230 235 243 / 0.045);
+    --glow: rgb(143 176 255 / 0.12);
     --shadow-card: 0 1px 2px rgb(0 0 0 / 0.4), 0 14px 34px -16px rgb(0 0 0 / 0.65);
-    --selection: rgb(45 212 191 / 0.25);
+    --selection: rgb(246 198 27 / 0.3);
 
     color-scheme: dark;
   }

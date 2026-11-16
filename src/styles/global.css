@@ -49,6 +49,12 @@
   --color-accent-hover: var(--accent-hover);
   --color-accent-soft: var(--accent-soft);
   --color-on-accent: var(--on-accent);
+  --color-mark: var(--mark);
+  --color-mark-hover: var(--mark-hover);
+  --color-mark-soft: var(--mark-soft);
+  --color-on-mark: var(--on-mark);
+  --color-ink: var(--ink);
+  --color-on-ink: var(--on-ink);
   --color-accent-cyan: var(--cyan);
   --color-cyan: var(--cyan);
   --color-violet: var(--violet);
@@ -60,16 +66,22 @@
 }
 
 @theme {
-  /* El verde ya no es "el" color de la marca: el acento es verde azulado y su
-     significado sigue siendo "vivo, disponible, accionable". Los fallos usan
-     --color-danger, nunca el acento. */
+  /* "Expediente": el acento de texto es azul tinta (--accent) y el unico
+     color de marca es el amarillo marcador (--mark), solo como relleno. Los
+     fallos usan --color-danger, nunca el acento. */
 
   /* --- Tipografia ----------------------------------------------------- */
-  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
-  /* Solo para el acento cursivo de titulares: pila del sistema, sin descarga
-     (el limite es dos familias web: Inter y JetBrains Mono). */
-  --font-serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, 'Times New Roman', serif;
+  /* Dos familias web. Schibsted Grotesk se descarto para titulares: con ella
+     los woff2 latin del home sumaban ~132 KB (> 120 KB de presupuesto), asi
+     que los titulares usan Inter con mas peso y tracking negativo (ver h1-h3
+     en @layer base). Las pilas "Fallback" son las @font-face de abajo con
+     metricas ajustadas para que el cambio de fuente no mueva el layout. */
+  --font-sans: 'Inter', 'Inter Fallback', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Inter', 'Inter Fallback', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'JetBrains Mono Fallback', ui-monospace, SFMono-Regular, Menlo, monospace;
+  /* Se retira el serif cursivo: la variable se conserva (el marcado aun la
+     usa) pero apunta a la pila de titulares. */
+  --font-serif: 'Inter', 'Inter Fallback', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 
   /* Ancho maximo del contenido (~1152px) -> clase `max-w-content`. */
   --container-content: 72rem;
@@ -98,6 +110,29 @@
       opacity: 0.4;
     }
   }
+}
+
+/* --- Fallbacks locales con metricas de la fuente real (sin CLS) ---
+   size-adjust iguala el ancho medio y ascent/descent-override la altura de
+   linea, asi el texto pintado con la fuente del sistema ocupa lo mismo que
+   cuando llega el woff2 (font-display: swap). Metricas de hhea/OS2 de los
+   propios woff2: Inter 1984/-494 sobre 2048, JetBrains Mono 1020/-300 sobre
+   1000 (monoespaciada, ancho 0.602 em frente a 0.600 de Courier New). */
+@font-face {
+  font-family: 'Inter Fallback';
+  src: local('Arial'), local('ArialMT');
+  size-adjust: 107.12%;
+  ascent-override: 90.44%;
+  descent-override: 22.52%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'JetBrains Mono Fallback';
+  src: local('Courier New'), local('CourierNewPSMT');
+  size-adjust: 100.33%;
+  ascent-override: 101.66%;
+  descent-override: 29.9%;
+  line-gap-override: 0%;
 }
 
 /* --- Fuentes self-hosted: SOLO subconjuntos latin y latin-ext (B3) ---
@@ -155,10 +190,18 @@
     -webkit-text-size-adjust: 100%;
   }
 
-  /* Titulares en mono: identidad de la web (cuerpo y tarjetas siguen en Inter). */
+  /* Titulares en la pila display: Inter mas pesada y apretada que el cuerpo.
+     El mono queda solo para metadato (IDs de evidencia, fechas, chips). */
   h1,
-  h2 {
-    font-family: var(--font-mono);
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+  h3 {
+    letter-spacing: -0.015em;
   }
   /* El cuerpo de un articulo se lee mejor en sans. */
   .prose h2,
@@ -169,6 +212,7 @@
   body {
     @apply bg-bg text-text font-sans antialiased;
     text-rendering: optimizeLegibility;
+    caret-color: var(--accent);
   }
 
   /* Preflight de Tailwind 4 deja los botones con el cursor por defecto (v3
@@ -192,8 +236,16 @@
     }
   }
 
+  /* Foco: hueco del color de fondo (2 px) + anillo tinta (2 px, >= 3:1 en
+     ambos temas) + halo marcador. El outline transparente lo pinta el modo
+     de alto contraste de Windows, que anula los box-shadow. */
   :focus-visible {
-    @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-bg;
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    box-shadow:
+      0 0 0 2px var(--bg),
+      0 0 0 4px var(--text),
+      0 0 0 7px var(--mark);
   }
 
   ::-webkit-scrollbar {
@@ -228,24 +280,24 @@
     @apply mb-3 font-mono text-xs font-medium uppercase tracking-[0.2em] text-accent;
   }
   .section-title {
-    @apply font-mono text-2xl font-bold tracking-tight text-text-title sm:text-3xl;
+    @apply font-display text-2xl font-bold tracking-tight text-text-title sm:text-3xl;
   }
   .section-subtitle {
     @apply mt-3 max-w-2xl text-[15px] leading-relaxed text-text-muted;
   }
 
-  /* Boton primario. */
+  /* Boton primario: relleno marcador con texto tinta (>= 7:1). El foco es
+     el global (anillo tinta + halo marcador). */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-md bg-accent px-4 py-2.5
-           text-sm font-medium text-on-accent transition-colors hover:bg-accent-hover
-           focus-visible:ring-2 focus-visible:ring-accent;
+    @apply inline-flex items-center justify-center gap-2 rounded-md bg-mark px-4 py-2.5
+           text-sm font-semibold text-on-mark transition-colors hover:bg-mark-hover;
   }
 
-  /* Boton secundario (borde). */
+  /* Boton secundario: borde tinta. */
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 rounded-md border border-bg-border
-           px-4 py-2.5 text-sm font-medium text-text-muted transition-colors
-           hover:border-text-faint hover:text-text;
+    @apply inline-flex items-center justify-center gap-2 rounded-md border border-text
+           px-4 py-2.5 text-sm font-medium text-text transition-colors
+           hover:bg-bg-soft;
   }
 
   /* Chip para tecnologias (mas sobrio). */

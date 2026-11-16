@@ -139,13 +139,6 @@ export const ui = {
 
     // Kickers: la linea pequena sobre cada titulo de seccion. Deben ser
     // DISTINTOS del titulo (antes se repetian) para no duplicar texto.
-    'kicker.experience': '01 / Trayectoria',
-    'kicker.skills': '02 / Stack técnico',
-    'kicker.projects': '03 / Portfolio',
-    'kicker.certs': '04 / Credenciales',
-    'kicker.blog': '05 / Blog',
-    'kicker.faq': '06 / Preguntas frecuentes',
-    'kicker.contact': '07 / Hablemos',
 
     'faq.title': 'Preguntas frecuentes',
     'faq.subtitle': 'Lo que suelen preguntarme antes de escribirme',
@@ -168,7 +161,6 @@ export const ui = {
     'cv.modal.close': 'Cerrar',
     'blog.title': 'Blog',
     'blog.subtitle': 'Artículos sobre ciberseguridad, respuesta a incidentes y tecnología',
-    'blog.readMore': 'Leer artículo',
     'blog.back': 'Volver al blog',
     'blog.empty': 'Aún no hay artículos publicados en este idioma.',
     'blog.loading': 'Cargando artículos...',
@@ -297,13 +289,6 @@ export const ui = {
     'contact.fieldRequired': 'This field is required.',
     'faq.more': 'See more questions',
 
-    'kicker.experience': '01 / Background',
-    'kicker.skills': '02 / Tech stack',
-    'kicker.projects': '03 / Portfolio',
-    'kicker.certs': '04 / Credentials',
-    'kicker.blog': '05 / Blog',
-    'kicker.faq': '06 / Frequently asked',
-    'kicker.contact': '07 / Get in touch',
 
     'faq.title': 'Frequently asked questions',
     'faq.subtitle': 'What people usually ask before reaching out',
@@ -326,7 +311,6 @@ export const ui = {
     'cv.modal.close': 'Close',
     'blog.title': 'Blog',
     'blog.subtitle': 'Articles about cybersecurity, incident response and technology',
-    'blog.readMore': 'Read article',
     'blog.back': 'Back to blog',
     'blog.empty': 'No articles published in this language yet.',
     'blog.loading': 'Loading articles...',
@@ -455,13 +439,6 @@ export const ui = {
     'contact.fieldRequired': 'Aquest camp és obligatori.',
     'faq.more': 'Veure més preguntes',
 
-    'kicker.experience': '01 / Trajectòria',
-    'kicker.skills': '02 / Stack tècnic',
-    'kicker.projects': '03 / Portfolio',
-    'kicker.certs': '04 / Credencials',
-    'kicker.blog': '05 / Blog',
-    'kicker.faq': '06 / Preguntes freqüents',
-    'kicker.contact': '07 / Parlem-ne',
 
     'faq.title': 'Preguntes freqüents',
     'faq.subtitle': "El que solen preguntar-me abans d'escriure'm",
@@ -484,7 +461,6 @@ export const ui = {
     'cv.modal.close': 'Tancar',
     'blog.title': 'Blog',
     'blog.subtitle': 'Articles sobre ciberseguretat, resposta a incidents i tecnologia',
-    'blog.readMore': 'Llegir article',
     'blog.back': 'Tornar al blog',
     'blog.empty': 'Encara no hi ha articles publicats en aquest idioma.',
     'blog.loading': 'Carregant articles...',

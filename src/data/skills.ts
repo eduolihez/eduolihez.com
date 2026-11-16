@@ -107,28 +107,3 @@ export const skillGroups: SkillGroup[] = [
   },
 ];
 
-export interface SkillChip {
-  label: string;
-  icon: string;
-}
-
-/**
- * Reparte todas las habilidades en dos filas para el doble carrusel de
- * <Skills />. Se intercalan los grupos (uno de cada, por turnos) para que en
- * una fila no se junten diez chips del mismo tema, y las filas quedan
- * equilibradas (difieren como mucho en uno).
- */
-export function skillRows(): [SkillChip[], SkillChip[]] {
-  const queues = skillGroups.map((g) => g.items.map((label) => ({ label, icon: g.icon })));
-  const rows: [SkillChip[], SkillChip[]] = [[], []];
-  let turn = 0;
-  while (queues.some((q) => q.length > 0)) {
-    for (const queue of queues) {
-      const chip = queue.shift();
-      if (!chip) continue;
-      rows[turn % 2].push(chip);
-      turn += 1;
-    }
-  }
-  return rows;
-}

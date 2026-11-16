@@ -11,7 +11,7 @@
 /** 16 hex en minusculas, o null si falta o no cuadra (se ignora en silencio). */
 function clean_visitor_id(mixed $v): ?string
 {
-    return is_string($v) && preg_match('/^[a-f0-9]{16}z/', $v) ? $v : null;
+    return is_string($v) && preg_match('/^[a-f0-9]{16}\z/', $v) ? $v : null;
 }
 
 /**

@@ -165,7 +165,7 @@ test('mensajes: abrir marca como leido, archivar, desarchivar y volver a no leid
   await row.getByRole('link', { name: subject }).click();
   await page.getByRole('button', { name: 'Desarchivar' }).click();
   await expect(page.locator('.flash.ok')).toContainText('devueltos a la bandeja');
-  await page.getByRole('button', { name: 'Marcar como no leido' }).click();
+  await page.getByRole('button', { name: 'Marcar como no leído' }).click();
   await expect(page).toHaveURL(/\/admin\/messages\.php\?f=inbox$/);
   await expect(page.locator('tbody tr', { hasText: subject }).locator('.pill.on')).toHaveText('Nuevo');
 });
@@ -175,11 +175,11 @@ test('mensajes: accion en lote "Leido" y vuelta a "No leido"', async ({ page }) 
   await page.goto('/admin/messages.php?space=site');
   const row = page.locator('tbody tr', { hasText: subject });
   await row.locator('.row-check').check();
-  await page.getByRole('button', { name: 'Leido', exact: true }).click();
+  await page.getByRole('button', { name: 'Leído', exact: true }).click();
   await expect(page.locator('.flash.ok')).toContainText('1 mensaje(s) marcados como leidos');
   await expect(row.locator('.pill.on')).toHaveCount(0);
   await row.locator('.row-check').check();
-  await page.getByRole('button', { name: 'No leido', exact: true }).click();
+  await page.getByRole('button', { name: 'No leído', exact: true }).click();
   await expect(row.locator('.pill.on')).toHaveText('Nuevo');
 });
 
@@ -193,14 +193,14 @@ test('analitica: enlaces de rango y CSV', async ({ page }) => {
   await expect(page).toHaveURL(/\?days=7&space=site$/);
   await expect(page.locator('.page-actions a', { hasText: /^7d$/ })).not.toHaveClass(/ghost/);
   await expect(page.locator('.page-actions a', { hasText: /^30d$/ })).toHaveClass(/ghost/);
-  await expect(page.locator('.card.stat .lbl').first()).toContainText('Visitas (7 dias)');
+  await expect(page.locator('.card.stat .lbl').first()).toContainText('Visitas (7 días)');
   // El seed mete visitas de los ultimos 6 dias para eduolihez.
   const visits = Number((await page.locator('.card.stat .num').first().innerText()).replace(/\D.*$/s, '').replace(/[.,]/g, ''));
   expect(visits).toBeGreaterThan(0);
 
   // Un rango fuera de la lista blanca cae en 30.
   await page.goto('/admin/analytics.php?days=9999&space=site');
-  await expect(page.locator('.card.stat .lbl').first()).toContainText('Visitas (30 dias)');
+  await expect(page.locator('.card.stat .lbl').first()).toContainText('Visitas (30 días)');
 
   const csvHref = await page.locator('.page-actions a', { hasText: 'Exportar CSV' }).getAttribute('href');
   expect(csvHref).toContain('export=csv');
@@ -209,7 +209,7 @@ test('analitica: enlaces de rango y CSV', async ({ page }) => {
   expect(resp.headers()['content-type']).toMatch(/^text\/csv/);
   expect(resp.headers()['content-disposition']).toMatch(/attachment; filename="visitas-30d-/);
   const lines = (await resp.text()).replace(/^﻿/, '').trim().split(/\r?\n/);
-  expect(lines[0]).toMatch(/^Fecha,Pagina,Idioma,Referrer/);
+  expect(lines[0]).toMatch(/^Fecha,Página,Idioma,Referrer/);
   expect(lines.length).toBeGreaterThan(1);
 });
 
@@ -218,7 +218,7 @@ test('mensajes: CSV con cabecera', async ({ page }) => {
   expect(resp.status()).toBe(200);
   expect(resp.headers()['content-type']).toMatch(/^text\/csv/);
   const lines = (await resp.text()).replace(/^﻿/, '').trim().split(/\r?\n/);
-  expect(lines[0]).toBe('ID,Nombre,Email,Asunto,Mensaje,IP,Leido,Destacado,Archivado,Fecha');
+  expect(lines[0]).toBe('ID,Nombre,Email,Asunto,Mensaje,IP,Leído,Destacado,Archivado,Fecha');
   expect(lines.some((l) => l.includes('E2E leido'))).toBe(true);
 });
 

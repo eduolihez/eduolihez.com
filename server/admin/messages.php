@@ -176,7 +176,7 @@ if ($viewId > 0) {
            href="<?= $prevId ? 'messages.php?id=' . $prevId : '#' ?>" <?= $prevId ? '' : 'disabled' ?>>&uarr; Mas reciente</a>
         <a class="btn ghost sm <?= $nextId ? '' : 'disabled' ?>"
            href="<?= $nextId ? 'messages.php?id=' . $nextId : '#' ?>" <?= $nextId ? '' : 'disabled' ?>>&darr; Mas antiguo</a>
-        <a class="btn ghost sm" href="messages.php">&larr; Volver al buzon</a>
+        <a class="btn ghost sm" href="messages.php">&larr; Volver al buzón</a>
     <?php page_header('Mensaje #' . (int) $m['id'], '', ob_get_clean()); ?>
 
     <div class="card">
@@ -360,8 +360,8 @@ show_flash();
       <input type="checkbox" id="check-all"> <span class="muted">Seleccionar todo</span>
     </label>
     <span class="faint bulk-label">Acciones:</span>
-    <button class="btn ghost sm" type="submit" name="action" value="read">Leido</button>
-    <button class="btn ghost sm" type="submit" name="action" value="unread">No leido</button>
+    <button class="btn ghost sm" type="submit" name="action" value="read">Leído</button>
+    <button class="btn ghost sm" type="submit" name="action" value="unread">No leído</button>
     <button class="btn ghost sm" type="submit" name="action" value="star">★ Destacar</button>
     <button class="btn ghost sm" type="submit" name="action" value="archive">Archivar</button>
     <button class="btn ghost sm" type="submit" name="action" value="unarchive">Desarchivar</button>
@@ -424,7 +424,7 @@ show_flash();
     <?php if ($page > 1): ?>
       <a class="btn ghost sm" href="<?= e(list_url($filter, $search, $page - 1)) ?>">&larr; Anterior</a>
     <?php endif; ?>
-    <span class="faint">Pagina <?= $page ?> de <?= $totalPages ?> · <?= number_format($totalRows) ?> mensajes</span>
+    <span class="faint">Página <?= $page ?> de <?= $totalPages ?> · <?= number_format($totalRows) ?> mensajes</span>
     <?php if ($page < $totalPages): ?>
       <a class="btn ghost sm" href="<?= e(list_url($filter, $search, $page + 1)) ?>">Siguiente &rarr;</a>
     <?php endif; ?>

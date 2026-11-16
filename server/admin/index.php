@@ -429,43 +429,19 @@ page_header('Hoy', 'Lo que pide atención ahora y cómo va la web.');
   </section>
 </div>
 
-<h2>Métricas</h2>
+<h2>Visitas</h2>
 <div class="card p-0">
   <table class="metrics-table">
-    <thead><tr><th scope="col">Métrica</th><th scope="col">Valor</th><th scope="col">Comparación</th></tr></thead>
+    <thead><tr><th scope="col">Métrica</th><th scope="col">Valor</th><th scope="col">Tendencia</th></tr></thead>
     <tbody>
       <tr><td>Visitas hoy</td><td><?= number_format($visitsToday) ?></td><td class="muted">ayer <?= number_format($visitsYest) ?> <?= delta_badge($visitsToday, $visitsYest) ?></td></tr>
       <tr><td>Visitas, 7 días</td><td><?= number_format($visits7) ?></td><td class="muted">7 anteriores <?= number_format($visitsPrev7) ?> <?= delta_badge($visits7, $visitsPrev7) ?></td></tr>
-      <tr><td>Visitantes únicos, 30 días</td><td><?= number_format($uniques30) ?></td><td class="muted">—</td></tr>
-      <tr><td>Visitas totales</td><td><?= number_format($visitsTotal) ?></td><td class="muted"><?= number_format($botsRecent) ?> bots filtrados (30 d)</td></tr>
-      <tr><td>Mensajes, 30 días</td><td><?= number_format($msg30) ?></td><td class="muted">30 anteriores <?= number_format($msgPrev30) ?> <?= delta_badge($msg30, $msgPrev30) ?></td></tr>
     </tbody>
   </table>
 </div>
-<p class="hint">Solo visitas humanas. Detalle completo en <a href="analytics.php">Analítica</a>.</p>
+<p class="hint">Solo visitas humanas. Canales, dispositivos y páginas más vistas, en <a href="analytics.php">Analítica</a>.</p>
 
 <div class="row2">
-  <div>
-    <h2>Canales de tráfico <span class="meta">30 d</span></h2>
-    <div class="card">
-      <?php if (!$channels): ?><div class="empty">Sin visitas en 30 días. Cuando lleguen, aquí verás de dónde vienen.</div><?php endif; ?>
-      <?php foreach ($channels as $name => $c): ?>
-        <?php bar_row((string) $name, $c, $maxChannel, 'green'); ?>
-      <?php endforeach; ?>
-    </div>
-  </div>
-  <div>
-    <h2>Dispositivos <span class="meta">30 d</span></h2>
-    <div class="card">
-      <?php if (!$deviceRows): ?><div class="empty">Sin visitas en 30 días.</div><?php endif; ?>
-      <?php foreach ($deviceRows as $r): ?>
-        <?php bar_row($deviceLabels[$r['k']] ?? $r['k'], (int) $r['c'], $maxDevice, 'violet'); ?>
-      <?php endforeach; ?>
-    </div>
-  </div>
-</div>
-
-<div class="row3">
   <div>
     <h2>Últimos mensajes</h2>
     <div class="card p-0">
@@ -478,11 +454,11 @@ page_header('Hoy', 'Lo que pide atención ahora y cómo va la web.');
             <tr>
               <td>
                 <a href="messages.php?id=<?= (int) $m['id'] ?>"
-                   style="<?= (int) $m['is_read'] === 0 ? 'font-weight:700;' : '' ?>">
+                   class="<?= (int) $m['is_read'] === 0 ? 'fw-700' : '' ?>">
                   <?= e($m['name']) ?>
                 </a>
                 <?php if ((int) $m['is_read'] === 0): ?>
-                  <span class="pill on" style="margin-left:.3rem;">Nuevo</span>
+                  <span class="pill on ml-xs">Nuevo</span>
                 <?php endif; ?>
                 <div class="faint"><?= e($m['subject'] !== '' ? $m['subject'] : '(sin asunto)') ?></div>
               </td>
@@ -491,18 +467,6 @@ page_header('Hoy', 'Lo que pide atención ahora y cómo va la web.');
           <?php endforeach; ?>
         </tbody>
       </table>
-    </div>
-  </div>
-
-  <div>
-    <h2>Páginas más vistas <span class="faint" style="font-weight:500;">(30 d)</span></h2>
-    <div class="card">
-      <?php if (!$topPages): ?>
-        <div class="empty">Sin datos de visitas todavía.</div>
-      <?php endif; ?>
-      <?php foreach ($topPages as $r): ?>
-        <?php bar_row($r['path'], (int) $r['c'], (int) $maxPage, 'green'); ?>
-      <?php endforeach; ?>
     </div>
   </div>
 
@@ -557,7 +521,7 @@ page_header('Hoy', 'Lo que pide atención ahora y cómo va la web.');
     <a class="btn" href="cert-edit.php">+ Nueva certificacion</a>
     <a class="btn" href="post-edit.php">+ Nueva entrada de blog</a>
     <a class="btn ghost" href="messages.php">Ver mensajes</a>
-    <a class="btn ghost" href="analytics.php">Analitica completa</a>
+    <a class="btn ghost" href="analytics.php">Analítica completa</a>
     <a class="btn ghost" href="security.php">Seguridad</a>
     <a class="btn ghost" href="backup.php">Copia de seguridad</a>
   </div>
@@ -584,23 +548,27 @@ page_header('Hoy', 'Lo que pide atención ahora y cómo va la web.');
   </div>
 
   <div>
-    <?php h2_icon($icoShield, 'Salud del sistema'); ?>
+    <?php h2_icon($icoShield, 'Alertas del sistema'); ?>
     <div class="card">
       <div class="health-grid">
         <?php
+          $alerts = 0;
+          $tile = static function (string $l, string $v, string $st) use (&$alerts): void {
+              if ($st === 'warn' || $st === 'danger') { $alerts++; status_tile($l, $v, $st); }
+          };
           $phpOk = version_compare(PHP_VERSION, '8.1', '>=');
-          status_tile('Version de PHP', PHP_VERSION, $phpOk ? 'ok' : 'warn');
+          $tile('Version de PHP', PHP_VERSION, $phpOk ? 'ok' : 'warn');
 
           $dbVersion = '—';
           try {
               $dbVersion = (string) db()->getAttribute(PDO::ATTR_SERVER_VERSION);
           } catch (Throwable $e) {
           }
-          status_tile('Base de datos', $dbVersion, $dbVersion !== '—' ? 'ok' : 'danger');
+          $tile('Base de datos', $dbVersion, $dbVersion !== '—' ? 'ok' : 'danger');
 
-          status_tile('HTTPS', $isHttps ? 'Activo' : 'Inactivo', $isHttps ? 'ok' : 'danger');
-          status_tile('Modo debug', !empty(config()['debug']) ? 'Activado' : 'Desactivado', !empty(config()['debug']) ? 'danger' : 'ok');
-          status_tile('setup.php', is_file(__DIR__ . '/setup.php') ? 'Presente — borralo' : 'Eliminado', is_file(__DIR__ . '/setup.php') ? 'warn' : 'ok');
+          $tile('HTTPS', $isHttps ? 'Activo' : 'Inactivo', $isHttps ? 'ok' : 'danger');
+          $tile('Modo debug', !empty(config()['debug']) ? 'Activado' : 'Desactivado', !empty(config()['debug']) ? 'danger' : 'ok');
+          $tile('setup.php', is_file(__DIR__ . '/setup.php') ? 'Presente — bórralo' : 'Eliminado', is_file(__DIR__ . '/setup.php') ? 'warn' : 'ok');
 
           $updir = config()['uploads']['dir'] ?? '';
           if ($updir && is_dir($updir)) {
@@ -614,34 +582,24 @@ page_header('Hoy', 'Lo que pide atención ahora y cómo va la web.');
                   // sin permisos de lectura recursiva: mostramos lo que haya
               }
               $writable = is_writable($updir);
-              status_tile('Carpeta /uploads', $files . ' archivos · ' . fbytes($bytes), $writable ? 'ok' : 'danger');
+              $tile('Carpeta /uploads', $files . ' archivos · ' . fbytes($bytes), $writable ? 'ok' : 'danger');
           } else {
-              status_tile('Carpeta /uploads', 'No existe', 'warn');
+              $tile('Carpeta /uploads', 'No existe', 'warn');
           }
 
-          status_tile(
+          $tile(
               'Accesos fallidos (7 d)',
               $failedLogins === null ? 'No disponible' : (string) $failedLogins,
               $failedLogins === null ? 'warn' : ($failedLogins >= 20 ? 'danger' : ($failedLogins > 0 ? 'warn' : 'ok'))
           );
-          status_tile(
+          $tile(
               'Accesos fallidos (30 d)',
               $failedLogins30 === null ? 'No disponible' : (string) $failedLogins30,
               $failedLogins30 === null ? 'warn' : ($failedLogins30 >= 50 ? 'danger' : ($failedLogins30 > 0 ? 'warn' : 'ok'))
           );
-          status_tile(
-              'Visitas registradas',
-              number_format(count_of('SELECT COUNT(*) FROM visits')),
-              'neutral'
-          );
-          status_tile(
-              'Registros de auditoría',
-              number_format(count_of('SELECT COUNT(*) FROM activity_log')),
-              'neutral'
-          );
-          status_tile('Zona horaria', date_default_timezone_get(), 'neutral');
         ?>
       </div>
+      <?php if ($alerts === 0): ?><p class="today-ok">Sin alertas: PHP, base de datos, HTTPS, debug, setup.php, uploads y accesos fallidos están bien.</p><?php endif; ?>
     </div>
   </div>
 </div>

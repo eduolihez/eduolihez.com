@@ -954,10 +954,6 @@
 }
 
 /* StackStrip: una linea estatica; lo que no cabe se recorta por elemento. */
-.stack-strip {
-  border-bottom: 1px solid var(--bg-border);
-  background: var(--bg-card);
-}
 .stack-line {
   display: flex;
   flex-wrap: wrap;
@@ -1641,5 +1637,82 @@ a.post-row:hover .post-title {
   .evidence-table a::after {
     content: ' (' attr(href) ')';
     font-size: 0.8em;
+  }
+}
+
+/* T13: home movil mas corta. Solo <768 px; escritorio no cambia. */
+.exp-summary {
+  display: none;
+}
+@media (max-width: 767px) {
+  #proyectos,
+  #experiencia,
+  #habilidades {
+    padding-block: 2.5rem;
+  }
+  #proyectos .section-subtitle,
+  #experiencia .section-subtitle,
+  #habilidades .section-subtitle {
+    margin-top: 0.25rem;
+  }
+  #proyectos > .container-page > div:first-child,
+  #experiencia > .container-page > div:first-child,
+  #habilidades > .container-page > div:first-child {
+    margin-bottom: 1.25rem;
+  }
+  #projects-grid {
+    gap: 0.75rem;
+  }
+  .project-card {
+    padding: 0.875rem;
+  }
+  .project-card .project-body {
+    padding: 0.875rem;
+  }
+  .project-card p {
+    margin-top: 0.375rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .project-card ul {
+    margin-top: 0.625rem;
+  }
+  .project-card > div:last-child,
+  .project-card .project-body > div:last-child {
+    padding-top: 0.25rem;
+  }
+  #experiencia ol > li {
+    padding-block: 1rem;
+    row-gap: 0.5rem;
+  }
+  #experiencia ol > li ul.list-disc {
+    margin-top: 0.375rem;
+  }
+  #experiencia ol > li ul.dot-list {
+    margin-top: 0.5rem;
+  }
+  #experiencia ol > li a.inline-flex {
+    margin-top: 0;
+  }
+  .skills-list {
+    line-height: 1.375rem;
+  }
+  .exp-summary {
+    display: flex;
+    min-height: 2.75rem;
+    cursor: pointer;
+    align-items: center;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-accent);
+  }
+  .exp-summary::marker {
+    color: var(--color-accent);
+  }
+  #habilidades dl > div {
+    padding-block: 0.75rem;
   }
 }

@@ -74,6 +74,7 @@ export const ui = {
     'experience.subtitle': 'Trayectoria profesional en ciberseguridad y sistemas',
     'experience.current': 'Actual',
     'experience.tech': 'Tecnologías',
+    'experience.details': 'Ver detalle',
 
     'skills.title': 'Habilidades',
     'skills.subtitle': 'Tecnologías y áreas de conocimiento',
@@ -233,6 +234,7 @@ export const ui = {
     'experience.subtitle': 'Professional background in cybersecurity and systems',
     'experience.current': 'Current',
     'experience.tech': 'Technologies',
+    'experience.details': 'Show details',
 
     'skills.title': 'Skills',
     'skills.subtitle': 'Technologies and areas of expertise',
@@ -390,6 +392,7 @@ export const ui = {
     'experience.subtitle': 'Trajectòria professional en ciberseguretat i sistemes',
     'experience.current': 'Actual',
     'experience.tech': 'Tecnologies',
+    'experience.details': 'Veure detall',
 
     'skills.title': 'Habilitats',
     'skills.subtitle': 'Tecnologies i àrees de coneixement',

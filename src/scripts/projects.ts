@@ -70,6 +70,13 @@ let escapeListenerBound = false;
 
 /** Tarjetas visibles antes de pulsar "Ver todos los proyectos". */
 const INITIAL_VISIBLE_COUNT = 7; // destacada a dos columnas (1) + 3 filas de 2 = 7 tarjetas
+/** En movil (una columna, <768 px) bastan 4: el resto sigue en el DOM, oculto. */
+const MOBILE_VISIBLE_COUNT = 4;
+
+function visibleLimit(): number {
+  const mobile = typeof window.matchMedia === 'function' && window.matchMedia('(max-width: 767px)').matches;
+  return mobile ? MOBILE_VISIBLE_COUNT : INITIAL_VISIBLE_COUNT;
+}
 
 function bindGlobalEscapeHandler(): void {
   if (escapeListenerBound) return;
@@ -277,6 +284,66 @@ export function initProjects(): void {
     return card;
   }
 
+  // Estado de visibilidad compartido entre el pintado de build (SSR) y el de la API.
+  let activeFilter = 'all';
+  let expanded = false;
+
+  /**
+   * Aplica el limite inicial ("Ver todos"/"Ver menos") y el filtro activo a las
+   * tarjetas que hay ahora mismo en el grid. Se llama dos veces como mucho: con
+   * las tarjetas de build (para que en movil tampoco haya 14 de golpe mientras
+   * llega la API) y con las de la API.
+   */
+  function bindCards(): void {
+    const cards = Array.from(grid.querySelectorAll<HTMLElement>('article'));
+    const showMoreWrap = document.getElementById('projects-show-more-wrap');
+    const showMoreBtn = document.getElementById('projects-show-more');
+    const limit = visibleLimit();
+    expanded = cards.length <= limit;
+    const labelMore = showMoreBtn?.dataset.labelMore ?? showMoreBtn?.textContent ?? '';
+    const labelLess = showMoreBtn?.dataset.labelLess ?? labelMore;
+
+    function applyVisibility(): void {
+      // El limite cuenta las tarjetas que coinciden con el filtro, no su
+      // posicion en la lista completa.
+      let matching = 0;
+      let leadSet = false;
+      cards.forEach((card) => {
+        const badgesAttr = card.getAttribute('data-badges') || '';
+        const badges = badgesAttr ? badgesAttr.split(',') : [];
+        const matchesFilter = activeFilter === 'all' || badges.includes(activeFilter);
+        const withinLimit = expanded || matching < limit;
+        if (matchesFilter) matching += 1;
+        const visible = matchesFilter && withinLimit;
+        card.classList.toggle('hidden', !visible);
+        // La primera ficha visible es la destacada: ocupa el ancho completo.
+        card.classList.toggle('is-lead', visible && !leadSet);
+        if (visible) leadSet = true;
+      });
+      // Con `limit` o menos coincidencias no hay nada que mostrar ni ocultar.
+      showMoreWrap?.classList.toggle('hidden', matching <= limit);
+      if (showMoreBtn) {
+        showMoreBtn.textContent = expanded ? labelLess : labelMore;
+        showMoreBtn.setAttribute('aria-expanded', String(expanded));
+      }
+    }
+    applyVisibility();
+    applyVisibilityRef = applyVisibility;
+
+    if (showMoreBtn) {
+      // onclick (no addEventListener): bindCards puede correr dos veces y no
+      // debe duplicar el manejador.
+      showMoreBtn.onclick = () => {
+        expanded = !expanded;
+        applyVisibility();
+        // Al contraer, la pagina se queda en el inicio de la seccion en vez
+        // de dejar al visitante perdido mas abajo.
+        if (!expanded) document.getElementById('proyectos')?.scrollIntoView?.({ block: 'start' });
+      };
+    }
+  }
+  let applyVisibilityRef: () => void = () => {};
+
   function setState(state: 'loading' | 'empty' | 'error', text: string): void {
     setStatusPanel(status, statusText, state, text);
   }
@@ -288,14 +355,18 @@ export function initProjects(): void {
   function loadProjects(): void {
     // Con tarjetas ya pintadas (build) no se muestra "cargando" ni se vacia el
     // grid hasta tener datos: evita el parpadeo y el salto de altura.
-    if (!grid.childElementCount) setState('loading', labels.loading);
+    if (grid.childElementCount) bindCards();
+    else setState('loading', labels.loading);
     fetchWithRetry(apiUrl, { headers: { Accept: 'application/json' } })
       .then((data) => {
         grid.dataset.loaded = '1';
         const items: Project[] = Array.isArray(data) ? data : (data as { items?: Project[] })?.items || [];
         grid.innerHTML = '';
         if (status) status.classList.add('hidden');
-        if (!items.length) return message(labels.empty);
+        if (!items.length) {
+          document.getElementById('projects-show-more-wrap')?.classList.add('hidden');
+          return message(labels.empty);
+        }
 
         const filtersContainer = document.getElementById('projects-filters');
         if (filtersContainer) filtersContainer.classList.remove('hidden');
@@ -307,49 +378,8 @@ export function initProjects(): void {
           .map(({ p }) => p);
         ordered.forEach((p) => grid.appendChild(makeCard(p)));
 
-        const cards = Array.from(grid.querySelectorAll<HTMLElement>('article'));
-        const showMoreWrap = document.getElementById('projects-show-more-wrap');
-        const showMoreBtn = document.getElementById('projects-show-more');
-        let activeFilter = 'all';
-        // "Ver todos" / "Ver menos" alternan el limite inicial. Cambiar de
-        // filtro lo abre (limitar a 7 solo tiene sentido en la vista "todos").
-        let expanded = cards.length <= INITIAL_VISIBLE_COUNT;
-        const labelMore = showMoreBtn?.dataset.labelMore ?? showMoreBtn?.textContent ?? '';
-        const labelLess = showMoreBtn?.dataset.labelLess ?? labelMore;
-
-        function applyVisibility(): void {
-          // El limite cuenta las tarjetas que coinciden con el filtro, no su
-          // posicion en la lista completa.
-          let matching = 0;
-          let leadSet = false;
-          cards.forEach((card) => {
-            const badgesAttr = card.getAttribute('data-badges') || '';
-            const badges = badgesAttr ? badgesAttr.split(',') : [];
-            const matchesFilter = activeFilter === 'all' || badges.includes(activeFilter);
-            const withinLimit = expanded || matching < INITIAL_VISIBLE_COUNT;
-            if (matchesFilter) matching += 1;
-            const visible = matchesFilter && withinLimit;
-            card.classList.toggle('hidden', !visible);
-            // La primera ficha visible es la destacada: ocupa el ancho completo.
-            card.classList.toggle('is-lead', visible && !leadSet);
-            if (visible) leadSet = true;
-          });
-          // Con 7 o menos coincidencias no hay nada que mostrar ni ocultar.
-          showMoreWrap?.classList.toggle('hidden', matching <= INITIAL_VISIBLE_COUNT);
-          if (showMoreBtn) {
-            showMoreBtn.textContent = expanded ? labelLess : labelMore;
-            showMoreBtn.setAttribute('aria-expanded', String(expanded));
-          }
-        }
-        applyVisibility();
-
-        showMoreBtn?.addEventListener('click', () => {
-          expanded = !expanded;
-          applyVisibility();
-          // Al contraer, la pagina se queda en el inicio de la seccion en vez
-          // de dejar al visitante perdido mas abajo.
-          if (!expanded) document.getElementById('proyectos')?.scrollIntoView?.({ block: 'start' });
-        });
+        activeFilter = 'all';
+        bindCards();
 
         const filterButtons = document.querySelectorAll<HTMLButtonElement>('.project-filter-btn');
         filterButtons.forEach((btn) => {
@@ -365,7 +395,7 @@ export function initProjects(): void {
             // tiene sentido en la vista "todos" sin filtrar.
             activeFilter = btn.getAttribute('data-filter') || 'all';
             expanded = true;
-            applyVisibility();
+            applyVisibilityRef();
           });
         });
       })

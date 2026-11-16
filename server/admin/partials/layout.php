@@ -118,28 +118,45 @@ function admin_header(string $title, string $active = ''): void
         $counts['lab_users'] = $countSafe('SELECT COUNT(*) FROM lab_users');
     }
 
-    $navGroups    = space_nav($space, $counts);
+    $navGroups  = space_nav($space, $counts);
+    $activeZone = zone_for_page($space, $active);
 
-    // Barra inferior (< 1024 px): 4 destinos fijos + "Mas" (abre el cajon).
-    // Usa el href del menu del espacio si la pagina esta en el; si no, el del
-    // espacio del sitio (mensajes, blog y analitica viven ahi).
-    $navHref = static function (string $page, string $fallback) use ($navGroups): string {
+    // Barra inferior (< 1024 px): hasta 4 accesos + "Mas" (abre el cajon).
+    // Solo destinos que existen en el menu del espacio actual: sin saltos a
+    // otro espacio (p. ej. en Global no hay Contenido).
+    $navItem = static function (string $page) use ($navGroups): ?array {
         foreach ($navGroups as $g) {
             foreach ($g['items'] as $it) {
                 if ($it['page'] === $page) {
-                    return (string) $it['href'];
+                    return $it;
                 }
             }
         }
-        return $fallback;
+        return null;
     };
-    $contentPages = ['posts.php', 'post-edit.php', 'projects.php', 'project-edit.php', 'certifications.php', 'cert-edit.php'];
-    $bottomNav = [
-        ['label' => 'Hoy', 'icon' => 'grid', 'href' => $navHref('index.php', 'index.php'), 'on' => $active === 'index.php'],
-        ['label' => 'Mensajes', 'icon' => 'mail', 'href' => $navHref('messages.php', 'messages.php?space=site'), 'on' => $active === 'messages.php', 'badge' => (int) ($counts['unread'] ?? 0)],
-        ['label' => 'Contenido', 'icon' => 'edit', 'href' => $navHref('posts.php', 'posts.php?space=site'), 'on' => in_array($active, $contentPages, true)],
-        ['label' => 'Analítica', 'icon' => 'chart', 'href' => $navHref('analytics.php', 'analytics.php'), 'on' => $active === 'analytics.php'],
-    ];
+    $bottomNav = [];
+    foreach (['index.php', 'messages.php', '', 'analytics.php'] as $page) {
+        if ($page === '') {
+            // Hueco de Contenido: Blog si existe, si no la primera entrada de la zona.
+            foreach ($navGroups as $g) {
+                if ($g['key'] === 'contenido' && $g['items']) {
+                    $first = $navItem('posts.php') ?? $g['items'][0];
+                    $bottomNav[] = ['label' => 'Contenido', 'icon' => 'edit', 'href' => $first['href'], 'on' => $activeZone === 'contenido'];
+                }
+            }
+            continue;
+        }
+        $it = $navItem($page);
+        if ($it !== null) {
+            $bottomNav[] = [
+                'label' => $it['label'],
+                'icon'  => $it['icon'],
+                'href'  => $it['href'],
+                'on'    => $active === $page,
+                'badge' => $it['badge_type'] === 'alert' ? (int) $it['badge'] : 0,
+            ];
+        }
+    }
     $spaceOptions = space_options($appsRows);
     $spaceLabel   = $space;
     foreach ($spaceOptions as $opt) {
@@ -249,10 +266,12 @@ function admin_header(string $title, string $active = ''): void
       </button>
     </div>
     
-    <nav class="sidebar-menu">
+    <nav class="sidebar-menu" aria-label="Navegación del panel">
       <?php foreach ($navGroups as $group): ?>
+        <?php $zoneId = 'nav-zone-' . $group['key']; ?>
+        <div class="nav-zone<?= $group['key'] === $activeZone ? ' is-active' : '' ?>"<?= $group['label'] !== '' ? ' role="group" aria-labelledby="' . e($zoneId) . '"' : '' ?>>
         <?php if ($group['label'] !== ''): ?>
-          <p class="nav-group-label"><?= e($group['label']) ?></p>
+          <p class="nav-zone-label" id="<?= e($zoneId) ?>"><?= e($group['label']) ?></p>
         <?php endif; ?>
         <?php foreach ($group['items'] as $item): ?>
           <a href="<?= e($item['href']) ?>" class="menu-item <?= $active === $item['page'] ? 'active' : '' ?>"<?= $active === $item['page'] ? ' aria-current="page"' : '' ?>>
@@ -263,6 +282,7 @@ function admin_header(string $title, string $active = ''): void
             <?php endif; ?>
           </a>
         <?php endforeach; ?>
+        </div>
       <?php endforeach; ?>
     </nav>
     
@@ -308,7 +328,7 @@ function admin_header(string $title, string $active = ''): void
         <button type="button" data-palette-open class="topbar-kbd" aria-label="Abrir paleta de comandos" aria-keyshortcuts="Control+K Meta+K"><b aria-hidden="true">⌘</b><span aria-hidden="true">K</span></button>
       </div>
     </header>
-    <nav class="bottom-nav" aria-label="Navegación principal">
+    <nav class="bottom-nav" aria-label="Accesos rápidos">
       <?php foreach ($bottomNav as $b): ?>
         <a href="<?= e($b['href']) ?>" class="bottom-nav-item<?= $b['on'] ? ' active' : '' ?>"<?= $b['on'] ? ' aria-current="page"' : '' ?>>
           <span class="bottom-nav-icon"><?= nav_icon($b['icon']) ?><?php if (!empty($b['badge'])): ?><span class="bottom-nav-badge"><?= e((string) $b['badge']) ?></span><?php endif; ?></span>
@@ -401,6 +421,41 @@ function page_header(string $title, string $description = '', string $actionsHtm
         . '</div>'
         . ($actionsHtml !== '' ? '<div class="page-actions">' . $actionsHtml . '</div>' : '')
         . '</div>';
+}
+
+/** Barra de filtros (div.filter-bar, role=group); $innerHtml es HTML de confianza del llamador. */
+function filter_bar(string $innerHtml, string $label = ''): string
+{
+    return '<div class="filter-bar" role="group"'
+        . ($label !== '' ? ' aria-label="' . e($label) . '"' : '')
+        . '>' . $innerHtml . '</div>';
+}
+
+/** Anclas de la pagina: [['id' => ..., 'label' => ...], ...] -> nav.section-nav; sin secciones -> ''. */
+function section_nav(array $sections): string
+{
+    $links = '';
+    foreach ($sections as $s) {
+        $id = (string) ($s['id'] ?? '');
+        if ($id !== '') {
+            $links .= '<a href="#' . e($id) . '">' . e((string) ($s['label'] ?? $id)) . '</a>';
+        }
+    }
+    return $links === '' ? '' : '<nav class="section-nav" aria-label="Secciones de la página">' . $links . '</nav>';
+}
+
+/** Abre una tarjeta con titulo interno (h3) y metadato opcional atenuado; cerrar con card_close(). */
+function card_open(string $title, string $meta = ''): string
+{
+    return '<div class="card"><h3>' . e($title)
+        . ($meta !== '' ? ' <small>' . e($meta) . '</small>' : '')
+        . '</h3>';
+}
+
+/** Cierra la tarjeta abierta con card_open(). */
+function card_close(): string
+{
+    return '</div>';
 }
 
 /** Titulo de seccion con icono SVG delante (mismo tamano que h2). */

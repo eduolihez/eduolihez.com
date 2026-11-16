@@ -897,7 +897,8 @@
   @media (max-width: 1023.98px) {
     .main-content-wrapper { padding-bottom: calc(64px + env(safe-area-inset-bottom)); }
     .bottom-nav {
-      display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
+      /* Columnas segun destinos del espacio (2 a 5): sin huecos vacios. */
+      display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr);
       position: fixed; left: 0; right: 0; bottom: 0; z-index: 90;
       background: var(--card); border-top: 1px solid var(--border);
       padding-bottom: env(safe-area-inset-bottom);
@@ -1060,6 +1061,77 @@
     table.stack tr.msg-row a { display: inline-flex; align-items: center; min-height: 44px; }
     table.stack tr.msg-row.is-unread { border-left: 3px solid var(--accent); }
   }
+
+  /* --- Estructura del panel (rediseno 2026-11): zonas del menu, barra de
+     filtros, anclas de seccion y tarjeta con titulo interno (layout.php:
+     filter_bar, section_nav, card_open/card_close). */
+  /* Alto real de la topbar sticky (padding 1rem + atajo ⌘K; 44 px tactil). */
+  :root { --topbar-h: 63px; }
+  @media (max-width: 767.98px), (pointer: coarse) { :root { --topbar-h: 77px; } }
+  header.topbar { min-height: var(--topbar-h); }
+
+  /* Zonas del menu lateral: etiqueta mono atenuada; la zona activa la marca
+     en acento y peso 700 (no solo color). */
+  .nav-zone { display: flex; flex-direction: column; gap: 0.15rem; }
+  .nav-zone + .nav-zone { margin-top: 0.7rem; }
+  .nav-zone-label {
+    font: 600 0.65rem/1.4 'JetBrains Mono', ui-monospace, monospace;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--faint); margin: 0 0 0.3rem 0.85rem;
+  }
+  .nav-zone.is-active .nav-zone-label { color: var(--accent); font-weight: 700; }
+
+  /* Barra de filtros: segmentado de periodo + interruptores. */
+  .filter-bar {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
+    background: var(--card); border: 1px solid var(--border); border-radius: 0.75rem;
+    padding: 10px 12px; box-shadow: var(--shadow-sm); margin-bottom: 1rem; max-width: 100%;
+  }
+  .seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; max-width: 100%; }
+  .seg a {
+    display: inline-flex; align-items: center; padding: 5px 11px; min-height: 32px;
+    color: var(--muted); font-size: 0.82rem; font-weight: 500; border-right: 1px solid var(--border);
+  }
+  .seg a:last-child { border-right: 0; }
+  .seg a:hover { background: var(--row-hover); color: var(--text); }
+  .seg a[aria-current="true"] { background: var(--accent); color: var(--on-accent); font-weight: 600; }
+  .seg a:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; position: relative; z-index: 1; }
+  .seg a[aria-current="true"]:focus-visible { outline-color: var(--on-accent); outline-offset: -4px; }
+  .toggle { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 0.85rem; cursor: pointer; margin: 0; min-height: 32px; }
+  .toggle input { width: 16px; height: 16px; margin: 0; accent-color: var(--accent); cursor: pointer; }
+
+  /* Anclas de la pagina: pildoras pegadas bajo la topbar sticky. */
+  .section-nav {
+    position: sticky; top: var(--topbar-h); z-index: 80;
+    display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 4px; padding: 8px 0;
+    background: var(--bg); min-width: 0; max-width: 100%;
+  }
+  .section-nav a {
+    display: inline-flex; align-items: center; padding: 5px 12px; border-radius: 99px;
+    border: 1px solid var(--border); background: var(--card); color: var(--muted);
+    font-size: 0.82rem; font-weight: 500; white-space: nowrap;
+  }
+  .section-nav a:hover { color: var(--accent); border-color: var(--accent); }
+  .section-nav a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  @media (max-width: 768px) {
+    .section-nav { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: thin; padding-inline: 2px; }
+    .section-nav::-webkit-scrollbar { height: 3px; }
+    .section-nav a { flex-shrink: 0; min-height: 44px; }
+  }
+
+  /* Secciones de pagina con ancla. */
+  .page-section { margin-top: 28px; scroll-margin-top: calc(var(--topbar-h) + 56px); }
+  .section-title { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin: 0 0 12px; }
+  .section-title h2 { margin: 0; font: 700 1rem/1.3 'JetBrains Mono', ui-monospace, monospace; color: var(--title); letter-spacing: -0.01em; }
+  .section-title span { color: var(--muted); font-size: 0.82rem; }
+
+  /* Titulo interno de tarjeta (card_open). */
+  .card > h3 {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 8px;
+    margin: 0 0 12px; font-size: 13px; font-weight: 600; line-height: 1.4;
+    color: var(--title); text-transform: none; letter-spacing: 0;
+  }
+  .card > h3 small { font-weight: 400; font-size: 0.75rem; color: var(--muted); }
 
 /* T11 · visitantes con cookie opt-in (analytics.php) */
 .t11-optin .t11-note { margin: 0 0 12px; color: var(--muted); font-size: .9em; }

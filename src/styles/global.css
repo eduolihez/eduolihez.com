@@ -1040,3 +1040,217 @@
 .palette-option[aria-selected='true']::after {
   color: var(--color-text-muted);
 }
+
+/* T3 - Hero "Expediente": banda en tinta (--ink en ambos temas) con la ficha
+   de evidencias. La columna izquierda redefine los tokens con los valores del
+   tema oscuro (ya verificados por tokens.test.ts sobre #0b1220), asi texto,
+   btn-ghost y el anillo de foco heredan colores legibles sobre la tinta. La
+   ficha (.ev-card) queda fuera de ese ambito y usa los tokens del tema. */
+.hero-band {
+  background: var(--ink);
+  color: var(--on-ink);
+}
+/* Movil: principal -> ficha -> metadato. Escritorio: dos columnas, la ficha
+   ocupa las dos filas de la derecha. */
+.hero-layout {
+  display: grid;
+  gap: 2rem;
+}
+@media (min-width: 1024px) {
+  .hero-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 24rem);
+    grid-template-rows: auto auto;
+    column-gap: 3rem;
+    row-gap: 2rem;
+    align-items: center;
+  }
+  .hero-main {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: end;
+  }
+  .hero-aside {
+    grid-column: 1;
+    grid-row: 2;
+    align-self: start;
+  }
+  .hero-layout > .ev-card {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+  }
+}
+.hero-ink {
+  --bg: var(--ink);
+  --bg-soft: #16233b;
+  --bg-border: #2c3a55;
+  --text: #e6ebf3;
+  --text-title: #f3f6fa;
+  --text-muted: #b4c0d2;
+  --text-faint: #9aa8bd;
+  --accent: #8fb0ff;
+  color: var(--text);
+}
+.hero-ink ::selection {
+  color: var(--on-mark);
+  background: var(--mark);
+}
+.hero-ctas {
+  display: grid;
+  gap: 0.625rem;
+}
+.hero-ctas > * {
+  min-height: 2.75rem;
+}
+@media (min-width: 640px) {
+  .hero-ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+}
+.hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem 1.5rem;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+.hero-meta li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+/* Hueco fijo: ocultar la insignia no desplaza nada. */
+.hero-status-slot {
+  min-height: 1.75rem;
+}
+.hero-status {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.75rem;
+  padding: 0 0.625rem;
+  border-radius: 0.25rem;
+  background: var(--mark);
+  color: var(--on-mark);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+.hero-status.hidden {
+  display: none;
+}
+
+/* Ficha: hoja del expediente sobre la tinta. */
+.ev-card {
+  min-width: 0;
+  padding: 1.25rem;
+  border: 1px solid var(--bg-border);
+  border-radius: 0.5rem;
+  background: var(--bg-card);
+  color: var(--text);
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.25), 0 24px 48px -24px rgb(0 0 0 / 0.6);
+}
+@media (min-width: 640px) {
+  .ev-card {
+    padding: 1.5rem;
+  }
+}
+.ev-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: baseline;
+  column-gap: 0.75rem;
+  padding: 0.25rem 0;
+  scroll-margin-top: 6rem;
+}
+.ev-row + .ev-row {
+  border-top: 1px solid var(--bg-border);
+}
+.ev-id,
+.ev-verify {
+  display: inline-block;
+  padding: 0.625rem 0;
+  text-underline-offset: 3px;
+}
+.ev-id {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.ev-id:hover {
+  color: var(--text-title);
+  text-decoration: underline;
+}
+.ev-text {
+  min-width: 0;
+  font-size: 0.875rem;
+  line-height: 1.35;
+}
+/* Firma: barrido de marcador sobre la etiqueta al pasar o enfocar la fila.
+   Relleno solido (no degradado visible); el texto pasa a --on-mark. */
+.ev-label {
+  color: var(--text-title);
+  font-weight: 500;
+  background-image: linear-gradient(var(--mark), var(--mark));
+  background-repeat: no-repeat;
+  background-size: 0% 100%;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  padding: 0 0.15em;
+  margin: 0 -0.15em;
+  transition:
+    background-size 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    color 0.2s ease-out;
+}
+.ev-row:hover .ev-label,
+.ev-row:focus-within .ev-label,
+.ev-row:target .ev-label {
+  background-size: 100% 100%;
+  color: var(--on-mark);
+}
+@media (prefers-reduced-motion: reduce) {
+  .ev-label {
+    transition: none;
+  }
+}
+/* Linea propia: la etiqueta queda en linea y el barrido abraza el texto. */
+.ev-year {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.ev-verify {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+}
+.ev-verify:hover {
+  color: var(--accent-hover);
+  text-decoration-thickness: 2px;
+}
+
+/* StackStrip: una linea estatica; lo que no cabe se recorta por elemento. */
+.stack-strip {
+  border-bottom: 1px solid var(--bg-border);
+  background: var(--bg-card);
+}
+.stack-line {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 0.75rem;
+  height: 1.5rem;
+  overflow: hidden;
+  line-height: 1.5rem;
+}
+.stack-line li {
+  white-space: nowrap;
+}
+.stack-line li + li::before {
+  content: '·';
+  margin-right: 0.75rem;
+  color: var(--text-muted);
+}

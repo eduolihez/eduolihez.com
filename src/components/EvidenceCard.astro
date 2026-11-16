@@ -1,0 +1,84 @@
+---
+/**
+ * <EvidenceCard /> - "Ficha" del hero: puesto actual (de src/data/experience.ts)
+ * y las evidencias E-01...E-nn de src/config.ts (`evidence`), cada una con su
+ * enlace de verificacion a la fuente real. Nada de datos inventados.
+ *
+ * El ID (E-01) es un permalink (#e-01) que funciona sin JS; con JS ademas
+ * copia la URL (src/scripts/evidence.ts). Al pasar o enfocar una fila, un
+ * barrido de marcador recorre su etiqueta (CSS, bloque T3 de global.css).
+ */
+import { useTranslations, pick } from '../i18n/utils';
+import type { Lang } from '../i18n/ui';
+import { SITE, evidence } from '../config';
+import { experiences } from '../data/experience';
+import { linkAttrs, evidenceAnchor } from '../scripts/evidence';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const current = experiences.find((e) => e.current) ?? experiences[0];
+---
+
+<aside class="ev-card" aria-labelledby="ev-card-role">
+  <div class="flex items-center gap-4">
+    <img
+      id="avatar-img"
+      src={SITE.avatarThumb}
+      alt={`${t('hero.photoAlt')} ${SITE.name}`}
+      width="64"
+      height="64"
+      loading="eager"
+      fetchpriority="high"
+      decoding="async"
+      class="h-12 w-12 shrink-0 rounded-md sm:h-16 sm:w-16 border border-bg-border object-cover"
+    />
+    <div class="min-w-0">
+      <h2 id="ev-card-role" class="text-lg leading-tight text-text-title">{pick(current.role, lang)}</h2>
+      <p class="mt-1 text-sm text-text-muted">
+        {current.company}
+        <span aria-hidden="true">·</span>
+        <span class="font-mono text-xs">{pick(current.period, lang)}</span>
+      </p>
+    </div>
+  </div>
+
+  <h3 class="mt-4 border-t border-bg-border pt-3 sm:mt-6 sm:pt-4 text-sm font-semibold text-text-title">
+    {t('hero.evidence.title')}
+  </h3>
+  <ol class="mt-2">
+    {
+      evidence.map((e) => {
+        const attrs = linkAttrs(e.href);
+        const isPdf = !attrs.external && /\.pdf$/i.test(e.href);
+        return (
+          <li id={evidenceAnchor(e.id)} class="ev-row">
+            <a href={`#${evidenceAnchor(e.id)}`} class="ev-id" data-evidence-copy={e.id}>
+              {e.id}
+            </a>
+            <span class="ev-text">
+              <span class="ev-label">{e.label}</span>
+              {e.year && <span class="ev-year">{e.year}</span>}
+            </span>
+            <a href={e.href} target={attrs.target} rel={attrs.rel} class="ev-verify">
+              {t('hero.evidence.verify')}
+              <span class="sr-only">
+                {e.label} {attrs.external ? t('hero.evidence.newTab') : isPdf ? t('hero.evidence.pdf') : ''}
+              </span>
+            </a>
+          </li>
+        );
+      })
+    }
+  </ol>
+  <p class="sr-only" aria-live="polite" data-evidence-live data-copied-text={t('hero.evidence.copied')}></p>
+</aside>
+
+<script>
+  import { initEvidenceCopy } from '../scripts/evidence';
+
+  initEvidenceCopy();
+  document.addEventListener('astro:page-load', () => initEvidenceCopy());
+</script>

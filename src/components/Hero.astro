@@ -1,16 +1,20 @@
 ---
 /**
- * <Hero /> - Perfil. Cuadricula de fondo, titular en mono con una linea
- * serif cursiva, bloque tipo terminal y, a la derecha, una tarjeta con la
- * foto y el flujo de triaje (diagrama, no datos en vivo).
+ * <Hero /> - Portada "Expediente": banda en tinta (--ink, igual en ambos
+ * temas). Izquierda: nombre, rol, una frase, CTAs y metadato (ubicacion,
+ * idiomas, disponibilidad). Derecha: la ficha <EvidenceCard /> con el puesto
+ * actual y las evidencias E-nn enlazadas a su fuente. Sin terminal ni datos
+ * en vivo; funciona sin JS y sin PHP.
  *
- * "Disponible" se oculta solo si en el panel pones open_to_work=0 (lo
- * comprueba el script de abajo via /api/settings.php, sin recompilar).
+ * "Disponible" se oculta si en el panel pones open_to_work=0 (lo comprueba
+ * el script de abajo via /api/settings.php, sin recompilar). Vive en un hueco
+ * de altura fija para que ocultarlo no mueva nada (CLS).
  */
 import { useTranslations } from '../i18n/utils';
 import type { Lang } from '../i18n/ui';
 import { SITE, api } from '../config';
 import Icon from './Icon.astro';
+import EvidenceCard from './EvidenceCard.astro';
 
 interface Props {
   lang: Lang;
@@ -20,160 +24,46 @@ const t = useTranslations(lang);
 // Misma URL (con lang) que Announcement y Contact: getSettings() comparte una
 // sola peticion por URL, y con URLs distintas volverian a ser dos.
 const settingsUrl = api(`/api/settings.php?lang=${lang}`);
-
-// Etapas del flujo de triaje. Los textos salen de tu experiencia real (ver
-// src/data/experience.ts); es un diagrama del proceso, no datos en vivo.
-const flow = [
-  { icon: 'logs', title: t('hero.flow.logs'), sub: t('hero.flow.logs.sub') },
-  { icon: 'shield', title: t('hero.flow.xdr'), sub: t('hero.flow.xdr.sub') },
-  { icon: 'search', title: t('hero.flow.triage'), sub: t('hero.flow.triage.sub') },
-  { icon: 'bolt', title: t('hero.flow.response'), sub: t('hero.flow.response.sub') },
-];
 ---
 
-<section id="perfil" class="relative overflow-hidden" data-settings={settingsUrl}>
-  <div class="hero-grid pointer-events-none absolute inset-0" aria-hidden="true"></div>
-  <div class="hero-fade pointer-events-none absolute inset-0" aria-hidden="true"></div>
-
-  <div
-    class="container-page relative grid gap-12 pb-16 pt-28 sm:pt-32 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] lg:items-center lg:gap-14"
-  >
-    <div>
-      <p style="--i:0" class="boot-line flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs uppercase tracking-[0.18em] text-text-muted">
-        <span id="hero-status" class="inline-flex items-center gap-2 text-accent">
-          <span class="sig-dot h-2 w-2 rounded-full bg-accent" aria-hidden="true"></span>
-          {t('hero.status')}
-        </span>
-      </p>
-
-      <h1
-        style="--i:1"
-        class="boot-line mt-5 font-mono text-[clamp(2rem,4.6vw,3.25rem)] font-bold leading-[1.05] tracking-tight text-text-title"
-      >
+<section id="perfil" class="hero-band" data-settings={settingsUrl}>
+  <!-- Movil: principal -> ficha -> metadato (la ficha justo tras los CTAs).
+       Escritorio: principal y metadato a la izquierda, ficha a la derecha. -->
+  <div class="hero-layout container-page pb-12 pt-20 sm:pt-28 lg:pb-20">
+    <div class="hero-ink hero-main min-w-0">
+      <h1 class="text-[clamp(2.25rem,5vw,3.75rem)] leading-[1.02] tracking-[-0.035em] text-text-title">
         {SITE.name}
       </h1>
-
-      <p style="--i:2" class="boot-line mt-5 font-serif text-2xl italic leading-snug text-text sm:text-3xl">
-        {t('hero.lead')} <span class="text-accent">{t('hero.lead.em')}</span>
+      <p class="mt-4 text-base font-medium leading-snug text-text sm:text-lg">{t('hero.role.short')}</p>
+      <p class="mt-4 max-w-[34ch] text-xl leading-snug text-text-muted sm:text-2xl">
+        {t('hero.lead')} <span class="font-semibold text-text-title">{t('hero.lead.em')}</span>
       </p>
 
-      <p style="--i:3" class="boot-line mt-5 font-mono text-sm leading-relaxed text-accent">{t('hero.role')}</p>
-
-      <p style="--i:4" class="boot-line mt-4 max-w-xl text-base leading-relaxed text-text-muted">
-        {t('hero.tagline')}
-      </p>
-
-      <div style="--i:5" class="boot-line mt-8 flex flex-wrap gap-3">
+      <div class="hero-ctas mt-6 sm:mt-8">
         <a href="#contacto" class="btn-primary">{t('hero.cta.contact')}</a>
         <button type="button" class="btn-ghost" data-cv-open aria-haspopup="dialog" aria-controls="cv-modal">
           <Icon name="download" class="h-4 w-4" />
           {t('hero.cta.cv')}
         </button>
-        <a
-          href={SITE.social.linkedin}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="btn-ghost"
-        >
+        <a href={SITE.social.linkedin} target="_blank" rel="noopener noreferrer" class="btn-ghost">
           <Icon name="linkedin" class="h-4 w-4" />
           {t('hero.cta.linkedin')}
         </a>
-        <button type="button" data-palette-open class="btn-ghost hidden font-mono sm:inline-flex">
-          <span class="text-accent" aria-hidden="true"><span data-shortcut-mod>Ctrl</span> K</span>
-          {t('hero.cta.palette')}
-        </button>
-      </div>
-
-      <!-- Bloque tipo terminal: texto estatico y verificable, sin metricas inventadas. -->
-      <div style="--i:6" class="boot-line mt-9 space-y-1 font-mono text-xs leading-relaxed text-text-muted">
-        <p><span class="text-accent" aria-hidden="true">$</span> whoami</p>
-        <p><span class="text-accent" aria-hidden="true">→</span> {SITE.jobTitle}</p>
-        <p><span class="text-accent" aria-hidden="true">$</span> stack</p>
-        <p><span class="text-accent" aria-hidden="true">→</span> Trend Micro Vision One · Fortinet · Python · IAM</p>
-        <p><span class="text-accent" aria-hidden="true">$</span> pwd</p>
-        <p><span class="text-accent" aria-hidden="true">→</span> {t('hero.location')} · {t('hero.languages')}</p>
       </div>
     </div>
 
-    <!-- Tarjeta: foto + diagrama del flujo de triaje -->
-    <div class="boot-line relative" style="--i:3">
-      <div
-        class="rounded-2xl border border-bg-border bg-bg-card p-5"
-        style="box-shadow: var(--shadow-card)"
-      >
-        <div class="flex items-center gap-4">
-          <div class="relative shrink-0">
-            <img
-              id="avatar-img"
-              src={SITE.avatarThumb}
-              alt={`${t('hero.photoAlt')} ${SITE.name}`}
-              width="72"
-              height="72"
-              loading="eager"
-              fetchpriority="high"
-              decoding="async"
-              class="h-[72px] w-[72px] rounded-2xl border border-bg-border object-cover"
-            />
-            <span
-              class="absolute -bottom-1 -right-1 grid h-5 w-5 place-items-center rounded-full border-2 border-bg-card bg-bg-card"
-              aria-hidden="true"
-            >
-              <span class="sig-dot h-2.5 w-2.5 rounded-full bg-accent"></span>
-            </span>
-          </div>
-          <div class="min-w-0">
-            <p class="truncate font-semibold text-text-title">{SITE.shortName}</p>
-            <p class="font-mono text-xs text-text-faint">{t('hero.card.role')}</p>
-            <ul class="mt-2 flex flex-wrap gap-1.5" aria-label={t('hero.card.focus')}>
-              {
-                ['SOC', 'Cloud', 'IAM', 'AI Sec'].map((chip) => (
-                  <li class="rounded-full border border-accent/30 bg-accent-soft px-2 py-0.5 font-mono text-[10px] text-accent">
-                    {chip}
-                  </li>
-                ))
-              }
-            </ul>
-          </div>
-        </div>
+    <EvidenceCard lang={lang} />
 
-        <p class="mt-6 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-text-faint">
-          <span class="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden="true"></span>
-          {t('hero.flow.label')}
-        </p>
-
-        <div class="relative mt-4">
-          <!-- Linea que une las etapas y pulso de señal que la recorre -->
-          <span class="absolute bottom-5 left-[17px] top-5 w-0.5 overflow-hidden rounded-full bg-bg-border" aria-hidden="true">
-            <span class="flow-pulse block h-full w-full bg-gradient-to-b from-transparent via-accent to-transparent"></span>
-          </span>
-          <ol class="relative space-y-5" aria-label={t('hero.flow.label')}>
-          {
-            flow.map((step, i) => (
-              <li class="flow-step relative flex items-center gap-3.5" style={`--s:${i}`}>
-                <span
-                  class={`grid h-9 w-9 shrink-0 place-items-center rounded-lg border ${
-                    i === flow.length - 1
-                      ? 'border-accent/50 bg-accent-soft text-accent'
-                      : 'border-bg-border bg-bg-card text-text-muted'
-                  }`}
-                >
-                  <Icon name={step.icon} class="h-[18px] w-[18px]" />
-                </span>
-                <span class="min-w-0">
-                  <span class="block font-mono text-[13px] font-semibold leading-tight text-text-title">
-                    <span class="text-text-faint" aria-hidden="true">0{i + 1}</span> {step.title}
-                  </span>
-                  <span class="mt-0.5 block text-xs leading-snug text-text-muted">{step.sub}</span>
-                </span>
-              </li>
-            ))
-          }
-          </ol>
-        </div>
-      </div>
+    <div class="hero-ink hero-aside min-w-0">
+      <ul class="hero-meta" aria-label={t('hero.meta')}>
+        <li><Icon name="location" class="h-4 w-4 shrink-0" />{t('hero.location')}</li>
+        <li><Icon name="languages" class="h-4 w-4 shrink-0" />{t('hero.languages')}</li>
+      </ul>
+      <p class="hero-status-slot mt-3">
+        <span id="hero-status" class="hero-status">{t('hero.status')}</span>
+      </p>
     </div>
   </div>
-
 </section>
 
 <script>
@@ -195,11 +85,6 @@ const flow = [
       .catch(() => status.classList.remove('hidden'));
   }
 
-  // Inicialización
-  function initAll() {
-    initAvailability();
-  }
-
-  initAll();
-  document.addEventListener('astro:page-load', initAll);
+  initAvailability();
+  document.addEventListener('astro:page-load', initAvailability);
 </script>

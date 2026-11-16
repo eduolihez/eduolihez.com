@@ -207,19 +207,19 @@ describe('initProjects()', () => {
       return Array.from({ length: count }, (_, i) => ({ ...sampleProject, title: `Proyecto ${i + 1}` }));
     }
 
-    it('con 6 proyectos o menos, se ven todos y el boton "ver todos" queda oculto', async () => {
+    it('con 7 proyectos o menos, se ven todos y el boton "ver todos" queda oculto', async () => {
       const grid = setupGrid();
-      mockFetchOnce({ ok: true, json: () => Promise.resolve(makeProjects(6)) });
+      mockFetchOnce({ ok: true, json: () => Promise.resolve(makeProjects(7)) });
 
       initProjects();
-      await vi.waitFor(() => expect(grid.querySelectorAll('article').length).toBe(6));
+      await vi.waitFor(() => expect(grid.querySelectorAll('article').length).toBe(7));
 
       const cards = Array.from(grid.querySelectorAll('article'));
       expect(cards.every((c) => !c.classList.contains('hidden'))).toBe(true);
       expect(document.getElementById('projects-show-more-wrap')?.classList.contains('hidden')).toBe(true);
     });
 
-    it('con mas de 6, solo se ven las 6 primeras y el boton "ver todos" aparece', async () => {
+    it('con mas de 7, solo se ven las 7 primeras y el boton "ver todos" aparece', async () => {
       const grid = setupGrid();
       mockFetchOnce({ ok: true, json: () => Promise.resolve(makeProjects(9)) });
 
@@ -228,7 +228,7 @@ describe('initProjects()', () => {
 
       const cards = Array.from(grid.querySelectorAll('article'));
       const visible = cards.filter((c) => !c.classList.contains('hidden'));
-      expect(visible.length).toBe(6);
+      expect(visible.length).toBe(7);
       expect(document.getElementById('projects-show-more-wrap')?.classList.contains('hidden')).toBe(false);
     });
 
@@ -249,7 +249,7 @@ describe('initProjects()', () => {
       expect(btn.getAttribute('aria-expanded')).toBe('true');
     });
 
-    it('pulsar "ver menos" vuelve a las 6 primeras y restaura "ver todos"', async () => {
+    it('pulsar "ver menos" vuelve a las 7 primeras y restaura "ver todos"', async () => {
       const grid = setupGrid();
       mockFetchOnce({ ok: true, json: () => Promise.resolve(makeProjects(9)) });
 
@@ -261,12 +261,12 @@ describe('initProjects()', () => {
       btn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
 
       const visible = Array.from(grid.querySelectorAll('article')).filter((c) => !c.classList.contains('hidden'));
-      expect(visible.length).toBe(6);
+      expect(visible.length).toBe(7);
       expect(btn.textContent).toBe('Ver todos');
       expect(btn.getAttribute('aria-expanded')).toBe('false');
     });
 
-    it('con un filtro activo, "ver menos" limita a 6 entre las tarjetas que coinciden', async () => {
+    it('con un filtro activo, "ver menos" limita a 7 entre las tarjetas que coinciden', async () => {
       const grid = setupGrid();
       document.body.insertAdjacentHTML(
         'beforeend',
@@ -282,11 +282,70 @@ describe('initProjects()', () => {
       document.querySelector<HTMLButtonElement>('.project-filter-btn')!.click();
       document.getElementById('projects-show-more')!.click(); // contraer
       const visible = Array.from(grid.querySelectorAll('article')).filter((c) => !c.classList.contains('hidden'));
-      expect(visible.length).toBe(6);
+      expect(visible.length).toBe(7);
       expect(visible.every((c) => (c.getAttribute('data-badges') || '').includes('open-source'))).toBe(true);
     });
 
-    it('con un filtro que deja 6 o menos, el boton se oculta', async () => {
+    it('los destacados van primero y la primera ficha visible es la principal (is-lead)', async () => {
+      const grid = setupGrid();
+      const projects = [
+        { ...sampleProject, title: 'Normal A', featured: 0 },
+        { ...sampleProject, title: 'Destacado B', featured: 1 },
+        { ...sampleProject, title: 'Normal C', featured: '0' },
+        { ...sampleProject, title: 'Destacado D', featured: '1' },
+      ];
+      mockFetchOnce({ ok: true, json: () => Promise.resolve(projects) });
+
+      initProjects();
+      await vi.waitFor(() => expect(grid.querySelectorAll('article').length).toBe(4));
+
+      const titles = Array.from(grid.querySelectorAll('article h3')).map((h) => h.textContent);
+      expect(titles).toEqual(['Destacado B', 'Destacado D', 'Normal A', 'Normal C']);
+      const lead = grid.querySelectorAll('article.is-lead');
+      expect(lead.length).toBe(1);
+      expect(lead[0].querySelector('h3')?.textContent).toBe('Destacado B');
+    });
+
+    it('al filtrar, la ficha principal pasa a la primera que coincide', async () => {
+      const grid = setupGrid();
+      document.body.insertAdjacentHTML(
+        'beforeend',
+        '<button class="project-filter-btn" data-filter="private-code">PRIV</button>',
+      );
+      const projects = [
+        { ...sampleProject, title: 'OSS', badges: ['open-source'] },
+        { ...sampleProject, title: 'Privado', badges: ['private-code'] },
+      ];
+      mockFetchOnce({ ok: true, json: () => Promise.resolve(projects) });
+
+      initProjects();
+      await vi.waitFor(() => expect(grid.querySelectorAll('article').length).toBe(2));
+      const btn = document.querySelector<HTMLButtonElement>('.project-filter-btn')!;
+      btn.click();
+
+      const lead = grid.querySelector('article.is-lead');
+      expect(lead?.querySelector('h3')?.textContent).toBe('Privado');
+      expect(btn.classList.contains('is-active')).toBe(true);
+      expect(btn.getAttribute('aria-pressed')).toBe('true');
+    });
+
+    it('con tarjetas ya pintadas en el build no muestra "cargando" ni las borra hasta tener datos', async () => {
+      const grid = setupGrid();
+      grid.innerHTML = '<article>Tarjeta del build</article>';
+      const status = document.getElementById('projects-status') as HTMLElement;
+      let resolve!: (v: unknown) => void;
+      vi.stubGlobal('fetch', vi.fn().mockReturnValueOnce(new Promise((r) => (resolve = r))));
+
+      initProjects();
+      expect(status.classList.contains('hidden')).toBe(true); // el panel no se muestra
+      expect(grid.textContent).toContain('Tarjeta del build');
+
+      resolve({ ok: true, json: () => Promise.resolve([sampleProject]) });
+      await vi.waitFor(() => expect(grid.textContent).not.toContain('Tarjeta del build'));
+      expect(grid.textContent).toContain('FollowGuard');
+    });
+
+    it('con un filtro que deja 7 o menos, el boton se oculta', async () => {
       const grid = setupGrid();
       document.body.insertAdjacentHTML(
         'beforeend',

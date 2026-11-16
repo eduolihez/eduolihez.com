@@ -36,40 +36,38 @@ const posts = await fetchLatestPostSummaries(lang, 3);
 
 {
   posts.length > 0 && (
-    <section id="blog-preview" class="border-b border-bg-border py-20 sm:py-28">
+    <section id="blog-preview" class="border-b border-bg-border py-14 sm:py-16">
       <div class="container-page">
-        <div class="reveal mb-12 flex flex-wrap items-end justify-between gap-4">
+        <div class="reveal mb-8 flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
           <div>
-            <p class="section-kicker">{t('kicker.blog')}</p>
             <h2 class="section-title">{t('blog.homeTitle')}</h2>
             <p class="section-subtitle">{t('blog.homeSubtitle')}</p>
           </div>
-          <a
-            href={blogIndexPath}
-            class="inline-flex shrink-0 items-center gap-1.5 text-sm font-semibold text-accent transition hover:text-accent-hover"
-          >
-            {t('blog.viewAll')} →
+          <a href={blogIndexPath} class="project-link shrink-0">
+            {t('blog.viewAll')}
           </a>
         </div>
 
-        <div class="grid gap-6 sm:grid-cols-3">
+        <div class="border-t border-bg-border">
           {posts.map((post) => {
             const href = `${basePath}${encodeURIComponent(post.slug)}/`;
+            const minutes = (post as { read_minutes?: number }).read_minutes;
             return (
-              <a
-                href={href}
-                class="reveal group flex flex-col rounded-xl border border-bg-border bg-bg-card p-5 shadow-xs transition hover:-translate-y-1 hover:border-bg-border-hover hover:shadow-md"
-              >
+              <a href={href} class="post-row group">
                 <time
-                  class="mb-2 font-mono text-xs text-text-muted"
+                  class="font-mono text-xs text-text-muted sm:pt-1"
                   datetime={post.published_at.replace(' ', 'T').slice(0, 10)}
                 >
                   {formatDate(post.published_at, lang)}
                 </time>
-                <h3 class="mb-2 text-base font-bold leading-snug text-text-title transition group-hover:text-accent">
-                  {post.title}
-                </h3>
-                <p class="line-clamp-3 text-sm text-text-muted">{post.summary}</p>
+                <div class="min-w-0">
+                  <h3 class="post-title text-base font-semibold leading-snug text-text-title">{post.title}</h3>
+                  {(post.category || minutes) && (
+                    <p class="mt-1 text-xs text-text-muted">
+                      {[post.category, minutes ? `${minutes} min` : null].filter(Boolean).join(' · ')}
+                    </p>
+                  )}
+                </div>
               </a>
             );
           })}

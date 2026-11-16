@@ -69,7 +69,7 @@ let currentModalCloseHandler: (() => void) | null = null;
 let escapeListenerBound = false;
 
 /** Tarjetas visibles antes de pulsar "Ver todos los proyectos". */
-const INITIAL_VISIBLE_COUNT = 6;
+const INITIAL_VISIBLE_COUNT = 7; // la ficha destacada ocupa dos columnas: 1 + 3 filas de 2
 
 function bindGlobalEscapeHandler(): void {
   if (escapeListenerBound) return;
@@ -112,9 +112,8 @@ export function initProjects(): void {
     a.innerHTML = iconSvg || '';
     a.appendChild(spanText);
 
-    a.className = isPrimary
-      ? 'inline-flex items-center gap-1.5 rounded-lg border border-accent bg-accent/10 hover:bg-accent hover:text-bg px-3 py-1.5 text-xs font-semibold text-accent transition duration-200 shadow-xs hover:no-underline'
-      : 'inline-flex items-center gap-1.5 rounded-lg border border-bg-border bg-bg-soft/40 hover:bg-bg-card hover:border-text-faint/40 px-3 py-1.5 text-xs font-semibold text-text-muted hover:text-text transition duration-200 shadow-xs hover:no-underline';
+    // Enlaces de texto en azul accion (--accent); el principal (demo) en negrita.
+    a.className = isPrimary ? 'project-link is-primary' : 'project-link';
     return a;
   }
 
@@ -188,7 +187,7 @@ export function initProjects(): void {
   function makeCard(p: Project): HTMLElement {
     const card = document.createElement('article');
     card.className =
-      'reveal is-visible group flex flex-col overflow-hidden rounded-lg border border-bg-border bg-bg-card transition hover:border-text-faint/40 shadow-xs';
+      'project-card reveal is-visible group flex flex-col overflow-hidden rounded-lg border border-bg-border bg-bg-card transition-colors hover:border-text-faint/40';
 
     card.setAttribute('data-badges', Array.isArray(p.badges) && p.badges.length ? p.badges.join(',') : '');
 
@@ -205,7 +204,7 @@ export function initProjects(): void {
       wrap.appendChild(im);
       if (Number(p.featured) === 1) {
         const b = document.createElement('span');
-        b.className = 'absolute left-2 top-2 rounded-sm bg-accent px-1.5 py-0.5 text-[11px] font-semibold text-bg';
+        b.className = 'absolute left-2 top-2 rounded-sm bg-mark px-1.5 py-0.5 text-[11px] font-semibold text-on-mark';
         b.textContent = labels.featured;
         wrap.appendChild(b);
       }
@@ -213,7 +212,7 @@ export function initProjects(): void {
     }
 
     const body = document.createElement('div');
-    body.className = 'flex flex-1 flex-col p-5';
+    body.className = 'project-body flex flex-1 flex-col p-5';
 
     const h = document.createElement('h3');
     h.className = 'text-base font-semibold text-text';
@@ -227,7 +226,7 @@ export function initProjects(): void {
         const meta = badgeMeta(b, labels);
         if (!meta) return;
         const badgeSpan = document.createElement('span');
-        badgeSpan.className = `rounded-sm ${meta.className} px-2 py-0.5 text-[10px] font-semibold border`;
+        badgeSpan.className = `rounded-sm ${meta.className} px-2 py-0.5 text-xs font-semibold border`;
         badgeSpan.textContent = meta.text;
         badgeContainer.appendChild(badgeSpan);
       });
@@ -252,14 +251,13 @@ export function initProjects(): void {
     }
 
     const links = document.createElement('div');
-    links.className = 'mt-auto pt-5 flex flex-wrap items-center gap-2 border-t border-bg-border/40';
+    links.className = 'mt-auto flex flex-wrap items-center gap-x-4 pt-4';
     const hasDetail = (p.description && p.description.trim()) || img;
     if (hasDetail) {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.innerHTML = eyeSvg + `<span>${labels.details}</span>`;
-      btn.className =
-        'inline-flex items-center gap-1.5 rounded-lg border border-bg-border bg-bg-soft/40 hover:bg-bg-card hover:border-text-faint/40 px-3 py-1.5 text-xs font-semibold text-text-muted hover:text-text transition duration-200 shadow-xs cursor-pointer';
+      btn.className = 'project-link cursor-pointer';
       btn.addEventListener('click', () => openModal(p));
       links.appendChild(btn);
     }
@@ -288,19 +286,26 @@ export function initProjects(): void {
   }
 
   function loadProjects(): void {
-    setState('loading', labels.loading);
-    grid.innerHTML = '';
+    // Con tarjetas ya pintadas (build) no se muestra "cargando" ni se vacia el
+    // grid hasta tener datos: evita el parpadeo y el salto de altura.
+    if (!grid.childElementCount) setState('loading', labels.loading);
     fetchWithRetry(apiUrl, { headers: { Accept: 'application/json' } })
       .then((data) => {
         grid.dataset.loaded = '1';
         const items: Project[] = Array.isArray(data) ? data : (data as { items?: Project[] })?.items || [];
+        grid.innerHTML = '';
         if (status) status.classList.add('hidden');
         if (!items.length) return message(labels.empty);
 
         const filtersContainer = document.getElementById('projects-filters');
         if (filtersContainer) filtersContainer.classList.remove('hidden');
 
-        items.forEach((p) => grid.appendChild(makeCard(p)));
+        // Destacados primero (orden estable: dentro de cada grupo manda la API).
+        const ordered = items
+          .map((p, i) => ({ p, i }))
+          .sort((a, b) => Number(Number(b.p.featured) === 1) - Number(Number(a.p.featured) === 1) || a.i - b.i)
+          .map(({ p }) => p);
+        ordered.forEach((p) => grid.appendChild(makeCard(p)));
 
         const cards = Array.from(grid.querySelectorAll<HTMLElement>('article'));
         const showMoreWrap = document.getElementById('projects-show-more-wrap');
@@ -316,13 +321,18 @@ export function initProjects(): void {
           // El limite cuenta las tarjetas que coinciden con el filtro, no su
           // posicion en la lista completa.
           let matching = 0;
+          let leadSet = false;
           cards.forEach((card) => {
             const badgesAttr = card.getAttribute('data-badges') || '';
             const badges = badgesAttr ? badgesAttr.split(',') : [];
             const matchesFilter = activeFilter === 'all' || badges.includes(activeFilter);
             const withinLimit = expanded || matching < INITIAL_VISIBLE_COUNT;
             if (matchesFilter) matching += 1;
-            card.classList.toggle('hidden', !(matchesFilter && withinLimit));
+            const visible = matchesFilter && withinLimit;
+            card.classList.toggle('hidden', !visible);
+            // La primera ficha visible es la destacada: ocupa el ancho completo.
+            card.classList.toggle('is-lead', visible && !leadSet);
+            if (visible) leadSet = true;
           });
           // Con 6 o menos coincidencias no hay nada que mostrar ni ocultar.
           showMoreWrap?.classList.toggle('hidden', matching <= INITIAL_VISIBLE_COUNT);
@@ -345,11 +355,11 @@ export function initProjects(): void {
         filterButtons.forEach((btn) => {
           btn.addEventListener('click', () => {
             filterButtons.forEach((b) => {
-              b.classList.remove('bg-accent', 'text-bg', 'border-accent');
-              b.classList.add('bg-bg-soft/40', 'text-text-muted', 'border-bg-border/60');
+              b.classList.remove('is-active');
+              b.setAttribute('aria-pressed', 'false');
             });
-            btn.classList.add('bg-accent', 'text-bg', 'border-accent');
-            btn.classList.remove('bg-bg-soft/40', 'text-text-muted', 'border-bg-border/60');
+            btn.classList.add('is-active');
+            btn.setAttribute('aria-pressed', 'true');
 
             // Cambiar de filtro tambien revela el resto: limitar a 6 solo
             // tiene sentido en la vista "todos" sin filtrar.

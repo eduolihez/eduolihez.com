@@ -16,7 +16,6 @@ import { api } from '../config';
 import { getImage } from 'astro:assets';
 import { buildLogoMap, fetchCertificationSummaries } from '../lib/certifications';
 import { safeUrl } from '../scripts/shared';
-import { issuerColor } from '../scripts/certifications';
 import StatusPanel from './StatusPanel.astro';
 import Icon from './Icon.astro';
 
@@ -48,48 +47,30 @@ const labels = {
   error: t('certs.error'),
   empty: t('certs.empty'),
   countLabel: t('certs.count.label'),
-  // Texto de la tarjeta de emisor: "10 credenciales"
-  credentials: pick('credenciales', 'credencials', 'credentials'),
-  credential: pick('credencial', 'credencial', 'credential'),
-  back: pick('Todas', 'Totes', 'All'),
-  // Se anuncia a los lectores de pantalla al pulsar una tarjeta de emisor.
-  viewIssuer: pick('Ver certificaciones de', 'Veure certificacions de', 'View certifications from'),
+  verify: t('certs.verify'),
 };
 ---
 
-<section id="certificaciones" class="border-b border-bg-border py-20 sm:py-28">
+<section id="certificaciones" class="border-b border-bg-border py-14 sm:py-16">
   <div class="container-page">
-    <div class="reveal mb-10 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-      <div>
-        <p class="section-kicker">{t('kicker.certs')}</p>
-        <h2 class="section-title">{t('certs.title')}</h2>
-        <p class="section-subtitle">{t('certs.subtitle')}</p>
-      </div>
-
-      <div class="flex shrink-0 items-center gap-3">
-        <Icon name="award" class="h-8 w-8 text-accent" />
-        <div>
-          <div
-            id="certs-counter"
-            class="font-mono text-3xl font-bold leading-none text-accent"
-            data-target="0"
-          >
-            0
-          </div>
-          <div class="mt-1 text-xs text-text-muted">{labels.countLabel}</div>
-        </div>
-      </div>
+    <div class="reveal mb-8">
+      <h2 class="section-title">{t('certs.title')}</h2>
+      <p class="section-subtitle">{t('certs.subtitle')}</p>
+      <p class="mt-3 text-sm text-text-muted">
+        <span id="certs-counter" class="font-mono font-semibold tabular-nums text-text" data-target="0">{ssrCerts.length}</span>
+        {labels.countLabel}
+      </p>
     </div>
 
     <StatusPanel
       id="certs-status"
-      class="mb-6"
+      class={ssrCerts.length ? 'mb-6 hidden' : 'mb-6'}
       loadingText={t('certs.loading')}
       retryText={t('status.retry')}
     />
 
     <!-- Buscador y filtros -->
-    <div class="reveal mb-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+    <div class="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
       <div class="relative w-full lg:max-w-xs">
         <span
           class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-text-muted"
@@ -106,7 +87,7 @@ const labels = {
           type="search"
           id="certs-search"
           aria-label={pick('Buscar certificación', 'Cercar certificació', 'Search certification')}
-          class="w-full rounded-lg border border-bg-border bg-bg-card py-2 pl-9 pr-3 text-sm text-text placeholder-text-muted/60 transition focus:border-accent focus:outline-hidden focus:ring-1 focus:ring-accent"
+          class="min-h-11 w-full rounded-md border border-bg-border bg-bg-card py-2 pl-9 pr-3 text-sm text-text placeholder-text-muted transition-colors"
           placeholder={pick(
             'Buscar certificación o emisor...',
             'Cercar certificació o emissor...',
@@ -121,9 +102,9 @@ const labels = {
         id="certs-filter-container"
         role="group"
         aria-label={pick('Filtrar por categoría', 'Filtrar per categoria', 'Filter by category')}
-        class="-mx-4 flex snap-x gap-1.5 overflow-x-auto px-4 pb-1 lg:mx-0 lg:flex-wrap lg:justify-end lg:overflow-visible lg:px-0"
+        class="-mx-5 flex snap-x gap-1.5 overflow-x-auto px-5 pb-1 sm:-mx-6 sm:px-6 lg:mx-0 lg:flex-wrap lg:justify-end lg:overflow-visible lg:px-0"
       >
-        <button type="button" data-filter="all" class="cert-filter-btn is-active">
+        <button type="button" data-filter="all" class="cert-filter-btn is-active" aria-pressed="true">
           {pick('Todas', 'Totes', 'All')}
         </button>
         <button type="button" data-filter="cyber" class="cert-filter-btn">
@@ -138,122 +119,62 @@ const labels = {
       </div>
     </div>
 
-    <!-- Migas: solo aparecen al entrar en un emisor concreto -->
-    <div id="certs-breadcrumb" class="reveal mb-5 hidden items-center gap-2 text-sm">
-      <button
-        id="certs-back-btn"
-        type="button"
-        class="inline-flex cursor-pointer items-center gap-1.5 rounded-md px-2 py-1 font-medium text-text-muted transition hover:bg-bg-soft hover:text-accent"
+    <!-- Lista densa: los destacados (orden de la API) arriba, el resto plegado. -->
+    <div class="certs-body">
+      <div
+        id="certs-grid"
+        class="border-t border-bg-border bg-bg-card"
+        data-api={apiUrl}
+        data-labels={JSON.stringify(labels)}
+        data-logos={JSON.stringify(logoMap)}
       >
-        <span aria-hidden="true">&larr;</span>
-        <span>{labels.back}</span>
-      </button>
-      <span class="text-text-faint" aria-hidden="true">/</span>
-      <span id="certs-breadcrumb-current" class="truncate font-semibold text-text"></span>
-    </div>
-
-    <div
-      id="certs-grid"
-      class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5"
-      data-api={apiUrl}
-      data-labels={JSON.stringify(labels)}
-      data-logos={JSON.stringify(logoMap)}
-    >
-      {ssrCerts.map((c) => {
-        const color = issuerColor((c.issuer || c.name || '?').trim());
-        const logo = safeUrl(c.logo_url);
-        const link = safeUrl(c.credential_url);
-        return (
-          <a
-            href={link || undefined}
-            target={link ? '_blank' : undefined}
-            rel={link ? 'noopener noreferrer' : undefined}
-            class="flex flex-col items-center gap-2 rounded-lg border border-bg-border bg-bg-card p-4 text-center"
-          >
-            <div
-              class="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-md border border-bg-border"
-              style={logo ? undefined : `background-color:${color}1a;border-color:${color}33`}
+        {ssrCerts.slice(0, 8).map((c) => {
+          const logo = safeUrl(c.logo_url);
+          const link = safeUrl(c.credential_url);
+          const Tag = link ? 'a' : 'div';
+          return (
+            <Tag
+              href={link || undefined}
+              target={link ? '_blank' : undefined}
+              rel={link ? 'noopener noreferrer' : undefined}
+              class="cert-row"
             >
-              {logo ? (
-                <img src={logoMap[logo] ?? logo} alt="" width="64" height="64" loading="lazy" decoding="async" class="h-full w-full object-contain p-2 bg-bg-soft" />
-              ) : (
-                <Icon name="award" class="h-7 w-7" style={`color:${color}`} />
-              )}
-            </div>
-            <span class="line-clamp-2 text-sm font-semibold text-text-title">{c.name}</span>
-            <span class="text-xs text-text-muted">{[c.issuer, c.issue_date].filter(Boolean).join(' · ')}</span>
-          </a>
-        );
-      })}
+              <span class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-sm border border-bg-border bg-bg-soft">
+                {logo ? (
+                  <img src={logoMap[logo] ?? logo} alt="" width="40" height="40" loading="lazy" decoding="async" class="h-full w-full object-contain p-1" />
+                ) : (
+                  <Icon name="award" class="h-5 w-5 text-text-faint" />
+                )}
+              </span>
+              <span class="min-w-0">
+                <span class="cert-name block truncate text-sm font-semibold text-text-title">{c.name}</span>
+                <span class="block truncate text-xs text-text-muted">{c.issuer}</span>
+              </span>
+              <span class="cert-year">{c.issue_date}</span>
+            </Tag>
+          );
+        })}
+      </div>
     </div>
 
-    <div id="certs-load-more-container" class="reveal mt-6 hidden justify-center">
-      <button
-        id="certs-load-more-btn"
-        type="button"
-        class="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-bg-border bg-bg-soft/40 px-4 py-2 text-xs font-semibold text-text-muted shadow-xs transition duration-200 hover:border-accent hover:bg-bg-card hover:text-accent"
-      >
-        <span>{pick('Ver más', 'Veure més', 'Show more')}</span>
-        <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path>
-        </svg>
+    <div id="certs-load-more-container" class="mt-6 hidden justify-center">
+      <button id="certs-load-more-btn" type="button" class="btn-ghost min-h-11 cursor-pointer">
+        <span>{pick('Ver todas', 'Veure-les totes', 'Show all')}</span>
       </button>
     </div>
 
-    <div class="reveal mt-10 flex justify-center">
+    <div class="mt-8 flex justify-center">
       <a
         href="https://www.credly.com/users/eduolihez"
         target="_blank"
         rel="noopener noreferrer"
-        class="btn-ghost"
+        class="project-link"
       >
-        <Icon name="award" class="h-4 w-4" />
         {t('certs.credly')}
       </a>
     </div>
   </div>
 </section>
-
-<style>
-  /* Los botones de filtro se estilan aqui y no con clases sueltas repetidas
-     seis veces en el marcado. Ademas el JS solo tiene que alternar .is-active
-     en vez de reescribir el className entero, que era lo que hacia antes y
-     borraba de paso los atributos de accesibilidad. */
-  /* Tailwind 4 publica cada token de @theme como variable CSS en :root, asi
-     que aqui basta con var(--color-*). La funcion theme() de v3 ya no aplica
-     en un <style> de Astro: este bloque no importa Tailwind. */
-  .cert-filter-btn {
-    flex-shrink: 0;
-    scroll-snap-align: start;
-    border-radius: 0.5rem;
-    border: 1px solid var(--color-bg-border);
-    background-color: var(--color-bg-card);
-    padding: 0.5rem 0.75rem;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--color-text-muted);
-    cursor: pointer;
-    transition: color 0.15s, border-color 0.15s, background-color 0.15s;
-    /* 40px de alto minimo: objetivo tactil comodo en movil. */
-    min-height: 2.5rem;
-  }
-  .cert-filter-btn:hover {
-    color: var(--color-text);
-    border-color: var(--color-text-faint);
-  }
-  .cert-filter-btn.is-active {
-    border-color: var(--color-accent);
-    background-color: rgb(74 222 128 / 0.1);
-    color: var(--color-accent);
-  }
-  /* Oculta la barra de scroll de los filtros sin impedir el desplazamiento. */
-  #certs-filter-container {
-    scrollbar-width: none;
-  }
-  #certs-filter-container::-webkit-scrollbar {
-    display: none;
-  }
-</style>
 
 <script>
   import { initCerts } from '../scripts/certifications';

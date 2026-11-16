@@ -647,87 +647,6 @@
       transform: none;
     }
   }
-
-  /* Cuadricula de fondo del hero: lineas finas que se desvanecen hacia los
-     bordes (mascara), sobre un resplandor del acento. Solo decoracion. */
-  .hero-grid {
-    background-image:
-      linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
-      linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
-    background-size: 44px 44px;
-    -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, #000 40%, transparent 100%);
-    mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, #000 40%, transparent 100%);
-  }
-
-  /* Pulso de señal que baja por la linea del flujo de triaje (solo transform). */
-  .flow-pulse {
-    animation: flow-pulse 2.8s linear infinite;
-  }
-  @keyframes flow-pulse {
-    from {
-      transform: translateY(-100%);
-    }
-    to {
-      transform: translateY(100%);
-    }
-  }
-
-  /* Entrada escalonada del hero: cada bloque sube y aparece con un retraso
-     (--i). Solo transform y opacity; con "menos movimiento" el reset global
-     la deja en su estado final. */
-  @media (prefers-reduced-motion: no-preference) {
-    .boot-line {
-      opacity: 0;
-      transform: translateY(14px);
-      animation: boot-in 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
-      animation-delay: calc(0.04s + var(--i, 0) * 0.08s);
-    }
-  }
-  @keyframes boot-in {
-    to {
-      opacity: 1;
-      transform: none;
-    }
-  }
-
-  /* Punto de estado que emite un anillo (como una señal de vida). */
-  .sig-dot {
-    animation: sig-pulse 2.6s ease-out infinite;
-  }
-  @keyframes sig-pulse {
-    0% {
-      box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-accent) 60%, transparent);
-    }
-    70% {
-      box-shadow: 0 0 0 8px transparent;
-    }
-    100% {
-      box-shadow: 0 0 0 0 transparent;
-    }
-  }
-
-  /* Las etapas del flujo se encienden de una en una, en bucle. */
-  .flow-step > span:first-child {
-    animation: step-glow 4.8s ease-in-out infinite;
-    animation-delay: calc(var(--s, 0) * 1.2s);
-  }
-  @keyframes step-glow {
-    0%, 22%, 100% {
-      border-color: var(--color-bg-border);
-    }
-    8%, 14% {
-      border-color: var(--color-accent);
-    }
-  }
-
-  /* Degradado sutil superior del hero (sustituye a la rejilla marcada). */
-  .hero-fade {
-    background: radial-gradient(
-      60% 50% at 50% 0%,
-      var(--glow),
-      transparent 70%
-    );
-  }
 }
 
 /* --- Modal de detalle de proyecto --- */
@@ -1185,4 +1104,116 @@
 }
 .field-error:empty::before {
   content: '';
+}
+
+/* T4b: Evidencia (proyectos, certificaciones) y vista previa del blog */
+.projects-body,
+.certs-body {
+  /* Reserva de alto: cargando, vacio y error no encogen la seccion. */
+  min-height: 12rem;
+}
+.project-filter-btn,
+.cert-filter-btn {
+  flex-shrink: 0;
+  min-height: 2.75rem;
+  border-radius: 0.375rem;
+  border: 1px solid var(--color-bg-border);
+  background-color: var(--color-bg-card);
+  padding: 0.5rem 0.875rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background-color 0.15s;
+}
+.project-filter-btn:hover,
+.cert-filter-btn:hover {
+  color: var(--color-text);
+  border-color: var(--color-text-faint);
+}
+/* Activo: tinta invertida (sin amarillo: --mark es solo relleno puntual). */
+.project-filter-btn.is-active,
+.cert-filter-btn.is-active {
+  border-color: var(--color-text);
+  background-color: var(--color-text);
+  color: var(--color-bg);
+}
+.project-link {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-accent);
+  text-underline-offset: 4px;
+}
+.project-link:hover {
+  color: var(--color-accent-hover);
+  text-decoration: underline;
+}
+.project-link.is-primary {
+  font-weight: 600;
+}
+@media (min-width: 768px) {
+  .project-card.is-lead {
+    grid-column: span 2;
+  }
+  .project-card.is-lead h3 {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+  }
+  .project-card.is-lead p {
+    max-width: 42rem;
+  }
+}
+
+/* Certificaciones: filas densas. Toda la fila es el enlace de verificacion. */
+.cert-row {
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 0.875rem;
+  min-height: 3.5rem;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--color-bg-border);
+  color: var(--color-text);
+}
+a.cert-row:hover {
+  background-color: var(--color-bg-soft);
+}
+a.cert-row:hover .cert-name {
+  color: var(--color-accent);
+}
+.cert-year {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Blog: lista editorial de 3 filas, sin imagenes. */
+.post-row {
+  display: grid;
+  gap: 0.375rem 2rem;
+  min-height: 3.5rem;
+  padding: 1.25rem 0.75rem;
+  border-bottom: 1px solid var(--color-bg-border);
+}
+@media (min-width: 640px) {
+  .post-row {
+    grid-template-columns: 8rem minmax(0, 1fr);
+  }
+}
+a.post-row:hover {
+  background-color: var(--color-bg-soft);
+}
+a.post-row:hover .post-title {
+  color: var(--color-accent);
+}
+#certs-filter-container {
+  scrollbar-width: none;
+}
+#certs-filter-container::-webkit-scrollbar {
+  display: none;
 }

@@ -215,49 +215,76 @@ function space_nav(string $space, array $counts): array
 
     if ($space === SPACE_GLOBAL) {
         return [
-            ['label' => '', 'items' => [
+            ['key' => 'resumen', 'label' => 'Resumen', 'items' => [
                 $item('index.php', 'Hoy', 'grid'),
                 $item('messages.php', 'Bandeja', 'mail', $count('unread'), 'alert'),
+            ]],
+            ['key' => 'trafico', 'label' => 'Tráfico', 'items' => [
                 $item('analytics.php', 'Analítica', 'chart'),
             ]],
-            ['label' => 'Sistema', 'items' => [
+            ['key' => 'sistema', 'label' => 'Sistema', 'items' => [
                 $item('security.php', 'Seguridad', 'shield'),
                 $item('settings.php', 'Ajustes', 'settings'),
                 $item('backup.php', 'Backup', 'database'),
                 $item('integrations.php', 'Integraciones', 'link'),
-                $item('apps.php', 'Gestionar apps', 'grid', $count('apps')),
+                $item('apps.php', 'Apps', 'grid', $count('apps')),
             ]],
         ];
     }
     if ($space === SPACE_SITE) {
         return [
-            ['label' => '', 'items' => [
+            ['key' => 'resumen', 'label' => 'Resumen', 'items' => [
                 $item('index.php', 'Hoy', 'grid'),
             ]],
-            ['label' => 'Contenido', 'items' => [
+            ['key' => 'contenido', 'label' => 'Contenido', 'items' => [
                 $item('projects.php', 'Proyectos', 'briefcase', $count('projects')),
                 $item('certifications.php', 'Certificaciones', 'award', $count('certs')),
                 $item('posts.php', 'Blog', 'edit', $count('posts')),
-            ]],
-            ['label' => 'Actividad', 'items' => [
-                $item('messages.php', 'Mensajes', 'mail', $count('unread'), 'alert'),
                 $item('revisar.php', 'Revisar', 'shield', $count('review')),
+            ]],
+            ['key' => 'trafico', 'label' => 'Tráfico', 'items' => [
+                $item('messages.php', 'Bandeja', 'mail', $count('unread'), 'alert'),
                 $item('analytics.php', 'Analítica', 'chart'),
             ]],
         ];
     }
     if ($space === SPACE_PHISHLAB) {
         return [
-            ['label' => '', 'items' => [
+            ['key' => 'resumen', 'label' => 'Resumen', 'items' => [
                 $item('analytics.php', 'Hoy', 'grid'),
+            ]],
+            ['key' => 'gestion', 'label' => 'Gestión', 'items' => [
                 $item('lab-users.php', 'Usuarios', 'users', $count('lab_users')),
             ]],
         ];
     }
     // app:<slug>
     return [
-        ['label' => '', 'items' => [
+        ['key' => 'resumen', 'label' => 'Resumen', 'items' => [
             $item('analytics.php', 'Hoy', 'grid'),
         ]],
     ];
+}
+
+/**
+ * Clave de la zona del menu (resumen|trafico|contenido|sistema|gestion) que
+ * contiene $page en $space. Las paginas de edicion usan la zona de su listado.
+ * Pagina desconocida -> null.
+ */
+function zone_for_page(string $space, string $page): ?string
+{
+    $page = [
+        'post-edit.php'    => 'posts.php',
+        'project-edit.php' => 'projects.php',
+        'cert-edit.php'    => 'certifications.php',
+        'app-edit.php'     => 'apps.php',
+    ][$page] ?? $page;
+    foreach (space_nav($space, []) as $group) {
+        foreach ($group['items'] as $it) {
+            if ($it['page'] === $page) {
+                return $group['key'];
+            }
+        }
+    }
+    return null;
 }

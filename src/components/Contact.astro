@@ -10,7 +10,6 @@ import { useTranslations } from '../i18n/utils';
 import type { Lang } from '../i18n/ui';
 import { SITE, api } from '../config';
 import Icon from './Icon.astro';
-
 interface Props {
   lang: Lang;
 }
@@ -88,11 +87,11 @@ const messages = {
           data-lang={lang}
           data-messages={JSON.stringify(messages)}
         >
-          <!-- Honeypot: oculto para humanos y lectores, presente para bots (B6).
+          <!-- Honeypot: `inert` (no enfocable ni leido por lectores), presente para bots (B6).
                Usa clases (hoja externa), no style inline, por la CSP estricta. -->
-          <div aria-hidden="true" class="absolute left-[-9999px] top-auto h-px w-px overflow-hidden">
+          <div inert class="absolute left-[-9999px] top-auto h-px w-px overflow-hidden">
             <label for="website">No rellenar</label>
-            <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" />
+            <input type="text" id="website" name="website" autocomplete="off" />
           </div>
 
           <div class="grid gap-x-4 sm:grid-cols-2">
@@ -108,9 +107,9 @@ const messages = {
                 maxlength="100"
                 autocomplete="name"
                 aria-describedby="name-error"
-                class="w-full rounded-md border border-bg-border bg-bg px-3.5 py-3 text-base text-text placeholder:text-text-faint aria-[invalid=true]:border-danger sm:text-sm"
+                class="w-full rounded-md border border-control-border bg-bg px-3.5 py-3 text-base text-text placeholder:text-text-faint aria-[invalid=true]:border-danger sm:text-sm"
               />
-              <p id="name-error" class="field-error"></p>
+              <p id="name-error" class="field-error" role="alert"></p>
             </div>
             <div>
               <label for="email" class="mb-1.5 block text-sm font-medium text-text">
@@ -124,20 +123,33 @@ const messages = {
                 maxlength="150"
                 autocomplete="email"
                 aria-describedby="email-error"
-                class="w-full rounded-md border border-bg-border bg-bg px-3.5 py-3 text-base text-text placeholder:text-text-faint aria-[invalid=true]:border-danger sm:text-sm"
+                class="w-full rounded-md border border-control-border bg-bg px-3.5 py-3 text-base text-text placeholder:text-text-faint aria-[invalid=true]:border-danger sm:text-sm"
               />
-              <p id="email-error" class="field-error"></p>
+              <p id="email-error" class="field-error" role="alert"></p>
             </div>
           </div>
 
           <div class="mt-1">
+            <label for="reason" class="mb-1.5 block text-sm font-medium text-text">{t('contact.reason')}</label>
+            <select
+              id="reason"
+              name="reason"
+              class="min-h-11 w-full rounded-md border border-control-border bg-bg px-3.5 py-3 text-base text-text sm:text-sm"
+            >
+              <option value="job">{t('contact.reason.job')}</option>
+              <option value="project">{t('contact.reason.project')}</option>
+              <option value="other" selected>{t('contact.reason.other')}</option>
+            </select>
+          </div>
+
+          <div class="mt-4">
             <label for="subject" class="mb-1.5 block text-sm font-medium text-text">{t('contact.subject')}</label>
             <input
               type="text"
               id="subject"
               name="subject"
               maxlength="150"
-              class="w-full rounded-md border border-bg-border bg-bg px-3.5 py-3 text-base text-text placeholder:text-text-faint aria-[invalid=true]:border-danger sm:text-sm"
+              class="w-full rounded-md border border-control-border bg-bg px-3.5 py-3 text-base text-text placeholder:text-text-faint aria-[invalid=true]:border-danger sm:text-sm"
             />
           </div>
 
@@ -152,9 +164,9 @@ const messages = {
               rows="5"
               maxlength="3000"
               aria-describedby="message-error"
-              class="w-full rounded-md border border-bg-border bg-bg px-3.5 py-3 text-base text-text placeholder:text-text-faint aria-[invalid=true]:border-danger sm:text-sm resize-y"
+              class="w-full rounded-md border border-control-border bg-bg px-3.5 py-3 text-base text-text placeholder:text-text-faint aria-[invalid=true]:border-danger sm:text-sm resize-y"
             ></textarea>
-            <p id="message-error" class="field-error"></p>
+            <p id="message-error" class="field-error" role="alert"></p>
           </div>
 
           {
@@ -162,6 +174,13 @@ const messages = {
               <div class="cf-turnstile mt-2" data-sitekey={turnstileKey} data-theme="auto" />
             )
           }
+
+          <noscript>
+            <p class="mt-4 text-sm text-text">
+              {t('contact.noscript')}
+              <a href={`mailto:${SITE.social.email}`} class="font-medium text-accent underline underline-offset-4">{SITE.social.email}</a>
+            </p>
+          </noscript>
 
           <button type="submit" id="contact-submit" class="btn-primary mt-4 min-h-11 w-full">
             <span id="contact-submit-text">{t('contact.send')}</span>
@@ -177,6 +196,7 @@ const messages = {
 <script>
   import { getSettings, captchaPending } from '../scripts/shared';
   import { loadTurnstileOnDemand } from '../scripts/turnstile';
+  import { applyReason } from '../scripts/contactReason';
 
   // Turnstile se carga bajo demanda (ver scripts/turnstile.ts). Su dominio ya
   // esta en la CSP de astro.config.mjs (ver CLOUDFLARE.md).
@@ -286,7 +306,7 @@ const messages = {
       const payload = {
         name: data.name.trim(),
         email: data.email.trim(),
-        subject: (data.subject || '').trim(),
+        subject: applyReason((data.subject || '').trim(), String(data.reason || 'other')),
         message: data.message.trim(),
         turnstileToken: data['cf-turnstile-response'] || '',
         // Idioma de la pagina: sale en el email de aviso (es/en/ca).

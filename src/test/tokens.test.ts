@@ -113,6 +113,11 @@ describe.each(themes)('contraste WCAG (%s)', (_name, t) => {
     expect(contrast(t['--on-mark'], t['--mark'])).toBeGreaterThanOrEqual(7);
   });
 
+  // WCAG 1.4.11: el borde de inputs/select/textarea y de .palette-input.
+  it.each(['--bg', '--bg-card'])('--control-border sobre %s >= 3:1', (bg) => {
+    expect(contrast(t['--control-border'], t[bg])).toBeGreaterThanOrEqual(3);
+  });
+
   // El indicador de foco es el anillo --text (global.css :focus-visible); el
   // halo --mark es refuerzo y en claro no llega a 3:1 sobre el papel.
   it.each(['--bg', '--bg-card'])('anillo de foco (--text) sobre %s >= 3:1', (bg) => {

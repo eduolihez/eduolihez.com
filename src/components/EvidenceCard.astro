@@ -12,7 +12,7 @@ import { useTranslations, pick } from '../i18n/utils';
 import type { Lang } from '../i18n/ui';
 import { SITE, evidence } from '../config';
 import { experiences } from '../data/experience';
-import { linkAttrs, evidenceAnchor } from '../scripts/evidence';
+import { linkAttrs, evidenceAnchor, sourceType } from '../scripts/evidence';
 
 interface Props {
   lang: Lang;
@@ -52,7 +52,8 @@ const current = experiences.find((e) => e.current) ?? experiences[0];
     {
       evidence.map((e) => {
         const attrs = linkAttrs(e.href);
-        const isPdf = !attrs.external && /\.pdf$/i.test(e.href);
+        const source = sourceType(e.href);
+        const hint = attrs.external ? t('hero.evidence.newTab') : source === 'PDF' ? t('hero.evidence.pdf') : '';
         return (
           <li id={evidenceAnchor(e.id)} class="ev-row">
             <a href={`#${evidenceAnchor(e.id)}`} class="ev-id" data-evidence-copy={e.id}>
@@ -60,13 +61,18 @@ const current = experiences.find((e) => e.current) ?? experiences[0];
             </a>
             <span class="ev-text">
               <span class="ev-label">{e.label}</span>
-              {e.year && <span class="ev-year">{e.year}</span>}
+              {(e.year || source) && (
+                <span class="ev-year">{[e.year, source].filter(Boolean).join(' · ')}</span>
+              )}
             </span>
-            <a href={e.href} target={attrs.target} rel={attrs.rel} class="ev-verify">
+            <a
+              href={e.href}
+              target={attrs.target}
+              rel={attrs.rel}
+              class="ev-verify"
+              aria-label={`${t('hero.evidence.verify')} ${e.label} ${hint}`.trim()}
+            >
               {t('hero.evidence.verify')}
-              <span class="sr-only">
-                {e.label} {attrs.external ? t('hero.evidence.newTab') : isPdf ? t('hero.evidence.pdf') : ''}
-              </span>
             </a>
           </li>
         );

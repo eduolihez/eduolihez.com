@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { linkAttrs, evidenceAnchor, permalink, initEvidenceCopy } from './evidence';
+import { sourceType, linkAttrs, evidenceAnchor, permalink, initEvidenceCopy } from './evidence';
 
 describe('linkAttrs()', () => {
   it('externo https: pestana nueva con noopener noreferrer', () => {
@@ -90,5 +90,20 @@ describe('initEvidenceCopy()', () => {
   it('usa document y navigator.clipboard por defecto', () => {
     setup();
     expect(initEvidenceCopy()).toBe(2);
+  });
+});
+
+describe('sourceType()', () => {
+  it('Credly para credly.com (https)', () => {
+    expect(sourceType('https://www.credly.com/badges/abc')).toBe('Credly');
+  });
+  it('PDF para archivos .pdf locales o remotos', () => {
+    expect(sourceType('/certificaciones/THM-R3JSJHVXSI.pdf')).toBe('PDF');
+    expect(sourceType('https://x.com/a.PDF#page=2')).toBe('PDF');
+  });
+  it('null si no es ninguna de las dos (no inventa tipo)', () => {
+    expect(sourceType('https://example.com/x')).toBeNull();
+    expect(sourceType('http://www.credly.com/x')).toBeNull();
+    expect(sourceType('')).toBeNull();
   });
 });

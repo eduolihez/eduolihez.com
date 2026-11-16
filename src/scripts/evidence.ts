@@ -23,6 +23,13 @@ export function linkAttrs(href: string): LinkAttrs {
   return { external: false };
 }
 
+/** Tipo de fuente que ve el visitante: Credly (insignia) o PDF (archivo). Otra cosa: null. */
+export function sourceType(href: string): 'Credly' | 'PDF' | null {
+  if (/^https:\/\/([a-z0-9-]+\.)*credly\.com\//i.test(href)) return 'Credly';
+  if (/\.pdf([?#]|$)/i.test(href)) return 'PDF';
+  return null;
+}
+
 /** Id del ancla de una evidencia: "E-01" -> "e-01". */
 export function evidenceAnchor(id: string): string {
   return id.toLowerCase();

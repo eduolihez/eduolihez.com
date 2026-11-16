@@ -15,9 +15,8 @@ import type { Lang } from '../i18n/ui';
 import { api } from '../config';
 import { getImage } from 'astro:assets';
 import { buildLogoMap, fetchCertificationSummaries } from '../lib/certifications';
-import { safeUrl } from '../scripts/shared';
 import StatusPanel from './StatusPanel.astro';
-import Icon from './Icon.astro';
+import CertRow from './CertRow.astro';
 
 interface Props {
   lang: Lang;
@@ -39,6 +38,10 @@ const logoMap = await buildLogoMap(ssrCerts, async (src) => {
   const img = await getImage({ src, inferSize: true, width: LOGO_WIDTH, format: 'webp' });
   return img.src;
 });
+
+// Destacadas visibles (= DEFAULT_LIMIT de scripts/certifications.ts); el resto va
+// en <details> pero SIEMPRE en el HTML estatico (SEO).
+const FEATURED = 8;
 
 const pick = <T,>(es: T, ca: T, en: T): T => (lang === 'es' ? es : lang === 'ca' ? ca : en);
 
@@ -91,7 +94,7 @@ const labels = {
           type="search"
           id="certs-search"
           aria-label={pick('Buscar certificación', 'Cercar certificació', 'Search certification')}
-          class="min-h-11 w-full rounded-md border border-bg-border bg-bg-card py-2 pl-9 pr-3 text-sm text-text placeholder-text-muted transition-colors"
+          class="min-h-11 w-full rounded-md border border-control-border bg-bg-card py-2 pl-9 pr-3 text-sm text-text placeholder-text-muted transition-colors"
           placeholder={pick(
             'Buscar certificación o emisor...',
             'Cercar certificació o emissor...',
@@ -132,32 +135,17 @@ const labels = {
         data-labels={JSON.stringify(labels)}
         data-logos={JSON.stringify(logoMap)}
       >
-        {ssrCerts.slice(0, 8).map((c) => {
-          const logo = safeUrl(c.logo_url);
-          const link = safeUrl(c.credential_url);
-          const Tag = link ? 'a' : 'div';
-          return (
-            <Tag
-              href={link || undefined}
-              target={link ? '_blank' : undefined}
-              rel={link ? 'noopener noreferrer' : undefined}
-              class="cert-row"
-            >
-              <span class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-sm border border-bg-border bg-bg-soft">
-                {logo ? (
-                  <img src={logoMap[logo] ?? logo} alt="" width="40" height="40" loading="lazy" decoding="async" class="h-full w-full object-contain p-1" />
-                ) : (
-                  <Icon name="award" class="h-5 w-5 text-text-faint" />
-                )}
-              </span>
-              <span class="min-w-0">
-                <span class="cert-name block truncate text-sm font-semibold text-text-title">{c.name}</span>
-                <span class="block truncate text-xs text-text-muted">{c.issuer}</span>
-              </span>
-              <span class="cert-year">{c.issue_date}</span>
-            </Tag>
-          );
-        })}
+        {ssrCerts.slice(0, FEATURED).map((c) => <CertRow cert={c} logoMap={logoMap} />)}
+        {
+          ssrCerts.length > FEATURED && (
+            <details class="certs-more">
+              <summary class="certs-more-summary">
+                {pick('Ver todas', 'Veure-les totes', 'Show all')} ({ssrCerts.length})
+              </summary>
+              {ssrCerts.slice(FEATURED).map((c) => <CertRow cert={c} logoMap={logoMap} />)}
+            </details>
+          )
+        }
       </div>
     </div>
 

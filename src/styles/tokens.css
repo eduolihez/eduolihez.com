@@ -23,6 +23,7 @@
   --bg-card: #ffffff;
   --bg-border: #d5dbe4;
   --bg-border-hover: #b9c2cf;
+  --control-border: #74829a;
 
   --text: #101828;
   --text-title: #0a1020;
@@ -67,6 +68,7 @@
   --bg-card: #111a2c;
   --bg-border: #1e2a40;
   --bg-border-hover: #2c3a55;
+  --control-border: #61728f;
 
   --text: #e6ebf3;
   --text-title: #f3f6fa;
@@ -115,6 +117,7 @@
     --bg-card: #111a2c;
     --bg-border: #1e2a40;
     --bg-border-hover: #2c3a55;
+    --control-border: #61728f;
 
     --text: #e6ebf3;
     --text-title: #f3f6fa;

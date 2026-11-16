@@ -1,0 +1,39 @@
+---
+/**
+ * <CertRow /> - Fila estatica de una certificacion (insignia, nombre + emisor,
+ * ano). Mismo marcado que makeCertRow() de src/scripts/certifications.ts: es
+ * lo que ven buscadores y visitantes sin JS hasta que initCerts() la repinta.
+ */
+import { safeUrl } from '../scripts/shared';
+import type { CertificationSummary } from '../lib/certifications';
+import Icon from './Icon.astro';
+
+interface Props {
+  cert: CertificationSummary;
+  logoMap: Record<string, string>;
+}
+const { cert: c, logoMap } = Astro.props;
+const logo = safeUrl(c.logo_url);
+const link = safeUrl(c.credential_url);
+const Tag = link ? 'a' : 'div';
+---
+
+<Tag
+  href={link || undefined}
+  target={link ? '_blank' : undefined}
+  rel={link ? 'noopener noreferrer' : undefined}
+  class="cert-row"
+>
+  <span class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-sm border border-bg-border bg-bg-soft">
+    {logo ? (
+      <img src={logoMap[logo] ?? logo} alt="" width="40" height="40" loading="lazy" decoding="async" class="h-full w-full object-contain p-1" />
+    ) : (
+      <Icon name="award" class="h-5 w-5 text-text-faint" />
+    )}
+  </span>
+  <span class="min-w-0">
+    <span class="cert-name block truncate text-sm font-semibold text-text-title">{c.name}</span>
+    <span class="block truncate text-xs text-text-muted">{c.issuer}</span>
+  </span>
+  <span class="cert-year">{c.issue_date}</span>
+</Tag>

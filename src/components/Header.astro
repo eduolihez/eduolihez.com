@@ -64,7 +64,7 @@ const flagSvgs = {
 
   <nav
     class="container-page flex h-16 items-center justify-between lg:h-14"
-    aria-label="Principal"
+    aria-label={t('nav.main')}
   >
     <a
       href={base}
@@ -119,13 +119,12 @@ const flagSvgs = {
         <Icon name="sun" class="theme-icon-sun h-4 w-4" />
       </button>
 
-      <!-- Selector de idioma (dropdown) -->
+      <!-- Selector de idioma: disclosure (boton aria-expanded + lista de enlaces normales). -->
       <div class="relative">
         <button
           id="lang-toggle"
           type="button"
           class="bar-btn inline-flex gap-2 px-2.5 py-1.5 font-mono text-xs font-medium"
-          aria-haspopup="true"
           aria-expanded="false"
           aria-controls="lang-menu"
           aria-label={`${t('nav.language')}: ${lang.toUpperCase()}`}
@@ -139,14 +138,15 @@ const flagSvgs = {
         <ul
           id="lang-menu"
           class="absolute right-0 mt-2 hidden min-w-[10rem] rounded-md border border-bg-border bg-bg-card p-1 shadow-xl"
-          role="menu"
         >
           {
             langLinks.map((l) => (
-              <li role="none">
+              <li>
                 <a
-                  role="menuitem"
                   href={l.href}
+                  hreflang={l.code}
+                  lang={l.code}
+                  aria-current={l.code === lang ? 'true' : undefined}
                   class={`flex min-h-11 items-center rounded-sm px-3 py-2 text-sm transition hover:bg-bg-soft ${
                     l.code === lang ? 'text-accent' : 'text-text-muted hover:text-text'
                   }`}
@@ -179,6 +179,7 @@ const flagSvgs = {
 
   <!-- Menu movil -->
   <div id="mobile-menu" class="hidden max-h-[calc(100dvh-4rem)] overflow-y-auto border-t border-bg-border bg-bg lg:hidden">
+    <nav aria-label={t('nav.mobile')}>
     <ul class="container-page space-y-1 p-1 py-4">
       {
         nav.map((item) => (
@@ -193,6 +194,7 @@ const flagSvgs = {
         ))
       }
     </ul>
+    </nav>
   </div>
 </header>
 

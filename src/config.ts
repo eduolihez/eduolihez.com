@@ -242,6 +242,7 @@ export const evidence: Evidence[] = [
     kind: 'credential',
     label: 'Fortinet NSE',
     href: 'https://www.credly.com/users/eduolihez',
+    year: '2026',
   },
   {
     id: 'E-03',
@@ -255,6 +256,7 @@ export const evidence: Evidence[] = [
     kind: 'file',
     label: 'TryHackMe Pre-Security',
     href: '/certificaciones/THM-R3JSJHVXSI.pdf',
+    year: '2023',
   },
 ];
 

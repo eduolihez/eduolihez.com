@@ -45,11 +45,14 @@ function chart_tick_step(int $columns, int $maxTicks = 8): int
  * Texto alternativo de un grafico de barras (role="img"): total y, si lo hay,
  * el mejor tramo. $best = ['label' => ..., 'c' => int] o null.
  */
-function chart_aria_label(string $title, int $total, ?array $best): string
+function chart_aria_label(string $title, int $total, ?array $best, ?int $prevTotal = null): string
 {
     $txt = $title . ': ' . number_format($total, 0, ',', '.') . ' visitas en total';
     if ($best !== null && (int) $best['c'] > 0) {
         $txt .= '; mejor: ' . $best['label'] . ' (' . number_format((int) $best['c'], 0, ',', '.') . ')';
+    }
+    if ($prevTotal !== null) {
+        $txt .= '; periodo anterior: ' . number_format($prevTotal, 0, ',', '.') . ' visitas';
     }
     return $txt . '.';
 }
@@ -117,4 +120,91 @@ function not_found_path_cell(string $path, string $space): string
     }
     return '<td class="path-cell">' . $code
         . ' <button type="button" class="btn ghost sm" data-copy="#' . $id . '" aria-label="Copiar ruta ' . e($path) . '">Copiar</button></td>';
+}
+
+/** Tasa de rebote en % (0-100, redondeada); null sin sesiones (evita dividir por cero). */
+function bounce_rate(int $bounced, int $sessions): ?float
+{
+    return $sessions > 0 ? round(($bounced / $sessions) * 100) : null;
+}
+
+/**
+ * Variacion porcentual de una metrica frente al periodo anterior, con el
+ * mismo marcado que delta_badge(). $lowerIsBetter (rebote): bajar se pinta
+ * como mejora (clase up) y subir como empeoramiento (down). Sin valor previo
+ * (null o 0: no hay base para un %) devuelve ''.
+ */
+function metric_delta_badge(?float $now, ?float $before, bool $lowerIsBetter = false): string
+{
+    if ($now === null || $before === null || $before == 0.0) {
+        return '';
+    }
+    $pct = (int) round((($now - $before) / $before) * 100);
+    $good = $lowerIsBetter ? $pct < 0 : $pct > 0;
+    $cls = $pct === 0 ? 'flat' : ($good ? 'up' : 'down');
+    return '<span class="delta ' . $cls . '">' . ($pct > 0 ? '+' : '') . $pct . '%</span>';
+}
+
+/** Rangos de mas de 60 dias se agregan por semanas en el grafico. */
+function chart_uses_weeks(int $days): bool
+{
+    return $days > 60;
+}
+
+/**
+ * Serie del grafico a partir de filas SQL ya agrupadas. $keys: claves de los
+ * tramos en orden (fechas Y-m-d o indices de semana); $labels: etiqueta corta
+ * de cada clave. $rows: filas ['k','c','u']; $prevRows: ['k','c'] del periodo
+ * anterior ya desplazadas a la clave equivalente. Huecos -> 0.
+ * Devuelve [['k','label','c','u','p'], ...].
+ */
+function build_chart_series(array $keys, array $labels, array $rows, array $prevRows): array
+{
+    $cur = $prev = [];
+    foreach ($rows as $r) {
+        $cur[(string) $r['k']] = ['c' => (int) $r['c'], 'u' => (int) ($r['u'] ?? 0)];
+    }
+    foreach ($prevRows as $r) {
+        $prev[(string) $r['k']] = (int) $r['c'];
+    }
+    $out = [];
+    foreach ($keys as $i => $k) {
+        $k = (string) $k;
+        $out[] = [
+            'k'     => $k,
+            'label' => (string) ($labels[$i] ?? $k),
+            'c'     => $cur[$k]['c'] ?? 0,
+            'u'     => $cur[$k]['u'] ?? 0,
+            'p'     => $prev[$k] ?? 0,
+        ];
+    }
+    return $out;
+}
+
+/**
+ * Claves y etiquetas de los tramos semanales de un rango de $days dias,
+ * del mas antiguo al actual. Semana w = dias atras FLOOR(DATEDIFF/7); la
+ * etiqueta es el primer dia del tramo (d/m) relativo a $today (Y-m-d).
+ * @return array{0: list<int>, 1: list<string>}
+ */
+function week_buckets(int $days, string $today): array
+{
+    $n = max(1, (int) ceil($days / 7));
+    $base = strtotime($today);
+    $keys = $labels = [];
+    for ($w = $n - 1; $w >= 0; $w--) {
+        $keys[] = $w;
+        $labels[] = date('d/m', strtotime('-' . ($w * 7 + 6) . ' day', $base));
+    }
+    return [$keys, $labels];
+}
+
+/** Escala del grafico: maximo entre periodo actual y anterior (minimo 1). */
+function chart_series_max(array $series): int
+{
+    $max = 1;
+    foreach ($series as $r) {
+        $max = max($max, (int) $r['c'], (int) $r['p']);
+    }
+    return $max;
 }

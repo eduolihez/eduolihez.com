@@ -1150,3 +1150,7 @@
 .section-nav a[aria-current="true"]:focus-visible { outline-color: var(--accent); }
 
 .path-cell { word-break: break-all; }
+
+/* Grafico diario/semanal: periodo anterior como linea discontinua superpuesta. */
+.chart .bar-stack { position: relative; width: 100%; display: flex; align-items: flex-end; }
+.chart .bar-prev { position: absolute; left: 0; right: 0; bottom: 0; border-top: 2px dashed var(--faint); pointer-events: none; z-index: 1; }

@@ -44,6 +44,7 @@ if ($isEdit) {
 }
 
 $errors = [];
+$fieldErr = []; // mismo texto que $errors, indexado por campo (solo presentacion)
 $success = false;
 
 // --- Guardar (POST) ---
@@ -85,16 +86,16 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
         $p['slug'] = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $p['slug']), '-'));
     }
 
-    if ($p['title'] === '') $errors[] = 'El título es obligatorio.';
-    if ($p['slug'] === '')  $errors[] = 'El slug (enlace amigable) es obligatorio.';
-    if ($p['summary'] === '') $errors[] = 'El resumen (meta descripción) es obligatorio.';
-    if ($p['content'] === '') $errors[] = 'El contenido del artículo es obligatorio.';
+    if ($p['title'] === '') $errors[] = $fieldErr['title'] = 'El título es obligatorio.';
+    if ($p['slug'] === '')  $errors[] = $fieldErr['slug'] = 'El slug (enlace amigable) es obligatorio.';
+    if ($p['summary'] === '') $errors[] = $fieldErr['summary'] = 'El resumen (meta descripción) es obligatorio.';
+    if ($p['content'] === '') $errors[] = $fieldErr['content'] = 'El contenido del artículo es obligatorio.';
 
     // Validar slug único
     $dup = db()->prepare('SELECT COUNT(*) FROM posts WHERE slug = ? AND id != ?');
     $dup->execute([$p['slug'], $id]);
     if ((int) $dup->fetchColumn() > 0) {
-        $errors[] = 'El slug ya está en uso por otro artículo. Modifica el campo Enlace.';
+        $errors[] = $fieldErr['slug'] = 'El slug ya está en uso por otro artículo. Modifica el campo Enlace.';
     }
 
     // Gestionar eliminación de la imagen de portada
@@ -114,7 +115,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
             $p['cover_url'] = $uploaded;
         }
     } catch (Throwable $ex) {
-        $errors[] = 'Error de imagen: ' . $ex->getMessage();
+        $errors[] = $fieldErr['cover_file'] = 'Error de imagen: ' . $ex->getMessage();
     }
 
     if (!$errors) {
@@ -159,106 +160,129 @@ admin_header($isEdit ? 'Editar Artículo' : 'Nuevo Artículo', 'posts.php');
 ?>
 <?php page_header($isEdit ? 'Editar Artículo' : 'Nuevo Artículo del Blog', '', '<a class="btn ghost" href="posts.php">Volver al listado</a>'); ?>
 
+<?php
+/** aria-invalid + aria-describedby de un campo (ayuda y, si falla, error). */
+$fa = static function (string $name, bool $hint = false) use (&$fieldErr): string {
+    $ids = [];
+    if ($hint) $ids[] = $name . '-hint';
+    if (isset($fieldErr[$name])) $ids[] = $name . '-error';
+    return ($ids ? ' aria-describedby="' . implode(' ', $ids) . '"' : '')
+         . (isset($fieldErr[$name]) ? ' aria-invalid="true"' : '');
+};
+/** Mensaje de error del servidor junto al campo. */
+$fm = static function (string $name) use (&$fieldErr): string {
+    return isset($fieldErr[$name])
+        ? '<p class="field-error" id="' . $name . '-error">' . e($fieldErr[$name]) . '</p>'
+        : '';
+};
+?>
 <?php if ($errors): ?>
-  <div class="flash err">
-    <p style="margin:0 0 .4rem; font-weight:700;">No se pudo guardar por los siguientes errores:</p>
-    <ul style="margin:0; padding-left:1.2rem;">
+  <div class="flash err" role="alert">
+    <p class="flash-title">No se pudo guardar por los siguientes errores:</p>
+    <ul class="flash-list">
       <?php foreach ($errors as $e): ?><li><?= e($e) ?></li><?php endforeach; ?>
     </ul>
   </div>
 <?php endif; ?>
 
-<form method="post" enctype="multipart/form-data" class="card" autocomplete="off" style="max-width:900px; margin:0 auto;">
+<form method="post" enctype="multipart/form-data" class="editor-form" autocomplete="off" id="post-form">
   <?= csrf_field() ?>
 
-  <div class="row2">
-    <div>
-      <label for="title">Título del artículo</label>
-      <input type="text" id="title" name="title" value="<?= e($p['title']) ?>" placeholder="Ej. Detección de ransomware en entornos Windows" required autofocus>
-    </div>
-    <div>
-      <label for="slug">Enlace (Slug) <span class="faint">(auto-generado)</span></label>
-      <input type="text" id="slug" name="slug" value="<?= e($p['slug']) ?>" placeholder="ej-deteccion-ransomware-windows" required<?= $isEdit ? '' : ' data-slug-auto' ?>>
-    </div>
-  </div>
+  <fieldset class="card form-section">
+    <legend>Contenido</legend>
+    <label for="title">Título del artículo</label>
+    <input type="text" id="title" name="title" value="<?= e($p['title']) ?>" placeholder="Ej. Detección de ransomware en entornos Windows" required autofocus<?= $fa('title') ?>>
+    <?= $fm('title') ?>
 
-  <div class="row2">
-    <div>
-      <label for="lang">Idioma del artículo</label>
-      <select id="lang" name="lang">
-        <option value="es" <?= $p['lang'] === 'es' ? 'selected' : '' ?>>Español (ES)</option>
-        <option value="en" <?= $p['lang'] === 'en' ? 'selected' : '' ?>>Inglés (EN)</option>
-        <option value="ca" <?= $p['lang'] === 'ca' ? 'selected' : '' ?>>Catalán (CA)</option>
-      </select>
-    </div>
-    <div>
-      <label for="visible">Estado de publicación</label>
-      <div style="padding-top:0.75rem;">
-        <label class="checkline" style="margin:0;">
-          <input type="checkbox" id="visible" name="visible" value="1" <?= ((int) $p['visible']) === 1 ? 'checked' : '' ?>>
-          <span><strong>Publicado en la web</strong> (si se desmarca, quedará como borrador y oculto)</span>
-        </label>
+    <label for="summary">Resumen / Extracto <span class="faint">(meta descripción SEO, máx. 250 caracteres)</span></label>
+    <textarea id="summary" name="summary" maxlength="250" placeholder="Escribe un breve resumen atractivo para Google y las listas de artículos..." required class="summary-input"<?= $fa('summary') ?>><?= e($p['summary']) ?></textarea>
+    <?= $fm('summary') ?>
+
+    <label for="content">Contenido <span class="faint">(puedes usar HTML o texto plano)</span></label>
+    <textarea id="content" name="content" placeholder="Escribe el cuerpo del artículo..." required class="editor-body"<?= $fa('content') ?>><?= e($p['content']) ?></textarea>
+    <?= $fm('content') ?>
+  </fieldset>
+
+  <fieldset class="card form-section">
+    <legend>Metadatos</legend>
+    <div class="row2">
+      <div>
+        <label for="slug">Enlace (slug) <span class="faint">(se genera solo)</span></label>
+        <input type="text" id="slug" name="slug" value="<?= e($p['slug']) ?>" placeholder="ej-deteccion-ransomware-windows" required<?= $isEdit ? '' : ' data-slug-auto' ?><?= $fa('slug') ?>>
+        <?= $fm('slug') ?>
+      </div>
+      <div>
+        <label for="lang">Idioma del artículo</label>
+        <select id="lang" name="lang">
+          <option value="es" <?= $p['lang'] === 'es' ? 'selected' : '' ?>>Español (ES)</option>
+          <option value="en" <?= $p['lang'] === 'en' ? 'selected' : '' ?>>Inglés (EN)</option>
+          <option value="ca" <?= $p['lang'] === 'ca' ? 'selected' : '' ?>>Catalán (CA)</option>
+        </select>
       </div>
     </div>
-  </div>
 
-  <div class="row2">
-    <div>
-      <label for="category">Categoría <span class="faint">(para el filtro del listado)</span></label>
-      <select id="category" name="category">
-        <option value="">Sin categoría</option>
-        <?php foreach (POST_CATEGORIES as $key => $label): ?>
-          <option value="<?= e($key) ?>" <?= $p['category'] === $key ? 'selected' : '' ?>><?= e($label) ?></option>
-        <?php endforeach; ?>
-      </select>
-      <p class="hint">Una sola, a diferencia de las etiquetas: es lo que ve el visitante
-         para filtrar <a href="/blog/" target="_blank">/blog/</a>. Con muchas etiquetas
-         libres el filtro se llenaba de botones; la categoría se queda en un puñado fijo.</p>
+    <div class="row2">
+      <div>
+        <label for="category">Categoría <span class="faint">(para el filtro del listado)</span></label>
+        <select id="category" name="category" aria-describedby="category-hint">
+          <option value="">Sin categoría</option>
+          <?php foreach (POST_CATEGORIES as $key => $label): ?>
+            <option value="<?= e($key) ?>" <?= $p['category'] === $key ? 'selected' : '' ?>><?= e($label) ?></option>
+          <?php endforeach; ?>
+        </select>
+        <p class="hint" id="category-hint">Una sola, a diferencia de las etiquetas: es lo que ve el visitante
+           para filtrar <a href="/blog/" target="_blank">/blog/</a>. Con muchas etiquetas
+           libres el filtro se llenaba de botones; la categoría se queda en un puñado fijo.</p>
+      </div>
+      <div>
+        <label for="tags">Etiquetas <span class="faint">(separadas por comas)</span></label>
+        <input type="text" id="tags" name="tags" value="<?= e($p['tags']) ?>"
+               placeholder="python, soc, automatizacion" maxlength="255" aria-describedby="tags-hint">
+        <p class="hint" id="tags-hint">Se guardan en minúsculas y sin repetir. Salen en la tarjeta del
+           artículo y como <code>keywords</code> en los datos estructurados. No se usan
+           para filtrar el listado.</p>
+      </div>
     </div>
-    <div>
-      <label for="tags">Etiquetas <span class="faint">(separadas por comas)</span></label>
-      <input type="text" id="tags" name="tags" value="<?= e($p['tags']) ?>"
-             placeholder="python, soc, automatizacion" maxlength="255">
-      <p class="hint">Se guardan en minúsculas y sin repetir. Salen en la tarjeta del
-         artículo y como <code>keywords</code> en los datos estructurados. No se usan
-         para filtrar el listado.</p>
+
+    <label for="cover_file">Imagen de portada</label>
+    <div class="soft-box cover-box">
+      <div>
+        <?php if (!empty($p['cover_url'])): ?>
+          <img id="cover-preview" src="<?= e($p['cover_url']) ?>" alt="Portada" class="cover-thumb">
+        <?php else: ?>
+          <div id="cover-placeholder" class="cover-thumb cover-empty">Sin portada</div>
+        <?php endif; ?>
+      </div>
+      <div>
+        <input type="file" name="cover_file" id="cover_file" accept="image/*" aria-describedby="cover_file-hint<?= isset($fieldErr['cover_file']) ? ' cover_file-error' : '' ?>"<?= isset($fieldErr['cover_file']) ? ' aria-invalid="true"' : '' ?>>
+        <p class="hint" id="cover_file-hint">Máximo 3 MB. Se aceptan formatos JPG, PNG, WEBP o GIF.</p>
+        <?= $fm('cover_file') ?>
+        <?php if (!empty($p['cover_url'])): ?>
+          <label class="checkline cover-delete">
+            <input type="checkbox" name="delete_cover" value="1">
+            <span>Eliminar imagen actual al guardar</span>
+          </label>
+        <?php endif; ?>
+      </div>
     </div>
-  </div>
+  </fieldset>
 
-  <label for="published_at">Fecha de publicación</label>
-  <input type="datetime-local" id="published_at" name="published_at"
-         value="<?= e($p['published_at']) ?>" style="max-width:300px;">
-  <p class="hint">Es la fecha que se muestra y la que ve Google. Puedes fecharla
-     hacia atrás; no tiene por qué coincidir con cuándo creaste el borrador.</p>
+  <fieldset class="card form-section">
+    <legend>Publicación</legend>
+    <label class="checkline" for="visible">
+      <input type="checkbox" id="visible" name="visible" value="1" <?= ((int) $p['visible']) === 1 ? 'checked' : '' ?>>
+      <span><strong>Publicado en la web</strong> (si se desmarca, queda como borrador y oculto)</span>
+    </label>
 
-  <label for="summary">Resumen / Extracto <span class="faint">(Meta Descripción SEO - máx. 250 caracteres)</span></label>
-  <textarea id="summary" name="summary" maxlength="250" placeholder="Escribe un breve resumen atractivo para Google y las listas de artículos..." required style="min-height:70px;"><?= e($p['summary']) ?></textarea>
+    <label for="published_at">Fecha de publicación</label>
+    <input type="datetime-local" id="published_at" name="published_at"
+           value="<?= e($p['published_at']) ?>" class="date-input" aria-describedby="published_at-hint">
+    <p class="hint" id="published_at-hint">Es la fecha que se muestra y la que ve Google. Puedes fecharla
+       hacia atrás; no tiene por qué coincidir con cuándo creaste el borrador.</p>
+  </fieldset>
 
-  <label for="content">Contenido <span class="faint">(Puedes usar HTML o texto plano)</span></label>
-  <textarea id="content" name="content" placeholder="Escribe el cuerpo del artículo..." required style="min-height:350px; font-family: inherit;"><?= e($p['content']) ?></textarea>
-
-  <label>Imagen de portada</label>
-  <div class="soft-box" style="display:grid; grid-template-columns: auto minmax(0, 1fr); gap:1.5rem; align-items:center; padding:1rem; border-radius:0.5rem; border:1px solid var(--border);">
-    <div>
-      <?php if (!empty($p['cover_url'])): ?>
-        <img id="cover-preview" src="<?= e($p['cover_url']) ?>" alt="Portada" style="width:120px; height:80px; object-fit:cover; border-radius:0.375rem; border:1px solid var(--border);">
-      <?php else: ?>
-        <div id="cover-placeholder" style="width:120px; height:80px; border-radius:0.375rem; border:1px dashed var(--border); display:flex; align-items:center; justify-content:center; color:var(--faint); font-size:11px; text-align:center; padding:5px;">Sin portada</div>
-      <?php endif; ?>
-    </div>
-    <div>
-      <input type="file" name="cover_file" id="cover_file" accept="image/*">
-      <p class="hint" style="margin-bottom:0.75rem;">Máximo 3 MB. Se aceptan formatos JPG, PNG, WEBP o GIF.</p>
-      <?php if (!empty($p['cover_url'])): ?>
-        <label class="checkline" style="margin:0; display:inline-flex; align-items:center;">
-          <input type="checkbox" name="delete_cover" value="1">
-          <span style="color:var(--danger); font-size:0.8rem;">Eliminar imagen actual al guardar</span>
-        </label>
-      <?php endif; ?>
-    </div>
-  </div>
-
-  <div class="actions" style="margin-top:2rem; justify-content:flex-end;">
+  <div class="form-actions">
+    <span class="save-state" id="save-state" role="status" aria-live="polite"><?= $errors ? 'No guardado: corrige los errores' : 'Sin cambios' ?></span>
     <a class="btn ghost" href="posts.php">Cancelar</a>
     <button type="submit" class="btn">Guardar artículo</button>
   </div>

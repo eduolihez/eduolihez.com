@@ -179,4 +179,43 @@
       el.form.submit();
     }
   });
+
+  // --- Validacion inline accesible (T7b) -----------------------------------
+  // El aviso nativo del navegador se sustituye por un mensaje junto al campo
+  // (aria-invalid + aria-describedby); el primer campo invalido recibe el foco.
+  var invalidFocused = false;
+  document.addEventListener('invalid', function (e) {
+    var el = e.target;
+    if (!el || !el.form || el.form.hasAttribute('data-native-validation')) return;
+    e.preventDefault();
+    el.setAttribute('aria-invalid', 'true');
+    var id = (el.id || el.name || 'campo') + '-error';
+    var msg = document.getElementById(id);
+    if (!msg) {
+      msg = document.createElement('p');
+      msg.id = id;
+      msg.className = 'field-error';
+      el.insertAdjacentElement('afterend', msg);
+    }
+    msg.textContent = el.validationMessage || 'Revisa este campo.';
+    var ids = (el.getAttribute('aria-describedby') || '').split(/\s+/).filter(Boolean);
+    if (ids.indexOf(id) === -1) ids.push(id);
+    el.setAttribute('aria-describedby', ids.join(' '));
+    if (!invalidFocused) {
+      invalidFocused = true;
+      el.focus();
+      setTimeout(function () { invalidFocused = false; }, 0);
+    }
+  }, true);
+
+  function clearInvalid(e) {
+    var el = e.target;
+    if (!el || !el.getAttribute || el.getAttribute('aria-invalid') !== 'true') return;
+    if (el.validity && !el.validity.valid) return;
+    el.removeAttribute('aria-invalid');
+    var msg = document.getElementById((el.id || el.name || 'campo') + '-error');
+    if (msg) msg.remove();
+  }
+  document.addEventListener('input', clearInvalid);
+  document.addEventListener('change', clearInvalid);
 })();

@@ -135,7 +135,7 @@ show_flash();
 
 <div class="card p-0">
   <div class="scroll-x">
-    <table>
+    <table class="stack">
       <thead>
         <tr>
           <th style="width:56px;"></th>
@@ -155,7 +155,7 @@ show_flash();
         <?php endif; ?>
         <?php foreach ($rows as $i => $p): ?>
           <tr>
-            <td>
+            <td data-label="Imagen">
               <?php if (!empty($p['image_url'])): ?>
                 <img src="<?= e($p['image_url']) ?>" alt="" width="48" height="32"
                      style="width:48px; height:32px; object-fit:cover; border-radius:.3rem; border:1px solid var(--border);">
@@ -163,11 +163,11 @@ show_flash();
                 <span class="faint">—</span>
               <?php endif; ?>
             </td>
-            <td>
+            <td data-label="Título">
               <strong><?= e($p['title_es']) ?></strong>
               <div class="faint">ID <?= (int) $p['id'] ?></div>
             </td>
-            <td>
+            <td data-label="Estado">
               <form method="post" class="d-inline">
                 <?= csrf_field() ?>
                 <input type="hidden" name="action" value="toggle_status">
@@ -178,35 +178,35 @@ show_flash();
                 </button>
               </form>
             </td>
-            <td>
+            <td data-label="Destacado">
               <form method="post" class="d-inline">
                 <?= csrf_field() ?>
                 <input type="hidden" name="action" value="toggle_featured">
                 <input type="hidden" name="id" value="<?= (int) $p['id'] ?>">
-                <button type="submit" class="btn icon ghost" title="Destacar / quitar destacado">
+                <button type="submit" class="btn icon ghost" title="Destacar / quitar destacado" aria-label="Destacar o quitar destacado">
                   <?= $p['featured'] ? '★' : '☆' ?>
                 </button>
               </form>
             </td>
-            <td class="faint">
+            <td data-label="Orden" class="faint">
               <div class="actions" style="gap:.2rem;">
                 <span class="mono"><?= (int) $p['sort_order'] ?></span>
                 <form method="post" class="d-inline">
                   <?= csrf_field() ?>
                   <input type="hidden" name="action" value="move_up">
                   <input type="hidden" name="id" value="<?= (int) $p['id'] ?>">
-                  <button class="btn icon ghost" type="submit" title="Subir" <?= $i === 0 ? 'disabled' : '' ?>>↑</button>
+                  <button class="btn icon ghost" type="submit" title="Subir" aria-label="Subir" <?= $i === 0 ? 'disabled' : '' ?>>↑</button>
                 </form>
                 <form method="post" class="d-inline">
                   <?= csrf_field() ?>
                   <input type="hidden" name="action" value="move_down">
                   <input type="hidden" name="id" value="<?= (int) $p['id'] ?>">
-                  <button class="btn icon ghost" type="submit" title="Bajar" <?= $i === $last ? 'disabled' : '' ?>>↓</button>
+                  <button class="btn icon ghost" type="submit" title="Bajar" aria-label="Bajar" <?= $i === $last ? 'disabled' : '' ?>>↓</button>
                 </form>
               </div>
             </td>
-            <td class="faint nowrap"><?= e(ago($p['updated_at'])) ?></td>
-            <td>
+            <td data-label="Actualizado" class="faint nowrap"><?= e(ago($p['updated_at'])) ?></td>
+            <td data-label="Acciones">
               <div class="actions justify-end">
                 <a class="btn ghost sm" href="project-edit.php?id=<?= (int) $p['id'] ?>">Editar</a>
                 <form method="post" data-confirm="¿Duplicar este proyecto?" class="d-inline">

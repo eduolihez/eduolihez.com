@@ -100,7 +100,7 @@ if ($newApiKey):
 
 <div class="card p-0">
   <div class="scroll-x">
-    <table>
+    <table class="stack">
       <thead>
         <tr>
           <th>App</th>
@@ -119,10 +119,10 @@ if ($newApiKey):
         <?php foreach ($rows as $a): ?>
           <?php $origins = json_decode((string) ($a['allowed_origins'] ?? '[]'), true) ?: []; ?>
           <tr>
-            <td><strong><?= e($a['display_name']) ?></strong></td>
-            <td class="mono faint"><?= e($a['slug']) ?></td>
-            <td><span class="pill <?= $a['has_content'] ? 'on' : '' ?>"><?= $a['has_content'] ? 'Sí' : 'Solo analítica' ?></span></td>
-            <td>
+            <td data-label="App"><strong><?= e($a['display_name']) ?></strong></td>
+            <td data-label="Slug" class="mono faint"><?= e($a['slug']) ?></td>
+            <td data-label="Contenido"><span class="pill <?= $a['has_content'] ? 'on' : '' ?>"><?= $a['has_content'] ? 'Sí' : 'Solo analítica' ?></span></td>
+            <td data-label="Clave de API">
               <?php if ($a['api_key_hash']): ?>
                 <span class="pill on">Configurada</span>
                 <?php if ($a['key_rotated_at']): ?>
@@ -132,9 +132,9 @@ if ($newApiKey):
                 <span class="pill warn">Sin generar</span>
               <?php endif; ?>
             </td>
-            <td class="faint"><?= $origins ? (string) count($origins) : '—' ?></td>
-            <td class="faint nowrap"><?= e(fdate($a['created_at'])) ?></td>
-            <td>
+            <td data-label="Orígenes" class="faint"><?= $origins ? (string) count($origins) : '—' ?></td>
+            <td data-label="Creada" class="faint nowrap"><?= e(fdate($a['created_at'])) ?></td>
+            <td data-label="Acciones">
               <div class="actions justify-end">
                 <a class="btn ghost sm" href="analytics.php?space=<?= e(urlencode(space_for_app_slug((string) $a['slug']))) ?>">Analitica</a>
                 <a class="btn ghost sm" href="app-edit.php?id=<?= (int) $a['id'] ?>">Editar</a>

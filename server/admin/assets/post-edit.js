@@ -20,7 +20,19 @@
       .replace(/-+/g, '-'); // Quitar guiones duplicados
   }
 
+  // Estado de guardado visible (#save-state): sin cambios / cambios sin guardar / guardando.
+  function initSaveState() {
+    var form = document.getElementById('post-form');
+    var out = document.getElementById('save-state');
+    if (!form || !out) return;
+    function set(state, text) { out.setAttribute('data-state', state); out.textContent = text; }
+    form.addEventListener('input', function () { set('dirty', 'Cambios sin guardar'); });
+    form.addEventListener('change', function () { set('dirty', 'Cambios sin guardar'); });
+    form.addEventListener('submit', function (e) { if (!e.defaultPrevented) set('saving', 'Guardando…'); });
+  }
+
   function init() {
+    initSaveState();
     var titleIn = document.getElementById('title');
     var slugIn = document.getElementById('slug');
     if (!titleIn || !slugIn || !slugIn.hasAttribute('data-slug-auto')) return;

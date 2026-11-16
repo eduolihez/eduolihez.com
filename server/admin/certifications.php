@@ -118,7 +118,7 @@ show_flash();
 
 <div class="card p-0">
   <div class="scroll-x">
-    <table>
+    <table class="stack">
       <thead>
         <tr>
           <th style="width:44px;"></th>
@@ -138,7 +138,7 @@ show_flash();
         <?php endif; ?>
         <?php foreach ($rows as $i => $c): ?>
           <tr>
-            <td>
+            <td data-label="Logo">
               <?php if (!empty($c['logo_url'])): ?>
                 <img src="<?= e($c['logo_url']) ?>" alt="" width="32" height="32" class="soft-box"
                      style="width:32px; height:32px; object-fit:contain; border-radius:.3rem; border:1px solid var(--border);">
@@ -146,7 +146,7 @@ show_flash();
                 <span class="faint">—</span>
               <?php endif; ?>
             </td>
-            <td>
+            <td data-label="Nombre">
               <strong><?= e($c['name']) ?></strong>
               <?php if (!empty($c['category'])): ?>
                 <div><span class="pill"><?= e($c['category']) ?></span></div>
@@ -155,9 +155,9 @@ show_flash();
                 <div class="faint" style="font-size:.75rem;">Con enlace de verificacion</div>
               <?php endif; ?>
             </td>
-            <td class="muted"><?= e($c['issuer']) ?></td>
-            <td class="faint"><?= e($c['issue_date']) ?></td>
-            <td>
+            <td data-label="Emisor" class="muted"><?= e($c['issuer']) ?></td>
+            <td data-label="Fecha" class="faint"><?= e($c['issue_date']) ?></td>
+            <td data-label="Visible">
               <form method="post" class="d-inline">
                 <?= csrf_field() ?>
                 <input type="hidden" name="action" value="toggle_visible">
@@ -167,24 +167,24 @@ show_flash();
                 </button>
               </form>
             </td>
-            <td class="faint">
+            <td data-label="Orden" class="faint">
               <div class="actions" style="gap:.2rem;">
                 <span class="mono"><?= (int) $c['sort_order'] ?></span>
                 <form method="post" class="d-inline">
                   <?= csrf_field() ?>
                   <input type="hidden" name="action" value="move_up">
                   <input type="hidden" name="id" value="<?= (int) $c['id'] ?>">
-                  <button class="btn icon ghost" type="submit" title="Subir" <?= $i === 0 ? 'disabled' : '' ?>>↑</button>
+                  <button class="btn icon ghost" type="submit" title="Subir" aria-label="Subir" <?= $i === 0 ? 'disabled' : '' ?>>↑</button>
                 </form>
                 <form method="post" class="d-inline">
                   <?= csrf_field() ?>
                   <input type="hidden" name="action" value="move_down">
                   <input type="hidden" name="id" value="<?= (int) $c['id'] ?>">
-                  <button class="btn icon ghost" type="submit" title="Bajar" <?= $i === $last ? 'disabled' : '' ?>>↓</button>
+                  <button class="btn icon ghost" type="submit" title="Bajar" aria-label="Bajar" <?= $i === $last ? 'disabled' : '' ?>>↓</button>
                 </form>
               </div>
             </td>
-            <td>
+            <td data-label="Acciones">
               <div class="actions justify-end">
                 <a class="btn ghost sm" href="cert-edit.php?id=<?= (int) $c['id'] ?>">Editar</a>
                 <form method="post" data-confirm="¿Duplicar esta certificacion?" class="d-inline">

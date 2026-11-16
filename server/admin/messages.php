@@ -356,7 +356,7 @@ show_flash();
   <?= csrf_field() ?>
   <div class="card" style="padding:.6rem 1rem; display:flex; gap:.5rem; flex-wrap:wrap; align-items:center;">
     <label style="margin:0; font-weight:400; display:flex; align-items:center; gap:.4rem;">
-      <input type="checkbox" id="check-all" style="width:auto;"> <span class="faint">Seleccionar todo</span>
+      <input type="checkbox" id="check-all" style="width:auto;"> <span class="muted">Seleccionar todo</span>
     </label>
     <span class="faint" style="margin-right:.5rem;">Acciones:</span>
     <button class="btn ghost sm" type="submit" name="action" value="read">Leido</button>
@@ -370,7 +370,7 @@ show_flash();
 
   <div class="card p-0">
     <div class="scroll-x">
-      <table>
+      <table class="stack">
         <thead>
           <tr>
             <th style="width:34px;"></th>
@@ -389,8 +389,8 @@ show_flash();
           <?php foreach ($rows as $m): ?>
             <?php $unreadRow = ((int) $m['is_read'] === 0); ?>
             <tr>
-              <td><input type="checkbox" name="ids[]" value="<?= (int) $m['id'] ?>" class="row-check" style="width:auto;"></td>
-              <td>
+              <td data-label="Seleccionar"><label class="check-hit"><input type="checkbox" name="ids[]" value="<?= (int) $m['id'] ?>" class="row-check" aria-label="Seleccionar mensaje de <?= e($m['name']) ?>" style="width:auto;"></label></td>
+              <td data-label="De">
                 <?php if ((int) $m['is_starred']): ?><span title="Destacado" style="color:var(--warn);">★</span><?php endif; ?>
                 <?php if ($unreadRow): ?><span class="pill on" style="margin-right:.3rem;">Nuevo</span><?php endif; ?>
                 <a href="messages.php?id=<?= (int) $m['id'] ?>" style="<?= $unreadRow ? 'font-weight:700;' : '' ?>">
@@ -398,14 +398,14 @@ show_flash();
                 </a>
                 <div class="faint"><?= e($m['email']) ?></div>
               </td>
-              <td class="<?= $unreadRow ? '' : 'muted' ?>">
+              <td data-label="Asunto" class="<?= $unreadRow ? '' : 'muted' ?>">
                 <a href="messages.php?id=<?= (int) $m['id'] ?>" style="color:inherit; <?= $unreadRow ? 'font-weight:600;' : '' ?>">
                   <?= e($m['subject'] !== '' ? $m['subject'] : '(sin asunto)') ?>
                 </a>
                 <?php if ((int) $m['is_archived']): ?><span class="pill off" style="margin-left:.3rem;">Archivado</span><?php endif; ?>
               </td>
-              <td class="faint nowrap"><?= e(fdate($m['created_at'])) ?><br><span style="font-size:.75rem;"><?= e(ago($m['created_at'])) ?></span></td>
-              <td>
+              <td data-label="Fecha" class="meta nowrap"><?= e(fdate($m['created_at'])) ?><br><span style="font-size:.75rem;"><?= e(ago($m['created_at'])) ?></span></td>
+              <td data-label="Acciones">
                 <div class="actions justify-end">
                   <a class="btn ghost sm" href="messages.php?id=<?= (int) $m['id'] ?>">Ver</a>
                 </div>

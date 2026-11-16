@@ -102,7 +102,7 @@ show_flash();
 
 <div class="card p-0">
   <div class="scroll-x">
-    <table>
+    <table class="stack">
       <thead>
         <tr>
           <th style="width:60px;">Portada</th>
@@ -125,7 +125,7 @@ show_flash();
         <?php endif; ?>
         <?php foreach ($rows as $c): ?>
           <tr>
-            <td>
+            <td data-label="Portada">
               <?php if (!empty($c['cover_url'])): ?>
                 <img src="<?= e($c['cover_url']) ?>" alt="" width="48" height="32" class="soft-box"
                      style="width:48px; height:32px; object-fit:cover; border-radius:.3rem; border:1px solid var(--border);">
@@ -133,26 +133,26 @@ show_flash();
                 <div class="soft-box" style="width:48px; height:32px; border-radius:.3rem; border:1px solid var(--border); display:flex; align-items:center; justify-content:center; color:var(--faint); font-size:10px; font-weight:700;">NO IMG</div>
               <?php endif; ?>
             </td>
-            <td>
+            <td data-label="Título">
               <a href="post-edit.php?id=<?= $c['id'] ?>" style="font-weight:600;">
                 <?= e($c['title']) ?>
               </a>
               <br>
               <span class="faint" style="font-size:0.75rem; display:block; max-width: 400px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-top:2px;"><?= e($c['summary']) ?></span>
             </td>
-            <td>
+            <td data-label="Categoría">
               <?php $categoryLabel = post_category_label($c['category']); ?>
               <?= $categoryLabel !== null ? '<span class="pill">' . e($categoryLabel) . '</span>' : '<span class="faint">—</span>' ?>
             </td>
-            <td>
+            <td data-label="Idioma">
               <span class="pill" style="text-transform: uppercase; font-family: 'JetBrains Mono', monospace; font-size:10px;">
                 <?= e($c['lang']) ?>
               </span>
             </td>
-            <td class="mono faint" style="font-size:12px;">
+            <td data-label="Enlace" class="mono faint" style="font-size:12px;">
               /blog/<?= e($c['slug']) ?>
             </td>
-            <td>
+            <td data-label="Estado">
               <form method="post" class="d-inline">
                 <?= csrf_field() ?>
                 <input type="hidden" name="id" value="<?= $c['id'] ?>">
@@ -162,12 +162,12 @@ show_flash();
                 </button>
               </form>
             </td>
-            <td class="nowrap faint">
+            <td data-label="Fecha" class="nowrap faint">
               <?= fdate($c['created_at'], 'd/m/Y H:i') ?>
             </td>
-            <td class="text-right">
+            <td data-label="Acciones" class="text-right">
               <div class="actions" style="justify-content:flex-end; gap: 0.35rem;">
-                <a class="btn ghost sm icon" href="post-edit.php?id=<?= $c['id'] ?>" title="Editar">
+                <a class="btn ghost sm icon" href="post-edit.php?id=<?= $c['id'] ?>" title="Editar" aria-label="Editar artículo">
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                 </a>
                 
@@ -175,7 +175,7 @@ show_flash();
                   <?= csrf_field() ?>
                   <input type="hidden" name="id" value="<?= $c['id'] ?>">
                   <input type="hidden" name="action" value="duplicate">
-                  <button type="submit" class="btn ghost sm icon" title="Duplicar">
+                  <button type="submit" class="btn ghost sm icon" title="Duplicar" aria-label="Duplicar artículo">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" /></svg>
                   </button>
                 </form>
@@ -184,7 +184,7 @@ show_flash();
                   <?= csrf_field() ?>
                   <input type="hidden" name="id" value="<?= $c['id'] ?>">
                   <input type="hidden" name="action" value="delete">
-                  <button type="submit" class="btn danger sm icon" title="Eliminar">
+                  <button type="submit" class="btn danger sm icon" title="Eliminar" aria-label="Eliminar artículo">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                   </button>
                 </form>

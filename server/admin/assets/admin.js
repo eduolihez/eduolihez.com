@@ -20,6 +20,8 @@
  *   #sidebar-open-btn / #sidebar-close-btn / #sidebar-overlay -> abren y
  *                        cierran el cajon lateral movil (clase .open en
  *                        #admin-sidebar y en el overlay).
+ *   nav.section-nav     -> marca con aria-current="true" el ancla de la
+ *                        seccion visible (IntersectionObserver).
  */
 (function () {
   'use strict';
@@ -44,10 +46,55 @@
     if (overlay) overlay.addEventListener('click', function () { toggleSidebar(false); });
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initSidebarDrawer);
-  } else {
+  // --- Indice de secciones: marca la seccion visible ------------------------
+  // Cada ancla de nav.section-nav apunta a una <section id>. La que ocupa la
+  // franja superior de la ventana (bajo la topbar y el indice sticky) lleva
+  // aria-current="true". Sin IntersectionObserver no se marca nada.
+  function initSectionSpy() {
+    var nav = document.querySelector('.section-nav');
+    if (!nav || !('IntersectionObserver' in window)) return;
+    var links = nav.querySelectorAll('a[href^="#"]');
+    var byId = {};
+    var sections = [];
+    for (var i = 0; i < links.length; i++) {
+      var id = decodeURIComponent(links[i].getAttribute('href').slice(1));
+      var section = id ? document.getElementById(id) : null;
+      if (section) {
+        byId[id] = links[i];
+        sections.push(section);
+      }
+    }
+    if (!sections.length) return;
+    var visible = {};
+    function mark() {
+      var current = null;
+      for (var j = 0; j < sections.length; j++) {
+        if (visible[sections[j].id]) { current = sections[j].id; break; }
+      }
+      if (!current) return;
+      for (var k in byId) {
+        if (k === current) byId[k].setAttribute('aria-current', 'true');
+        else byId[k].removeAttribute('aria-current');
+      }
+    }
+    var observer = new IntersectionObserver(function (entries) {
+      for (var n = 0; n < entries.length; n++) {
+        visible[entries[n].target.id] = entries[n].isIntersecting;
+      }
+      mark();
+    }, { rootMargin: '-140px 0px -55% 0px' });
+    for (var m = 0; m < sections.length; m++) observer.observe(sections[m]);
+  }
+
+  function initAll() {
     initSidebarDrawer();
+    initSectionSpy();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAll);
+  } else {
+    initAll();
   }
 
   // El interruptor de tema (#theme-toggle[data-theme-toggle]) y la paleta de

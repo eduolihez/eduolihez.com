@@ -189,6 +189,11 @@ foreach ($daily as $r) {
         $bestDay = $r;
     }
 }
+// Ayer, para el delta de "Hoy": penultimo punto de la serie diaria; con 24 h
+// la serie tiene un solo dia y se pide aparte.
+$yesterday = count($daily) >= 2
+    ? (int) $daily[count($daily) - 2]['c']
+    : q_int("SELECT COUNT(*) FROM visits WHERE $botFilter AND DATE(visited_at) = CURDATE() - INTERVAL 1 DAY");
 
 // --- Desgloses --------------------------------------------------------------
 $topPages = q_rows(
@@ -511,38 +516,56 @@ page_header(
   </div>
   <input type="hidden" name="days" value="<?= e((string) $days) ?>">
   <input type="hidden" name="space" value="<?= e(admin_space()) ?>">
-  <label class="toggle"><input type="checkbox" name="bots" value="1"<?= $withBots ? ' checked' : '' ?>> Incluir bots</label>
-  <button type="submit" class="btn sm">Aplicar</button>
+  <label class="toggle"><input type="checkbox" name="bots" value="1" data-autosubmit<?= $withBots ? ' checked' : '' ?>> Incluir bots</label>
+  <?php /* admin.js envia el form al marcar la casilla; sin JS queda el boton. */ ?>
+  <noscript><button type="submit" class="btn sm">Aplicar</button></noscript>
 <?php $filterHtml = ob_get_clean(); ?>
 <form method="get" action="">
   <?= filter_bar($filterHtml, 'Filtros') ?>
 </form>
 <?= section_nav($sections) ?>
 
+<?php ob_start(); ?>
+  <?= card_open('Franja horaria', $days === 1 ? 'últimas 24 h' : '') ?>
+    <?php $bestHour = (int) array_search(max($byHour), $byHour, true); ?>
+    <div class="chart" style="height:110px;" role="img" aria-label="<?= e(chart_aria_label(
+        'Visitas por franja horaria',
+        array_sum($byHour),
+        ['label' => $bestHour . ':00', 'c' => $byHour[$bestHour]]
+    )) ?>">
+      <?php foreach ($byHour as $h => $c): ?>
+        <div class="col">
+          <div class="bar-v" style="height:<?= max(3, (int) round(($c / $maxHour) * 80)) ?>px; background:var(--cyan);"
+               title="<?= $h ?>:00 — <?= $c ?> visitas"></div>
+          <div class="tick"><?= $h % 3 === 0 ? $h : '' ?></div>
+        </div>
+      <?php endforeach; ?>
+    </div>
+    <p class="hint">Hora local del servidor (<?= e(date_default_timezone_get()) ?>).</p>
+  <?= card_close() ?>
+<?php $hourCardHtml = (string) ob_get_clean(); ?>
+
 <section id="resumen" class="page-section">
   <div class="section-title"><h2>Resumen</h2><span>Visitas, visitantes y calidad de la visita en el periodo.</span></div>
-  <div class="grid4">
+  <div class="grid4 kpi-grid">
     <div class="card stat">
       <div class="num"><?= number_format($inRange) ?><?= delta_badge($inRange, $prevRange) ?></div>
       <div class="lbl">Visitas (<?= $days === 1 ? '24 h' : $days . ' días' ?>)<br><span class="faint">vs. periodo anterior</span></div>
+      <?= count($daily) >= 2 ? sparkline(array_column($daily, 'c')) : '' ?>
     </div>
     <div class="card stat">
       <div class="num cyan"><?= number_format($uniques) ?><?= delta_badge($uniques, $prevUniques) ?></div>
       <div class="lbl">Visitantes únicos<br><span class="faint"><?= $perVisitor ?> páginas por visitante</span></div>
+      <?= count($daily) >= 2 ? sparkline(array_column($daily, 'u'), 'cyan') : '' ?>
     </div>
     <div class="card stat">
-      <div class="num violet"><?= number_format($today) ?></div>
-      <div class="lbl">Hoy<br><span class="faint">
-        <?php if ($bestDay): ?>mejor día: <?= e(date('d/m', strtotime($bestDay['d']))) ?> (<?= $bestDay['c'] ?>)<?php endif; ?>
-      </span></div>
+      <div class="num violet"><?= number_format($today) ?><?= delta_badge($today, $yesterday) ?></div>
+      <div class="lbl">Hoy<br><span class="faint">vs. ayer (<?= number_format($yesterday) ?>)<?php if ($bestDay && $days > 1): ?> · mejor día: <?= e(date('d/m', strtotime($bestDay['d']))) ?> (<?= $bestDay['c'] ?>)<?php endif; ?></span></div>
     </div>
     <div class="card stat">
       <div class="num warn"><?= number_format($botCount) ?></div>
       <div class="lbl">Visitas de bots<br><span class="faint"><?= number_format($humanTotal) ?> humanas en total</span></div>
     </div>
-  </div>
-
-  <div class="grid4">
     <div class="card stat">
       <div class="num"><?= $bounceRate ?>%</div>
       <div class="lbl">Rebote<br><span class="faint">sesiones de una sola página</span></div>
@@ -557,6 +580,10 @@ page_header(
     </div>
   </div>
 
+  <?php if ($days === 1): ?>
+    <?php /* Con 24 h el grafico diario seria una sola barra: va la franja horaria. */ ?>
+    <?= $hourCardHtml ?>
+  <?php else: ?>
   <?= card_open('Visitas por día', $chartDays < $days ? 'últimos ' . $chartDays . ' días' : '') ?>
     <?php if (!array_sum(array_column($daily, 'c'))): ?>
       <div class="empty">Sin datos de visitas en este rango.</div>
@@ -580,6 +607,7 @@ page_header(
       <p class="hint">Pasa el ratón por una barra para ver visitas y visitantes únicos de ese día.</p>
     <?php endif; ?>
   <?= card_close() ?>
+  <?php endif; ?>
 </section>
 
 <section id="audiencia" class="page-section">
@@ -772,23 +800,7 @@ page_header(
 <section id="comportamiento" class="page-section">
   <div class="section-title"><h2>Comportamiento</h2><span>Cuándo se visita y qué se hace en la página.</span></div>
   <div class="row2">
-    <?= card_open('Franja horaria') ?>
-      <?php $bestHour = (int) array_search(max($byHour), $byHour, true); ?>
-      <div class="chart" style="height:110px;" role="img" aria-label="<?= e(chart_aria_label(
-          'Visitas por franja horaria',
-          array_sum($byHour),
-          ['label' => $bestHour . ':00', 'c' => $byHour[$bestHour]]
-      )) ?>">
-        <?php foreach ($byHour as $h => $c): ?>
-          <div class="col">
-            <div class="bar-v" style="height:<?= max(3, (int) round(($c / $maxHour) * 80)) ?>px; background:var(--cyan);"
-                 title="<?= $h ?>:00 — <?= $c ?> visitas"></div>
-            <div class="tick"><?= $h % 3 === 0 ? $h : '' ?></div>
-          </div>
-        <?php endforeach; ?>
-      </div>
-      <p class="hint">Hora local del servidor (<?= e(date_default_timezone_get()) ?>).</p>
-    <?= card_close() ?>
+    <?php if ($days !== 1): ?><?= $hourCardHtml ?><?php endif; ?>
     <?= card_open('Día de la semana') ?>
       <?php foreach ($dowNames as $i => $name): ?>
         <?php bar_row($name, $byDow[$i], $maxDow, 'violet'); ?>

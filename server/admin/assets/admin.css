@@ -1141,3 +1141,10 @@
 .more-rows > summary { cursor: pointer; color: var(--accent); font-size: 0.82rem; font-weight: 500; padding: 6px 2px; min-height: 32px; }
 .more-rows > summary:hover { text-decoration: underline; }
 .more-rows[open] > summary { margin-bottom: 8px; }
+
+/* KPIs de analytics.php: una sola rejilla auto-fit (antes 4 + 3 en dos filas). */
+.kpi-grid { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; }
+
+/* Ancla de la seccion visible (admin.js, IntersectionObserver). */
+.section-nav a[aria-current="true"] { color: var(--on-accent); background: var(--accent); border-color: var(--accent); font-weight: 600; }
+.section-nav a[aria-current="true"]:focus-visible { outline-color: var(--accent); }

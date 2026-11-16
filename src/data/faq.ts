@@ -154,9 +154,9 @@ export const faqItems: FaqItem[] = [
       ca: 'Com puc contactar amb ell?',
     },
     answer: {
-      es: 'Mediante el formulario de contacto de esta misma web, por correo a eduardo@eduolihez.com o a través de su perfil de LinkedIn. También puedes descargar su tarjeta de contacto (vCard) desde la sección de contacto.',
-      en: 'Through the contact form on this site, by email at eduardo@eduolihez.com, or via his LinkedIn profile. You can also download his contact card (vCard) from the contact section.',
-      ca: 'Mitjançant el formulari de contacte del web, per correu a eduardo@eduolihez.com o a través del seu perfil de LinkedIn. També pots descarregar la seva targeta de contacte (vCard) des de la secció de contacte.',
+      es: 'Mediante el formulario de contacto de esta misma web, por correo a hola@eduolihez.com o a través de su perfil de LinkedIn. También puedes descargar su tarjeta de contacto (vCard) desde la sección de contacto.',
+      en: 'Through the contact form on this site, by email at hola@eduolihez.com, or via his LinkedIn profile. You can also download his contact card (vCard) from the contact section.',
+      ca: 'Mitjançant el formulari de contacte del web, per correu a hola@eduolihez.com o a través del seu perfil de LinkedIn. També pots descarregar la seva targeta de contacte (vCard) des de la secció de contacte.',
     },
   },
 ];

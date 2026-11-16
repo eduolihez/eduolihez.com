@@ -23,7 +23,7 @@ return [
     // --- Notificaciones por email del formulario de contacto ---
     'mail' => [
         'enabled' => true,
-        'to'      => 'eduardo@eduolihez.com',   // donde recibiras los avisos
+        'to'      => 'hola@eduolihez.com',   // donde recibiras los avisos
         'from'    => 'no-reply@eduolihez.com', // remitente (usa tu dominio)
         'subject_prefix' => '[Portfolio] ',
     ],

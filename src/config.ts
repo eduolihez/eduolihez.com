@@ -170,7 +170,7 @@ export const SITE = {
   social: {
     linkedin: 'https://www.linkedin.com/in/eduolihez/',
     github: 'https://github.com/eduolihez',
-    email: 'eduardo@eduolihez.com',
+    email: 'hola@eduolihez.com',
   },
 
   // Repositorio de ESTA web (distinto del perfil de github.eduolihez de

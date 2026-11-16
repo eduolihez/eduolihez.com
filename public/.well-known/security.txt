@@ -2,7 +2,7 @@
 # https://securitytxt.org
 # Actualiza "Expires" al menos una vez al ano.
 
-Contact: mailto:eduardo@eduolihez.com
+Contact: mailto:security@eduolihez.com
 Contact: https://www.linkedin.com/in/eduolihez/
 Expires: 2027-07-24T00:00:00.000Z
 Preferred-Languages: es, en, ca

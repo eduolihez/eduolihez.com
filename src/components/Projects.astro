@@ -68,10 +68,14 @@ const labels = {
     <div class="projects-body">
       <StatusPanel
         id="projects-status"
-        class={ssrProjects.length ? 'hidden' : ''}
+        class="hidden"
         loadingText={t('projects.loading')}
         retryText={t('status.retry')}
       />
+
+      {!ssrProjects.length && (
+        <noscript><p class="status-panel border-dashed">{t('projects.empty')}</p></noscript>
+      )}
 
       <div
         id="projects-grid"

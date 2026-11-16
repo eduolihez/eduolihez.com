@@ -4,7 +4,9 @@
 # PHP: usa $PHP_BIN si está definido; si no, el PHP de winget si existe; si no, `php` del PATH.
 set -e
 
-PHAR=".superpowers/tools/phpunit.phar"
+# Rutas desde la raiz del repo (no desde el cwd): asi funciona lanzado desde cualquier carpeta.
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+PHAR="$ROOT/.superpowers/tools/phpunit.phar"
 # PHPUnit fijado: version exacta + SHA-256. El enlace sin version (phpunit-10.5.phar) cambia con cada
 # parche, asi que no sirve para fijar nada. Para subir de version: baja la nueva, comprueba su firma
 # GPG (phpunit-<v>.phar.asc, clave D840 6D0D 8294 7747 2937 7831 4AA3 9408 6372 C20A) y actualiza ambas lineas.
@@ -23,7 +25,7 @@ fi
 
 if [ ! -f "$PHAR" ]; then
   echo "Falta $PHAR. Descárgalo con:" >&2
-  echo "  mkdir -p .superpowers/tools && curl -sSfL -o $PHAR https://phar.phpunit.de/phpunit-$PHPUNIT_VERSION.phar" >&2
+  echo "  mkdir -p \"$ROOT/.superpowers/tools\" && curl -sSfL -o $PHAR https://phar.phpunit.de/phpunit-$PHPUNIT_VERSION.phar" >&2
   exit 1
 fi
 
@@ -46,4 +48,11 @@ if ! "$PHP_BIN" -m | grep -qix mbstring; then
   FLAGS+=(-d "extension_dir=$(dirname "$PHP_BIN")/ext" -d extension=mbstring)
 fi
 
-exec "$PHP_BIN" "${FLAGS[@]}" "$PHAR" "$@"
+# phpunit.xml vive en la raiz y sus rutas son relativas a el: se pasa explicito
+# salvo que el llamador ya indique otra configuracion.
+CONFIG=(--configuration "$ROOT/phpunit.xml")
+for arg in "$@"; do
+  case "$arg" in -c|--configuration|--configuration=*|--no-configuration) CONFIG=() ;; esac
+done
+
+exec "$PHP_BIN" "${FLAGS[@]}" "$PHAR" "${CONFIG[@]}" "$@"

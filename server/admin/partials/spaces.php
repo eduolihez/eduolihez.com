@@ -233,8 +233,10 @@ function space_nav(string $space, array $counts): array
     }
     if ($space === SPACE_SITE) {
         return [
+            // Bandeja en Resumen, igual que en Global: misma zona en ambos espacios.
             ['key' => 'resumen', 'label' => 'Resumen', 'items' => [
                 $item('index.php', 'Hoy', 'grid'),
+                $item('messages.php', 'Bandeja', 'mail', $count('unread'), 'alert'),
             ]],
             ['key' => 'contenido', 'label' => 'Contenido', 'items' => [
                 $item('projects.php', 'Proyectos', 'briefcase', $count('projects')),
@@ -243,15 +245,16 @@ function space_nav(string $space, array $counts): array
                 $item('revisar.php', 'Revisar', 'shield', $count('review')),
             ]],
             ['key' => 'trafico', 'label' => 'Tráfico', 'items' => [
-                $item('messages.php', 'Bandeja', 'mail', $count('unread'), 'alert'),
                 $item('analytics.php', 'Analítica', 'chart'),
             ]],
         ];
     }
+    // PhishLab y apps no tienen panel "Hoy" (index.php redirige a analytics.php):
+    // la entrada se llama por lo que es, Analítica, en la zona Tráfico.
     if ($space === SPACE_PHISHLAB) {
         return [
-            ['key' => 'resumen', 'label' => 'Resumen', 'items' => [
-                $item('analytics.php', 'Hoy', 'grid'),
+            ['key' => 'trafico', 'label' => 'Tráfico', 'items' => [
+                $item('analytics.php', 'Analítica', 'chart'),
             ]],
             ['key' => 'gestion', 'label' => 'Gestión', 'items' => [
                 $item('lab-users.php', 'Usuarios', 'users', $count('lab_users')),
@@ -260,10 +263,55 @@ function space_nav(string $space, array $counts): array
     }
     // app:<slug>
     return [
-        ['key' => 'resumen', 'label' => 'Resumen', 'items' => [
-            $item('analytics.php', 'Hoy', 'grid'),
+        ['key' => 'trafico', 'label' => 'Tráfico', 'items' => [
+            $item('analytics.php', 'Analítica', 'chart'),
         ]],
     ];
+}
+
+/**
+ * Barra inferior (< 1024 px): hasta 4 accesos (Hoy, Bandeja, Contenido,
+ * Analitica) sacados del menu del espacio ($navGroups = space_nav()); el
+ * boton "Mas" lo pinta layout.php. Solo destinos que existen en el menu del
+ * espacio: sin saltos a otro espacio (p. ej. en Global no hay Contenido).
+ * Devuelve items ['label','icon','href','on','badge'].
+ */
+function bottom_nav(array $navGroups, string $active, ?string $activeZone): array
+{
+    $navItem = static function (string $page) use ($navGroups): ?array {
+        foreach ($navGroups as $g) {
+            foreach ($g['items'] as $it) {
+                if ($it['page'] === $page) {
+                    return $it;
+                }
+            }
+        }
+        return null;
+    };
+    $out = [];
+    foreach (['index.php', 'messages.php', '', 'analytics.php'] as $page) {
+        if ($page === '') {
+            // Hueco de Contenido: Blog si existe, si no la primera entrada de la zona.
+            foreach ($navGroups as $g) {
+                if ($g['key'] === 'contenido' && $g['items']) {
+                    $first = $navItem('posts.php') ?? $g['items'][0];
+                    $out[] = ['label' => 'Contenido', 'icon' => 'edit', 'href' => $first['href'], 'on' => $activeZone === 'contenido', 'badge' => 0];
+                }
+            }
+            continue;
+        }
+        $it = $navItem($page);
+        if ($it !== null) {
+            $out[] = [
+                'label' => $it['label'],
+                'icon'  => $it['icon'],
+                'href'  => $it['href'],
+                'on'    => $active === $page,
+                'badge' => $it['badge_type'] === 'alert' ? (int) $it['badge'] : 0,
+            ];
+        }
+    }
+    return $out;
 }
 
 /**

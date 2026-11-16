@@ -13,6 +13,7 @@ require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/partials/layout.php';
 require_once __DIR__ . '/../lib/ua.php';
 require_once __DIR__ . '/../lib/analytics_report.php';
+require_once __DIR__ . '/partials/analytics_view.php';
 require_login();
 
 // --- Rango de fechas: lista blanca, nunca se interpola valor del usuario ----
@@ -135,7 +136,7 @@ if (($_GET['export'] ?? '') === 'csv') {
         array_map(static fn(array $r): array => [
             $r['visited_at'], $r['path'], $r['lang'], $r['referrer'],
             $r['country'], $r['device'], $r['browser'], $r['os'],
-            $r['is_bot'] ? 'si' : 'no',
+            $r['is_bot'] ? 'sí' : 'no',
             $r['duration_s'], $r['scroll_pct'], $r['utm_source'], $r['utm_medium'],
             $r['utm_campaign'], $r['viewport'], $r['browser_lang'],
         ], $rows)
@@ -143,7 +144,9 @@ if (($_GET['export'] ?? '') === 'csv') {
 }
 
 // --- KPIs -------------------------------------------------------------------
-$total   = q_int("SELECT COUNT(*) FROM visits WHERE $botFilter");
+// Humanas de siempre (sin rango): con "Incluir bots" $botFilter es 1=1, asi
+// que aqui se fija is_bot = 0 para que la cifra diga lo que dice la etiqueta.
+$humanTotal = q_int("SELECT COUNT(*) FROM visits WHERE is_bot = 0$appFilterSql");
 $inRange = q_int("SELECT COUNT(*) FROM visits WHERE $botFilter AND visited_at > (NOW() - INTERVAL ? DAY)", [$days]);
 $prevRange = q_int(
     "SELECT COUNT(*) FROM visits WHERE $botFilter
@@ -248,7 +251,7 @@ $weekdays = q_rows(
     [$days]
 );
 // DAYOFWEEK: 1=domingo ... 7=sabado. Lo reordenamos a lunes-domingo.
-$dowNames = ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab', 'Dom'];
+$dowNames = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 $dowMap   = [2 => 0, 3 => 1, 4 => 2, 5 => 3, 6 => 4, 7 => 5, 1 => 6];
 $byDow = array_fill(0, 7, 0);
 foreach ($weekdays as $r) {
@@ -435,8 +438,8 @@ $maxUtm   = max_count($utmRows);
 $maxBroLang = max_count($browserLangs);
 $maxViewport = max_count($viewports);
 
-$deviceLabels  = ['desktop' => 'Escritorio', 'mobile' => 'Movil', 'tablet' => 'Tablet', 'desconocido' => 'Desconocido'];
-$langLabels    = ['es' => 'Espanol', 'en' => 'Ingles', 'ca' => 'Catalan', '?' => 'Desconocido'];
+$deviceLabels  = ['desktop' => 'Escritorio', 'mobile' => 'Móvil', 'tablet' => 'Tablet', 'desconocido' => 'Desconocido'];
+$langLabels    = ['es' => 'Español', 'en' => 'Inglés', 'ca' => 'Catalán', '?' => 'Desconocido'];
 // Los cortes (480/768/1024/1440) tienen que coincidir con bucketViewport()
 // en src/scripts/analytics.ts: si cambian alli, cambiar tambien aqui.
 $viewportLabels = ['xs' => '< 480 px', 'sm' => '480–767 px', 'md' => '768–1023 px',
@@ -475,29 +478,6 @@ if ($hasVisitorCol) {
     $optPerVisitor = $optVisitors > 0 ? round($optVisits / $optVisitors, 1) : 0;
 }
 
-/**
- * Tabla larga: las 10 primeras filas a la vista y el resto dentro de un
- * <details> nativo (sin JS). $rowHtml devuelve el <tr> ya escapado.
- */
-function long_table(string $theadHtml, array $rows, callable $rowHtml, string $emptyRowHtml): string
-{
-    $table = static function (array $part, string $body = '') use ($theadHtml, $rowHtml): string {
-        foreach ($part as $r) {
-            $body .= $rowHtml($r);
-        }
-        return '<div class="scroll-x"><table><thead>' . $theadHtml . '</thead><tbody>' . $body . '</tbody></table></div>';
-    };
-    if (!$rows) {
-        return $table([], $emptyRowHtml);
-    }
-    $html = $table(array_slice($rows, 0, 10));
-    if (count($rows) > 10) {
-        $html .= '<details class="more-rows"><summary>Ver todo (' . count($rows) . ')</summary>'
-            . $table(array_slice($rows, 10)) . '</details>';
-    }
-    return $html;
-}
-
 // Enlaces del filtro: el rango conserva bots y espacio ($appQs); todo se
 // escapa con e() al pintarlo, asi que los & salen como &amp;.
 $botsQs   = $withBots ? '&bots=1' : '';
@@ -522,11 +502,6 @@ page_header(
     $appName !== null ? '— ' . $appName : ''
 );
 ?>
-<?php if ($appSlug !== '' && $appId === null): ?>
-  <p class="hint" style="color:var(--warn);">
-    No se encontro ninguna app con slug "<?= e($appSlug) ?>" — mostrando datos de todas las apps.
-  </p>
-<?php endif; ?>
 
 <?php ob_start(); ?>
   <div class="seg" role="group" aria-label="Periodo">
@@ -553,17 +528,17 @@ page_header(
     </div>
     <div class="card stat">
       <div class="num cyan"><?= number_format($uniques) ?><?= delta_badge($uniques, $prevUniques) ?></div>
-      <div class="lbl">Visitantes unicos<br><span class="faint"><?= $perVisitor ?> paginas por visitante</span></div>
+      <div class="lbl">Visitantes únicos<br><span class="faint"><?= $perVisitor ?> páginas por visitante</span></div>
     </div>
     <div class="card stat">
       <div class="num violet"><?= number_format($today) ?></div>
       <div class="lbl">Hoy<br><span class="faint">
-        <?php if ($bestDay): ?>mejor dia: <?= e(date('d/m', strtotime($bestDay['d']))) ?> (<?= $bestDay['c'] ?>)<?php endif; ?>
+        <?php if ($bestDay): ?>mejor día: <?= e(date('d/m', strtotime($bestDay['d']))) ?> (<?= $bestDay['c'] ?>)<?php endif; ?>
       </span></div>
     </div>
     <div class="card stat">
       <div class="num warn"><?= number_format($botCount) ?></div>
-      <div class="lbl">Visitas de bots<br><span class="faint"><?= number_format($total) ?> humanas en total</span></div>
+      <div class="lbl">Visitas de bots<br><span class="faint"><?= number_format($humanTotal) ?> humanas en total</span></div>
     </div>
   </div>
 
@@ -586,14 +561,19 @@ page_header(
     <?php if (!array_sum(array_column($daily, 'c'))): ?>
       <div class="empty">Sin datos de visitas en este rango.</div>
     <?php else: ?>
-      <div class="chart">
-        <?php foreach ($daily as $r): ?>
+      <?php $tickStep = chart_tick_step(count($daily)); ?>
+      <div class="chart" role="img" aria-label="<?= e(chart_aria_label(
+          'Visitas por día',
+          array_sum(array_column($daily, 'c')),
+          $bestDay ? ['label' => date('d/m', strtotime($bestDay['d'])), 'c' => $bestDay['c']] : null
+      )) ?>">
+        <?php foreach ($daily as $i => $r): ?>
           <?php $h = (int) round(($r['c'] / $maxDay) * 120); ?>
           <div class="col">
             <div class="val"><?= $r['c'] ?: '' ?></div>
             <div class="bar-v" style="height:<?= max(3, $h) ?>px"
-                 title="<?= e($r['d']) ?>: <?= $r['c'] ?> visitas · <?= $r['u'] ?> unicos"></div>
-            <div class="tick"><?= e(date('d/m', strtotime($r['d']))) ?></div>
+                 title="<?= e($r['d']) ?>: <?= $r['c'] ?> visitas · <?= $r['u'] ?> únicos"></div>
+            <div class="tick"><?= $i % $tickStep === 0 ? e(date('d/m', strtotime($r['d']))) : '' ?></div>
           </div>
         <?php endforeach; ?>
       </div>
@@ -793,7 +773,12 @@ page_header(
   <div class="section-title"><h2>Comportamiento</h2><span>Cuándo se visita y qué se hace en la página.</span></div>
   <div class="row2">
     <?= card_open('Franja horaria') ?>
-      <div class="chart" style="height:110px;">
+      <?php $bestHour = (int) array_search(max($byHour), $byHour, true); ?>
+      <div class="chart" style="height:110px;" role="img" aria-label="<?= e(chart_aria_label(
+          'Visitas por franja horaria',
+          array_sum($byHour),
+          ['label' => $bestHour . ':00', 'c' => $byHour[$bestHour]]
+      )) ?>">
         <?php foreach ($byHour as $h => $c): ?>
           <div class="col">
             <div class="bar-v" style="height:<?= max(3, (int) round(($c / $maxHour) * 80)) ?>px; background:var(--cyan);"

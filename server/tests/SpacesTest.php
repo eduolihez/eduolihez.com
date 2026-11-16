@@ -171,12 +171,12 @@ final class SpacesTest extends TestCase
     public function testSpaceNavSiteListaExacta(): void
     {
         $this->assertSame(
-            ['index.php', 'projects.php', 'certifications.php', 'posts.php', 'revisar.php', 'messages.php', 'analytics.php'],
+            ['index.php', 'messages.php', 'projects.php', 'certifications.php', 'posts.php', 'revisar.php', 'analytics.php'],
             $this->navPages('site')
         );
     }
 
-    public function testSpaceNavSiteTieneHoyYMensajes(): void
+    public function testSpaceNavSiteItemsHoyYBandeja(): void
     {
         $resumen = $this->navItem('site', 'index.php');
         $this->assertSame('Hoy', $resumen['label']);
@@ -212,6 +212,24 @@ final class SpacesTest extends TestCase
     {
         $this->assertSame(['analytics.php', 'lab-users.php'], $this->navPages('phishlab'));
         $this->assertSame(['analytics.php'], $this->navPages('app:nowait'));
+    }
+
+    /** analytics.php no es un panel "Hoy": en PhishLab y apps se llama Analitica. */
+    public function testSpaceNavPhishlabYAppLlamanAnaliticaALaAnalitica(): void
+    {
+        foreach (['phishlab', 'app:nowait'] as $space) {
+            $item = $this->navItem($space, 'analytics.php');
+            $this->assertNotNull($item, $space);
+            $this->assertSame('Analítica', $item['label'], $space);
+            $this->assertSame('chart', $item['icon'], $space);
+            $this->assertSame('trafico', zone_for_page($space, 'analytics.php'), $space);
+        }
+    }
+
+    public function testBandejaEnLaMismaZonaEnGlobalYSite(): void
+    {
+        $this->assertSame('resumen', zone_for_page('global', 'messages.php'));
+        $this->assertSame('resumen', zone_for_page('site', 'messages.php'));
     }
 
     public function testSpaceNavBadges(): void
@@ -361,6 +379,8 @@ final class SpacesTest extends TestCase
         $keys = ['resumen', 'trafico', 'contenido', 'sistema', 'gestion'];
         foreach (['global', 'site', 'phishlab', 'app:nowait'] as $space) {
             foreach (space_nav($space, []) as $group) {
+                $this->assertArrayHasKey('key', $group, $space);
+                $this->assertArrayHasKey('label', $group, $space);
                 $this->assertContains($group['key'], $keys, $space);
                 $this->assertNotSame('', $group['label'], $space);
             }
@@ -383,9 +403,11 @@ final class SpacesTest extends TestCase
         $this->assertSame('sistema', zone_for_page('global', 'apps.php'));
         $this->assertSame('contenido', zone_for_page('site', 'projects.php'));
         $this->assertSame('contenido', zone_for_page('site', 'revisar.php'));
-        $this->assertSame('trafico', zone_for_page('site', 'messages.php'));
-        $this->assertSame('resumen', zone_for_page('app:nowait', 'analytics.php'));
-        $this->assertSame('resumen', zone_for_page('phishlab', 'analytics.php'));
+        $this->assertSame('resumen', zone_for_page('global', 'messages.php'));
+        $this->assertSame('resumen', zone_for_page('site', 'messages.php'));
+        $this->assertSame('trafico', zone_for_page('site', 'analytics.php'));
+        $this->assertSame('trafico', zone_for_page('app:nowait', 'analytics.php'));
+        $this->assertSame('trafico', zone_for_page('phishlab', 'analytics.php'));
         $this->assertSame('gestion', zone_for_page('phishlab', 'lab-users.php'));
     }
 
@@ -401,6 +423,45 @@ final class SpacesTest extends TestCase
     {
         $this->assertNull(zone_for_page('site', 'nope.php'));
         $this->assertNull(zone_for_page('global', 'projects.php'));
+    }
+
+    public function testBottomNavGlobal(): void
+    {
+        $b = bottom_nav(space_nav('global', ['unread' => 4]), 'messages.php', 'resumen');
+        $this->assertSame(['Hoy', 'Bandeja', 'Analítica'], array_column($b, 'label'));
+        $this->assertSame([false, true, false], array_column($b, 'on'));
+        $this->assertSame([0, 4, 0], array_column($b, 'badge'));
+        $this->assertSame('messages.php?space=global', $b[1]['href']);
+    }
+
+    public function testBottomNavSiteTieneContenidoQueApuntaAlBlog(): void
+    {
+        $b = bottom_nav(space_nav('site', []), 'post-edit.php', 'contenido');
+        $this->assertSame(['Hoy', 'Bandeja', 'Contenido', 'Analítica'], array_column($b, 'label'));
+        $this->assertSame('posts.php?space=site', $b[2]['href']);
+        $this->assertSame('edit', $b[2]['icon']);
+        $this->assertSame([false, false, true, false], array_column($b, 'on'));
+    }
+
+    public function testBottomNavContenidoSinBlogUsaLaPrimeraEntrada(): void
+    {
+        $groups = [['key' => 'contenido', 'label' => 'Contenido', 'items' => [
+            ['page' => 'projects.php', 'href' => 'projects.php?space=site', 'label' => 'Proyectos', 'icon' => 'briefcase', 'badge' => '', 'badge_type' => 'count'],
+        ]]];
+        $b = bottom_nav($groups, 'index.php', null);
+        $this->assertSame([['label' => 'Contenido', 'icon' => 'edit', 'href' => 'projects.php?space=site', 'on' => false, 'badge' => 0]], $b);
+    }
+
+    public function testBottomNavPhishlabYApp(): void
+    {
+        $p = bottom_nav(space_nav('phishlab', []), 'analytics.php', 'trafico');
+        $this->assertSame(['Analítica'], array_column($p, 'label'));
+        $this->assertTrue($p[0]['on']);
+        $this->assertSame('analytics.php?space=phishlab', $p[0]['href']);
+
+        $a = bottom_nav(space_nav('app:nowait', []), 'lab-users.php', null);
+        $this->assertSame(['Analítica'], array_column($a, 'label'));
+        $this->assertFalse($a[0]['on']);
     }
 
     public function testIndexViewFilaDesconocidaEsDashboardAZeros(): void

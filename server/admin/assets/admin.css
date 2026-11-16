@@ -231,22 +231,6 @@
     flex: 1;
   }
 
-  /* Cabecera de grupo (Contenido / Actividad / Sistema): mismo patron mono
-     versalita que el "section-kicker" del sitio publico, para que el panel
-     no se sienta un sistema aparte. */
-  .nav-group-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.65rem;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--faint);
-    margin: 1.1rem 0 0.4rem 0.85rem;
-  }
-  .nav-group-label:first-child {
-    margin-top: 0;
-  }
-
   .menu-item {
     position: relative;
     display: flex;
@@ -824,7 +808,7 @@
 
   /* --- Rediseno v2: mismo lenguaje que la web publica ---------------------
      Titulares y marca en mono, acento verde azulado y paleta de comandos. */
-  h1, h2, .brand, .topbar-title, .nav-group-label { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace; }
+  h1, h2, .brand, .topbar-title { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace; }
   h1 { font-weight: 700; letter-spacing: -0.02em; }
   .brand { letter-spacing: -0.02em; }
   .topbar-kbd {
@@ -882,7 +866,6 @@
      para enlaces y estado activo, amarillo --mark solo como relleno con
      --on-mark. Barra inferior < 1024 px; "Mas" abre el cajon lateral. */
   h1, h2, h3, .brand, .topbar-title { font-family: 'Inter', system-ui, sans-serif; font-weight: 700; color: var(--title); letter-spacing: -0.015em; }
-  .nav-group-label { font-family: 'JetBrains Mono', ui-monospace, monospace; }
   .empty { font-style: normal; }
   ::selection { background: var(--selection); color: var(--text); }
   input, textarea { caret-color: var(--accent); }
@@ -1127,12 +1110,27 @@
   .section-title span { color: var(--muted); font-size: 0.82rem; }
 
   /* Titulo interno de tarjeta (card_open). */
-  .card > h3 {
+  .card > h3.card-title {
     display: flex; justify-content: space-between; align-items: baseline; gap: 8px;
     margin: 0 0 12px; font-size: 13px; font-weight: 600; line-height: 1.4;
     color: var(--title); text-transform: none; letter-spacing: 0;
   }
-  .card > h3 small { font-weight: 400; font-size: 0.75rem; color: var(--muted); }
+  .card > h3.card-title small { font-weight: 400; font-size: 0.75rem; color: var(--muted); }
+
+  /* Graficos de barras: las columnas encogen hasta caber en la tarjeta (con
+     min-width:16px desbordaban a 390 px aunque .chart tenga overflow-x). */
+  .chart .col { flex: 1 1 0; min-width: 0; }
+  .chart .tick, .chart .val { max-width: 100%; overflow: visible; }
+  .chart .tick:empty, .chart .val:empty { visibility: hidden; }
+  @media (max-width: 640px) {
+    .chart { gap: 2px; }
+    .chart .val { display: none; }
+  }
+
+  /* Titulo de la topbar en una sola linea: si hiciera wrap creceria por
+     encima de --topbar-h y taparia .section-nav (sticky a ese alto). */
+  .topbar-left { min-width: 0; flex: 1 1 auto; }
+  .topbar-title { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* T11 · visitantes con cookie opt-in (analytics.php) */
 .t11-optin .t11-note { margin: 0 0 12px; color: var(--muted); font-size: .9em; }

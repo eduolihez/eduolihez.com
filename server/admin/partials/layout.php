@@ -122,41 +122,7 @@ function admin_header(string $title, string $active = ''): void
     $activeZone = zone_for_page($space, $active);
 
     // Barra inferior (< 1024 px): hasta 4 accesos + "Mas" (abre el cajon).
-    // Solo destinos que existen en el menu del espacio actual: sin saltos a
-    // otro espacio (p. ej. en Global no hay Contenido).
-    $navItem = static function (string $page) use ($navGroups): ?array {
-        foreach ($navGroups as $g) {
-            foreach ($g['items'] as $it) {
-                if ($it['page'] === $page) {
-                    return $it;
-                }
-            }
-        }
-        return null;
-    };
-    $bottomNav = [];
-    foreach (['index.php', 'messages.php', '', 'analytics.php'] as $page) {
-        if ($page === '') {
-            // Hueco de Contenido: Blog si existe, si no la primera entrada de la zona.
-            foreach ($navGroups as $g) {
-                if ($g['key'] === 'contenido' && $g['items']) {
-                    $first = $navItem('posts.php') ?? $g['items'][0];
-                    $bottomNav[] = ['label' => 'Contenido', 'icon' => 'edit', 'href' => $first['href'], 'on' => $activeZone === 'contenido'];
-                }
-            }
-            continue;
-        }
-        $it = $navItem($page);
-        if ($it !== null) {
-            $bottomNav[] = [
-                'label' => $it['label'],
-                'icon'  => $it['icon'],
-                'href'  => $it['href'],
-                'on'    => $active === $page,
-                'badge' => $it['badge_type'] === 'alert' ? (int) $it['badge'] : 0,
-            ];
-        }
-    }
+    $bottomNav    = bottom_nav($navGroups, $active, $activeZone);
     $spaceOptions = space_options($appsRows);
     $spaceLabel   = $space;
     foreach ($spaceOptions as $opt) {
@@ -444,10 +410,10 @@ function section_nav(array $sections): string
     return $links === '' ? '' : '<nav class="section-nav" aria-label="Secciones de la página">' . $links . '</nav>';
 }
 
-/** Abre una tarjeta con titulo interno (h3) y metadato opcional atenuado; cerrar con card_close(). */
+/** Abre una tarjeta con titulo interno (h3.card-title) y metadato opcional atenuado; cerrar con card_close(). */
 function card_open(string $title, string $meta = ''): string
 {
-    return '<div class="card"><h3>' . e($title)
+    return '<div class="card"><h3 class="card-title">' . e($title)
         . ($meta !== '' ? ' <small>' . e($meta) . '</small>' : '')
         . '</h3>';
 }

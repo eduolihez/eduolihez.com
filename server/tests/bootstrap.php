@@ -33,3 +33,10 @@ require_once __DIR__ . '/../lab/next.php'; // pura: solo lab_safe_next(), sin se
 // layout.php NO va aqui: requiere auth.php y mataria el proceso de PHPUnit.
 require_once __DIR__ . '/../admin/partials/icons.php';
 require_once __DIR__ . '/../admin/partials/spaces.php';
+require_once __DIR__ . '/../admin/partials/analytics_view.php';
+
+// e() es el escapado real del panel (auth.php). auth.php no se puede incluir
+// (sesion + BD), asi que se extrae solo esa funcion: una unica fuente de
+// verdad para todos los tests que comprueban HTML escapado.
+require_once __DIR__ . '/support/extract_functions.php';
+extract_php_functions(__DIR__ . '/../admin/auth.php', ['e']);

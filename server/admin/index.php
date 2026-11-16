@@ -88,10 +88,10 @@ if ($indexView['view'] === 'picker') {
     $apps = rows_of('SELECT id, slug, display_name, has_content FROM apps ORDER BY created_at ASC');
     $sparkColors = ['', 'cyan', 'violet', 'warn']; // ciclan si hay mas de 4 apps
 
-    admin_header('Resumen global', 'index.php');
+    admin_header('Hoy', 'index.php');
     show_flash();
     ?>
-    <?php page_header('Resumen global', 'Últimos 7 días, comparado con los 7 anteriores. Elige un sitio para entrar en su panel.'); ?>
+    <?php page_header('Hoy', 'Últimos 7 días, comparado con los 7 anteriores. Elige un sitio para entrar en su panel.'); ?>
 
     <?php if (!$apps): ?>
       <div class="card empty">Aún no hay sitios registrados. <a href="apps.php">Registra el primero →</a></div>

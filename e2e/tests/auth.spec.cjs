@@ -20,7 +20,7 @@ test('contrasena correcta: aterriza en index.php en Global y el logout cierra la
   await expectSpace(page, 'Global');
   await expect(page.locator('.sidebar-footer .username')).toHaveText(user);
 
-  await page.getByRole('button', { name: 'Cerrar sesion' }).click();
+  await page.getByRole('button', { name: 'Cerrar sesión' }).click();
   await expect(page).toHaveURL(/\/admin\/login\.php$/);
 
   // La sesion ya no vale: volver al panel redirige al login.

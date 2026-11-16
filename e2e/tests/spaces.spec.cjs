@@ -4,17 +4,17 @@ const { test, expect } = require('@playwright/test');
 const { PHP_WARNING, menuLabels, expectActive, expectSpace, followLink } = require('./helpers.cjs');
 
 const MENUS = {
-  global: ['Resumen', 'Bandeja', 'Analítica', 'Seguridad', 'Ajustes', 'Backup', 'Integraciones', 'Gestionar apps'],
-  site: ['Resumen', 'Proyectos', 'Certificaciones', 'Blog', 'Mensajes', 'Analítica'],
-  phishlab: ['Resumen', 'Usuarios'],
-  app: ['Resumen'],
+  global: ['Hoy', 'Bandeja', 'Analítica', 'Seguridad', 'Ajustes', 'Backup', 'Integraciones', 'Gestionar apps'],
+  site: ['Hoy', 'Proyectos', 'Certificaciones', 'Blog', 'Mensajes', 'Analítica'],
+  phishlab: ['Hoy', 'Usuarios'],
+  app: ['Hoy'],
 };
 
 test('Global: menu completo y Resumen activo', async ({ page }) => {
   await page.goto('/admin/index.php?space=global');
   await expectSpace(page, 'Global');
   expect(await menuLabels(page)).toEqual(MENUS.global);
-  await expectActive(page, 'Resumen');
+  await expectActive(page, 'Hoy');
 });
 
 test('el selector lista los espacios y navega al inicio de cada uno', async ({ page }) => {
@@ -41,7 +41,7 @@ test('el selector lista los espacios y navega al inicio de cada uno', async ({ p
 });
 
 const SPACE_CASES = [
-  { url: 'index.php?space=site', space: 'eduolihez.com', menu: MENUS.site, active: 'Resumen' },
+  { url: 'index.php?space=site', space: 'eduolihez.com', menu: MENUS.site, active: 'Hoy' },
   { url: 'projects.php?space=site', space: 'eduolihez.com', menu: MENUS.site, active: 'Proyectos' },
   { url: 'certifications.php?space=site', space: 'eduolihez.com', menu: MENUS.site, active: 'Certificaciones' },
   { url: 'posts.php?space=site', space: 'eduolihez.com', menu: MENUS.site, active: 'Blog' },
@@ -50,8 +50,8 @@ const SPACE_CASES = [
   { url: 'messages.php?space=global', space: 'Global', menu: MENUS.global, active: 'Bandeja' },
   { url: 'apps.php?space=global', space: 'Global', menu: MENUS.global, active: 'Gestionar apps' },
   { url: 'lab-users.php?space=phishlab', space: 'PhishLab', menu: MENUS.phishlab, active: 'Usuarios' },
-  { url: 'analytics.php?space=phishlab', space: 'PhishLab', menu: MENUS.phishlab, active: 'Resumen' },
-  { url: 'analytics.php?space=app:nowait', space: 'NoWait', menu: MENUS.app, active: 'Resumen' },
+  { url: 'analytics.php?space=phishlab', space: 'PhishLab', menu: MENUS.phishlab, active: 'Hoy' },
+  { url: 'analytics.php?space=app:nowait', space: 'NoWait', menu: MENUS.app, active: 'Hoy' },
 ];
 
 for (const c of SPACE_CASES) {
@@ -96,7 +96,7 @@ test('index.php abre Global aunque la sesion recuerde otro espacio', async ({ pa
   // ...pero index.php sin ?space= siempre es Global.
   await page.goto('/admin/index.php');
   await expectSpace(page, 'Global');
-  await expectActive(page, 'Resumen');
+  await expectActive(page, 'Hoy');
   expect(await menuLabels(page)).toEqual(MENUS.global);
 });
 

@@ -181,7 +181,7 @@ if ($viewId > 0) {
 
     <div class="card">
       <table>
-        <tr><th style="width:130px;">De</th><td><strong><?= e($m['name']) ?></strong></td></tr>
+        <tr><th class="col-w130">De</th><td><strong><?= e($m['name']) ?></strong></td></tr>
         <tr><th>Email</th><td><a href="mailto:<?= e($m['email']) ?>"><?= e($m['email']) ?></a></td></tr>
         <tr><th>Asunto</th><td><?= e($m['subject'] !== '' ? $m['subject'] : '(sin asunto)') ?></td></tr>
         <tr><th>Fecha</th><td class="muted"><?= e(fdate($m['created_at'], 'd/m/Y H:i:s')) ?> · <?= e(ago($m['created_at'])) ?></td></tr>
@@ -194,7 +194,7 @@ if ($viewId > 0) {
       </table>
 
       <h2>Contenido</h2>
-      <div class="card inset" style="white-space:pre-wrap;"><?= e($m['message']) ?></div>
+      <div class="card inset pre-wrap"><?= e($m['message']) ?></div>
 
       <div class="actions mt-2">
         <a class="btn" href="mailto:<?= e($m['email']) ?>?subject=<?= rawurlencode('RE: ' . $m['subject']) ?>">Responder por email</a>
@@ -343,22 +343,23 @@ show_flash();
   <?php endforeach; ?>
 </div>
 
-<form method="get" class="card" style="display:flex; gap:.6rem; align-items:center; padding:.75rem 1rem;">
+<form method="get" class="card search-bar">
   <input type="hidden" name="f" value="<?= e($filter) ?>">
-  <input type="search" name="q" value="<?= e($search) ?>" placeholder="Buscar por nombre, email, asunto o texto..." style="flex:1;">
+  <input type="search" name="q" value="<?= e($search) ?>" placeholder="Buscar por nombre, email, asunto o texto…">
   <button class="btn sm" type="submit">Buscar</button>
   <?php if ($search !== ''): ?>
     <a class="btn ghost sm" href="<?= e(list_url($filter, '')) ?>">Limpiar</a>
   <?php endif; ?>
 </form>
 
-<form method="post" id="bulk-form">
+<form method="post" id="bulk-form" class="bulk-form">
   <?= csrf_field() ?>
-  <div class="card" style="padding:.6rem 1rem; display:flex; gap:.5rem; flex-wrap:wrap; align-items:center;">
-    <label style="margin:0; font-weight:400; display:flex; align-items:center; gap:.4rem;">
-      <input type="checkbox" id="check-all" style="width:auto;"> <span class="muted">Seleccionar todo</span>
+  <div class="card bulk-bar">
+    <button type="button" class="btn ghost sm select-toggle" data-select-toggle aria-pressed="false">Seleccionar</button>
+    <label class="check-all-label">
+      <input type="checkbox" id="check-all"> <span class="muted">Seleccionar todo</span>
     </label>
-    <span class="faint" style="margin-right:.5rem;">Acciones:</span>
+    <span class="faint bulk-label">Acciones:</span>
     <button class="btn ghost sm" type="submit" name="action" value="read">Leido</button>
     <button class="btn ghost sm" type="submit" name="action" value="unread">No leido</button>
     <button class="btn ghost sm" type="submit" name="action" value="star">★ Destacar</button>
@@ -373,7 +374,7 @@ show_flash();
       <table class="stack" role="table">
         <thead role="rowgroup">
           <tr role="row">
-            <th role="columnheader" style="width:34px;"></th>
+            <th role="columnheader" class="col-w34"></th>
             <th role="columnheader">De</th>
             <th role="columnheader">Asunto</th>
             <th role="columnheader">Fecha</th>
@@ -388,24 +389,24 @@ show_flash();
           <?php endif; ?>
           <?php foreach ($rows as $m): ?>
             <?php $unreadRow = ((int) $m['is_read'] === 0); ?>
-            <tr role="row">
-              <td role="cell" data-label="Seleccionar"><label class="check-hit"><input type="checkbox" name="ids[]" value="<?= (int) $m['id'] ?>" class="row-check" aria-label="Seleccionar mensaje de <?= e($m['name']) ?>" style="width:auto;"></label></td>
-              <td role="cell" data-label="De">
-                <?php if ((int) $m['is_starred']): ?><span title="Destacado" style="color:var(--warn);">★</span><?php endif; ?>
-                <?php if ($unreadRow): ?><span class="pill on" style="margin-right:.3rem;">Nuevo</span><?php endif; ?>
-                <a href="messages.php?id=<?= (int) $m['id'] ?>" style="<?= $unreadRow ? 'font-weight:700;' : '' ?>">
+            <tr role="row" class="msg-row<?= $unreadRow ? ' is-unread' : '' ?>">
+              <td role="cell" data-label="Seleccionar"><label class="check-hit"><input type="checkbox" name="ids[]" value="<?= (int) $m['id'] ?>" class="row-check" aria-label="Seleccionar mensaje de <?= e($m['name']) ?>"></label></td>
+              <td role="cell" data-label="De" class="msg-from">
+                <?php if ((int) $m['is_starred']): ?><span title="Destacado" class="text-warn">★</span><?php endif; ?>
+                <?php if ($unreadRow): ?><span class="pill on mr-xs">Nuevo</span><?php endif; ?>
+                <a href="messages.php?id=<?= (int) $m['id'] ?>" class="<?= $unreadRow ? 'fw-700' : '' ?>">
                   <?= e($m['name']) ?>
                 </a>
-                <div class="faint"><?= e($m['email']) ?></div>
+                <div class="faint msg-email"><?= e($m['email']) ?></div>
               </td>
-              <td role="cell" data-label="Asunto" class="<?= $unreadRow ? '' : 'muted' ?>">
-                <a href="messages.php?id=<?= (int) $m['id'] ?>" style="color:inherit; <?= $unreadRow ? 'font-weight:600;' : '' ?>">
+              <td role="cell" data-label="Asunto" class="msg-subject <?= $unreadRow ? '' : 'muted' ?>">
+                <a href="messages.php?id=<?= (int) $m['id'] ?>" class="link-inherit<?= $unreadRow ? ' fw-600' : '' ?>">
                   <?= e($m['subject'] !== '' ? $m['subject'] : '(sin asunto)') ?>
                 </a>
-                <?php if ((int) $m['is_archived']): ?><span class="pill off" style="margin-left:.3rem;">Archivado</span><?php endif; ?>
+                <?php if ((int) $m['is_archived']): ?><span class="pill off ml-xs">Archivado</span><?php endif; ?>
               </td>
-              <td role="cell" data-label="Fecha" class="meta nowrap"><?= e(fdate($m['created_at'])) ?><br><span style="font-size:.75rem;"><?= e(ago($m['created_at'])) ?></span></td>
-              <td role="cell" data-label="Acciones">
+              <td role="cell" data-label="Fecha" class="meta nowrap msg-date"><?= e(fdate($m['created_at'])) ?><br><span class="fs-xs"><?= e(ago($m['created_at'])) ?></span></td>
+              <td role="cell" data-label="Acciones" class="msg-actions">
                 <div class="actions justify-end">
                   <a class="btn ghost sm" href="messages.php?id=<?= (int) $m['id'] ?>">Ver</a>
                 </div>
@@ -419,7 +420,7 @@ show_flash();
 </form>
 
 <?php if ($totalPages > 1): ?>
-  <div class="actions" style="justify-content:center; margin-top:1rem;">
+  <div class="actions pager">
     <?php if ($page > 1): ?>
       <a class="btn ghost sm" href="<?= e(list_url($filter, $search, $page - 1)) ?>">&larr; Anterior</a>
     <?php endif; ?>

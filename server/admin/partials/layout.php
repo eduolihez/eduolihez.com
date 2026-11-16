@@ -176,6 +176,7 @@ function admin_header(string $title, string $active = ''): void
 <link rel="icon" type="image/svg+xml" href="<?= e(asset_url('favicon.svg')) ?>">
 </head>
 <body>
+<a class="skip-link" href="#main">Saltar al contenido</a>
 <?php
   // Paleta de comandos (Ctrl/Cmd+K): mismas rutas que el menu lateral mas
   // acciones. Los comandos van como JSON en un atributo; palette.js los pinta
@@ -238,7 +239,7 @@ function admin_header(string $title, string $active = ''): void
           </div>
         </details>
       </div>
-      <button id="sidebar-close-btn" class="sidebar-toggle-btn mobile-only" aria-label="Cerrar menu">
+      <button id="sidebar-close-btn" class="sidebar-toggle-btn mobile-only" aria-label="Cerrar menú">
         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
       </button>
     </div>
@@ -282,11 +283,11 @@ function admin_header(string $title, string $active = ''): void
           <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path stroke-linecap="round" stroke-linejoin="round" d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4l1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></svg>
           Cambiar tema
         </button>
-        <form method="post" action="logout.php" style="display:inline; width:100%;">
+        <form method="post" action="logout.php" class="logout-form">
           <?= csrf_field() ?>
           <button type="submit" class="action-btn danger-text">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-            Cerrar sesion
+            Cerrar sesión
           </button>
         </form>
       </div>
@@ -309,12 +310,12 @@ function admin_header(string $title, string $active = ''): void
           <span class="bottom-nav-label"><?= e($b['label']) ?></span>
         </a>
       <?php endforeach; ?>
-      <button id="sidebar-open-btn" type="button" class="bottom-nav-item sidebar-toggle-btn mobile-only" aria-label="Abrir menu: más secciones" aria-controls="admin-sidebar">
+      <button id="sidebar-open-btn" type="button" class="bottom-nav-item sidebar-toggle-btn mobile-only" aria-label="Abrir menú: más secciones" aria-controls="admin-sidebar">
         <span class="bottom-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" /></svg></span>
         <span class="bottom-nav-label">Más</span>
       </button>
     </nav>
-    <main>
+    <main id="main" tabindex="-1">
 <?php
 }
 

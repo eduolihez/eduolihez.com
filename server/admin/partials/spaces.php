@@ -215,7 +215,7 @@ function space_nav(string $space, array $counts): array
     if ($space === SPACE_GLOBAL) {
         return [
             ['label' => '', 'items' => [
-                $item('index.php', 'Resumen', 'grid'),
+                $item('index.php', 'Hoy', 'grid'),
                 $item('messages.php', 'Bandeja', 'mail', $count('unread'), 'alert'),
                 $item('analytics.php', 'Analítica', 'chart'),
             ]],
@@ -231,7 +231,7 @@ function space_nav(string $space, array $counts): array
     if ($space === SPACE_SITE) {
         return [
             ['label' => '', 'items' => [
-                $item('index.php', 'Resumen', 'grid'),
+                $item('index.php', 'Hoy', 'grid'),
             ]],
             ['label' => 'Contenido', 'items' => [
                 $item('projects.php', 'Proyectos', 'briefcase', $count('projects')),
@@ -247,7 +247,7 @@ function space_nav(string $space, array $counts): array
     if ($space === SPACE_PHISHLAB) {
         return [
             ['label' => '', 'items' => [
-                $item('analytics.php', 'Resumen', 'grid'),
+                $item('analytics.php', 'Hoy', 'grid'),
                 $item('lab-users.php', 'Usuarios', 'users', $count('lab_users')),
             ]],
         ];
@@ -255,7 +255,7 @@ function space_nav(string $space, array $counts): array
     // app:<slug>
     return [
         ['label' => '', 'items' => [
-            $item('analytics.php', 'Resumen', 'grid'),
+            $item('analytics.php', 'Hoy', 'grid'),
         ]],
     ];
 }

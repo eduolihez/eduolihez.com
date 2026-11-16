@@ -161,6 +161,21 @@
     }
   });
 
+  // --- Modo "Seleccionar" del buzon (T10, solo se ve a < 768 px) -----------
+  document.addEventListener('click', function (e) {
+    var btn = e.target && e.target.closest ? e.target.closest('[data-select-toggle]') : null;
+    if (!btn) return;
+    var form = btn.closest('form');
+    if (!form) return;
+    var on = form.classList.toggle('select-mode');
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    btn.textContent = on ? 'Cancelar selección' : 'Seleccionar';
+    if (!on) {
+      var boxes = form.querySelectorAll('.row-check, #check-all');
+      for (var i = 0; i < boxes.length; i++) boxes[i].checked = false;
+    }
+  });
+
   // --- Marcar / desmarcar todo ---------------------------------------------
   document.addEventListener('change', function (e) {
     var el = e.target;

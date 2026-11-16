@@ -127,8 +127,8 @@ show_flash();
 ?>
 <?php page_header('Proyectos', '', '<a class="btn" href="project-edit.php">+ Nuevo proyecto</a>', '(' . $published . ' publicados de ' . $totalAll . ')'); ?>
 
-<form method="get" class="card" style="display:flex; gap:.6rem; align-items:center; padding:.75rem 1rem;">
-  <input type="search" name="q" value="<?= e($search) ?>" placeholder="Buscar por titulo o tecnologia..." style="flex:1;">
+<form method="get" class="card search-bar">
+  <input type="search" name="q" value="<?= e($search) ?>" placeholder="Buscar por título o tecnología…">
   <button class="btn sm" type="submit">Buscar</button>
   <?php if ($search !== ''): ?><a class="btn ghost sm" href="projects.php">Limpiar</a><?php endif; ?>
 </form>
@@ -138,7 +138,7 @@ show_flash();
     <table class="stack" role="table">
       <thead role="rowgroup">
         <tr role="row">
-          <th role="columnheader" style="width:56px;"></th>
+          <th role="columnheader" class="col-w56"></th>
           <th role="columnheader">Titulo (ES)</th>
           <th role="columnheader">Estado</th>
           <th role="columnheader">Destacado</th>
@@ -158,7 +158,7 @@ show_flash();
             <td role="cell" data-label="Imagen">
               <?php if (!empty($p['image_url'])): ?>
                 <img src="<?= e($p['image_url']) ?>" alt="" width="48" height="32"
-                     style="width:48px; height:32px; object-fit:cover; border-radius:.3rem; border:1px solid var(--border);">
+                     class="thumb-sm">
               <?php else: ?>
                 <span class="faint">—</span>
               <?php endif; ?>
@@ -172,8 +172,8 @@ show_flash();
                 <?= csrf_field() ?>
                 <input type="hidden" name="action" value="toggle_status">
                 <input type="hidden" name="id" value="<?= (int) $p['id'] ?>">
-                <button type="submit" class="pill <?= $p['status'] === 'published' ? 'on' : 'off' ?>"
-                        style="cursor:pointer;" title="Clic para cambiar">
+                <button type="submit" class="pill pill-btn <?= $p['status'] === 'published' ? 'on' : 'off' ?>"
+                        title="Clic para cambiar">
                   <?= $p['status'] === 'published' ? 'Publicado' : 'Borrador' ?>
                 </button>
               </form>
@@ -189,7 +189,7 @@ show_flash();
               </form>
             </td>
             <td role="cell" data-label="Orden" class="faint">
-              <div class="actions" style="gap:.2rem;">
+              <div class="actions gap-xs">
                 <span class="mono"><?= (int) $p['sort_order'] ?></span>
                 <form method="post" class="d-inline">
                   <?= csrf_field() ?>

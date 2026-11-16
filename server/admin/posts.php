@@ -94,8 +94,8 @@ show_flash();
 ?>
 <?php page_header('Artículos del Blog', '', '<a class="btn" href="post-edit.php">+ Nuevo artículo</a>', '(' . $visible . ' visibles de ' . $totalAll . ')'); ?>
 
-<form method="get" class="card" style="display:flex; gap:.6rem; align-items:center; padding:.75rem 1rem;">
-  <input type="search" name="q" value="<?= e($search) ?>" placeholder="Buscar por título, resumen o contenido..." style="flex:1;">
+<form method="get" class="card search-bar">
+  <input type="search" name="q" value="<?= e($search) ?>" placeholder="Buscar por título, resumen o contenido…">
   <button class="btn sm" type="submit">Buscar</button>
   <?php if ($search !== ''): ?><a class="btn ghost sm" href="posts.php">Limpiar</a><?php endif; ?>
 </form>
@@ -105,14 +105,14 @@ show_flash();
     <table class="stack" role="table">
       <thead role="rowgroup">
         <tr role="row">
-          <th role="columnheader" style="width:60px;">Portada</th>
+          <th role="columnheader" class="col-w60">Portada</th>
           <th role="columnheader">Título</th>
           <th role="columnheader">Categoría</th>
           <th role="columnheader">Idioma</th>
           <th role="columnheader">Slug / Enlace</th>
           <th role="columnheader">Estado</th>
           <th role="columnheader">Fecha</th>
-          <th role="columnheader" style="text-align:right; width:220px;">Acciones</th>
+          <th role="columnheader" class="col-w220 text-right">Acciones</th>
         </tr>
       </thead>
       <tbody role="rowgroup">
@@ -128,28 +128,28 @@ show_flash();
             <td role="cell" data-label="Portada">
               <?php if (!empty($c['cover_url'])): ?>
                 <img src="<?= e($c['cover_url']) ?>" alt="" width="48" height="32" class="soft-box"
-                     style="width:48px; height:32px; object-fit:cover; border-radius:.3rem; border:1px solid var(--border);">
+                     class="thumb-sm">
               <?php else: ?>
-                <div class="soft-box" style="width:48px; height:32px; border-radius:.3rem; border:1px solid var(--border); display:flex; align-items:center; justify-content:center; color:var(--faint); font-size:10px; font-weight:700;">NO IMG</div>
+                <div class="soft-box thumb-sm thumb-empty">NO IMG</div>
               <?php endif; ?>
             </td>
             <td role="cell" data-label="Título">
-              <a href="post-edit.php?id=<?= $c['id'] ?>" style="font-weight:600;">
+              <a href="post-edit.php?id=<?= $c['id'] ?>" class="fw-600">
                 <?= e($c['title']) ?>
               </a>
               <br>
-              <span class="faint" style="font-size:0.75rem; display:block; max-width: 400px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-top:2px;"><?= e($c['summary']) ?></span>
+              <span class="faint cell-summary"><?= e($c['summary']) ?></span>
             </td>
             <td role="cell" data-label="Categoría">
               <?php $categoryLabel = post_category_label($c['category']); ?>
               <?= $categoryLabel !== null ? '<span class="pill">' . e($categoryLabel) . '</span>' : '<span class="faint">—</span>' ?>
             </td>
             <td role="cell" data-label="Idioma">
-              <span class="pill" style="text-transform: uppercase; font-family: 'JetBrains Mono', monospace; font-size:10px;">
+              <span class="pill pill-code">
                 <?= e($c['lang']) ?>
               </span>
             </td>
-            <td role="cell" data-label="Enlace" class="mono faint" style="font-size:12px;">
+            <td role="cell" data-label="Enlace" class="mono faint fs-12">
               /blog/<?= e($c['slug']) ?>
             </td>
             <td role="cell" data-label="Estado">
@@ -157,7 +157,7 @@ show_flash();
                 <?= csrf_field() ?>
                 <input type="hidden" name="id" value="<?= $c['id'] ?>">
                 <input type="hidden" name="action" value="toggle_visible">
-                <button type="submit" class="pill <?= ((int) $c['visible']) === 1 ? 'on' : 'off' ?>" style="cursor:pointer; border:1px solid var(--border);">
+                <button type="submit" class="pill pill-btn <?= ((int) $c['visible']) === 1 ? 'on' : 'off' ?>">
                   <?= ((int) $c['visible']) === 1 ? 'Publicado' : 'Borrador' ?>
                 </button>
               </form>
@@ -166,7 +166,7 @@ show_flash();
               <?= fdate($c['created_at'], 'd/m/Y H:i') ?>
             </td>
             <td role="cell" data-label="Acciones" class="text-right">
-              <div class="actions" style="justify-content:flex-end; gap: 0.35rem;">
+              <div class="actions justify-end gap-sm">
                 <a class="btn ghost sm icon" href="post-edit.php?id=<?= $c['id'] ?>" title="Editar" aria-label="Editar artículo">
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                 </a>

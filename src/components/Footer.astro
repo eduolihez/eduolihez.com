@@ -140,6 +140,9 @@ const iconLinkClass =
         <a href={aboutPath} class="transition hover:text-accent">{t('footer.aboutSite')}</a>
         <span aria-hidden="true">·</span>
         <a href={socAlternates[lang]} class="transition hover:text-accent">{socProfile[lang].breadcrumb}</a>
+        <span aria-hidden="true">·</span>
+        {/* Reabre el aviso de cookies (consent.ts); sin JS lleva a la explicacion. */}
+        <a href={aboutPath} data-consent-open aria-controls="consent-banner" class="transition hover:text-accent">{t('footer.cookies')}</a>
       </p>
       <div class="flex items-center gap-5">
         <button

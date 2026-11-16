@@ -55,7 +55,7 @@ function db(): PDO
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             // Usa prepared statements reales (mas seguro).
             PDO::ATTR_EMULATE_PREPARES   => false,
-        ]));
+        ]), 5);
         // Sincronizar zona horaria de MySQL con la de PHP
         $offset = date('P');
         $pdo->exec("SET time_zone = '$offset'");

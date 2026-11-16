@@ -654,7 +654,7 @@ page_header(
     <?php /* Con 24 h el grafico diario seria una sola barra: va la franja horaria. */ ?>
     <?= $hourCardHtml ?>
   <?php else: ?>
-  <?= card_open($chartWeekly ? 'Visitas por semana' : 'Visitas por día', $chartWeekly ? count($chartKeys) . ' semanas completas' : '') ?>
+  <?= card_open($chartWeekly ? 'Visitas por semana' : 'Visitas por día', $chartWeekly ? count($chartKeys) . ' semanas de 7 días' : '') ?>
     <?php if (!array_sum(array_column($chartSeries, 'c'))): ?>
       <div class="empty">Sin datos de visitas en este rango.</div>
     <?php else: ?>
@@ -678,6 +678,9 @@ page_header(
         <?php endforeach; ?>
       </div>
       <p class="hint">Pasa el ratón por una barra para ver visitas y únicos; la línea discontinua es el periodo anterior.</p>
+      <?php if ($chartWeekly): ?>
+        <p class="hint">Semanas de 7 días naturales terminadas hoy, así que la suma (<?= count($chartKeys) * 7 ?> días) puede superar el total de la barra de KPIs (<?= (int) $days ?> días). La última barra incluye el día de hoy, todavía a medias.</p>
+      <?php endif; ?>
     <?php endif; ?>
   <?= card_close() ?>
   <?php endif; ?>

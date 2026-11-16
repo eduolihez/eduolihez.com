@@ -9,7 +9,7 @@
  */
 import { useTranslations, pick } from '../i18n/utils';
 import type { Lang } from '../i18n/ui';
-import { skillGroups } from '../data/skills';
+import { skillGroups, skillRefHref } from '../data/skills';
 import Icon from './Icon.astro';
 
 interface Props {
@@ -40,6 +40,17 @@ const t = useTranslations(lang);
                   <li>{item}</li>
                 ))}
               </ul>
+              {group.refs && group.refs.length > 0 && (
+                <p class="mt-2 text-xs text-text-muted">
+                  <span class="font-mono">{t('skills.evidence')}:</span>
+                  {group.refs.map((ref, i) => (
+                    <>
+                      {i > 0 ? ', ' : ' '}
+                      <a href={skillRefHref(ref, lang)} class="text-accent underline underline-offset-2">{ref.label}</a>
+                    </>
+                  ))}
+                </p>
+              )}
             </dd>
           </div>
         ))

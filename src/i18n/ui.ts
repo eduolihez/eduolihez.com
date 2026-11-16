@@ -77,6 +77,7 @@ export const ui = {
 
     'skills.title': 'Habilidades',
     'skills.subtitle': 'Tecnologías y áreas de conocimiento',
+    'skills.evidence': 'Respaldo',
     'skills.openAll': 'Ver todas las habilidades',
     'skills.modalTitle': 'Todas las habilidades',
     'skills.rowsLabel': 'Resumen de habilidades',
@@ -229,6 +230,7 @@ export const ui = {
 
     'skills.title': 'Skills',
     'skills.subtitle': 'Technologies and areas of expertise',
+    'skills.evidence': 'Backed by',
     'skills.openAll': 'View all skills',
     'skills.modalTitle': 'All skills',
     'skills.rowsLabel': 'Skills overview',
@@ -379,6 +381,7 @@ export const ui = {
 
     'skills.title': 'Habilitats',
     'skills.subtitle': 'Tecnologies i àrees de coneixement',
+    'skills.evidence': 'Suport',
     'skills.openAll': 'Veure totes les habilitats',
     'skills.modalTitle': 'Totes les habilitats',
     'skills.rowsLabel': "Resum d'habilitats",

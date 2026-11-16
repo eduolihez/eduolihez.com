@@ -5,12 +5,31 @@
  * Los nombres de las tecnologias no se traducen; solo el titulo de la categoria.
  */
 import type { Localized } from '../i18n/utils';
+import type { Lang } from '../i18n/ui';
+import { evidencePaths } from '../lib/evidencePage';
+import { evidenceAnchor } from '../scripts/evidence';
 
 export interface SkillGroup {
   category: Localized;
   /** Nombre de icono de src/components/Icon.astro. */
   icon: string;
   items: string[];
+  /** Respaldo real del grupo: evidencia E-nn, repo publicado o app/proyecto de esta web. */
+  refs?: SkillRef[];
+  /** Habilidades del grupo SIN respaldo en datos existentes (se muestran sin enlace). */
+  unbacked?: string[];
+}
+
+export type SkillRef =
+  | { kind: 'evidence'; id: string; label: string }
+  | { kind: 'repo'; repo: string; label: string }
+  | { kind: 'page'; path: string; enPath?: string; label: string };
+
+/** Enlace final de un respaldo, segun el idioma (las paginas sin version CA caen a ES). */
+export function skillRefHref(ref: SkillRef, lang: Lang): string {
+  if (ref.kind === 'evidence') return `${evidencePaths[lang]}#${evidenceAnchor(ref.id)}`;
+  if (ref.kind === 'repo') return `https://github.com/eduolihez/${ref.repo}`;
+  return lang === 'en' && ref.enPath ? ref.enPath : ref.path;
 }
 
 export const skillGroups: SkillGroup[] = [
@@ -28,6 +47,10 @@ export const skillGroups: SkillGroup[] = [
       'Email & Collaboration Security',
       'Security Awareness (SAT)',
       'Phishing Simulation',
+    ],
+    refs: [
+      { kind: 'evidence', id: 'E-03', label: 'E-03 Trend Vision One Advanced' },
+      { kind: 'page', path: '/projects/phishlab/', label: 'PhishLab' },
     ],
   },
   {
@@ -49,6 +72,8 @@ export const skillGroups: SkillGroup[] = [
       'Red Teaming',
       'Web Application Security',
     ],
+    refs: [{ kind: 'repo', repo: 'llm-chatbot-pentest', label: 'llm-chatbot-pentest' }],
+    unbacked: ['Penetration Testing', 'Red Teaming'],
   },
   {
     icon: 'shield',
@@ -68,6 +93,10 @@ export const skillGroups: SkillGroup[] = [
       'Criptografía',
       'Análisis de Phishing',
     ],
+    refs: [
+      { kind: 'evidence', id: 'E-03', label: 'E-03 Trend Vision One Advanced' },
+      { kind: 'repo', repo: 'vigia', label: 'Vigia' },
+    ],
   },
   {
     icon: 'code',
@@ -77,6 +106,7 @@ export const skillGroups: SkillGroup[] = [
       ca: 'Llenguatges & Desenvolupament',
     },
     items: ['Python', 'JavaScript', 'TypeScript', 'Rust', 'SQL', 'Bash'],
+    refs: [{ kind: 'page', path: '/projects/followguard/', label: 'FollowGuard' }],
   },
   {
     icon: 'database',
@@ -86,6 +116,7 @@ export const skillGroups: SkillGroup[] = [
       ca: 'IA & Dades',
     },
     items: ['Machine Learning', 'Prompt Engineering', 'ONNX', 'Azure AI'],
+    refs: [{ kind: 'evidence', id: 'E-01', label: 'E-01 Azure AI Fundamentals' }],
   },
   {
     icon: 'server',
@@ -95,6 +126,7 @@ export const skillGroups: SkillGroup[] = [
       ca: 'Sistemes & Xarxes',
     },
     items: ['Active Directory', 'Windows Server', 'Linux', 'Redes', 'Firewalls'],
+    refs: [{ kind: 'evidence', id: 'E-02', label: 'E-02 Fortinet NSE' }],
   },
   {
     icon: 'globe',
@@ -104,6 +136,8 @@ export const skillGroups: SkillGroup[] = [
       ca: 'Web & Eines',
     },
     items: ['Next.js', 'Tailwind CSS', 'SQLite', 'Git', 'Chrome Extensions'],
+    refs: [{ kind: 'page', path: '/apps/nowait/', enPath: '/en/apps/nowait/', label: 'NoWait' }],
+    unbacked: ['Next.js'],
   },
 ];
 

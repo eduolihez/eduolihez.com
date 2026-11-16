@@ -1119,6 +1119,7 @@
 
   /* Graficos de barras: las columnas encogen hasta caber en la tarjeta (con
      min-width:16px desbordaban a 390 px aunque .chart tenga overflow-x). */
+  .chart { overflow-x: clip; }
   .chart .col { flex: 1 1 0; min-width: 0; }
   .chart .tick, .chart .val { max-width: 100%; overflow: visible; }
   .chart .tick:empty, .chart .val:empty { visibility: hidden; }

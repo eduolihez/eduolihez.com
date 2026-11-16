@@ -717,12 +717,12 @@ if ($hasVisitorCol):
 </p>
 
 <p class="hint mt-3">
-  <strong>Privacidad:</strong> las IPs se guardan hasheadas con sal (mas user-agent), no se
-  usan cookies de seguimiento y no se comparte nada con terceros. Los referrers se almacenan
-  sin parametros de query. La sesión (rebote, entrada/salida) se identifica con un id que vive
-  solo en <code>sessionStorage</code> mientras la pestana esta abierta: no persiste, no se cruza
-  con otras visitas y no sale del navegador salvo para contar "estas páginas son la misma
-  visita". Compatible con RGPD sin banner de cookies.
+  <strong>Privacidad:</strong> las IPs se guardan hasheadas con sal (más user-agent) y no se
+  comparte nada con terceros. Los referrers se almacenan sin parámetros de query. La sesión
+  (rebote, entrada/salida) se identifica con un id que vive solo en <code>sessionStorage</code>
+  mientras la pestaña está abierta. Además hay una cookie propia opcional, <code>eo_vid</code>:
+  solo se crea si el visitante la acepta en el banner y sirve para distinguir nuevos de
+  recurrentes. Do Not Track se respeta.
 </p>
 
 <?php admin_footer(); ?>

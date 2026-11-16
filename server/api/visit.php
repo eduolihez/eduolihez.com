@@ -65,7 +65,7 @@ function clean_short(string $v, int $max): ?string
 /** Valida un token cliente de 16 hex (session_id / hit_id), o null si no cuadra. */
 function clean_token(string $v): ?string
 {
-    return preg_match('/^[a-f0-9]{16}$/', $v) ? $v : null;
+    return preg_match('/^[a-f0-9]{16}\z/', $v) ? $v : null;
 }
 
 /** Entero dentro de [$min, $max], o null si no es numerico o se sale de rango. */

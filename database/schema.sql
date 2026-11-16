@@ -460,6 +460,13 @@ CALL add_column_if_missing('visits', 'browser_lang', "CHAR(2) NULL AFTER `viewpo
 CALL add_index_if_missing('visits', 'idx_session', '`session_id`, `visited_at`');
 CALL add_index_if_missing('visits', 'idx_hit',     '`hit_id`');
 
+-- Tarea 11: visitor_id OPT-IN. Valor de la cookie propia eo_vid (16 hex
+-- aleatorios, 180 dias) que el navegador solo crea si el visitante ACEPTA la
+-- analitica. NULL para todo el que no acepta (o con DNT/GPC). Sirve para
+-- distinguir visitantes nuevos de recurrentes en esa muestra; nada mas.
+CALL add_column_if_missing('visits', 'visitor_id', "CHAR(16) NULL AFTER `browser_lang`");
+CALL add_index_if_missing('visits', 'idx_visitor', '`visitor_id`, `visited_at`');
+
 -- Buzon: destacar y archivar mensajes.
 CALL add_column_if_missing('messages', 'is_starred',  'TINYINT(1) NOT NULL DEFAULT 0');
 CALL add_column_if_missing('messages', 'is_archived', 'TINYINT(1) NOT NULL DEFAULT 0');

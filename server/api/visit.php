@@ -34,6 +34,7 @@
  */
 require_once __DIR__ . '/../lib/http.php';
 require_once __DIR__ . '/../lib/ua.php';
+require_once __DIR__ . '/../lib/visitor.php';
 
 apply_cors();
 
@@ -248,14 +249,12 @@ try {
 
     $appId = resolve_app_id((string) ($input['app'] ?? ''));
 
-    $stmt = db()->prepare(
-        'INSERT INTO visits
+    $insertSql = 'INSERT INTO visits
             (app_id, path, referrer, ip_hash, user_agent, country, device, browser, os, lang, is_bot,
              session_id, hit_id, utm_source, utm_medium, utm_campaign, viewport, browser_lang,
              visited_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())'
-    );
-    $stmt->execute([
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())';
+    $insertParams = [
         $appId,
         $path,
         $referrer,
@@ -274,7 +273,34 @@ try {
         $utmCampaign,
         $viewport,
         $browserLang,
-    ]);
+    ];
+
+    // visitor_id (opt-in, tarea 11): solo llega si el visitante acepto la
+    // cookie eo_vid. Sin el, el INSERT es exactamente el de siempre.
+    $visitorId = clean_visitor_id($input['visitor_id'] ?? null);
+    $inserted = false;
+    if ($visitorId !== null) {
+        try {
+            $stmt = db()->prepare(
+                'INSERT INTO visits
+                    (app_id, path, referrer, ip_hash, user_agent, country, device, browser, os, lang, is_bot,
+                     session_id, hit_id, utm_source, utm_medium, utm_campaign, viewport, browser_lang,
+                     visitor_id, visited_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())'
+            );
+            $stmt->execute([...$insertParams, $visitorId]);
+            $inserted = true;
+        } catch (PDOException $e) {
+            // Columna aun sin migrar: se reintenta sin ella. Cualquier otro
+            // error sube al catch general (sin reintento: evita doble fila).
+            if (!is_unknown_column($e)) {
+                throw $e;
+            }
+        }
+    }
+    if (!$inserted) {
+        db()->prepare($insertSql)->execute($insertParams);
+    }
 
     // Purga probabilistica: ~1% de las veces borra visitas de +400 dias para
     // que la tabla no crezca indefinidamente. Sin necesidad de cron.

@@ -1,585 +1,391 @@
 ---
 name: eduolihez.com
-description: Rediseño v2 — papel y tinta con acento verde azulado (claro, oscuro o sistema), titulares en mono, cuadrícula de fondo, paleta de comandos Ctrl/Cmd+K. Web pública y /admin comparten tokens.
+description: Expediente — informe de incidente con evidencias numeradas. Gris frío de papel técnico (claro) o tinta azul noche (oscuro), acento de texto azul tinta, amarillo marcador solo como relleno. Web pública en modo Read, /admin en modo Operate, mismos tokens.
 colors:
-  signal-green: "#4ade80"
-  signal-green-hover: "#22c55e"
-  signal-green-soft: "#134e2a"
-  probe-cyan: "#22d3ee"
-  trace-violet: "#a78bfa"
-  ink: "#0a0e14"
-  ink-soft: "#0f141c"
-  ink-card: "#141a24"
-  hairline: "#1f2733"
-  hairline-hover: "#2b3543"
-  text-primary: "#e6edf3"
-  text-title: "#f0f3f6"
-  text-muted: "#9aa7b8"
-  text-faint: "#78849a"
-  danger: "#f87171"
-  warn: "#f59e0b"
-  veil: "rgb(3 5 8 / 0.7)"
-  oss: "#10b981"
-  wip: "#f59e0b"
-  closed: "#60a5fa"
-  print-paper: "#ffffff"
-  print-ink: "#000000"
-  print-rule: "#cccccc"
+  bg: "#f3f5f8"
+  bg-soft: "#e9edf2"
+  bg-card: "#ffffff"
+  bg-border: "#d5dbe4"
+  bg-border-hover: "#b9c2cf"
+  text: "#101828"
+  text-title: "#0a1020"
+  text-muted: "#475467"
+  text-faint: "#5d6b7e"
+  accent: "#2443b0"
+  accent-hover: "#1a3390"
+  accent-soft: "#e3e9fb"
+  on-accent: "#ffffff"
+  mark: "#f6c61b"
+  mark-hover: "#e8b70c"
+  mark-soft: "#fdf0c2"
+  on-mark: "#101828"
+  ink: "#0b1220"
+  on-ink: "#f3f5f8"
+  cyan: "#0e7490"
+  violet: "#6d44d8"
+  danger: "#b3261e"
+  warn: "#8f5608"
+  oss: "#0d7a54"
+  wip: "#8f5608"
+  closed: "#1b5cc0"
+  dark-bg: "#0b1220"
+  dark-bg-soft: "#0f1729"
+  dark-bg-card: "#111a2c"
+  dark-bg-border: "#1e2a40"
+  dark-bg-border-hover: "#2c3a55"
+  dark-text: "#e6ebf3"
+  dark-text-title: "#f3f6fa"
+  dark-text-muted: "#9aa8bd"
+  dark-text-faint: "#8a98ae"
+  dark-accent: "#8fb0ff"
+  dark-accent-hover: "#b3c9ff"
+  dark-accent-soft: "#16254a"
+  dark-on-accent: "#0b1220"
+  dark-mark-hover: "#ffd84d"
+  dark-mark-soft: "#3a3112"
+  dark-cyan: "#22d3ee"
+  dark-violet: "#a78bfa"
+  dark-danger: "#f87171"
+  dark-warn: "#f59e0b"
+  dark-oss: "#10b981"
+  dark-wip: "#f59e0b"
+  dark-closed: "#60a5fa"
 typography:
   display:
-    fontFamily: "Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif"
+    fontFamily: "Inter, Inter Fallback, system-ui, -apple-system, Segoe UI, Roboto, sans-serif"
     fontSize: "clamp(1.875rem, 5vw, 3rem)"
-    fontWeight: 600
+    fontWeight: 700
     lineHeight: 1.1
     letterSpacing: "-0.025em"
   headline:
-    fontFamily: "Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif"
-    fontSize: "clamp(1.5rem, 3vw, 1.875rem)"
-    fontWeight: 600
+    fontFamily: "Inter, Inter Fallback, system-ui, -apple-system, Segoe UI, Roboto, sans-serif"
+    fontSize: "1.5rem"
+    fontWeight: 700
     lineHeight: 1.2
     letterSpacing: "-0.025em"
-  title:
-    fontFamily: "Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif"
-    fontSize: "1rem"
-    fontWeight: 600
-    lineHeight: 1.5
-    letterSpacing: "normal"
-  title-lg:
-    fontFamily: "Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif"
-    fontSize: "1.125rem"
-    fontWeight: 600
-    lineHeight: 1.5
-    letterSpacing: "normal"
   body:
-    fontFamily: "Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif"
+    fontFamily: "Inter, Inter Fallback, system-ui, -apple-system, Segoe UI, Roboto, sans-serif"
     fontSize: "0.875rem"
     fontWeight: 400
     lineHeight: 1.625
     letterSpacing: "normal"
-  subtitle:
-    fontFamily: "Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif"
-    fontSize: "0.9375rem"
+  prose:
+    fontFamily: "Inter, Inter Fallback, system-ui, -apple-system, Segoe UI, Roboto, sans-serif"
+    fontSize: "1.0625rem"
     fontWeight: 400
-    lineHeight: 1.625
+    lineHeight: 1.7
     letterSpacing: "normal"
-  label:
-    fontFamily: "JetBrains Mono, ui-monospace, SFMono-Regular, Menlo, monospace"
-    fontSize: "0.75rem"
-    fontWeight: 500
-    lineHeight: 1.4
-    letterSpacing: "0.2em"
   meta:
-    fontFamily: "JetBrains Mono, ui-monospace, SFMono-Regular, Menlo, monospace"
-    fontSize: "0.6875rem"
+    fontFamily: "JetBrains Mono, JetBrains Mono Fallback, ui-monospace, SFMono-Regular, Menlo, monospace"
+    fontSize: "0.75rem"
     fontWeight: 400
     lineHeight: 1.5
     letterSpacing: "normal"
-  micro:
-    fontFamily: "Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif"
-    fontSize: "0.625rem"
-    fontWeight: 600
-    lineHeight: 1.4
-    letterSpacing: "normal"
 rounded:
-  xs: "2px"
   sm: "4px"
   md: "6px"
   lg: "8px"
-  xl: "12px"
-  full: "9999px"
 spacing:
+  container: "64rem"
   gutter: "20px"
   gutter-lg: "32px"
-  grid-gap: "20px"
-  card-pad: "20px"
-  panel-pad: "24px"
-  section-y: "80px"
-  section-y-lg: "112px"
+  touch-target: "44px"
 components:
   button-primary:
-    backgroundColor: "{colors.signal-green}"
-    textColor: "{colors.ink}"
+    backgroundColor: "{colors.mark}"
+    textColor: "{colors.on-mark}"
     rounded: "{rounded.md}"
     padding: "10px 16px"
     typography: "{typography.body}"
   button-primary-hover:
-    backgroundColor: "{colors.signal-green-hover}"
-    textColor: "{colors.ink}"
+    backgroundColor: "{colors.mark-hover}"
+    textColor: "{colors.on-mark}"
   button-ghost:
     backgroundColor: "transparent"
-    textColor: "{colors.text-muted}"
+    textColor: "{colors.text}"
     rounded: "{rounded.md}"
     padding: "10px 16px"
     typography: "{typography.body}"
-  button-ghost-hover:
-    backgroundColor: "transparent"
-    textColor: "{colors.text-primary}"
   card:
-    backgroundColor: "{colors.ink-card}"
-    textColor: "{colors.text-primary}"
+    backgroundColor: "{colors.bg-card}"
+    textColor: "{colors.text}"
     rounded: "{rounded.lg}"
-    padding: "{spacing.card-pad}"
-  input:
-    backgroundColor: "{colors.ink}"
-    textColor: "{colors.text-primary}"
-    rounded: "{rounded.md}"
-    padding: "10px 14px"
-    typography: "{typography.body}"
   chip:
     backgroundColor: "transparent"
     textColor: "{colors.text-muted}"
     rounded: "{rounded.sm}"
     padding: "2px 8px"
     typography: "{typography.meta}"
-  status-pill:
-    backgroundColor: "{colors.signal-green}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.full}"
-    padding: "4px 12px"
-    typography: "{typography.meta}"
-  status-panel:
-    backgroundColor: "{colors.ink-card}"
-    textColor: "{colors.text-muted}"
+  hero-band:
+    backgroundColor: "{colors.ink}"
+    textColor: "{colors.on-ink}"
+  hero-status:
+    backgroundColor: "{colors.mark}"
+    textColor: "{colors.on-mark}"
+    rounded: "{rounded.sm}"
+  evidence-card:
+    backgroundColor: "{colors.bg-card}"
+    textColor: "{colors.text}"
     rounded: "{rounded.lg}"
-    padding: "14px 16px"
-    typography: "{typography.body}"
-  status-panel-error:
-    backgroundColor: "{colors.ink-card}"
-    textColor: "{colors.text-primary}"
-    rounded: "{rounded.lg}"
-    padding: "14px 16px"
+    padding: "24px"
 ---
 
 # Design System: eduolihez.com
 
-## Rediseño v2 (vigente)
-
-> **Esta sección prevalece.** El resto del documento describe la identidad anterior
-> ("La Consola de Guardia", solo oscura, verde `#4ade80`) y se conserva como historia y
-> como referencia de las reglas que siguen vigentes (estados, un solo rojo, mono como
-> metadato, accesibilidad). Donde haya conflicto, manda lo de aquí.
-
-**Inspiración:** edouardgouilliard.com (papel y tinta, mono en titulares, cuadrícula
-tenue, ⌘K, línea de estado). Se adapta, no se copia: el hero es un diagrama del flujo de
-triaje de un SOC, no una topología del homelab, y **no hay datos en vivo inventados**.
-
-### Tema: sistema por defecto, alternable
-
-- Sin elección guardada, el sitio sigue a `prefers-color-scheme`.
-- El botón (y la paleta) guardan `light`/`dark` en `localStorage['theme']`; "Tema del
-  sistema" lo borra. `public/theme-init.js` lo aplica antes del primer pintado (script
-  externo, compatible con la CSP). Lógica y tests en `src/scripts/theme.ts`.
-- Resolución: `<html data-theme>` explícito → si no, media query. Los valores viven en
-  `src/styles/tokens.css` (web) y en `server/admin/assets/admin.css` (admin); **mismos
-  valores** en ambos.
-
-### Paleta (todos los pares de texto ≥ 4.5:1, comprobado)
-
-| Token | Claro | Oscuro |
-|---|---|---|
-| `bg` / `bg-soft` / `bg-card` | `#f5f6f3` / `#eceee9` / `#ffffff` | `#0a0e14` / `#0f141c` / `#141a24` |
-| `bg-border` | `#e0e3de` | `#1f2733` |
-| `text` / `text-title` | `#131820` / `#0a0e14` | `#e6edf3` / `#f0f3f6` |
-| `text-muted` / `text-faint` | `#49535f` / `#5b6674` | `#9aa7b8` / `#8e99ad` |
-| `accent` / hover / soft | `#047266` / `#035c52` / `#dcf1ed` | `#2dd4bf` / `#5eead4` / `#0e3a35` |
-| `danger` · `warn` | `#b3261e` · `#8f5608` | `#f87171` · `#f59e0b` |
-| `oss` · `wip` · `closed` | `#0d7a54` · `#8f5608` · `#1b5cc0` | `#10b981` · `#f59e0b` · `#60a5fa` |
-
-El acento de texto en claro es más oscuro que el verde azulado decorativo de la
-referencia (`#0aa593`, ~2.9:1 sobre papel): no llegaba a AA. El significado no cambia:
-el acento sigue siendo "vivo, disponible, accionable"; un fallo usa `danger`, nunca el acento.
-
-### Tipografía
-
-- **Titulares h1/h2 y marca en JetBrains Mono** (700, tracking ceñido). Cuerpo y tarjetas
-  en Inter. El cuerpo de los artículos del blog (`.prose`) sigue en Inter.
-- **Línea de apertura del hero en serif cursiva** (`--font-serif`, pila del sistema, sin
-  descarga) con la parte final en acento. Límite: dos familias web (Inter y JetBrains Mono).
-
-### Elementos nuevos
-
-- **Cuadrícula de fondo** (`.hero-grid`) con máscara radial y resplandor del acento.
-- **Paleta de comandos** Ctrl/Cmd+K (`Palette.astro`, `palette.ts`): patrón combobox +
-  listbox, filtrado sin acentos, foco devuelto al cerrar. La etiqueta del atajo se adapta a la
-  plataforma (`data-shortcut-mod`); grupos con color propio (`data-kind`) e iconos clonados de
-  un `<template>`. En el admin se reutiliza el mismo
-  módulo, empaquetado a `server/admin/assets/palette.js` con `npm run admin:palette`
-  (también se ejecuta en `npm run build`).
-- **Doble carrusel de habilidades** (`Skills.astro`, `skillRows()`): dos filas en sentido
-  contrario; el título abre una ventana con todo agrupado (`skills.ts`).
-- **Franja de stack** (`StackStrip`): tecnologías reales de `src/data/skills.ts`. El HTML
-  lleva una copia; la segunda la clona `marquee.ts`.
-- **Marca:** `EO // security` en la web y `EO // admin` en el panel.
-- **Flujo de triaje** (tarjeta del hero): lista vertical de cuatro etapas (Logs → XDR →
-  Triaje → Respuesta) con icono, subtítulo real de tu experiencia y un pulso de señal
-  (`.flow-pulse`, solo `transform`) que baja por la línea. Es un diagrama del proceso:
-  nada de él pretende ser un dato en vivo.
-- **Iconos** (`Icon.astro`): los de trazo (`sun`, `moon`, `terminal`, `arrowRight`,
-  `cloud`, `server`, `globe`, `logs`, `user`) comparten el envoltorio `stroke()`; el
-  resto son rellenos. Las categorías de habilidades llevan icono (`icon` en `skills.ts`).
-- **Footer compacto:** marca + contacto a la izquierda, proyectos publicados a la derecha
-  (enlaces estáticos: sostienen el rastreo de `/projects/` y `/apps/`) y una barra final con
-  copyright, "Sobre esta web", ⌘K y volver arriba. Se eliminó la columna de navegación
-  (duplicaba cabecera y paleta), los badges repetidos y el texto "Diseñado por…".
-
-### Reglas que se mantienen
-
-Mono solo para metadato y titulares (no prosa), un único rojo, el verde/acento no significa
-fallo, respeto de `prefers-reduced-motion`, WCAG AA y sin CDN de fuentes.
-
----
-
 ## Overview
 
-**Creative North Star: "La Consola de Guardia"**
+**Mundo visual: "Expediente".** La web es el expediente de un analista: un informe de
+incidente con evidencias numeradas. Sustituye a las dos identidades anteriores ("La
+Consola de Guardia", verde sobre negro; y el rediseño v2 de papel, mono y serif cursivo).
+Se evitó a propósito la estética de consola hacker: la investigación del rediseño
+(`.claude/flujo/ESTADO.md`) la desaconseja para el público que decide en menos de un minuto.
 
-Un puesto de vigilancia de madrugada. La pantalla está en penumbra porque el turno
-dura horas y la vista tiene que aguantar; todo se lee sin esfuerzo sobre un negro
-azulado que nunca llega al negro puro. El verde no decora: aparece exactamente donde
-algo está vivo, disponible o es accionable, igual que en un panel de operación. Cuando
-todo está en calma, la pantalla está casi en blanco y negro.
+Dos modos con los mismos tokens:
 
-El dialecto de terminal está presente pero contenido. El prompt `>_` en la marca, los
-kickers de sección en mono versalita con `0.2em` de tracking, la línea
-`Status: OPTIMIZING_CV // Severity: INFO` del modal de CV, el punto que late junto al
-avatar cuando hay disponibilidad. Es una terminal ordenada y apagada, no una pantalla
-de película: **ningún efecto simula ser algo que el sitio no es.** Esa contención es
-coherente con la promesa del producto — si la web afirma algo, el repositorio lo
-respalda — y se extiende a lo visual: nada aparenta profundidad, actividad o volumen
-que no exista de verdad.
+- **Read** (web pública): una columna centrada a 64rem, escaneable arriba y profundizable
+  abajo.
+- **Operate** (`/admin`): uso repetitivo de un solo operador; sidebar, "Hoy", tablas que se
+  vuelven tarjetas en móvil.
 
-La densidad es media-alta pero respirada. Las secciones se separan por bloques de
-80–112px y se distinguen por tono, no por marco: el fondo alterna entre `#0a0e14` y
-`#0f141c`, y una hairline de 1px cierra cada bloque. La composición es de una sola
-columna centrada a 1024px, con rejillas de dos o tres celdas dentro. Todo el trabajo
-de jerarquía lo hacen el tono, el peso tipográfico y el espacio.
+Principio rector heredado de `PRODUCT.md`: nada simula ser algo que el sitio no es. Sin
+terminal falsa, sin datos en vivo inventados, sin testimonios ni métricas.
 
-**Key Characteristics:**
-- Negro azulado en tres capas tonales, jamás negro puro (`#0a0e14` → `#0f141c` → `#141a24`)
-- Un solo verde señal (`#4ade80`), escaso por doctrina
-- Inter para lo que se lee, JetBrains Mono exclusivamente para metadatos, etiquetas y código
-- Superficie plana: separación por hairline de 1px y capa tonal, casi nunca por sombra
-- Radio contenido y creciente con el tamaño de la superficie (2px → 12px)
-- Movimiento mínimo: `fade-up` de entrada, transiciones de color de 150–300ms, nada más
+## Tema
+
+- Sin elección guardada, el sitio sigue a `prefers-color-scheme`.
+- El botón y la paleta guardan `light`/`dark` en `localStorage['theme']`; "Tema del
+  sistema" lo borra. `public/theme-init.js` lo aplica antes del primer pintado (script
+  externo, compatible con la CSP). Lógica y tests en `src/scripts/theme.ts`.
+- Resolución: `<html data-theme>` explícito; si no, la media query. `tokens.css` tiene dos
+  bloques oscuros (selector de atributo y media query) que `src/test/tokens.test.ts`
+  obliga a ser idénticos.
+- **Una fuente de verdad:** los valores viven en `src/styles/tokens.css` y se copian
+  literalmente a `server/admin/assets/admin.css` (PHP estático, no importa la hoja de la
+  web). El test de tokens comprueba la igualdad y el contraste. Si cambia un valor, cambia
+  en los dos sitios.
+- `global.css` publica los tokens como utilidades de Tailwind con `@theme inline`
+  (`bg-bg-card`, `text-accent`, `bg-mark`…). **No se renombran clases ni tokens**: varios
+  `src/scripts/*.ts` construyen clases Tailwind en cadenas y tienen tests. Una clase nueva
+  se añade; no sustituye.
 
 ## Colors
 
-Paleta oscura y estrecha: cuatro escalones de fondo, cuatro de texto y un solo acento
-cromático con dos secundarios reservados a un uso muy concreto.
+La paleta tiene tres planos de fondo, cuatro de texto, un acento de texto, un amarillo de
+relleno y una tinta fija. Valores de `tokens.css` (claro / oscuro):
 
-### Primary
+| Token | Claro | Oscuro |
+|---|---|---|
+| `bg` / `bg-soft` / `bg-card` | `#f3f5f8` / `#e9edf2` / `#ffffff` | `#0b1220` / `#0f1729` / `#111a2c` |
+| `bg-border` / `bg-border-hover` | `#d5dbe4` / `#b9c2cf` | `#1e2a40` / `#2c3a55` |
+| `text` / `text-title` | `#101828` / `#0a1020` | `#e6ebf3` / `#f3f6fa` |
+| `text-muted` / `text-faint` | `#475467` / `#5d6b7e` | `#9aa8bd` / `#8a98ae` |
+| `accent` / `accent-hover` / `accent-soft` / `on-accent` | `#2443b0` / `#1a3390` / `#e3e9fb` / `#ffffff` | `#8fb0ff` / `#b3c9ff` / `#16254a` / `#0b1220` |
+| `mark` / `mark-hover` / `mark-soft` / `on-mark` | `#f6c61b` / `#e8b70c` / `#fdf0c2` / `#101828` | `#f6c61b` / `#ffd84d` / `#3a3112` / `#101828` |
+| `ink` / `on-ink` | `#0b1220` / `#f3f5f8` | `#0b1220` / `#f3f5f8` |
+| `cyan` · `violet` | `#0e7490` · `#6d44d8` | `#22d3ee` · `#a78bfa` |
+| `danger` · `warn` | `#b3261e` · `#8f5608` | `#f87171` · `#f59e0b` |
+| `oss` · `wip` · `closed` | `#0d7a54` · `#8f5608` · `#1b5cc0` | `#10b981` · `#f59e0b` · `#60a5fa` |
+| `scrim` | `rgb(16 24 40 / 0.55)` | `rgb(3 6 12 / 0.72)` |
+| `selection` | `rgb(246 198 27 / 0.45)` | `rgb(246 198 27 / 0.3)` |
 
-- **Verde Señal** (`#4ade80`): el único acento del sistema. Marca la acción primaria
-  (`.btn-primary`), los enlaces (`.link-accent`), los kickers de sección, el rol en el
-  hero, el contador de certificaciones, el foco visible y el estado "disponible para
-  trabajar". Su trabajo es señalizar, no ambientar.
-- **Verde Señal Intenso** (`#22c55e`): exclusivamente el hover del botón primario y de
-  los enlaces del cuerpo del blog. Nunca es un color de reposo.
-- **Verde Señal Tenue** (`#134e2a`): fondo de badge sobre oscuro, para cuando hace falta
-  un plano verde sin gritar. En la práctica se usa poco: el patrón dominante es
-  `signal-green` a `/5`–`/20` de opacidad sobre el fondo de la sección.
+También hay `grid-line`, `glow` y `shadow-card` por tema (ver `tokens.css`). El front
+matter lista claro y oscuro; los tokens sin prefijo `dark-` son los del tema claro.
 
-### Secondary
+### Reglas de color
 
-- **Cian de Sonda** (`#22d3ee`): acento secundario reservado a **"Sobre esta web"**,
-  donde los bloques temáticos necesitan diferenciarse entre sí (`tone: 'cyan'`). No es
-  un color de uso general.
+**`--mark` es solo relleno.** El amarillo marcador va siempre como fondo con `--on-mark`
+encima (≥ 7:1): botón primario, insignia de disponibilidad, barrido de la evidencia,
+contadores del admin, selección de texto. Nunca texto amarillo sobre fondo claro.
 
-### Tertiary
+**`--accent` es el color de texto y enlace.** Es un azul tinta (`#2443b0` en claro,
+`#8fb0ff` en oscuro) porque se usa como texto y tiene que cumplir ≥ 4.5:1 sobre `bg` y
+`bg-card`. Enlaces (`.link-accent`, `.ev-verify`), estado activo del admin, cursor de
+escritura.
 
-- **Violeta de Traza** (`#a78bfa`): tercer tono de la misma rotación de "Sobre esta web"
-  (`tone: 'violet'`). Mismo alcance restringido que el cian.
+**`--ink` es la banda de portada.** `#0b1220` fijo en los dos temas: el hero es oscuro
+también en claro (color comprometido, no solo un acento). La columna izquierda del hero
+(`.hero-ink`) redefine los tokens de texto con los valores del tema oscuro para que el
+texto, `btn-ghost` y el foco sean legibles sobre la tinta. La ficha de evidencias queda
+fuera de ese ámbito y usa los tokens del tema activo.
 
-### Neutral
+**Un solo rojo, y no es el acento.** Un fallo usa `--danger`, un aviso `--warn`. El
+amarillo no significa aviso ni fallo.
 
-- **Tinta** (`#0a0e14`): fondo principal del sitio y de las secciones impares. Negro
-  azulado, nunca `#000`.
-- **Tinta Suave** (`#0f141c`): fondo de las secciones alternas (proyectos, contacto,
-  FAQ, blog). Es el mecanismo principal de separación entre bloques.
-- **Tinta de Tarjeta** (`#141a24`): la tercera y última capa. Tarjetas, menús
-  desplegables, modales, campos de código.
-- **Hairline** (`#1f2733`): el borde de 1px que dibuja tarjetas, campos, chips y
-  secciones. Es la herramienta de estructura por defecto de todo el sistema.
-- **Hairline Activa** (`#2b3543`): la misma línea al pasar el ratón sobre una tarjeta.
-- **Texto Principal** (`#e6edf3`): cuerpo y titulares de sección.
-- **Texto de Titular** (`#f0f3f6`): un escalón por encima, reservado a los `h2`/`h3` del
-  contenido del blog y a la marca del pie.
-- **Texto Atenuado** (`#9aa7b8`): descripciones, subtítulos de sección, navegación en
-  reposo, contenido secundario. Es el color de más superficie del sitio después del fondo.
-- **Texto Tenue** (`#78849a`): metadatos, fechas, etiquetas de columna, pistas. Es el escalon mas tenue que aun cumple WCAG AA (4.63 sobre `ink-card`, el peor fondo); el valor anterior `#6b7688` se quedaba en 3.80.
+**`--cyan` y `--violet`** son decorativos y acotados: bloques de "Sobre esta web" y sellos
+de emisor de certificaciones sin logotipo. No van a titulares, botones ni enlaces.
 
-### Status
+**Estado de proyecto:** `oss`, `wip`, `closed` como texto sólido sobre fondo al 10 % y
+borde al 20 % (`text-oss`, `bg-wip/10`, `border-closed/20`).
 
-- **Rojo de Fallo** (`#f87171`): el único rojo del sistema. Errores de carga, alertas
-  y acciones destructivas, en el sitio público y en `/admin`. Se usa como texto sólido
-  sobre fondo al 5% y borde al 30%.
-- **Ámbar de Aviso** (`#f59e0b`): avisos y contenido retirado deliberadamente (la
-  página 410, cuyo propio texto dice que no es un error). También el badge "En Desarrollo".
-
-Tres badges de proyecto, siempre en el mismo patrón: texto sólido, fondo al 10%, borde al 20%.
-
-- **Open Source** (`oss`, `#10b981`) · **En Desarrollo** (`wip`, `#f59e0b`) · **Código Privado** (`closed`, `#60a5fa`)
-
-Son **tokens**, no literales de Tailwind. Se escriben `text-oss` / `bg-wip/10` /
-`border-closed/20`. Antes se escribían `bg-emerald-500` y compañía: coincidían de valor,
-pero no estaban atados al sistema, así que un cambio de token no habría llegado a la
-interfaz. Contraste verificado: 7.07, 8.31 y 7.03 sobre el fondo del pie.
-
-### Otros
-
-- **Velo de Modal** (`rgb(3 5 8 / 0.7)`): el único uso de un negro más profundo que
-  `ink`, y solo detrás de un modal, siempre con `backdrop-filter: blur(4px)`.
-- **Impresión** (`print-paper` `#ffffff`, `print-ink` `#000000`, `print-rule` `#cccccc`):
-  los únicos blancos y negros absolutos del sistema. Existen solo dentro de
-  `@media print`, donde la web se convierte en un CV sobre papel y el contraste máximo
-  deja de ser un problema para pasar a ser el objetivo.
-
-### Named Rules (estado)
-
-**La Regla del Verde que no Falla.** El verde significa "vivo, disponible, accionable".
-Por eso **no puede significar también "ha fallado"**: un error nunca va del color de lo
-que funciona. Todo fallo usa `danger`; todo aviso usa `warn`. Antes de esta regla la
-página 404 anunciaba `ERROR: 404 ROUTE NOT FOUND` en verde.
-
-**La Regla del Rojo Único.** Hay un solo rojo: `#f87171`. Históricamente el sitio
-improvisó cinco (`red-300`, `red-400`, `red-500`, `red-600`, `rose-900`) más un naranja
-y un amarillo, todos fuera de paleta. Un segundo rojo es deriva, no un matiz.
-
-### Named Rules
-
-**La Regla de la Señal Escasa.** El verde no supera aproximadamente el 10% de la
-superficie visible de ninguna pantalla. Su rareza es exactamente lo que lo hace legible
-como señal: si todo es verde, nada avisa. Antes de añadir un elemento verde a una
-pantalla, comprueba qué otro deja de serlo.
-
-**La Regla del Verde Único.** Hay un solo verde de marca: `#4ade80`. El panel `/admin`
-usa hoy `#10b981` y un fondo `#090e16` propios: eso es **deriva, no un subsistema**. La
-paleta de esta página es la normativa; cualquier trabajo en `/admin` converge hacia ella.
-
-**La Regla del Tercer Tono.** El cian y el violeta tienen exactamente **dos** usos, y
-ninguno más: separar los bloques temáticos de "Sobre esta web", y teñir los sellos de
-emisor de la sección de certificaciones cuando una credencial no trae logotipo. Los dos
-son decorativos, acotados y pequeños. Llevarlos a un titular, a un botón o a un enlace
-rompe el sistema — el sitio tiene un acento, no tres.
-
-*Nota de procedencia:* el segundo uso no estaba en la primera versión de este documento
-porque no vi ese componente al escribirlo. La auditoría lo destapó: la paleta de sellos
-tenía siete tonos, dos de ellos (`#f472b6` rosa y `#34d399` verde-400) fuera de la paleta
-por completo. Se redujo a cuatro tokens del sistema y la regla se amplió para describir
-lo que el código hace de verdad.
+**Contraste:** lo comprueba `src/test/tokens.test.ts`: texto y acento ≥ 4.5:1 sobre `bg`
+y `bg-card`; `--on-mark` sobre `--mark` ≥ 7:1. El halo del foco en `--mark` sobre claro
+queda en 1,48:1; el 3:1 lo aporta el anillo `--text` (ver Foco).
 
 ## Typography
 
-**Display / Body Font:** Inter Variable (con `system-ui`, `-apple-system`, `Segoe UI`, `Roboto`)
-**Label / Mono Font:** JetBrains Mono Variable (con `ui-monospace`, `SFMono-Regular`, `Menlo`)
+Dos familias web, autoalojadas, solo subconjuntos `latin` y `latin-ext`, ejes variables,
+`font-display: swap`. Sin petición a CDN de fuentes (decisión de seguridad ligada a la CSP).
 
-Ambas autoalojadas con `@font-face` declaradas a mano, solo subconjuntos `latin` y
-`latin-ext`, ejes variables completos (Inter 100–900, JetBrains Mono 100–800) y
-`font-display: swap`. **No hay ninguna petición a un CDN de fuentes en el sitio público**,
-y esa es una decisión de seguridad, no de rendimiento.
+- **Inter** (100–900): cuerpo y titulares. `h1`, `h2`, `h3` y `.section-title` en peso
+  **700 con `letter-spacing: -0.025em`** (`h3` −0.015em), `text-wrap: balance`. Display
+  `clamp(1.875rem, 5vw, 3rem)` una vez por página; títulos de sección `text-2xl`/`text-3xl`.
+- **JetBrains Mono** (100–800): **solo metadato**: IDs de evidencia (E-nn), años, fechas,
+  chips de tecnología, contadores, código y el editor del admin. Nunca prosa.
+- **Prosa del blog** (`.prose`): Inter 1.0625rem / 1.7, `max-width: 37rem`. Medida medida
+  en el rediseño: 71–72 caracteres por línea en ES/EN/CA.
 
-**Character:** un par funcional, no expresivo. Inter aporta neutralidad legible a
-cualquier tamaño; JetBrains Mono aporta la voz de la máquina. La personalidad no está en
-la elección de las familias sino en el reparto estricto entre ellas: la mono no es un
-recurso estético, es una categoría semántica.
+Se descartó Schibsted Grotesk para titulares: con ella los woff2 `latin` del home sumaban
+~132 KB frente a un presupuesto de 120 KB (`ESTADO.md`, `registro.md`). El carácter
+editorial sale del peso y del tracking, no de una tercera familia. `--font-serif` se
+conserva como variable (el marcado aún la referencia) pero apunta a la pila de Inter.
 
-### Hierarchy
+### Excepción deliberada: fuentes "Inter Fallback" y "JetBrains Mono Fallback"
 
-- **Display** (600, `1.875rem` → `3rem`, `tracking-tight`): el nombre en el hero. Una vez
-  por página, nunca más.
-- **Headline** (600, `1.5rem` → `1.875rem`, `tracking-tight`): títulos de sección
-  (`.section-title`) y `h1` de las páginas interiores.
-- **Title** (600, `1rem`–`1.125rem`): títulos de tarjeta, encabezados de modal, puestos
-  del timeline.
-- **Body** (400, `0.875rem`–`1rem`, `leading-relaxed` 1.625): párrafos, descripciones,
-  subtítulos de sección (`.section-subtitle`, limitado a `max-w-2xl`).
-- **Label** (mono, 500, `0.75rem`, `uppercase`, `tracking-[0.2em]`): los kickers de
-  sección (`.section-kicker`) y los encabezados de columna del pie. Es la firma
-  tipográfica más reconocible del sitio.
-- **Meta** (mono, 400, `0.6875rem`–`0.75rem`): stacks de tecnología, fechas, contadores,
-  la marca `>_ eduolihez`, la línea de estado del modal de CV.
+`global.css` declara dos `@font-face` locales que no son familias de marca:
 
-### Named Rules
+| Familia | `src` | `size-adjust` | `ascent` / `descent` / `line-gap` |
+|---|---|---|---|
+| `Inter Fallback` | `local('Arial')` | 107.12 % | 90.44 % / 22.52 % / 0 % |
+| `JetBrains Mono Fallback` | `local('Courier New')` | 100.33 % | 101.66 % / 29.9 % / 0 % |
 
-**La Regla del Mono como Metadato.** JetBrains Mono nunca compone prosa. Se reserva a
-seis usos: la marca, los kickers de sección, los chips de tecnología, los números y
-contadores, las etiquetas de estado y el código. Un párrafo en mono es un error del
-sistema, no una variación.
-
-**La Regla del Titular Ceñido.** Todo lo que sea Display o Headline lleva
-`letter-spacing: -0.025em`. Todo lo que sea Label mono en versalitas lleva `0.2em`. No
-hay tracking intermedio en el sistema: o se ciñe o se abre del todo.
+Existen para que el texto pintado con la fuente del sistema ocupe lo mismo que con el
+woff2 y el cambio no provoque CLS. Van en la pila entre la fuente real y `system-ui`.
+Cuentan como ajustes de métrica, no como tercera familia: el límite sigue siendo dos
+familias web. **El hook de impeccable las marca como fuentes no declaradas; es un falso
+positivo conocido y no se añade un ignore.**
 
 ## Layout
 
-Una sola columna centrada. `.container-page` fija `max-width: 64rem` (1024px) con
-gutters de `20px` en móvil, `24px` desde `sm` y `32px` desde `lg`. Dentro, las rejillas
-son de dos columnas (contacto, hero) o de tres (proyectos, certificaciones, blog),
-siempre colapsando a una en móvil con `gap: 20px`–`24px`.
+Una columna centrada: `.container-page` a `max-width: 64rem` (`max-w-5xl`), gutters de 20 px
+en móvil, 24 px desde `sm` y 32 px desde `lg`. Secciones separadas por `border-b` de
+`bg-border` y relleno de 3.5–4 rem. `scroll-padding-top: 5rem` por la cabecera fija.
+`--container-content: 72rem` está declarado en `@theme` pero ningún componente lo usa.
 
-El ritmo vertical es de `80px` de padding de sección, `112px` desde `sm`. La cabecera es
-fija, mide `56px` de alto y el documento compensa con `scroll-padding-top: 5rem` para que
-los anclajes no queden bajo ella. El hero es la única excepción al ritmo: `py-20` con
-`pt-28`/`sm:pt-32` extra para librar la cabecera.
+**Orden de la home** (`PortfolioSections.astro`): Hero, StackStrip, Experience, Projects,
+Certifications, Skills, BlogPreview, Faq, Contact. StackStrip queda tras el Hero
+(desviación aceptada respecto al plan inicial).
 
-Breakpoints: los de Tailwind por defecto — `sm` 640px, `md` 768px, `lg` 1024px. `md` es
-la frontera de la navegación (menú de escritorio ↔ hamburguesa); `lg` es donde el hero
-pasa a dos columnas y los grids a tres.
+Hay modo impresión (`@media print`): oculta cabecera, pie y formulario, fondo blanco, y
+`.no-print` para lo que sobra; la home sale como CV.
 
-Existe además un modo impresión completo: oculta cabecera, pie y formulario, invierte a
-fondo blanco y texto negro, y convierte la home en un CV limpio con `break-inside: avoid`
-por sección.
+## Firma: la cadena de evidencias (E-nn)
 
-### Named Rules
+Cada afirmación verificable del hero lleva una etiqueta **E-01, E-02…** en JetBrains Mono,
+enlazada a su fuente real (credencial en Credly, PDF en `/certificaciones/`, archivo de
+`about-tech.ts`).
 
-**La Regla de la Alternancia Tonal.** Las secciones consecutivas alternan `ink` y
-`ink-soft` y se cierran con `border-b` de `hairline`. Ese par —cambio de tono más línea
-de 1px— es el único separador de sección del sistema. No se usan divisores decorativos,
-ni ondas, ni degradados de transición.
+- **Datos:** campo estático `evidence` en `src/config.ts`. Si una afirmación no tiene
+  fuente, no lleva etiqueta. `src/test/evidence.test.ts` falla si una ruta local no existe
+  en `public/`. Paridad de E-nn en ES/EN/CA.
+- **Ficha** (`.ev-card`, `EvidenceCard.astro`): hoja del expediente sobre la banda de
+  tinta. Fila = `E-nn` (mono, `.ev-id`), texto con año en mono en línea propia, y enlace
+  "Verificar" (`.ev-verify`, `--accent`, subrayado).
+- **Barrido de marcador:** al pasar el ratón, enfocar (`:focus-within`) o llegar por
+  ancla (`:target`) a una fila, la etiqueta (`.ev-label`) se rellena de `--mark` y el texto
+  pasa a `--on-mark`. Es un relleno sólido animado por `background-size` (0.45 s), no un
+  degradado decorativo; con `prefers-reduced-motion` no hay transición.
+- **Cada E-nn es un permalink** (`ev-row` con `scroll-margin-top`).
 
-*Nota de estado:* el token `--container-content: 72rem` está declarado en `@theme` pero
-**ningún componente lo usa**; el ancho real lo fija `.container-page` a `64rem`. Está
-registrado aquí para que nadie lo tome por normativo.
+## Patrones por sección (modo Read)
 
-## Elevation & Depth
+- **Hero con banda tinta** (`.hero-band`, `.hero-layout`): nombre, rol, una frase y tres
+  CTA (contacto con `btn-primary`, CV y LinkedIn con `btn-ghost`), cada uno ≥ 44 px. En
+  móvil: principal, ficha, metadato. Desde 1024 px: dos columnas, la ficha ocupa las dos
+  filas de la derecha (24rem). Insignia de disponibilidad (`.hero-status`, relleno
+  `--mark`) en un hueco de altura fija: ocultarla no desplaza nada. Es dinámica (ajuste
+  `open_to_work` del panel) y se oculta si el ajuste está a 0; no se fija en el código.
+- **StackStrip:** una línea estática de tecnologías reales (`src/data/skills.ts`),
+  recortada por elemento si no cabe. Sin carrusel ni JS.
+- **Experiencia:** compacta, datos de `src/data/experience.ts`; chips y metadato en mono.
+- **Evidencia (Projects, Certifications):** tarjetas `.card` (8 px, borde 1 px, sin
+  sombra). Filtros con objetivo ≥ 44 px. El estado "cargando / vacío / error" vive en
+  `StatusPanel.astro` (`data-state`); el error nombra el problema y ofrece reintento.
+- **Habilidades:** lista de definición agrupada por categoría con icono; las habilidades
+  fluyen en una línea (`.dot-list`). Sin marquee, sin ventana, sin muro de píldoras.
+- **FAQ:** `<details>` nativos. Las preguntas siguen todas en el DOM (alimentan `FAQPage` y
+  `llms.txt`); se pliegan visualmente en un bloque "ver más".
+- **Blog en modo Read:** índice en filas (`.blog-entry`) y artículo con `.prose` a medida
+  de lectura, tabla de contenidos (`.post-toc`) y código legible. Contraste ≥ 6,5:1
+  medido en el rediseño.
+- **Páginas de error** (`ErrorPage.astro`, 400/403/404/410/500): una columna estrecha,
+  qué pasó y qué hacer; la primera acción es la principal; el código HTTP va como metadato
+  en mono al pie. Un error usa `--danger`, nunca el acento. Siguen en inglés (servidas
+  por Apache, sin selector de idioma).
+- **Páginas auxiliares:** "Sobre esta web" como lista de definición de dos columnas con
+  el archivo de cada control; `/projects` en filas.
 
-**Este apartado describe el estado observado, no una doctrina cerrada.** La profundidad
-se construye hoy casi por completo con capa tonal y hairline: `ink` → `ink-soft` →
-`ink-card`, cada plano separado por un borde de 1px. La inmensa mayoría de las superficies
-son planas en reposo y responden al hover cambiando color de borde, no elevándose.
+## Admin: modo Operate
 
-Las sombras existen, pero en un puñado de sitios contados y siempre con una razón:
+Mismos tokens, sin serif ni portada. Inter 700 para títulos (`-0.015em`), mono solo para
+IDs, fechas y metadato. El CSS es **`server/admin/assets/admin.css`**, un fichero externo
+enlazado desde `server/admin/partials/layout.php` (antes se describía como embebido).
+Las fuentes se autoalojan en `server/admin/assets/fonts/` (latin).
 
-### Shadow Vocabulary
+- **Navegación:** sidebar fija en escritorio; barra inferior de cinco ítems bajo 1024 px
+  (`.bottom-nav`, ítems de 56 px de alto, insignia en `--mark`), con "Más" que abre el
+  cajón lateral.
+- **Hoy** (`index.php`): primera vista; lista de lo que pide acción (contadores
+  `.today-count`, relleno `--mark` si hay pendientes) y métricas. Solo con datos que la
+  página ya tiene.
+- **Tablas a tarjetas:** `table.stack` con `data-label` por celda; bajo 768 px cada fila es
+  una tarjeta y la etiqueta sale de CSS; la cabecera se oculta solo de forma visual.
+- **Formularios:** validación inline accesible (`aria-invalid`, `.field-error` asociado
+  con `aria-describedby`), barra de acciones fija (`.form-actions`, queda sobre la barra
+  inferior en móvil), editor con medida de 80 ch.
+- **Paleta de comandos** (Ctrl/Cmd+K): mismo módulo que la web, empaquetado en
+  `server/admin/assets/palette.js` (`npm run admin:palette`, también en `npm run build`).
+- **Foco:** anillo `--accent` de 2 px con offset 2 px.
+- **Objetivos táctiles de 44 px** en menú, botones (táctil o < 768 px), campos y casillas.
+- El token `--faint-ui` es propio del admin (`#8592a6` / `#6b7a92`) para bordes de
+  componente, no para texto.
 
-- **Elevación de modal** (`shadow-2xl`, con `backdrop-filter: blur(4px)` y velo
-  `rgb(3 5 8 / 0.7)`): la única elevación real del sistema. Separa el modal de proyecto y
-  el de CV del documento que queda detrás.
-- **Halo de disponibilidad** (`box-shadow: 0 0 15px rgba(74,222,128,0.4)`): el resplandor
-  del badge "Disponible para trabajar" sobre el avatar. No es profundidad, es emisión: la
-  única luz propia de toda la interfaz.
-- **Realce de control** (`shadow-xs`): apoyo mínimo en los botones de filtro de proyectos
-  y certificaciones, para despegarlos de la sección.
-- **Velo de cabecera y pie** (`backdrop-blur-md` / `backdrop-blur-xs` con fondos a
-  `/80` y `/40`): profundidad por translucidez, no por sombra.
+## Elevación y forma
 
-*Decisión abierta:* no se ha fijado si "plano por defecto" es una prohibición o una
-preferencia. Hasta que se decida, el estado anterior es la referencia: si una pantalla
-nueva necesita una sombra, tiene que poder explicar por qué la capa tonal no bastaba.
+Superficies planas: capa tonal más borde de 1 px. Sombra solo donde separa de verdad:
+la ficha del hero (`.ev-card`), la paleta y los modales (con `scrim` y desenfoque de
+fondo), y `--shadow-card` en el admin. Radios: **4 px** chips e insignias, **6 px**
+botones y campos, **8 px** tarjetas, **12 px** paneles grandes y paleta del admin.
 
-## Shapes
+## Foco y movimiento
 
-Rectángulos de esquina blanda, sin excepción. No hay formas orgánicas, ni recortes, ni
-siluetas irregulares en ningún punto del sistema. El vocabulario completo son seis pasos
-de radio y una hairline de 1px.
+- **Foco global** (`:focus-visible`): hueco de 2 px del color de fondo, anillo `--text` de
+  2 px (≥ 3:1 en ambos temas) y halo `--mark` de 7 px. Lleva un `outline` transparente de
+  2 px para el modo de alto contraste de Windows, que anula los `box-shadow`.
+- **Movimiento:** transiciones de color cortas y el barrido de la evidencia. Con
+  `prefers-reduced-motion: reduce`, animaciones y transiciones quedan a ~0 ms. El reveal
+  al scroll solo oculta contenido tras el gate `.js-reveal`: sin JS todo es visible.
 
-- **2px** (`rounded-xs`): banderas del selector de idioma, micro-badges del pie.
-- **4px** (`rounded-sm`): chips de tecnología, badges de estado de proyecto, `code` en línea.
-- **6px** (`rounded-md`): botones, campos de formulario, elementos de menú, enlaces de navegación.
-- **8px** (`rounded-lg`): tarjetas (`.card`), botones de filtro, iconos sociales del pie, imágenes del blog.
-- **12px** (`rounded-xl`): las superficies grandes — el avatar, el panel del formulario de contacto, los modales.
-- **9999px** (`rounded-full`): exclusivamente el badge de disponibilidad y los spinners de carga.
+## Reglas duras
 
-El borde por defecto es `1px solid` en `hairline`. Los estados de énfasis no engrosan el
-borde: cambian su color (a `hairline-hover`, `text-faint/40` o `signal-green/40`).
+- **Sin cursiva ni serif.** Ninguna `italic` ni familia serif en la interfaz. Los
+  `<em>` del anuncio llevan `not-italic font-semibold`.
+- **Sin tarjetas anidadas.** Una tarjeta no contiene otra tarjeta con borde y fondo.
+- **Sin kickers.** No hay etiquetas pequeñas en versalitas sobre los títulos de sección.
+  `.section-kicker` sigue definida en `global.css` pero ninguna sección la usa; no se
+  reintroduce.
+- **Objetivos táctiles ≥ 44 px** en móvil (24 px es el mínimo WCAG; 44 es la meta del
+  proyecto). Los CTA del hero, los filtros y todo el admin táctil cumplen 44.
+- **Sin terminal falsa** ni efectos que aparenten datos en vivo.
+- **Máximo dos familias web.** Las `Fallback` son ajustes de métrica (ver Typography).
+- **CSP intacta.** Sin `unsafe-inline` en `script-src`, sin CDN de scripts, fuentes ni
+  estilos, sin `<script>` inyectado en runtime. En el admin, sin `<script>` ni `<style>`
+  dinámicos nuevos. `e2e/csp.spec.cjs` lo comprueba.
+- **Los tokens son idénticos** en `tokens.css` y `admin.css`; los comprueba
+  `src/test/tokens.test.ts`.
+- **El amarillo es relleno; el azul es texto; el rojo es fallo.**
+- **Tres longitudes de texto.** Todo se diseña para ES, EN y CA; sin scroll horizontal a
+  360, 390, 768, 1024 ni 1440 px.
+- **Tests de `src/pages/`** van en `src/test/pages/`, no junto a la ruta.
 
-### Named Rules
+## Cosas por verificar
 
-**La Regla del Radio Creciente.** El radio escala con la superficie: cuanto más grande el
-contenedor, más blanda la esquina. Un chip a 12px o un modal a 4px rompen la escala. Si
-dudas, mira el tamaño del elemento, no su importancia.
+Estado conocido tras el rediseño, sin presentar como resuelto:
 
-**La Regla de la Línea Única.** Toda estructura se dibuja con `1px`. No hay bordes de 2px
-salvo el anillo de foco (`ring-2` en `signal-green`) y el aro que late alrededor del
-avatar disponible — dos casos que son señal, no estructura.
-
-## Components
-
-### Buttons
-
-- **Shape:** esquina de 6px (`rounded-md`), altura de 40px efectivos (`px-4 py-2.5`), `inline-flex` con `gap-2` para el icono.
-- **Primary** (`.btn-primary`): plano de Verde Señal con texto en Tinta (`#0a0e14`), peso 500, `text-sm`. El contraste invertido es deliberado: el botón primario es la superficie más brillante de la página.
-- **Ghost** (`.btn-ghost`): sin fondo, borde hairline, texto atenuado. Es el botón por defecto para todo lo que no sea la acción principal — en el hero conviven un primario y dos ghost.
-- **Hover / Focus:** el primario transiciona a `#22c55e`; el ghost sube el borde a `text-faint` y el texto a `text-primary`. Solo transiciona el color (`transition-colors`); **nada se desplaza ni se escala**.
-- **Foco:** `ring-2` en Verde Señal con `ring-offset-2` sobre el fondo, aplicado globalmente a `:focus-visible`.
-
-### Chips
-
-- **Tecnología** (`.badge`): borde hairline, sin fondo, mono `text-xs`, texto atenuado, radio 4px. Es el chip por defecto (experiencia, stack de proyecto).
-- **Estado de proyecto:** texto sólido del color de estado, fondo del mismo color al 10%, borde al 20%, `text-[10px]` en peso 600. Tres variantes fijas: Open Source, En Desarrollo, Código Privado.
-- **Filtro** (`.cert-filter-btn`, filtros de proyecto): radio 8px, fondo `ink-card`, `min-height: 2.5rem` para objetivo táctil. Activo = borde Verde Señal, fondo verde al 10%, texto verde.
-
-### Cards / Containers
-
-- **Corner Style:** 8px (`.card`), 12px en paneles grandes.
-- **Background:** `ink-card` sobre secciones en `ink` o `ink-soft`.
-- **Border:** hairline de 1px; al hover pasa a `text-faint/40`.
-- **Shadow Strategy:** ninguna. Ver *Elevation & Depth*.
-- **Internal Padding:** `20px` en tarjeta de proyecto, `24px`–`32px` en el panel del formulario.
-
-### Inputs / Fields
-
-- **Style:** fondo `ink` (más oscuro que la tarjeta que los contiene — el campo se hunde, no se levanta), borde hairline, radio 6px, `px-3.5 py-2.5`, `text-sm`, placeholder en `text-faint`.
-- **Focus:** el borde pasa a Verde Señal y se anula el outline por defecto (`focus:outline-hidden`); el anillo global de `:focus-visible` cubre la navegación por teclado.
-- **Label:** encima del campo, `text-sm` peso 500 en `text-primary`, con asterisco en Verde Señal cuando es obligatorio.
-
-### Navigation
-
-- **Cabecera:** fija, 56px, fondo `ink/80` con `backdrop-blur-md` y borde inferior `hairline/60`. Marca en mono con el prompt `>_` en verde. Enlaces en `text-muted` que suben a `text-primary` al hover — sin subrayado, sin indicador de sección activa.
-- **Selector de idioma:** botón con borde hairline que muestra bandera SVG en línea + código de idioma; desplegable en `ink-card` con radio 6px y `shadow-xl`. El idioma activo se marca en Verde Señal.
-- **Móvil (`< md`):** hamburguesa que despliega una lista a ancho completo sobre fondo `ink`, con enlaces de `44px` de alto (`py-2.5` + `text-base`).
-- **Pie:** rejilla de cuatro columnas con encabezados mono en versalitas de `11px`, enlaces mono de `12px` y una línea superior en degradado de Verde Señal al 25% que se desvanece por los extremos.
-
-### Status Panel (componente de firma)
-
-Proyectos, certificaciones y blog piden su contenido a `/api/*.php` al cargar, así que
-"cargando", "vacío" y "error" no son casos raros: son lo que ve cualquiera que entre
-mientras el backend responde, o si se cae. Los tres estados viven en un solo componente
-(`StatusPanel.astro`), y el JS solo cambia `data-state`.
-
-- **Forma:** panel de 8px de radio, hairline de 1px, fondo `ink-card` al 60%, `14px 16px`.
-- **Cargando:** spinner de 2px con el arco superior en Verde Señal.
-- **Vacío:** icono `inbox` y borde discontinuo — el único uso de `border-dashed` del sistema.
-- **Error:** icono `alert` en `danger`, borde `danger/30`, fondo `danger/5`, y un botón de
-  reintento. Un error siempre nombra el problema **y** ofrece la salida.
-- **Accesibilidad:** el contenedor lleva `role="status"` y `aria-live="polite"`, así que el
-  cambio de estado se anuncia sin robar el foco.
-
-### Reveal on scroll (componente de firma)
-
-Toda sección entra con un `fade-up` de 18px en 500ms al cruzar el viewport. Lo distintivo
-es el mecanismo: el ocultado inicial vive tras un gate `.js-reveal` que solo se aplica si
-el script llega a ejecutarse. **Sin JavaScript, o si el script falla, el contenido está
-siempre visible.** Es el patrón que debe imitar cualquier animación de entrada futura.
-
-### Availability frame (componente de firma)
-
-El avatar del hero es el único punto emisivo del sitio: aro verde al 20% desenfocado, aro
-pulsante de 2px al 40%, y un badge en píldora con halo verde. Todo el conjunto se muestra
-u oculta según `open_to_work` desde `/api/settings.php`, y **por defecto se muestra si la
-petición falla**. Es la traducción visual del estado "en servicio" del North Star.
-
-## Do's and Don'ts
-
-### Do:
-
-- **Do** separar bloques alternando `ink` / `ink-soft` más una `border-b` de `hairline`. Es el único separador de sección del sistema.
-- **Do** encabezar cada sección con el trío `.section-kicker` (mono versalita, `0.2em`) → `.section-title` → `.section-subtitle` (limitado a `max-w-2xl`). Está en todas las secciones del sitio; romperlo se nota.
-- **Do** usar `var(--color-*)` en los `<style>` de componentes Astro. Tailwind 4 publica cada token de `@theme` en `:root`; ese bloque no importa Tailwind y `theme()` ya no existe.
-- **Do** dar a los controles táctiles un mínimo de `40px` de alto, como hace `.cert-filter-btn` con `min-height: 2.5rem`.
-- **Do** poner cualquier animación de entrada tras un gate de JS, como `.js-reveal`: el contenido debe ser visible si el script no corre.
-- **Do** diseñar contando con tres longitudes de texto. Los mismos botones y etiquetas se pintan en español, inglés y catalán.
-
-### Don't:
-
-- **Don't** introducir un segundo verde. `#10b981` en `/admin` es deriva conocida, no una escala hermana: la referencia es `#4ade80`.
-- **Don't** llevar el cian (`#22d3ee`) ni el violeta (`#a78bfa`) fuera de "Sobre esta web". Existen solo para diferenciar los bloques de esa página.
-- **Don't** componer prosa en JetBrains Mono. La mono es metadato: marca, kickers, chips, números, estados y código.
-- **Don't** añadir sombras para dar jerarquía. La herramienta por defecto es la capa tonal más la hairline de 1px; la sombra queda para el modal y para el halo de disponibilidad.
-- **Don't** mover ni escalar elementos en hover. El sistema transiciona color (150–300ms) y nada más; las dos únicas excepciones vigentes son los iconos sociales del pie (`-translate-y-0.5`) y la flecha de los enlaces de navegación del pie.
-- **Don't** cargar fuentes, iconos, estilos o scripts desde un CDN. Las fuentes son `@font-face` locales con subconjuntos latinos; la CSP con hashes no admite otra cosa. `server/admin/partials/layout.php` autoaloja las mismas fuentes en `assets/fonts/` precisamente por esto — el panel llegó a enlazar Google Fonts, la CSP la bloqueaba en silencio, y se corrigió.
-- **Don't** engrosar bordes para dar énfasis. La estructura es siempre `1px`; los únicos `2px` del sistema son el anillo de foco y el aro de disponibilidad, y ambos son señal.
-- **Don't** pintar un error de verde ni inventar un rojo nuevo. `danger` (`#f87171`) para fallos, `warn` (`#f59e0b`) para avisos, y nada más.
-- **Don't** dejar un estado de carga, vacío o error como una línea de texto suelta. Usa `<StatusPanel />`: tiene los tres estados, el icono, `role="status"` y la salida.
-- **Don't** usar texto con degradado (`bg-clip-text`) ni halos de color sin desplazamiento (`drop-shadow` a 0 0). El énfasis sale del peso, el tamaño y el tono. Las cinco páginas de error los llevaban y se retiraron.
-- **Don't** usar negro puro (`#000`) ni blanco puro (`#fff`) en pantalla. El sistema va de `#0a0e14` a `#f0f3f6`; el blanco y el negro absolutos están reservados a la hoja de impresión.
+- Lighthouse (LCP/CLS/INP) y axe sin repetir en el cierre (tarea T8).
+- Lector de pantalla real en el admin sin probar; solape del `.form-actions` fijo a 1440
+  px sin captura.
+- Contraste de `--text-faint` en texto de 0,8–0,875 rem (`.spec-term--meta`, `.about-note`)
+  sin calcular en píxeles.
+- Objetivos de 40 px en 1440 de algún elemento del shell (`min-h-10`).
+- El título del admin sigue como "Resumen global" en la vista multi-sitio, y "Resumen" en
+  el menú, frente a "Hoy" en la vista principal (los e2e exigen la etiqueta).

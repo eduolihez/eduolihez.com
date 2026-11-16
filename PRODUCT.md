@@ -8,7 +8,7 @@ web
 
 ## Users
 
-Dos públicos con **el mismo peso**; ninguno se sacrifica por el otro.
+Dos públicos con **el mismo peso** en la web pública; ninguno se sacrifica por el otro. Un tercer usuario, el operador, usa el panel.
 
 **1. Reclutador / hiring manager.** Llega desde LinkedIn, de un proceso de selección
 abierto o de una búsqueda con nombre propio. Escanea: rol actual, certificaciones,
@@ -79,21 +79,25 @@ choquen, gana la de arriba.
 
 **Stack (codebase existente).** Astro 7 en salida `static` con i18n nativo
 (`es` en `/`, `en` en `/en/`, `ca` en `/ca/`), Tailwind CSS 4 vía plugin de Vite con
-el tema en `@theme` dentro de `src/styles/global.css` (no hay `tailwind.config`).
-Backend propio en PHP 8 + MySQL. Tipografías autoalojadas (Inter Variable, JetBrains
-Mono Variable) — sin CDN de fuentes.
+el tema en `@theme` dentro de `src/styles/global.css` (no hay `tailwind.config`) y los
+valores de color en `src/styles/tokens.css` (claro y oscuro). Backend propio en PHP 8 +
+MySQL. Tipografías autoalojadas (Inter Variable, JetBrains Mono Variable) — sin CDN de
+fuentes. El diseño vigente se describe en `DESIGN.md` ("Expediente").
 
-**Superficies públicas.** Home de una página (hero, experiencia, habilidades,
-proyectos, certificaciones, FAQ, contacto) ×3 idiomas · blog índice + artículo ×3
+**Superficies públicas.** Home de una página ×3 idiomas, con las secciones en este
+orden: Hero (con ficha de evidencias E-nn), StackStrip, Experience, Projects,
+Certifications, Skills, BlogPreview, Faq y Contact · blog índice + artículo ×3
 idiomas · `/projects` · `/sobre-esta-web` (`/en/about-this-website`,
 `/ca/sobre-aquesta-web`) · páginas de error 400/403/404/410/500 · `sitemap.xml` ·
 `llms.txt` · `sitemap-posts.xml` · `llms-blog.txt` (estos dos últimos, servidos
 por PHP en cada petición en vez de generados al compilar, porque los artículos
 del blog viven en MySQL — ver [la wiki](https://github.com/eduolihez/eduolihez.com/wiki/SEO-AI-Visibility-Plan)).
 
-**Superficie privada.** Panel `/admin` en PHP: panel, proyectos, certificaciones,
-blog, mensajes (con contador de no leídos), analítica, seguridad, ajustes y backup.
-Autenticación con registro de intentos de login y log de actividad.
+**Superficie privada.** Panel `/admin` en PHP: vista "Hoy" (qué pide acción ahora),
+proyectos, certificaciones, blog, mensajes (con contador de no leídos), analítica,
+seguridad, ajustes y backup. Navegación lateral en escritorio y barra inferior en móvil;
+las tablas pasan a tarjetas en pantallas estrechas. Autenticación con registro de
+intentos de login y log de actividad.
 
 **API pública (solo lectura + telemetría).** `projects`, `certifications`, `posts`,
 `post`, `settings`, `contact`, `visit`.
@@ -107,9 +111,14 @@ migración incluida.
 - **CSP estricta con hashes.** No se puede inyectar `<script>` desde JavaScript en
   runtime, ni cargar scripts, fuentes o estilos desde ningún CDN. Nada de
   `unsafe-inline` en `script-src`.
-- **Sin build en el panel.** El CSS de `/admin` va embebido en
-  `server/admin/partials/layout.php` para que el panel sea autónomo. Cualquier
-  rediseño del panel se hace dentro de esa restricción, no añadiendo un pipeline.
+- **Sin build en el panel.** El CSS de `/admin` es un fichero estático,
+  `server/admin/assets/admin.css`, enlazado desde `server/admin/partials/layout.php`,
+  con las fuentes en `server/admin/assets/fonts/`. Sus tokens copian los de
+  `src/styles/tokens.css` y un test (`src/test/tokens.test.ts`) comprueba que coinciden.
+  Cualquier rediseño del panel se hace dentro de esa restricción, sin añadir un pipeline.
+- **Evidencias con fuente.** Cada etiqueta E-nn del hero sale del campo `evidence` de
+  `src/config.ts` y apunta a una URL o ruta real; `src/test/evidence.test.ts` falla si una
+  ruta local no existe en `public/`. Una afirmación sin fuente no lleva etiqueta.
 - **Sin terceros de analítica.** La analítica es propia y la IP se guarda hasheada
   con sal. No se introducen scripts de seguimiento externos.
 - **`format: 'directory'`** en el build (compatibilidad Apache/cPanel) y
@@ -186,7 +195,8 @@ trabajo futuro se audita contra ese nivel: contraste de texto y de componentes d
 interfaz, foco visible y no oscurecido, navegación completa por teclado, objetivos
 táctiles suficientes, texto redimensionable y `prefers-reduced-motion` respetado.
 
-Base ya existente sobre la que construir: enlace de salto al contenido en
-`BaseLayout.astro` y dos bloques de `prefers-reduced-motion` en
-`src/styles/global.css`. Aún **no auditado** contra AA de forma sistemática — el
-compromiso es el objetivo, no un estado verificado.
+Base ya existente: enlace de salto al contenido en `BaseLayout.astro`, foco visible
+global y `prefers-reduced-motion` en `src/styles/global.css`, objetivos táctiles de 44 px
+como meta, y un test de contraste de los tokens (`src/test/tokens.test.ts`). Aún **no
+auditado** contra AA de forma sistemática (axe, lector de pantalla): el compromiso es el
+objetivo, no un estado verificado.

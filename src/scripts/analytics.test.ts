@@ -168,6 +168,25 @@ describe('trackVisit()', () => {
     expect(body.path).toBe(location.pathname);
   });
 
+  it('sin consentimiento no envia visitor_id; con consentimiento si; al retirarlo deja de enviarlo', () => {
+    localStorage.clear();
+    trackVisit();
+    expect(readBody(fetch as ReturnType<typeof vi.fn>, 0)).not.toHaveProperty('visitor_id');
+
+    localStorage.setItem('eo_consent', `granted|${Date.now()}`);
+    trackVisit();
+    // calls: 0 hit, 1 beat, 2 hit
+    const vid = readBody(fetch as ReturnType<typeof vi.fn>, 2).visitor_id;
+    expect(vid).toMatch(TOKEN_RE);
+    expect(document.cookie).toContain(`eo_vid=${vid}`);
+
+    localStorage.setItem('eo_consent', `denied|${Date.now()}`);
+    trackVisit();
+    expect(readBody(fetch as ReturnType<typeof vi.fn>, 4)).not.toHaveProperty('visitor_id');
+    expect(document.cookie).not.toContain('eo_vid=');
+    localStorage.clear();
+  });
+
   it('reutiliza el mismo session_id entre paginas de la misma pestana', () => {
     trackVisit();
     const first = readBody(fetch as ReturnType<typeof vi.fn>, 0).session_id;

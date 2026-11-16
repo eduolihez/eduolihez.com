@@ -15,8 +15,13 @@
  *     visible y hasta donde se hizo scroll, referenciando el hit_id de esa
  *     pagina. Es la unica forma en que esta analitica sabe algo de
  *     comportamiento, y no requiere guardar nada nuevo en el cliente.
+ *
+ * Solo si el visitante ACEPTA la analitica (consent.ts), el "hit" lleva ademas
+ * `visitor_id`: el valor de la cookie propia `eo_vid` (180 dias). Sin
+ * consentimiento, con DNT/GPC o tras retirarlo, el cuerpo no cambia.
  */
 import { api } from '../config';
+import { consentedVisitorId } from './consent';
 
 const SESSION_KEY = 'eo_session_id';
 export const TOKEN_RE = /^[a-f0-9]{16}$/;
@@ -157,7 +162,7 @@ export function trackVisit(): void {
     pageStart = performance.now();
     maxScrollPct = currentScrollPct();
 
-    const body = JSON.stringify({
+    const payload: Record<string, string> = {
       path: location.pathname,
       referrer: document.referrer || '',
       session_id: sessionId,
@@ -165,8 +170,11 @@ export function trackVisit(): void {
       viewport: bucketViewport(window.innerWidth),
       browser_lang: browserLangCode(navigator.language || ''),
       ...parseUtm(location.search),
-    });
-    send(body);
+    };
+    // Solo con consentimiento vigente; si no, consentedVisitorId() borra la cookie.
+    const visitorId = consentedVisitorId();
+    if (visitorId) payload.visitor_id = visitorId;
+    send(JSON.stringify(payload));
   } catch {
     /* silencioso: la analitica nunca debe romper la web */
   }

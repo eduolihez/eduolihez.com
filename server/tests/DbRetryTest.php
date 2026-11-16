@@ -59,6 +59,33 @@ final class DbRetryTest extends TestCase
         }
     }
 
+    public function testReintentaUnCodigoDesconocidoPeroNoUnaBaseInexistente(): void
+    {
+        $calls = 0;
+        $result = db_connect_with_retry(function () use (&$calls) {
+            $calls++;
+            if ($calls < 2) {
+                throw self::pdoError(9999, 'error raro del hosting');
+            }
+            return 'conexion';
+        }, 3, function (int $us) {
+        });
+        $this->assertSame('conexion', $result);
+        $this->assertSame(2, $calls);
+
+        $calls = 0;
+        try {
+            db_connect_with_retry(function () use (&$calls) {
+                $calls++;
+                throw self::pdoError(1049, 'Unknown database');
+            }, 3, function (int $us) {
+            });
+            $this->fail('Debia propagar la excepcion');
+        } catch (PDOException $e) {
+            $this->assertSame(1, $calls, 'un 1049 no se arregla esperando');
+        }
+    }
+
     public function testSeRindeTrasElUltimoIntentoYPropagaElError(): void
     {
         $calls = 0;

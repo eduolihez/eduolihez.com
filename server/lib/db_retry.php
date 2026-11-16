@@ -28,6 +28,14 @@ const DB_RETRYABLE_ERRORS = [
     2013, // Lost connection to MySQL server during query (handshake)
 ];
 
+/**
+ * Errores que NO se arreglan esperando: credenciales (1045), base de datos
+ * inexistente (1049) y acceso denegado a la base (1044). Todo lo demas al
+ * conectar se trata como transitorio: el hosting devolvia un codigo que no
+ * estaba en la lista de arriba y la API seguia dando 500 (0,4 s, sin reintento).
+ */
+const DB_PERMANENT_ERRORS = [1044, 1045, 1049];
+
 /** Extrae el codigo numerico de MySQL de una PDOException de conexion. */
 function db_error_code(PDOException $e): int
 {
@@ -65,7 +73,7 @@ function db_connect_with_retry(callable $connect, int $attempts = 3, ?callable $
         try {
             return $connect();
         } catch (PDOException $e) {
-            $retryable = in_array(db_error_code($e), DB_RETRYABLE_ERRORS, true);
+            $retryable = !in_array(db_error_code($e), DB_PERMANENT_ERRORS, true);
             if (!$retryable || $try >= $attempts) {
                 throw $e;
             }

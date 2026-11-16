@@ -28,7 +28,7 @@ import { experiences } from '../data/experience';
 import { skillGroups } from '../data/skills';
 import { faqItems } from '../data/faq';
 import { pick } from '../i18n/utils';
-import { buildFaqPage, profileDates, shouldEmitProfilePage } from '../scripts/seo-graph';
+import { buildBlogNode, buildFaqPage, profileDates, shouldEmitProfilePage } from '../scripts/seo-graph';
 
 interface Props {
   title: string;
@@ -88,7 +88,7 @@ interface Props {
    * desconectado de la entidad canonica que el resto del sitio (y el dominio
    * companero de herramientas) tambien referencia por ese mismo @id.
    */
-  article?: {
+article?: {
     headline: string;
     description: string;
     datePublished: string;
@@ -97,6 +97,8 @@ interface Props {
     readMinutes?: number;
     image?: string;
   };
+  /** Nodo Blog con la lista de articulos (solo indices del blog). */
+  blogIndex?: { name: string; description: string; posts: { headline: string; url: string; datePublished: string }[] };
 }
 
 const {
@@ -113,6 +115,7 @@ const {
   breadcrumbName,
   ogType = 'profile',
   article,
+  blogIndex,
 } = Astro.props;
 
 const canonical = new URL(path, SITE.domain).href;
@@ -329,6 +332,10 @@ const blogPosting = article && {
   publisher: { '@id': personId },
 };
 
+const blogNode =
+  blogIndex &&
+  buildBlogNode(canonical, siteId, personId, lang, blogIndex.name, blogIndex.description, blogIndex.posts);
+
 const graph = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -341,6 +348,7 @@ const graph = {
     ...(path === homePath ? buildSoftwareNodes(lang, SITE.domain, personId) : []),
     ...((withFaq || faq) && faqPage ? [faqPage] : []),
     ...(blogPosting ? [blogPosting] : []),
+    ...(blogNode ? [blogNode] : []),
   ],
 };
 ---

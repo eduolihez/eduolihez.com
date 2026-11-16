@@ -47,6 +47,8 @@ interface Props {
   breadcrumbName?: string;
   /** og:type. Ver <Seo />. */
   ogType?: 'profile' | 'article';
+  /** Nodo Blog con la lista de articulos (solo indices del blog). Ver <Seo />. */
+  blogIndex?: { name: string; description: string; posts: { headline: string; url: string; datePublished: string }[] };
   /** Nodo BlogPosting del detalle de un articulo. Ver <Seo />. */
   article?: {
     headline: string;
@@ -72,6 +74,7 @@ const {
   breadcrumbName,
   ogType,
   article,
+  blogIndex,
 } = Astro.props;
 
 // El enlace de salto estaba escrito a mano en castellano, asi que en /en/ y
@@ -120,6 +123,7 @@ const t = useTranslations(lang);
       breadcrumbName={breadcrumbName}
       ogType={ogType}
       article={article}
+      blogIndex={blogIndex}
     />
 
     {/* Cloudflare Web Analytics: capa ADICIONAL a la analitica propia

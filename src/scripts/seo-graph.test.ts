@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { profileDates, shouldEmitProfilePage, buildFaqPage, extractFaqFromHtml } from './seo-graph';
+import { profileDates, shouldEmitProfilePage, buildFaqPage, extractFaqFromHtml, buildBlogNode } from './seo-graph';
 
 describe('profileDates', () => {
   // ISO 8601 con hora y zona: lo que Google acepta (la fecha sola da aviso).
@@ -81,5 +81,27 @@ describe('extractFaqFromHtml', () => {
 
   it('el último bloque llega hasta el final si no hay otro h2', () => {
     expect(extractFaqFromHtml('<h2>FAQ</h2><h3>¿A?</h3><p>B</p>')).toEqual([{ q: '¿A?', a: 'B' }]);
+  });
+});
+
+describe('buildBlogNode', () => {
+  const posts = [
+    { headline: 'Uno', url: 'https://eduolihez.com/blog/post/uno/', datePublished: '2026-11-01T00:00:00+00:00' },
+    { headline: 'Dos', url: 'https://eduolihez.com/blog/post/dos/', datePublished: '2026-11-02T00:00:00+00:00' },
+  ];
+  const build = (p = posts) =>
+    buildBlogNode('https://eduolihez.com/blog/', 'site', 'person', 'es', 'Blog', 'Desc', p);
+
+  it('sin posts devuelve null', () => {
+    expect(build([])).toBeNull();
+  });
+
+  it('lista cada post como BlogPosting con su URL y fecha', () => {
+    const node = build() as Record<string, any>;
+    expect(node['@type']).toBe('Blog');
+    expect(node['@id']).toBe('https://eduolihez.com/blog/#blog');
+    expect(node.blogPost).toHaveLength(2);
+    expect(node.blogPost[0]).toMatchObject({ '@type': 'BlogPosting', headline: 'Uno', url: posts[0].url });
+    expect(node.author).toEqual({ '@id': 'person' });
   });
 });

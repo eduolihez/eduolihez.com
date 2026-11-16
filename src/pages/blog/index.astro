@@ -28,6 +28,7 @@
  */
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { useTranslations } from '../../i18n/utils';
+import { SITE } from '../../config';
 import { fetchAllPostSummaries, isoDate } from '../../lib/posts';
 import { formatDate, safeUrl } from '../../scripts/blog';
 
@@ -49,6 +50,15 @@ const posts = await fetchAllPostSummaries(lang);
 const categories = [...new Set(posts.map((p) => p.category).filter((c): c is string => Boolean(c)))].sort((a, b) =>
   a.localeCompare(b)
 );
+const blogIndex = {
+  name: title,
+  description,
+  posts: posts.map((p) => ({
+    headline: p.title,
+    url: new URL(`/blog/post/${encodeURIComponent(p.slug || '')}/`, SITE.domain).href,
+    datePublished: isoDate(p.published_at),
+  })),
+};
 ---
 
 <BaseLayout
@@ -59,6 +69,7 @@ const categories = [...new Set(posts.map((p) => p.category).filter((c): c is str
   alternates={alternates}
   withFaq={false}
   breadcrumbName="Blog"
+  blogIndex={blogIndex}
 >
   <section class="border-b border-bg-border bg-bg-soft py-20 sm:py-28">
     <div class="container-page">

@@ -90,3 +90,38 @@ export function extractFaqFromHtml(html: string): { q: string; a: string }[] {
   }
   return out;
 }
+
+/**
+ * Nodo Blog de JSON-LD para el indice de articulos: lista los posts que el
+ * HTML ya muestra (blogPost) con su URL canonica. Devuelve null sin posts, ya
+ * que un Blog vacio no aporta nada.
+ */
+export function buildBlogNode(
+  canonical: string,
+  siteId: string,
+  personId: string,
+  lang: string,
+  name: string,
+  description: string,
+  posts: { headline: string; url: string; datePublished: string }[],
+): Record<string, unknown> | null {
+  if (posts.length === 0) return null;
+  return {
+    '@type': 'Blog',
+    '@id': `${canonical}#blog`,
+    name,
+    description,
+    url: canonical,
+    inLanguage: lang,
+    isPartOf: { '@id': siteId },
+    author: { '@id': personId },
+    publisher: { '@id': personId },
+    blogPost: posts.map((p) => ({
+      '@type': 'BlogPosting',
+      headline: p.headline,
+      url: p.url,
+      datePublished: p.datePublished,
+      author: { '@id': personId },
+    })),
+  };
+}

@@ -157,41 +157,6 @@ const itemList = {
         </p>
       </div>
 
-      <!-- Filtros de Proyectos -->
-      <div
-        id="static-projects-filters"
-        class="mb-8 flex flex-wrap gap-2 animate-fade-in"
-      >
-        <button
-          type="button"
-          class="static-filter-btn min-h-11 px-4 py-1.5 text-sm font-semibold rounded-lg bg-accent text-bg transition duration-200 border border-accent cursor-pointer"
-          data-filter="all"
-        >
-          Todos
-        </button>
-        <button
-          type="button"
-          class="static-filter-btn min-h-11 px-4 py-1.5 text-sm font-semibold rounded-lg bg-bg-soft/40 text-text-muted transition duration-200 border border-bg-border/60 hover:bg-bg-card hover:text-text cursor-pointer"
-          data-filter="open-source"
-        >
-          Open Source
-        </button>
-        <button
-          type="button"
-          class="static-filter-btn min-h-11 px-4 py-1.5 text-sm font-semibold rounded-lg bg-bg-soft/40 text-text-muted transition duration-200 border border-bg-border/60 hover:bg-bg-card hover:text-text cursor-pointer"
-          data-filter="in-development"
-        >
-          En Desarrollo
-        </button>
-        <button
-          type="button"
-          class="static-filter-btn min-h-11 px-4 py-1.5 text-sm font-semibold rounded-lg bg-bg-soft/40 text-text-muted transition duration-200 border border-bg-border/60 hover:bg-bg-card hover:text-text cursor-pointer"
-          data-filter="private-code"
-        >
-          Código Privado
-        </button>
-      </div>
-
       <ul class="grid gap-x-10 gap-y-6 sm:grid-cols-2">
         {
           projects.map((p) => (
@@ -262,37 +227,4 @@ const itemList = {
 
   <script type="application/ld+json" set:html={JSON.stringify(itemList)} />
 
-  <script>
-    function initStaticFilters() {
-      const container = document.getElementById('static-projects-filters');
-      if (!container || container.dataset.loaded) return;
-      container.dataset.loaded = '1';
-
-      const filterButtons = document.querySelectorAll('.static-filter-btn');
-      filterButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-          filterButtons.forEach(b => {
-            b.classList.remove('bg-accent', 'text-bg', 'border-accent');
-            b.classList.add('bg-bg-soft/40', 'text-text-muted', 'border-bg-border/60');
-          });
-          btn.classList.add('bg-accent', 'text-bg', 'border-accent');
-          btn.classList.remove('bg-bg-soft/40', 'text-text-muted', 'border-bg-border/60');
-          
-          const filterValue = btn.getAttribute('data-filter');
-          const cards = document.querySelectorAll('.project-card-item');
-          cards.forEach(card => {
-            const badgesAttr = card.getAttribute('data-badges') || '';
-            const badges = badgesAttr ? badgesAttr.split(',') : [];
-            if (filterValue === 'all' || badges.includes(filterValue)) {
-              card.classList.remove('hidden');
-            } else {
-              card.classList.add('hidden');
-            }
-          });
-        });
-      });
-    }
-    initStaticFilters();
-    document.addEventListener('astro:page-load', initStaticFilters);
-  </script>
 </BaseLayout>

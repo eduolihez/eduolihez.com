@@ -1161,4 +1161,8 @@
 /* Etiquetas de los extremos alineadas hacia dentro: centradas en una columna
    estrecha desbordaban 1-7 px por la derecha y daban scroll interno en .chart. */
 .chart .col:last-child .tick, .chart .col:last-child .val { align-self: flex-end; }
+/* Eje y cifras: mas legibles (mono, tabulares, contraste AA) y semanas a cero apagadas. */
+.chart .tick { color: var(--muted); font-size: 0.72rem; font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; margin-top: 0.55rem; padding-bottom: 0.25rem; letter-spacing: -0.01em; min-height: 1.1rem; box-sizing: content-box; }
+.chart .val { color: var(--text); font-size: 0.74rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.chart .bar-v.is-zero { min-height: 2px; opacity: 0.35; border-radius: 2px 2px 0 0; }
 .chart .col:first-child .tick, .chart .col:first-child .val { align-self: flex-start; }

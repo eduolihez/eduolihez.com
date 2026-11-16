@@ -199,6 +199,19 @@ function week_buckets(int $days, string $today): array
     return [$keys, $labels];
 }
 
+/**
+ * Fecha corta legible para el eje del grafico: "11/11" -> "11 nov".
+ * Si no tiene forma d/m devuelve el texto tal cual.
+ */
+function chart_short_date(string $dm): string
+{
+    static $meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+    if (!preg_match('~^(\d{1,2})/(\d{1,2})$~', $dm, $m) || (int) $m[2] < 1 || (int) $m[2] > 12) {
+        return $dm;
+    }
+    return (int) $m[1] . ' ' . $meses[(int) $m[2] - 1];
+}
+
 /** Escala del grafico: maximo entre periodo actual y anterior (minimo 1). */
 function chart_series_max(array $series): int
 {

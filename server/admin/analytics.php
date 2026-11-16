@@ -670,10 +670,10 @@ page_header(
             <div class="val"><?= $r['c'] ?: '' ?></div>
             <div class="bar-stack">
               <?php if ($r['p'] > 0): ?><div class="bar-prev" style="height:<?= max(2, (int) round(($r['p'] / $chartMax) * 120)) ?>px"></div><?php endif; ?>
-              <div class="bar-v" style="height:<?= max(3, (int) round(($r['c'] / $chartMax) * 120)) ?>px"
+              <div class="bar-v<?= $r['c'] ? '' : ' is-zero' ?>" style="height:<?= max(3, (int) round(($r['c'] / $chartMax) * 120)) ?>px"
                    title="<?= e(($chartWeekly ? 'Semana del ' : '') . $r['label']) ?>: <?= $r['c'] ?> visitas · <?= $r['u'] ?> únicos · periodo anterior <?= $r['p'] ?>"></div>
             </div>
-            <div class="tick"><?= $i % $tickStep === 0 ? e($r['label']) : '' ?></div>
+            <div class="tick"><?= $i % $tickStep === 0 ? e($chartWeekly ? chart_short_date($r['label']) : $r['label']) : '' ?></div>
           </div>
         <?php endforeach; ?>
       </div>

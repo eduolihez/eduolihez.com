@@ -154,4 +154,13 @@ b"] as $bad) {
         $this->assertStringContainsString('&lt;x&gt;</code>', $html);
         $this->assertStringContainsString('data-copy="#nf-', $html);
     }
+
+    public function testChartShortDate(): void
+    {
+        $this->assertSame('11 nov', chart_short_date('11/11'));
+        $this->assertSame('1 ene', chart_short_date('01/01'));
+        $this->assertSame('30 dic', chart_short_date('30/12'));
+        $this->assertSame('xx', chart_short_date('xx'));
+        $this->assertSame('5/13', chart_short_date('5/13'));
+    }
 }

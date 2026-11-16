@@ -136,21 +136,10 @@ const messages = {
               name="reason"
               class="min-h-11 w-full rounded-md border border-control-border bg-bg px-3.5 py-3 text-base text-text sm:text-sm"
             >
+              <option value="other" selected>{t('contact.reason.other')}</option>
               <option value="job">{t('contact.reason.job')}</option>
               <option value="project">{t('contact.reason.project')}</option>
-              <option value="other" selected>{t('contact.reason.other')}</option>
             </select>
-          </div>
-
-          <div class="mt-4">
-            <label for="subject" class="mb-1.5 block text-sm font-medium text-text">{t('contact.subject')}</label>
-            <input
-              type="text"
-              id="subject"
-              name="subject"
-              maxlength="150"
-              class="w-full rounded-md border border-control-border bg-bg px-3.5 py-3 text-base text-text placeholder:text-text-faint aria-[invalid=true]:border-danger sm:text-sm"
-            />
           </div>
 
           <div class="mt-4">
@@ -161,7 +150,7 @@ const messages = {
               id="message"
               name="message"
               required
-              rows="5"
+              rows="4"
               maxlength="3000"
               aria-describedby="message-error"
               class="w-full rounded-md border border-control-border bg-bg px-3.5 py-3 text-base text-text placeholder:text-text-faint aria-[invalid=true]:border-danger sm:text-sm resize-y"
@@ -306,7 +295,9 @@ const messages = {
       const payload = {
         name: data.name.trim(),
         email: data.email.trim(),
-        subject: applyReason((data.subject || '').trim(), String(data.reason || 'other')),
+        // El asunto ya no se pide: es opcional en el servidor, asi que solo
+        // viaja la etiqueta del motivo ([Oferta] / [Proyecto]; "Otro" = vacio).
+        subject: applyReason('', String(data.reason || 'other')),
         message: data.message.trim(),
         turnstileToken: data['cf-turnstile-response'] || '',
         // Idioma de la pagina: sale en el email de aviso (es/en/ca).

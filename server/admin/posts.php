@@ -102,30 +102,30 @@ show_flash();
 
 <div class="card p-0">
   <div class="scroll-x">
-    <table class="stack">
-      <thead>
-        <tr>
-          <th style="width:60px;">Portada</th>
-          <th>Título</th>
-          <th>Categoría</th>
-          <th>Idioma</th>
-          <th>Slug / Enlace</th>
-          <th>Estado</th>
-          <th>Fecha</th>
-          <th style="text-align:right; width:220px;">Acciones</th>
+    <table class="stack" role="table">
+      <thead role="rowgroup">
+        <tr role="row">
+          <th role="columnheader" style="width:60px;">Portada</th>
+          <th role="columnheader">Título</th>
+          <th role="columnheader">Categoría</th>
+          <th role="columnheader">Idioma</th>
+          <th role="columnheader">Slug / Enlace</th>
+          <th role="columnheader">Estado</th>
+          <th role="columnheader">Fecha</th>
+          <th role="columnheader" style="text-align:right; width:220px;">Acciones</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody role="rowgroup">
         <?php if (!$rows): ?>
-          <tr>
-            <td colspan="8" class="empty">
+          <tr role="row">
+            <td role="cell" colspan="8" class="empty">
               <?= $search !== '' ? 'Ningún artículo coincide con la búsqueda.' : 'Aún no hay artículos publicados.' ?>
             </td>
           </tr>
         <?php endif; ?>
         <?php foreach ($rows as $c): ?>
-          <tr>
-            <td data-label="Portada">
+          <tr role="row">
+            <td role="cell" data-label="Portada">
               <?php if (!empty($c['cover_url'])): ?>
                 <img src="<?= e($c['cover_url']) ?>" alt="" width="48" height="32" class="soft-box"
                      style="width:48px; height:32px; object-fit:cover; border-radius:.3rem; border:1px solid var(--border);">
@@ -133,26 +133,26 @@ show_flash();
                 <div class="soft-box" style="width:48px; height:32px; border-radius:.3rem; border:1px solid var(--border); display:flex; align-items:center; justify-content:center; color:var(--faint); font-size:10px; font-weight:700;">NO IMG</div>
               <?php endif; ?>
             </td>
-            <td data-label="Título">
+            <td role="cell" data-label="Título">
               <a href="post-edit.php?id=<?= $c['id'] ?>" style="font-weight:600;">
                 <?= e($c['title']) ?>
               </a>
               <br>
               <span class="faint" style="font-size:0.75rem; display:block; max-width: 400px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-top:2px;"><?= e($c['summary']) ?></span>
             </td>
-            <td data-label="Categoría">
+            <td role="cell" data-label="Categoría">
               <?php $categoryLabel = post_category_label($c['category']); ?>
               <?= $categoryLabel !== null ? '<span class="pill">' . e($categoryLabel) . '</span>' : '<span class="faint">—</span>' ?>
             </td>
-            <td data-label="Idioma">
+            <td role="cell" data-label="Idioma">
               <span class="pill" style="text-transform: uppercase; font-family: 'JetBrains Mono', monospace; font-size:10px;">
                 <?= e($c['lang']) ?>
               </span>
             </td>
-            <td data-label="Enlace" class="mono faint" style="font-size:12px;">
+            <td role="cell" data-label="Enlace" class="mono faint" style="font-size:12px;">
               /blog/<?= e($c['slug']) ?>
             </td>
-            <td data-label="Estado">
+            <td role="cell" data-label="Estado">
               <form method="post" class="d-inline">
                 <?= csrf_field() ?>
                 <input type="hidden" name="id" value="<?= $c['id'] ?>">
@@ -162,10 +162,10 @@ show_flash();
                 </button>
               </form>
             </td>
-            <td data-label="Fecha" class="nowrap faint">
+            <td role="cell" data-label="Fecha" class="nowrap faint">
               <?= fdate($c['created_at'], 'd/m/Y H:i') ?>
             </td>
-            <td data-label="Acciones" class="text-right">
+            <td role="cell" data-label="Acciones" class="text-right">
               <div class="actions" style="justify-content:flex-end; gap: 0.35rem;">
                 <a class="btn ghost sm icon" href="post-edit.php?id=<?= $c['id'] ?>" title="Editar" aria-label="Editar artículo">
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>

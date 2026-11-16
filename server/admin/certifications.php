@@ -118,27 +118,27 @@ show_flash();
 
 <div class="card p-0">
   <div class="scroll-x">
-    <table class="stack">
-      <thead>
-        <tr>
-          <th style="width:44px;"></th>
-          <th>Nombre</th>
-          <th>Emisor</th>
-          <th>Fecha</th>
-          <th>Visible</th>
-          <th>Orden</th>
-          <th class="text-right">Acciones</th>
+    <table class="stack" role="table">
+      <thead role="rowgroup">
+        <tr role="row">
+          <th role="columnheader" style="width:44px;"></th>
+          <th role="columnheader">Nombre</th>
+          <th role="columnheader">Emisor</th>
+          <th role="columnheader">Fecha</th>
+          <th role="columnheader">Visible</th>
+          <th role="columnheader">Orden</th>
+          <th role="columnheader" class="text-right">Acciones</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody role="rowgroup">
         <?php if (!$rows): ?>
-          <tr><td colspan="7" class="empty">
+          <tr role="row"><td role="cell" colspan="7" class="empty">
             <?= $search !== '' ? 'Ninguna certificación coincide con la búsqueda.' : 'Aún no hay certificaciones.' ?>
           </td></tr>
         <?php endif; ?>
         <?php foreach ($rows as $i => $c): ?>
-          <tr>
-            <td data-label="Logo">
+          <tr role="row">
+            <td role="cell" data-label="Logo">
               <?php if (!empty($c['logo_url'])): ?>
                 <img src="<?= e($c['logo_url']) ?>" alt="" width="32" height="32" class="soft-box"
                      style="width:32px; height:32px; object-fit:contain; border-radius:.3rem; border:1px solid var(--border);">
@@ -146,7 +146,7 @@ show_flash();
                 <span class="faint">—</span>
               <?php endif; ?>
             </td>
-            <td data-label="Nombre">
+            <td role="cell" data-label="Nombre">
               <strong><?= e($c['name']) ?></strong>
               <?php if (!empty($c['category'])): ?>
                 <div><span class="pill"><?= e($c['category']) ?></span></div>
@@ -155,9 +155,9 @@ show_flash();
                 <div class="faint" style="font-size:.75rem;">Con enlace de verificacion</div>
               <?php endif; ?>
             </td>
-            <td data-label="Emisor" class="muted"><?= e($c['issuer']) ?></td>
-            <td data-label="Fecha" class="faint"><?= e($c['issue_date']) ?></td>
-            <td data-label="Visible">
+            <td role="cell" data-label="Emisor" class="muted"><?= e($c['issuer']) ?></td>
+            <td role="cell" data-label="Fecha" class="faint"><?= e($c['issue_date']) ?></td>
+            <td role="cell" data-label="Visible">
               <form method="post" class="d-inline">
                 <?= csrf_field() ?>
                 <input type="hidden" name="action" value="toggle_visible">
@@ -167,7 +167,7 @@ show_flash();
                 </button>
               </form>
             </td>
-            <td data-label="Orden" class="faint">
+            <td role="cell" data-label="Orden" class="faint">
               <div class="actions" style="gap:.2rem;">
                 <span class="mono"><?= (int) $c['sort_order'] ?></span>
                 <form method="post" class="d-inline">
@@ -184,7 +184,7 @@ show_flash();
                 </form>
               </div>
             </td>
-            <td data-label="Acciones">
+            <td role="cell" data-label="Acciones">
               <div class="actions justify-end">
                 <a class="btn ghost sm" href="cert-edit.php?id=<?= (int) $c['id'] ?>">Editar</a>
                 <form method="post" data-confirm="¿Duplicar esta certificacion?" class="d-inline">

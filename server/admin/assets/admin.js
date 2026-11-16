@@ -184,12 +184,16 @@
   // El aviso nativo del navegador se sustituye por un mensaje junto al campo
   // (aria-invalid + aria-describedby); el primer campo invalido recibe el foco.
   var invalidFocused = false;
+  function errId(el) {
+    var base = el.id || String(el.name || 'campo').toLowerCase().replace(/[^a-z0-9_-]+/g, '-').replace(/^-+|-+$/g, '') || 'campo';
+    return base + '-error';
+  }
   document.addEventListener('invalid', function (e) {
     var el = e.target;
     if (!el || !el.form || el.form.hasAttribute('data-native-validation')) return;
     e.preventDefault();
     el.setAttribute('aria-invalid', 'true');
-    var id = (el.id || el.name || 'campo') + '-error';
+    var id = errId(el);
     var msg = document.getElementById(id);
     if (!msg) {
       msg = document.createElement('p');
@@ -213,7 +217,7 @@
     if (!el || !el.getAttribute || el.getAttribute('aria-invalid') !== 'true') return;
     if (el.validity && !el.validity.valid) return;
     el.removeAttribute('aria-invalid');
-    var msg = document.getElementById((el.id || el.name || 'campo') + '-error');
+    var msg = document.getElementById(errId(el));
     if (msg) msg.remove();
   }
   document.addEventListener('input', clearInvalid);

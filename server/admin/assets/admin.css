@@ -607,7 +607,7 @@
      sin tope desbordaba la pagina en movil (portada de post-edit.php). */
   input[type=file] { max-width: 100%; }
   input:focus, textarea:focus, select:focus {
-    outline: none; border-color: var(--accent);
+    border-color: var(--accent);
     box-shadow: 0 0 0 3px var(--accent-soft);
     background: var(--card);
   }
@@ -976,3 +976,5 @@
   .save-state { margin-right: auto; color: var(--muted); font-size: 0.82rem; }
   .save-state[data-state="dirty"], .save-state[data-state="saving"] { color: var(--text); font-weight: 600; }
   @media (max-width: 1023.98px) { .form-actions { bottom: calc(64px + env(safe-area-inset-bottom)); } }
+  .editor-form input, .editor-form textarea, .editor-form select { scroll-margin-bottom: 6rem; }
+  .editor-form { padding-bottom: 1rem; }

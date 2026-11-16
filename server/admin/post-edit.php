@@ -164,15 +164,15 @@ admin_header($isEdit ? 'Editar Artículo' : 'Nuevo Artículo', 'posts.php');
 /** aria-invalid + aria-describedby de un campo (ayuda y, si falla, error). */
 $fa = static function (string $name, bool $hint = false) use (&$fieldErr): string {
     $ids = [];
-    if ($hint) $ids[] = $name . '-hint';
-    if (isset($fieldErr[$name])) $ids[] = $name . '-error';
+    if ($hint) $ids[] = e($name) . '-hint';
+    if (isset($fieldErr[$name])) $ids[] = e($name) . '-error';
     return ($ids ? ' aria-describedby="' . implode(' ', $ids) . '"' : '')
          . (isset($fieldErr[$name]) ? ' aria-invalid="true"' : '');
 };
 /** Mensaje de error del servidor junto al campo. */
 $fm = static function (string $name) use (&$fieldErr): string {
     return isset($fieldErr[$name])
-        ? '<p class="field-error" id="' . $name . '-error">' . e($fieldErr[$name]) . '</p>'
+        ? '<p class="field-error" id="' . e($name) . '-error">' . e($fieldErr[$name]) . '</p>'
         : '';
 };
 ?>

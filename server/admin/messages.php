@@ -370,27 +370,27 @@ show_flash();
 
   <div class="card p-0">
     <div class="scroll-x">
-      <table class="stack">
-        <thead>
-          <tr>
-            <th style="width:34px;"></th>
-            <th>De</th>
-            <th>Asunto</th>
-            <th>Fecha</th>
-            <th class="text-right">Acciones</th>
+      <table class="stack" role="table">
+        <thead role="rowgroup">
+          <tr role="row">
+            <th role="columnheader" style="width:34px;"></th>
+            <th role="columnheader">De</th>
+            <th role="columnheader">Asunto</th>
+            <th role="columnheader">Fecha</th>
+            <th role="columnheader" class="text-right">Acciones</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody role="rowgroup">
           <?php if (!$rows): ?>
-            <tr><td colspan="5" class="empty">
+            <tr role="row"><td role="cell" colspan="5" class="empty">
               <?= $search !== '' ? 'Ningún mensaje coincide con la búsqueda.' : 'Aún no hay mensajes en esta vista.' ?>
             </td></tr>
           <?php endif; ?>
           <?php foreach ($rows as $m): ?>
             <?php $unreadRow = ((int) $m['is_read'] === 0); ?>
-            <tr>
-              <td data-label="Seleccionar"><label class="check-hit"><input type="checkbox" name="ids[]" value="<?= (int) $m['id'] ?>" class="row-check" aria-label="Seleccionar mensaje de <?= e($m['name']) ?>" style="width:auto;"></label></td>
-              <td data-label="De">
+            <tr role="row">
+              <td role="cell" data-label="Seleccionar"><label class="check-hit"><input type="checkbox" name="ids[]" value="<?= (int) $m['id'] ?>" class="row-check" aria-label="Seleccionar mensaje de <?= e($m['name']) ?>" style="width:auto;"></label></td>
+              <td role="cell" data-label="De">
                 <?php if ((int) $m['is_starred']): ?><span title="Destacado" style="color:var(--warn);">★</span><?php endif; ?>
                 <?php if ($unreadRow): ?><span class="pill on" style="margin-right:.3rem;">Nuevo</span><?php endif; ?>
                 <a href="messages.php?id=<?= (int) $m['id'] ?>" style="<?= $unreadRow ? 'font-weight:700;' : '' ?>">
@@ -398,14 +398,14 @@ show_flash();
                 </a>
                 <div class="faint"><?= e($m['email']) ?></div>
               </td>
-              <td data-label="Asunto" class="<?= $unreadRow ? '' : 'muted' ?>">
+              <td role="cell" data-label="Asunto" class="<?= $unreadRow ? '' : 'muted' ?>">
                 <a href="messages.php?id=<?= (int) $m['id'] ?>" style="color:inherit; <?= $unreadRow ? 'font-weight:600;' : '' ?>">
                   <?= e($m['subject'] !== '' ? $m['subject'] : '(sin asunto)') ?>
                 </a>
                 <?php if ((int) $m['is_archived']): ?><span class="pill off" style="margin-left:.3rem;">Archivado</span><?php endif; ?>
               </td>
-              <td data-label="Fecha" class="meta nowrap"><?= e(fdate($m['created_at'])) ?><br><span style="font-size:.75rem;"><?= e(ago($m['created_at'])) ?></span></td>
-              <td data-label="Acciones">
+              <td role="cell" data-label="Fecha" class="meta nowrap"><?= e(fdate($m['created_at'])) ?><br><span style="font-size:.75rem;"><?= e(ago($m['created_at'])) ?></span></td>
+              <td role="cell" data-label="Acciones">
                 <div class="actions justify-end">
                   <a class="btn ghost sm" href="messages.php?id=<?= (int) $m['id'] ?>">Ver</a>
                 </div>

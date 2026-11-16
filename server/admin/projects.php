@@ -135,27 +135,27 @@ show_flash();
 
 <div class="card p-0">
   <div class="scroll-x">
-    <table class="stack">
-      <thead>
-        <tr>
-          <th style="width:56px;"></th>
-          <th>Titulo (ES)</th>
-          <th>Estado</th>
-          <th>Destacado</th>
-          <th>Orden</th>
-          <th>Actualizado</th>
-          <th class="text-right">Acciones</th>
+    <table class="stack" role="table">
+      <thead role="rowgroup">
+        <tr role="row">
+          <th role="columnheader" style="width:56px;"></th>
+          <th role="columnheader">Titulo (ES)</th>
+          <th role="columnheader">Estado</th>
+          <th role="columnheader">Destacado</th>
+          <th role="columnheader">Orden</th>
+          <th role="columnheader">Actualizado</th>
+          <th role="columnheader" class="text-right">Acciones</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody role="rowgroup">
         <?php if (!$rows): ?>
-          <tr><td colspan="7" class="empty">
+          <tr role="row"><td role="cell" colspan="7" class="empty">
             <?= $search !== '' ? 'Ningún proyecto coincide con la búsqueda.' : 'Aún no hay proyectos. Crea el primero.' ?>
           </td></tr>
         <?php endif; ?>
         <?php foreach ($rows as $i => $p): ?>
-          <tr>
-            <td data-label="Imagen">
+          <tr role="row">
+            <td role="cell" data-label="Imagen">
               <?php if (!empty($p['image_url'])): ?>
                 <img src="<?= e($p['image_url']) ?>" alt="" width="48" height="32"
                      style="width:48px; height:32px; object-fit:cover; border-radius:.3rem; border:1px solid var(--border);">
@@ -163,11 +163,11 @@ show_flash();
                 <span class="faint">—</span>
               <?php endif; ?>
             </td>
-            <td data-label="Título">
+            <td role="cell" data-label="Título">
               <strong><?= e($p['title_es']) ?></strong>
               <div class="faint">ID <?= (int) $p['id'] ?></div>
             </td>
-            <td data-label="Estado">
+            <td role="cell" data-label="Estado">
               <form method="post" class="d-inline">
                 <?= csrf_field() ?>
                 <input type="hidden" name="action" value="toggle_status">
@@ -178,7 +178,7 @@ show_flash();
                 </button>
               </form>
             </td>
-            <td data-label="Destacado">
+            <td role="cell" data-label="Destacado">
               <form method="post" class="d-inline">
                 <?= csrf_field() ?>
                 <input type="hidden" name="action" value="toggle_featured">
@@ -188,7 +188,7 @@ show_flash();
                 </button>
               </form>
             </td>
-            <td data-label="Orden" class="faint">
+            <td role="cell" data-label="Orden" class="faint">
               <div class="actions" style="gap:.2rem;">
                 <span class="mono"><?= (int) $p['sort_order'] ?></span>
                 <form method="post" class="d-inline">
@@ -205,8 +205,8 @@ show_flash();
                 </form>
               </div>
             </td>
-            <td data-label="Actualizado" class="faint nowrap"><?= e(ago($p['updated_at'])) ?></td>
-            <td data-label="Acciones">
+            <td role="cell" data-label="Actualizado" class="faint nowrap"><?= e(ago($p['updated_at'])) ?></td>
+            <td role="cell" data-label="Acciones">
               <div class="actions justify-end">
                 <a class="btn ghost sm" href="project-edit.php?id=<?= (int) $p['id'] ?>">Editar</a>
                 <form method="post" data-confirm="¿Duplicar este proyecto?" class="d-inline">

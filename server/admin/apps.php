@@ -100,29 +100,29 @@ if ($newApiKey):
 
 <div class="card p-0">
   <div class="scroll-x">
-    <table class="stack">
-      <thead>
-        <tr>
-          <th>App</th>
-          <th>Slug</th>
-          <th>Contenido</th>
-          <th>Clave de API</th>
-          <th>Orígenes permitidos</th>
-          <th>Creada</th>
-          <th class="text-right">Acciones</th>
+    <table class="stack" role="table">
+      <thead role="rowgroup">
+        <tr role="row">
+          <th role="columnheader">App</th>
+          <th role="columnheader">Slug</th>
+          <th role="columnheader">Contenido</th>
+          <th role="columnheader">Clave de API</th>
+          <th role="columnheader">Orígenes permitidos</th>
+          <th role="columnheader">Creada</th>
+          <th role="columnheader" class="text-right">Acciones</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody role="rowgroup">
         <?php if (!$rows): ?>
-          <tr><td colspan="7" class="empty">Aún no hay apps registradas.</td></tr>
+          <tr role="row"><td role="cell" colspan="7" class="empty">Aún no hay apps registradas.</td></tr>
         <?php endif; ?>
         <?php foreach ($rows as $a): ?>
           <?php $origins = json_decode((string) ($a['allowed_origins'] ?? '[]'), true) ?: []; ?>
-          <tr>
-            <td data-label="App"><strong><?= e($a['display_name']) ?></strong></td>
-            <td data-label="Slug" class="mono faint"><?= e($a['slug']) ?></td>
-            <td data-label="Contenido"><span class="pill <?= $a['has_content'] ? 'on' : '' ?>"><?= $a['has_content'] ? 'Sí' : 'Solo analítica' ?></span></td>
-            <td data-label="Clave de API">
+          <tr role="row">
+            <td role="cell" data-label="App"><strong><?= e($a['display_name']) ?></strong></td>
+            <td role="cell" data-label="Slug" class="mono faint"><?= e($a['slug']) ?></td>
+            <td role="cell" data-label="Contenido"><span class="pill <?= $a['has_content'] ? 'on' : '' ?>"><?= $a['has_content'] ? 'Sí' : 'Solo analítica' ?></span></td>
+            <td role="cell" data-label="Clave de API">
               <?php if ($a['api_key_hash']): ?>
                 <span class="pill on">Configurada</span>
                 <?php if ($a['key_rotated_at']): ?>
@@ -132,9 +132,9 @@ if ($newApiKey):
                 <span class="pill warn">Sin generar</span>
               <?php endif; ?>
             </td>
-            <td data-label="Orígenes" class="faint"><?= $origins ? (string) count($origins) : '—' ?></td>
-            <td data-label="Creada" class="faint nowrap"><?= e(fdate($a['created_at'])) ?></td>
-            <td data-label="Acciones">
+            <td role="cell" data-label="Orígenes" class="faint"><?= $origins ? (string) count($origins) : '—' ?></td>
+            <td role="cell" data-label="Creada" class="faint nowrap"><?= e(fdate($a['created_at'])) ?></td>
+            <td role="cell" data-label="Acciones">
               <div class="actions justify-end">
                 <a class="btn ghost sm" href="analytics.php?space=<?= e(urlencode(space_for_app_slug((string) $a['slug']))) ?>">Analitica</a>
                 <a class="btn ghost sm" href="app-edit.php?id=<?= (int) $a['id'] ?>">Editar</a>

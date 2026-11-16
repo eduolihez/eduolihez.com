@@ -21,7 +21,9 @@
  * consentimiento, con DNT/GPC o tras retirarlo, el cuerpo no cambia.
  */
 import { api } from '../config';
-import { consentedVisitorId } from './consent';
+import { consentedVisitorId, hasPrivacySignal, type PrivacyNav } from './consent';
+// Eventos de clic (delegados); import con efecto para no tocar BaseLayout.
+import './events';
 
 const SESSION_KEY = 'eo_session_id';
 export const TOKEN_RE = /^[a-f0-9]{16}$/;
@@ -90,7 +92,7 @@ function currentScrollPct(): number {
   return Math.max(0, Math.min(100, Math.round(pct)));
 }
 
-function send(body: string): void {
+export function send(body: string): void {
   const url = api('/api/visit.php');
   // sendBeacon no bloquea la carga; si no existe, usamos fetch.
   if (navigator.sendBeacon) {
@@ -151,8 +153,8 @@ function sendBeat(): void {
 
 export function trackVisit(): void {
   try {
-    // No registramos si el usuario pide "Do Not Track".
-    if (navigator.doNotTrack === '1') return;
+    // No registramos con "Do Not Track" ni Global Privacy Control.
+    if (hasPrivacySignal(navigator as PrivacyNav)) return;
 
     // Cierra la pagina anterior (si la habia) antes de abrir la nueva.
     sendBeat();

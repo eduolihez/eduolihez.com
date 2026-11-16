@@ -38,7 +38,7 @@ const [primary, ...rest] = actions;
   withFaq={false}
   noindex={true}
 >
-  <section class="error-page container-page">
+  <section class="error-page container-page" data-error-page={code === '404' ? '404' : undefined}>
     <div class="error-page__body">
       <h1 class="error-page__title">{heading}</h1>
       <p class="error-page__summary">{summary}</p>

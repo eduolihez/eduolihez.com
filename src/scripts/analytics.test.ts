@@ -225,6 +225,30 @@ describe('trackVisit()', () => {
     expect(fetch).not.toHaveBeenCalled();
   });
 
+  it('no registra hit ni beat con Global Privacy Control', () => {
+    trackVisit(); // sin GPC: abre una pagina (1 hit)
+    Object.defineProperty(navigator, 'globalPrivacyControl', {
+      value: true,
+      configurable: true,
+      writable: true,
+    });
+    (fetch as ReturnType<typeof vi.fn>).mockClear();
+
+    trackVisit(); // con GPC: ni beat de la anterior ni hit nuevo
+    expect(fetch).not.toHaveBeenCalled();
+
+    Object.defineProperty(navigator, 'globalPrivacyControl', {
+      value: undefined,
+      configurable: true,
+      writable: true,
+    });
+  });
+
+  it('sin DNT ni GPC sigue registrando', () => {
+    trackVisit();
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
   it('usa sendBeacon en vez de fetch cuando esta disponible', () => {
     const sendBeaconMock = vi.fn().mockReturnValue(true);
     Object.defineProperty(navigator, 'sendBeacon', {

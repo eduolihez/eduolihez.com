@@ -18,57 +18,44 @@
  * sola linea de JavaScript. El contenido esta SIEMPRE en el HTML, asi que los
  * rastreadores lo leen aunque no ejecuten scripts.
  */
-import { useTranslations, pick } from '../i18n/utils';
+import { useTranslations } from '../i18n/utils';
 import type { Lang } from '../i18n/ui';
 import { faqItems } from '../data/faq';
+import FaqItem from './FaqItem.astro';
 
 interface Props {
   lang: Lang;
 }
 const { lang } = Astro.props;
 const t = useTranslations(lang);
+// Las 5 primeras a la vista; el resto sigue en el DOM dentro de un <details> envolvente.
+const VISIBLE = 5;
+const shown = faqItems.slice(0, VISIBLE);
+const more = faqItems.slice(VISIBLE);
 ---
 
-<section id="faq" class="border-b border-bg-border bg-bg-soft py-20 sm:py-28">
-  <div class="container-page">
-    <div class="reveal mb-12">
-      <p class="section-kicker">{t('kicker.faq')}</p>
+<section id="faq" class="border-b border-bg-border bg-bg-soft py-14 sm:py-16">
+  <div class="container-page grid gap-8 lg:grid-cols-[1fr_2fr] lg:gap-14">
+    <div>
       <h2 class="section-title">{t('faq.title')}</h2>
       <p class="section-subtitle">{t('faq.subtitle')}</p>
     </div>
 
-    <div class="reveal mx-auto max-w-3xl divide-y divide-bg-border border-y border-bg-border">
+    <div class="border-y border-bg-border">
+      {shown.map((item) => <FaqItem item={item} lang={lang} />)}
       {
-        faqItems.map((item) => (
-          <details class="faq-item group">
-            <summary
-              class="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-left text-[15px] font-medium text-text transition hover:text-accent"
-            >
-              <span>{pick(item.question, lang)}</span>
-              <svg
-                class="faq-chevron h-4 w-4 shrink-0 text-text-faint transition-transform duration-200"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path fill="currentColor" d="M12 15.4 6.6 10 8 8.6l4 4 4-4L17.4 10Z" />
-              </svg>
+        more.length > 0 && (
+          <details class="faq-more border-t border-bg-border">
+            <summary class="faq-more-summary flex min-h-11 cursor-pointer list-none items-center gap-2 py-3 text-sm font-semibold text-accent hover:underline">
+              <span>{t('faq.more')}</span>
+              <span class="font-mono text-xs text-text-muted" aria-hidden="true">+{more.length}</span>
             </summary>
-            <p class="pb-5 pr-8 text-sm leading-relaxed text-text-muted">
-              {pick(item.answer, lang)}
-            </p>
+            <div class="divide-y divide-bg-border border-t border-bg-border">
+              {more.map((item) => <FaqItem item={item} lang={lang} />)}
+            </div>
           </details>
-        ))
+        )
       }
     </div>
   </div>
 </section>
-
-<style>
-  /* Quita el triangulo por defecto del <summary> en Safari y Chrome. */
-  .faq-item summary::-webkit-details-marker {
-    display: none;
-  }
-  .faq-item[open] .faq-chevron {
-    transform: rotate(180deg);
-  }
-</style>

@@ -1,0 +1,24 @@
+---
+/** Una pregunta de <Faq />: <details> nativo, sin JS. */
+import { pick } from '../i18n/utils';
+import type { Lang } from '../i18n/ui';
+import type { FaqItem } from '../data/faq';
+
+interface Props {
+  item: FaqItem;
+  lang: Lang;
+}
+const { item, lang } = Astro.props;
+---
+
+<details class="faq-item group">
+  <summary
+    class="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 py-3.5 text-left text-[15px] font-medium text-text hover:text-accent"
+  >
+    <span>{pick(item.question, lang)}</span>
+    <svg class="faq-chevron h-4 w-4 shrink-0 text-text-muted transition-transform duration-200" viewBox="0 0 24 24" aria-hidden="true">
+      <path fill="currentColor" d="M12 15.4 6.6 10 8 8.6l4 4 4-4L17.4 10Z"></path>
+    </svg>
+  </summary>
+  <p class="pb-4 pr-8 text-sm leading-relaxed text-text-muted">{pick(item.answer, lang)}</p>
+</details>

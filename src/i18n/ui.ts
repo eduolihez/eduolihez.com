@@ -127,6 +127,8 @@ export const ui = {
     'contact.captcha': 'Completa la verificación anti-bots antes de enviar.',
     'contact.or': 'o encuéntrame en',
     'contact.vcard': 'Guardar contacto',
+    'contact.fieldRequired': 'Este campo es obligatorio.',
+    'faq.more': 'Ver más preguntas',
 
     // Kickers: la linea pequena sobre cada titulo de seccion. Deben ser
     // DISTINTOS del titulo (antes se repetian) para no duplicar texto.
@@ -278,6 +280,8 @@ export const ui = {
     'contact.captcha': 'Please complete the anti-bot check before sending.',
     'contact.or': 'or find me on',
     'contact.vcard': 'Save contact',
+    'contact.fieldRequired': 'This field is required.',
+    'faq.more': 'See more questions',
 
     'kicker.experience': '01 / Background',
     'kicker.skills': '02 / Tech stack',
@@ -427,6 +431,8 @@ export const ui = {
     'contact.captcha': "Completa la verificació anti-bots abans d'enviar.",
     'contact.or': "o troba'm a",
     'contact.vcard': 'Desar contacte',
+    'contact.fieldRequired': 'Aquest camp és obligatori.',
+    'faq.more': 'Veure més preguntes',
 
     'kicker.experience': '01 / Trajectòria',
     'kicker.skills': '02 / Stack tècnic',

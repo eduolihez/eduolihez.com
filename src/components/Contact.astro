@@ -29,66 +29,58 @@ const messages = {
   invalidEmail: t('contact.invalidEmail'),
   disabled: t('contact.disabled'),
   captcha: t('contact.captcha'),
+  fieldRequired: t('contact.fieldRequired'),
 };
 ---
 
-<section id="contacto" class="bg-bg-soft py-20 sm:py-28">
+<section id="contacto" class="bg-bg-soft py-14 sm:py-16">
   <div class="container-page">
-    <div class="grid gap-12 lg:grid-cols-2 lg:gap-16">
-      <div class="reveal">
-        <p class="section-kicker">{t('kicker.contact')}</p>
+    <div class="grid gap-10 lg:grid-cols-[1fr_1.4fr] lg:gap-14">
+      <div>
         <h2 class="section-title">{t('contact.title')}</h2>
         <p class="section-subtitle">{t('contact.subtitle')}</p>
 
-        <div class="mt-8 space-y-2">
+        <div class="mt-6">
           <a
             href={`mailto:${SITE.social.email}`}
-            class="group flex items-center gap-3 rounded-lg p-1.5 text-sm text-text-muted transition duration-200 hover:text-accent"
+            class="group flex min-h-11 items-center gap-3 text-sm text-text hover:text-accent"
           >
-            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-bg-border bg-bg-card/40 text-text-faint transition duration-200 group-hover:border-accent/30 group-hover:bg-accent/10 group-hover:text-accent">
-              <Icon name="mail" class="h-4 w-4" />
-            </span>
+            <Icon name="mail" class="h-4 w-4 shrink-0 text-text-muted group-hover:text-accent" />
             {SITE.social.email}
           </a>
           <a
             href={SITE.social.linkedin}
             target="_blank"
             rel="noopener noreferrer"
-            class="group flex items-center gap-3 rounded-lg p-1.5 text-sm text-text-muted transition duration-200 hover:text-accent"
+            class="group flex min-h-11 items-center gap-3 text-sm text-text hover:text-accent"
           >
-            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-bg-border bg-bg-card/40 text-text-faint transition duration-200 group-hover:border-accent/30 group-hover:bg-accent/10 group-hover:text-accent">
-              <Icon name="linkedin" class="h-4 w-4" />
-            </span>
+            <Icon name="linkedin" class="h-4 w-4 shrink-0 text-text-muted group-hover:text-accent" />
             LinkedIn
           </a>
           <a
             href={SITE.social.github}
             target="_blank"
             rel="noopener noreferrer"
-            class="group flex items-center gap-3 rounded-lg p-1.5 text-sm text-text-muted transition duration-200 hover:text-accent"
+            class="group flex min-h-11 items-center gap-3 text-sm text-text hover:text-accent"
           >
-            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-bg-border bg-bg-card/40 text-text-faint transition duration-200 group-hover:border-accent/30 group-hover:bg-accent/10 group-hover:text-accent">
-              <Icon name="github" class="h-4 w-4" />
-            </span>
+            <Icon name="github" class="h-4 w-4 shrink-0 text-text-muted group-hover:text-accent" />
             GitHub
           </a>
           <a
             href={SITE.vcard}
             download
-            class="group flex items-center gap-3 rounded-lg p-1.5 text-sm text-text-muted transition duration-200 hover:text-accent"
+            class="group flex min-h-11 items-center gap-3 text-sm text-text hover:text-accent"
           >
-            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-bg-border bg-bg-card/40 text-text-faint transition duration-200 group-hover:border-accent/30 group-hover:bg-accent/10 group-hover:text-accent">
-              <Icon name="download" class="h-4 w-4" />
-            </span>
+            <Icon name="download" class="h-4 w-4 shrink-0 text-text-muted group-hover:text-accent" />
             {t('contact.vcard')}
           </a>
         </div>
       </div>
 
-      <div class="reveal">
+      <div>
         <form
           id="contact-form"
-          class="rounded-xl border border-bg-border bg-bg-card p-6 sm:p-8"
+          class="rounded-md border border-bg-border bg-bg-card p-5 sm:p-6"
           novalidate
           data-api={apiUrl}
           data-settings={settingsUrl}
@@ -103,10 +95,10 @@ const messages = {
             <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" />
           </div>
 
-          <div class="grid gap-4 sm:grid-cols-2">
+          <div class="grid gap-x-4 sm:grid-cols-2">
             <div>
               <label for="name" class="mb-1.5 block text-sm font-medium text-text">
-                {t('contact.name')} <span class="text-accent">*</span>
+                {t('contact.name')} <span class="text-danger" aria-hidden="true">*</span>
               </label>
               <input
                 type="text"
@@ -115,12 +107,14 @@ const messages = {
                 required
                 maxlength="100"
                 autocomplete="name"
-                class="w-full rounded-md border border-bg-border bg-bg px-3.5 py-2.5 text-sm text-text placeholder:text-text-faint focus:border-accent focus:outline-hidden"
+                aria-describedby="name-error"
+                class="w-full rounded-md border border-bg-border bg-bg px-3.5 py-3 text-base text-text placeholder:text-text-faint aria-[invalid=true]:border-danger sm:text-sm"
               />
+              <p id="name-error" class="field-error"></p>
             </div>
             <div>
               <label for="email" class="mb-1.5 block text-sm font-medium text-text">
-                {t('contact.email')} <span class="text-accent">*</span>
+                {t('contact.email')} <span class="text-danger" aria-hidden="true">*</span>
               </label>
               <input
                 type="email"
@@ -129,27 +123,27 @@ const messages = {
                 required
                 maxlength="150"
                 autocomplete="email"
-                class="w-full rounded-md border border-bg-border bg-bg px-3.5 py-2.5 text-sm text-text placeholder:text-text-faint focus:border-accent focus:outline-hidden"
+                aria-describedby="email-error"
+                class="w-full rounded-md border border-bg-border bg-bg px-3.5 py-3 text-base text-text placeholder:text-text-faint aria-[invalid=true]:border-danger sm:text-sm"
               />
+              <p id="email-error" class="field-error"></p>
             </div>
           </div>
 
-          <div class="mt-4">
-            <label for="subject" class="mb-1.5 block text-sm font-medium text-text">
-              {t('contact.subject')}
-            </label>
+          <div class="mt-1">
+            <label for="subject" class="mb-1.5 block text-sm font-medium text-text">{t('contact.subject')}</label>
             <input
               type="text"
               id="subject"
               name="subject"
               maxlength="150"
-              class="w-full rounded-md border border-bg-border bg-bg px-3.5 py-2.5 text-sm text-text placeholder:text-text-faint focus:border-accent focus:outline-hidden"
+              class="w-full rounded-md border border-bg-border bg-bg px-3.5 py-3 text-base text-text placeholder:text-text-faint aria-[invalid=true]:border-danger sm:text-sm"
             />
           </div>
 
           <div class="mt-4">
             <label for="message" class="mb-1.5 block text-sm font-medium text-text">
-              {t('contact.message')} <span class="text-accent">*</span>
+              {t('contact.message')} <span class="text-danger" aria-hidden="true">*</span>
             </label>
             <textarea
               id="message"
@@ -157,36 +151,27 @@ const messages = {
               required
               rows="5"
               maxlength="3000"
-              class="w-full resize-y rounded-md border border-bg-border bg-bg px-3.5 py-2.5 text-sm text-text placeholder:text-text-faint focus:border-accent focus:outline-hidden"
+              aria-describedby="message-error"
+              class="w-full rounded-md border border-bg-border bg-bg px-3.5 py-3 text-base text-text placeholder:text-text-faint aria-[invalid=true]:border-danger sm:text-sm resize-y"
             ></textarea>
+            <p id="message-error" class="field-error"></p>
           </div>
 
           {
             turnstileKey && (
-              <div
-                class="cf-turnstile mt-4"
-                data-sitekey={turnstileKey}
-                data-theme="auto"
-              />
+              <div class="cf-turnstile mt-2" data-sitekey={turnstileKey} data-theme="auto" />
             )
           }
 
-          <button type="submit" id="contact-submit" class="btn-primary mt-6 w-full">
+          <button type="submit" id="contact-submit" class="btn-primary mt-4 min-h-11 w-full">
             <span id="contact-submit-text">{t('contact.send')}</span>
           </button>
 
-          <p
-            id="contact-feedback"
-            role="status"
-            aria-live="polite"
-            class="mt-4 hidden text-sm"
-          >
-          </p>
+          <p id="contact-feedback" role="status" aria-live="polite" class="mt-3 min-h-10 text-sm font-medium"></p>
         </form>
       </div>
     </div>
   </div>
-
 </section>
 
 <script>
@@ -212,9 +197,23 @@ const messages = {
 
     function setFeedback(text, ok) {
       feedback.textContent = text;
-      feedback.classList.remove('hidden', 'text-accent', 'text-danger');
+      feedback.classList.remove('text-accent', 'text-danger');
       feedback.classList.add(ok ? 'text-accent' : 'text-danger');
     }
+
+    // Validacion inline: el mensaje va junto al campo (#<id>-error, ya
+    // enlazado con aria-describedby) y aria-invalid marca el campo.
+    function setFieldError(id, msg) {
+      const input = document.getElementById(id);
+      const slot = document.getElementById(id + '-error');
+      if (!input || !slot) return;
+      slot.textContent = msg;
+      if (msg) input.setAttribute('aria-invalid', 'true');
+      else input.removeAttribute('aria-invalid');
+    }
+    ['name', 'email', 'message'].forEach((id) => {
+      document.getElementById(id)?.addEventListener('input', () => setFieldError(id, ''));
+    });
 
     // El formulario se puede apagar desde /admin -> Ajustes (util si llega
     // spam). Si esta apagado, bloqueamos el envio y mostramos las vias
@@ -257,11 +256,19 @@ const messages = {
         form.reset();
         return;
       }
-      if (!data.name?.trim() || !data.email?.trim() || !data.message?.trim()) {
-        return setFeedback(messages.required, false);
-      }
-      if (!isEmail(data.email)) {
-        return setFeedback(messages.invalidEmail, false);
+      const problems = [];
+      if (!data.name?.trim()) problems.push(['name', messages.fieldRequired]);
+      if (!data.email?.trim()) problems.push(['email', messages.fieldRequired]);
+      else if (!isEmail(data.email)) problems.push(['email', messages.invalidEmail]);
+      if (!data.message?.trim()) problems.push(['message', messages.fieldRequired]);
+      ['name', 'email', 'message'].forEach((id) => {
+        const found = problems.find((p) => p[0] === id);
+        setFieldError(id, found ? found[1] : '');
+      });
+      if (problems.length > 0) {
+        feedback.textContent = '';
+        document.getElementById(problems[0][0])?.focus();
+        return;
       }
 
       // Captcha de Cloudflare: si hay widget y aun no esta resuelto, no se
@@ -274,7 +281,7 @@ const messages = {
       btn.setAttribute('disabled', 'true');
       btn.classList.add('opacity-60', 'cursor-not-allowed');
       btnText.textContent = messages.sending;
-      feedback.classList.add('hidden');
+      feedback.textContent = '';
 
       const payload = {
         name: data.name.trim(),

@@ -379,108 +379,6 @@
   }
 }
 
-/* Franja de stack: dos copias de la lista en una pista que se desplaza media
-   anchura (el bucle es continuo). Se detiene al pasar el raton. */
-.marquee-track {
-  display: flex;
-  width: max-content;
-  animation: marquee 48s linear infinite;
-}
-.marquee:hover .marquee-track {
-  animation-play-state: paused;
-}
-@keyframes marquee {
-  to {
-    transform: translateX(-50%);
-  }
-}
-
-/* Doble carrusel de habilidades: dos pistas en sentido contrario, con los
-   bordes desvanecidos. Pausa al pasar el raton; con "menos movimiento" las
-   filas se quedan quietas y en varias lineas (sin las copias del bucle). */
-.skills-rows {
-  display: grid;
-  gap: 0.75rem;
-}
-.skills-marquee {
-  overflow: hidden;
-  -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
-  mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
-}
-.skills-track {
-  gap: 0.75rem;
-  padding-right: 0.75rem;
-  animation-duration: 60s;
-}
-.skills-track.is-reverse {
-  animation-direction: reverse;
-  animation-duration: 72s;
-}
-.skills-marquee:hover .skills-track {
-  animation-play-state: paused;
-}
-.skill-chip {
-  display: inline-flex;
-  flex-shrink: 0;
-  align-items: center;
-  gap: 0.5rem;
-  border: 1px solid var(--color-bg-border);
-  border-radius: 9999px;
-  background: var(--color-bg-card);
-  padding: 0.5rem 1rem;
-  font-family: var(--font-mono);
-  font-size: 0.8125rem;
-  color: var(--color-text-muted);
-  transition: border-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
-}
-.skill-chip svg {
-  color: var(--color-accent);
-}
-.skill-chip:hover {
-  border-color: var(--color-accent);
-  color: var(--color-text-title);
-  transform: translateY(-2px);
-}
-@media (prefers-reduced-motion: reduce) {
-  .skills-marquee {
-    -webkit-mask-image: none;
-    mask-image: none;
-    padding-inline: max(1rem, calc((100vw - 72rem) / 2));
-  }
-  .skills-track {
-    width: auto;
-    flex-wrap: wrap;
-    animation: none;
-  }
-  .skills-track > [aria-hidden='true'] {
-    display: none;
-  }
-}
-
-/* Titulo de Habilidades como boton que abre la ventana con todo. */
-.skills-title-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.75rem;
-  border-radius: 0.5rem;
-  text-align: left;
-  transition: color 0.15s ease;
-}
-.skills-title-cta {
-  display: grid;
-  height: 1.75rem;
-  width: 1.75rem;
-  place-items: center;
-  border: 1px solid var(--color-bg-border);
-  border-radius: 9999px;
-  color: var(--color-accent);
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.15s ease;
-}
-.skills-title-btn:hover .skills-title-cta {
-  background: var(--color-accent-soft);
-  transform: translateX(4px);
-}
-
 /* Icono del interruptor de tema: muestra la accion (en claro, la luna). */
 .theme-icon-sun {
   display: none;
@@ -1254,4 +1152,37 @@
   content: '·';
   margin-right: 0.75rem;
   color: var(--text-muted);
+}
+
+/* T4a: Experience, Skills, Faq, Contact (Expediente) */
+.dot-list {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 0.5rem;
+}
+.dot-list li:not(:last-child)::after {
+  content: '·';
+  margin-left: 0.5rem;
+  color: var(--text-muted);
+}
+.faq-item summary::-webkit-details-marker,
+.faq-more-summary::-webkit-details-marker {
+  display: none;
+}
+.faq-item[open] .faq-chevron {
+  transform: rotate(180deg);
+}
+.faq-more[open] > .faq-more-summary {
+  border-bottom: 1px solid var(--color-bg-border);
+}
+/* Mensaje de error junto al campo: la altura se reserva para que no salte. */
+.field-error {
+  min-height: 1.25rem;
+  margin-top: 0.25rem;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
+  color: var(--danger);
+}
+.field-error:empty::before {
+  content: '';
 }

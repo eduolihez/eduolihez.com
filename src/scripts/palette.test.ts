@@ -5,6 +5,7 @@ import {
   initPalette,
   isMacPlatform,
   normalize,
+  sectionCommands,
   type PaletteCommand,
 } from './palette';
 import { CV_OPEN_EVENT } from './cvModal';
@@ -384,5 +385,63 @@ describe('initPalette — icons and group kinds', () => {
     ]);
     const headings = [...document.querySelectorAll<HTMLElement>('.palette-group')];
     expect(headings.map((h) => h.dataset.kind)).toEqual(['go', 'actions']);
+  });
+});
+
+describe('sectionCommands', () => {
+  it('returns nothing without a container', () => {
+    expect(sectionCommands(null, 'Ir a sección')).toEqual([]);
+  });
+
+  it('builds one command per in-page anchor, skipping empty ones', () => {
+    const nav = document.createElement('nav');
+    nav.innerHTML = '<a href="#resumen"> Resumen </a><a href="#">Vacío</a><a href="/x">Fuera</a><a href="#bots"></a>';
+    expect(sectionCommands(nav, 'Ir a sección')).toEqual([
+      { id: 'section-resumen', group: 'Ir a sección', label: 'Resumen', href: '#resumen', keywords: 'ir a seccion' },
+    ]);
+  });
+});
+
+describe('initPalette — sections and downloads', () => {
+  function mountWithSections(commands: PaletteCommand[] = COMMANDS): void {
+    mountPalette(commands);
+    const pal = root();
+    pal.dataset.sections = '.section-nav';
+    pal.dataset.sectionsGroup = 'Ir a sección';
+    document.body.insertAdjacentHTML(
+      'beforeend',
+      '<nav class="section-nav"><a href="#audiencia">Audiencia</a></nav><section id="audiencia">A</section>',
+    );
+    initPalette();
+  }
+
+  it('lists page sections first and focuses the section when chosen', () => {
+    mountWithSections();
+    press('k', { ctrlKey: true });
+    expect(options()[0].textContent).toBe('Audiencia');
+    options()[0].click();
+    expect(root().hidden).toBe(true);
+    const section = document.getElementById('audiencia')!;
+    expect(section.getAttribute('tabindex')).toBe('-1');
+    expect(document.activeElement).toBe(section);
+  });
+
+  it('keeps the original order when there is no section container', () => {
+    press('k', { ctrlKey: true });
+    expect(options()[0].textContent).toBe('Proyectos');
+  });
+
+  it('marks downloads and returns focus to the opener', () => {
+    mountPalette([{ id: 'csv', label: 'Exportar CSV', group: 'Analítica', href: '/x.csv', download: true }]);
+    initPalette();
+    const opener = document.querySelector<HTMLButtonElement>('[data-palette-open]')!;
+    opener.focus();
+    opener.click();
+    const opt = options()[0] as HTMLAnchorElement;
+    expect(opt.hasAttribute('download')).toBe(true);
+    opt.addEventListener('click', (e) => e.preventDefault());
+    opt.click();
+    expect(root().hidden).toBe(true);
+    expect(document.activeElement).toBe(opener);
   });
 });

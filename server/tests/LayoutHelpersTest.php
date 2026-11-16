@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class LayoutHelpersTest extends TestCase
 {
-    private const HELPERS = ['filter_bar', 'section_nav', 'card_open', 'card_close'];
+    private const HELPERS = ['filter_bar', 'section_nav', 'card_open', 'card_close', 'bar_row'];
 
     public static function setUpBeforeClass(): void
     {
@@ -70,5 +70,27 @@ final class LayoutHelpersTest extends TestCase
     public function testCardCloseCierraLaTarjeta(): void
     {
         $this->assertSame('</div>', card_close());
+    }
+
+    private function barRow(string ...$args): string
+    {
+        ob_start();
+        bar_row($args[0], 5, 10, '', '', $args[1] ?? '');
+        return (string) ob_get_clean();
+    }
+
+    public function testBarRowSinHrefNoEnlaza(): void
+    {
+        $html = $this->barRow('/a<b>');
+        $this->assertStringContainsString('<span>/a&lt;b&gt;</span>', $html);
+        $this->assertStringNotContainsString('<a ', $html);
+    }
+
+    public function testBarRowConHrefEnlazaEnPestanaNueva(): void
+    {
+        $this->assertStringContainsString(
+            '<span><a href="https://x.test/?a=1&amp;b=2" target="_blank" rel="noopener">/p</a></span>',
+            $this->barRow('/p', 'https://x.test/?a=1&b=2')
+        );
     }
 }

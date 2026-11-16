@@ -28,6 +28,26 @@ export interface PaletteCommand {
   icon?: string;
   /** Familia del grupo: la hoja de estilos le da un color propio a cada una. */
   kind?: string;
+  /** Descarga (p. ej. un CSV): no navega, así que el foco vuelve a quien abrió. */
+  download?: boolean;
+}
+
+/**
+ * Comandos "Ir a sección" a partir de las anclas (a[href^="#"]) del contenedor
+ * que indica data-sections en la paleta. Sin contenedor, ninguno.
+ */
+export function sectionCommands(container: ParentNode | null, group: string): PaletteCommand[] {
+  if (!container) return [];
+  return [...container.querySelectorAll<HTMLAnchorElement>('a[href^="#"]')]
+    .map((a) => ({ href: a.getAttribute('href') ?? '', label: (a.textContent ?? '').trim() }))
+    .filter((s) => s.href.length > 1 && s.label !== '')
+    .map((s) => ({
+      id: `section-${s.href.slice(1)}`,
+      group,
+      label: s.label,
+      href: s.href,
+      keywords: 'ir a seccion',
+    }));
 }
 
 /** Apple (macOS/iOS): ahi el modificador es Cmd; en Windows y Linux, Ctrl. */
@@ -147,7 +167,14 @@ export function initPalette(): void {
   teardown = controller;
   const { signal } = controller;
 
-  const all = parseCommands(root.dataset.commands);
+  const sectionsSelector = root.dataset.sections;
+  const all = [
+    ...sectionCommands(
+      sectionsSelector ? document.querySelector(sectionsSelector) : null,
+      root.dataset.sectionsGroup ?? 'Ir a sección',
+    ),
+    ...parseCommands(root.dataset.commands),
+  ];
   let visible: PaletteCommand[] = [];
   let selected = 0;
   let opener: HTMLElement | null = null;
@@ -206,6 +233,7 @@ export function initPalette(): void {
           el.target = '_blank';
           el.rel = 'noopener noreferrer';
         }
+        if (cmd.download) el.setAttribute('download', '');
       } else if (el instanceof HTMLButtonElement) {
         el.type = 'button';
       }
@@ -242,9 +270,19 @@ export function initPalette(): void {
       return;
     }
     if (cmd.action) setTheme(ACTION_THEME[cmd.action]);
+    if (cmd.href?.startsWith('#')) {
+      // Ancla de la misma página: no recarga; el foco pasa a la sección.
+      close(false);
+      const target = document.getElementById(decodeURIComponent(cmd.href.slice(1)));
+      if (target) {
+        if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
+        target.focus({ preventScroll: true });
+      }
+      return;
+    }
     // Un enlace de la misma pestana recarga la pagina; los externos y mailto: no,
     // y ahi el foco se perderia en <body>.
-    close(!cmd.href || cmd.external === true || cmd.href.startsWith('mailto:'));
+    close(!cmd.href || cmd.external === true || cmd.download === true || cmd.href.startsWith('mailto:'));
   }
 
   // aria-modal no basta en todos los lectores: el resto de la pagina queda inert

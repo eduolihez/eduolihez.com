@@ -95,4 +95,63 @@ final class AnalyticsViewTest extends TestCase
         $this->assertSame('Franja horaria: 0 visitas en total.', chart_aria_label('Franja horaria', 0, null));
         $this->assertSame('X: 0 visitas en total.', chart_aria_label('X', 0, ['label' => '01/01', 'c' => 0]));
     }
+
+    public function testFiltrosDeLaUrlMandanSobreLaSesion(): void
+    {
+        $session = ['admin_analytics' => ['days' => 90, 'bots' => true]];
+        $this->assertSame(['days' => 7, 'bots' => false], analytics_filters(['days' => '7'], $session));
+        $this->assertSame(['days' => 7, 'bots' => true], analytics_filters(['days' => '7', 'bots' => '1'], []));
+    }
+
+    public function testFiltrosSinDaysUsanLaSesion(): void
+    {
+        $this->assertSame(['days' => 90, 'bots' => true], analytics_filters([], ['admin_analytics' => ['days' => 90, 'bots' => true]]));
+        $this->assertSame(['days' => 30, 'bots' => false], analytics_filters([], []));
+    }
+
+    public function testFiltrosFueraDeLaAllowlistVuelvenAlDefecto(): void
+    {
+        $this->assertSame(30, analytics_filters(['days' => '8'], [])['days']);
+        $this->assertSame(30, analytics_filters(['days' => ['7']], [])['days']);
+        $this->assertSame(30, analytics_filters(['days' => '7abc'], [])['days']);
+        $this->assertSame(['days' => 30, 'bots' => false], analytics_filters([], ['admin_analytics' => ['days' => '7', 'bots' => '1']]));
+        $this->assertSame(30, analytics_filters([], ['admin_analytics' => ['days' => 8]])['days']);
+        $this->assertSame(30, analytics_filters([], ['admin_analytics' => 'x'])['days']);
+    }
+
+    public function testPublicPageUrlSoloEnGlobalYSite(): void
+    {
+        $this->assertSame('https://eduolihez.com/blog/', public_page_url('/blog/', 'global'));
+        $this->assertSame('https://eduolihez.com/', public_page_url('/', 'site'));
+        $this->assertSame('', public_page_url('/blog/', 'phishlab'));
+        $this->assertSame('', public_page_url('/blog/', 'app:nowait'));
+    }
+
+    public function testPublicPageUrlRechazaRutasRaras(): void
+    {
+        foreach (['', 'blog/', '//evil.com/x', '/\evil.com', 'javascript:alert(1)', '/a b', "/a
+b"] as $bad) {
+            $this->assertSame('', public_page_url($bad, 'site'), $bad);
+        }
+    }
+
+    public function testNotFoundPathCellConEnlaceYBotonCopiar(): void
+    {
+        $id = 'nf-' . substr(md5('/viejo?a=1&b="2"'), 0, 10);
+        $html = not_found_path_cell('/viejo?a=1&b="2"', 'site');
+        $this->assertSame(
+            '<td class="path-cell"><a href="https://eduolihez.com/viejo?a=1&amp;b=&quot;2&quot;" target="_blank" rel="noopener">'
+            . '<code id="' . $id . '">/viejo?a=1&amp;b=&quot;2&quot;</code></a>'
+            . ' <button type="button" class="btn ghost sm" data-copy="#' . $id . '" aria-label="Copiar ruta /viejo?a=1&amp;b=&quot;2&quot;">Copiar</button></td>',
+            $html
+        );
+    }
+
+    public function testNotFoundPathCellSinEnlaceFueraDeGlobalYSite(): void
+    {
+        $html = not_found_path_cell('<x>', 'phishlab');
+        $this->assertStringNotContainsString('<a ', $html);
+        $this->assertStringContainsString('&lt;x&gt;</code>', $html);
+        $this->assertStringContainsString('data-copy="#nf-', $html);
+    }
 }

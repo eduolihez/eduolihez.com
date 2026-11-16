@@ -17,14 +17,13 @@ require_once __DIR__ . '/partials/analytics_view.php';
 require_login();
 
 // --- Rango de fechas: lista blanca, nunca se interpola valor del usuario ----
-$allowedDays = [1, 7, 14, 30, 90, 365];
-$days = (int) ($_GET['days'] ?? 30);
-if (!in_array($days, $allowedDays, true)) {
-    $days = 30;
-}
-
-// ¿Incluir bots en las cifras? Por defecto NO (falsean todo).
-$withBots = ($_GET['bots'] ?? '') === '1';
+// Sin ?days= se recupera lo ultimo elegido (sesion, como admin_space). Bots
+// por defecto NO (falsean todo).
+$allowedDays = ANALYTICS_ALLOWED_DAYS;
+$filters  = analytics_filters($_GET, $_SESSION ?? []);
+$days     = $filters['days'];
+$withBots = $filters['bots'];
+$_SESSION['admin_analytics'] = $filters;
 
 // --- App (docs/designs/admin-dashboard.md): filtra por app_id si se pide -----
 // El slug sale del espacio activo (?space=, o ?app= como alias legado);
@@ -698,19 +697,19 @@ page_header(
     <?= card_open('Páginas más vistas') ?>
       <?php if (!$topPages): ?><div class="empty">Sin datos.</div><?php endif; ?>
       <?php foreach ($topPages as $r): ?>
-        <?php bar_row($r['path'], (int) $r['c'], $maxPage, 'green'); ?>
+        <?php bar_row($r['path'], (int) $r['c'], $maxPage, 'green', '', public_page_url((string) $r['path'], admin_space())); ?>
       <?php endforeach; ?>
     <?= card_close() ?>
     <?= card_open('Páginas de entrada') ?>
       <?php if (!$entryPages): ?><div class="empty">Sin datos.</div><?php endif; ?>
       <?php foreach ($entryPages as $r): ?>
-        <?php bar_row($r['path'], (int) $r['c'], $maxEntry, 'green'); ?>
+        <?php bar_row($r['path'], (int) $r['c'], $maxEntry, 'green', '', public_page_url((string) $r['path'], admin_space())); ?>
       <?php endforeach; ?>
     <?= card_close() ?>
     <?= card_open('Páginas de salida') ?>
       <?php if (!$exitPages): ?><div class="empty">Sin datos.</div><?php endif; ?>
       <?php foreach ($exitPages as $r): ?>
-        <?php bar_row($r['path'], (int) $r['c'], $maxExit, 'violet'); ?>
+        <?php bar_row($r['path'], (int) $r['c'], $maxExit, 'violet', '', public_page_url((string) $r['path'], admin_space())); ?>
       <?php endforeach; ?>
     <?= card_close() ?>
   </div>
@@ -745,7 +744,7 @@ page_header(
     <?= long_table(
         '<tr><th>Ruta</th><th class="text-right">Veces</th><th class="text-right">Última vez</th></tr>',
         $notFound,
-        static fn(array $r): string => '<tr><td style="word-break:break-all;">' . e((string) $r['path']) . '</td>'
+        static fn(array $r): string => '<tr>' . not_found_path_cell((string) $r['path'], admin_space())
             . '<td class="text-right">' . (int) $r['c'] . '</td>'
             . '<td class="text-right">' . e(fdate((string) $r['last_at'])) . '</td></tr>',
         '<tr><td colspan="3" class="empty">'

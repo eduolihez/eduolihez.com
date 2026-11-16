@@ -32,6 +32,7 @@ function asset_url(string $file): string
 
 require_once __DIR__ . '/spaces.php';
 require_once __DIR__ . '/icons.php';
+require_once __DIR__ . '/analytics_view.php';
 
 /**
  * Deja constancia en el log del servidor de un fallo que el panel tolera (tabla
@@ -189,6 +190,17 @@ function admin_header(string $title, string $active = ''): void
           'keywords' => 'cambiar espacio app',
       ];
   }
+  // Analitica: rangos y CSV, siempre en el espacio actual. El CSV usa el
+  // rango recordado (analytics_filters sin ?days=).
+  $spaceQs = '&space=' . urlencode($space);
+  foreach ([7, 30, 90] as $d) {
+      $paletteCommands[] = ['id' => 'analytics-' . $d, 'group' => 'Analítica', 'label' => 'Analítica ' . $d . 'd',
+          'href' => 'analytics.php?days=' . $d . $spaceQs, 'keywords' => 'analitica visitas rango periodo'];
+  }
+  $csvDays = analytics_filters([], $_SESSION ?? [])['days'];
+  $paletteCommands[] = ['id' => 'analytics-csv', 'group' => 'Analítica', 'label' => 'Exportar CSV',
+      'href' => 'analytics.php?days=' . $csvDays . '&export=csv' . $spaceQs, 'download' => true,
+      'keywords' => 'descargar visitas analitica'];
   $paletteCommands[] = ['id' => 'site', 'group' => 'Acciones', 'label' => 'Ver web', 'href' => 'https://eduolihez.com/', 'external' => true];
   $paletteCommands[] = ['id' => 'theme-light', 'group' => 'Acciones', 'label' => 'Tema claro', 'action' => 'theme-light', 'keywords' => 'claro light'];
   $paletteCommands[] = ['id' => 'theme-dark', 'group' => 'Acciones', 'label' => 'Tema oscuro', 'action' => 'theme-dark', 'keywords' => 'oscuro dark noche'];
@@ -196,7 +208,7 @@ function admin_header(string $title, string $active = ''): void
   $paletteJson = json_encode($paletteCommands, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 ?>
 <div data-palette hidden class="palette-backdrop" role="dialog" aria-modal="true"
-     aria-label="Paleta de comandos" data-commands="<?= e((string) $paletteJson) ?>" data-empty="Sin resultados">
+     aria-label="Paleta de comandos" data-sections=".section-nav" data-sections-group="Ir a sección" data-commands="<?= e((string) $paletteJson) ?>" data-empty="Sin resultados">
   <div class="palette-panel">
     <input data-palette-input type="text" role="combobox" aria-expanded="true"
            aria-controls="palette-list" aria-autocomplete="list" autocomplete="off"
@@ -458,12 +470,19 @@ function status_tile(string $label, string $value, string $state = 'neutral'): v
         . '</div>';
 }
 
-/** Fila de barra horizontal con etiqueta y valor. */
-function bar_row(string $label, int $value, int $max, string $color = '', string $suffix = ''): void
+/**
+ * Fila de barra horizontal con etiqueta y valor. $href (opcional): la
+ * etiqueta enlaza ahi en pestana nueva (p. ej. la URL publica de una ruta).
+ */
+function bar_row(string $label, int $value, int $max, string $color = '', string $suffix = '', string $href = ''): void
 {
     $pct = $max > 0 ? max(1, (int) round(($value / $max) * 100)) : 0;
+    $labelHtml = e($label);
+    if ($href !== '') {
+        $labelHtml = '<a href="' . e($href) . '" target="_blank" rel="noopener">' . $labelHtml . '</a>';
+    }
     echo '<div class="barline">'
-        . '<div class="lab"><span>' . e($label) . '</span>'
+        . '<div class="lab"><span>' . $labelHtml . '</span>'
         . '<span>' . number_format($value) . ($suffix !== '' ? ' · ' . e($suffix) : '') . '</span></div>'
         . '<div class="bar-wrap"><div class="bar ' . e($color) . '" style="width:' . $pct . '%"></div></div>'
         . '</div>';

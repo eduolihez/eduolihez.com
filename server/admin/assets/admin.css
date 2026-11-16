@@ -1137,3 +1137,9 @@
 /* T11 · visitantes con cookie opt-in (analytics.php) */
 .t11-optin .t11-note { margin: 0 0 12px; color: var(--muted); font-size: .9em; }
 .t11-optin .grid4 { margin: 0; }
+
+/* Tablas largas de analytics.php: resto de filas plegado en <details> (sin JS). */
+.more-rows { margin-top: 8px; }
+.more-rows > summary { cursor: pointer; color: var(--accent); font-size: 0.82rem; font-weight: 500; padding: 6px 2px; min-height: 32px; }
+.more-rows > summary:hover { text-decoration: underline; }
+.more-rows[open] > summary { margin-bottom: 8px; }

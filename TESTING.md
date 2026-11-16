@@ -168,3 +168,7 @@ servicio, `schema.sql`, `config.php` generado desde el ejemplo, seed y
   archivos cambien de forma y rompan el output, así que el test debe usar
   los datos reales para detectarlo.
 - Nunca importar secretos o credenciales en un archivo de test.
+
+## Enlaces de credenciales (manual)
+`npm run check:credentials` hace HEAD/GET a las URLs externas de `evidence` (config.ts) y lista las que dan 4xx/5xx o fallan de red.
+No está en `build` ni en `verify` porque depende de la red; úsalo a mano antes de publicar.

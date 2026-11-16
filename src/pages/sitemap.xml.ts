@@ -107,6 +107,21 @@ const translatedGroups: { paths: Record<'es' | 'en' | 'ca', string>; lastmod: st
     ]),
   },
   {
+    // "Evidencias".
+    paths: {
+      es: '/evidencias/',
+      en: '/en/evidence/',
+      ca: '/ca/evidencies/',
+    },
+    lastmod: gitLastMod([
+      'src/pages/evidencias.astro',
+      'src/pages/en/evidence.astro',
+      'src/pages/ca/evidencies.astro',
+      'src/components/EvidenceIndex.astro',
+      'src/config.ts',
+    ]),
+  },
+  {
     // "Sobre esta web".
     paths: {
       es: '/sobre-esta-web/',

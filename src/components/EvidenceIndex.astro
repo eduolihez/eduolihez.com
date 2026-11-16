@@ -1,0 +1,91 @@
+---
+/**
+ * <EvidenceIndex /> - Pagina /evidencias: tabla con todas las E-nn (emisor,
+ * año, tipo de fuente, permalink #e-nn). Solo datos reales de config.ts.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import type { Lang } from '../i18n/ui';
+import { evidenceCopy, evidencePaths, evidenceRows } from '../lib/evidencePage';
+import { evidenceAnchor, linkAttrs, sourceType } from '../scripts/evidence';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const c = evidenceCopy[lang];
+const rows = evidenceRows();
+const path = evidencePaths[lang];
+const home = lang === 'es' ? '/' : `/${lang}/`;
+const sourceLabel = (href: string) => {
+  const s = sourceType(href);
+  return s === 'Credly' ? c.credly : s === 'PDF' ? c.pdf : c.other;
+};
+---
+
+<BaseLayout
+  title={c.title}
+  description={c.description}
+  lang={lang}
+  path={path}
+  withFaq={false}
+  alternates={evidencePaths}
+  breadcrumbName={c.crumb}
+>
+  <section class="border-b border-bg-border py-20 sm:py-28">
+    <div class="container-page">
+      <a
+        href={home}
+        class="no-print group mb-8 inline-flex min-h-11 items-center gap-2 font-mono text-xs text-text-muted transition hover:text-accent"
+      >
+        <span class="transition-transform group-hover:-translate-x-1">&larr;</span> {c.back}
+      </a>
+      <h1 class="page-title">{c.h1}</h1>
+      <p class="page-lede">{c.lede}</p>
+      <p class="no-print mt-6">
+        <button type="button" data-print class="btn-ghost min-h-11 cursor-pointer">{c.print}</button>
+      </p>
+
+      <div class="evidence-table-wrap mt-10">
+        <table class="evidence-table">
+          <thead>
+            <tr>
+              <th scope="col">{c.id}</th>
+              <th scope="col">{c.what}</th>
+              <th scope="col">{c.issuer}</th>
+              <th scope="col">{c.year}</th>
+              <th scope="col">{c.source}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              rows.map((r) => {
+                const attrs = linkAttrs(r.href);
+                return (
+                  <tr id={evidenceAnchor(r.id)}>
+                    <td class="font-mono">
+                      <a href={`#${evidenceAnchor(r.id)}`}>{r.id}</a>
+                    </td>
+                    <td>{r.label}</td>
+                    <td>{r.issuer}</td>
+                    <td class="font-mono">{r.year || '—'}</td>
+                    <td>
+                      <a href={r.href} target={attrs.target} rel={attrs.rel}>
+                        {sourceLabel(r.href)} · {c.verify}
+                      </a>
+                    </td>
+                  </tr>
+                );
+              })
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import { initPrintButtons } from '../scripts/print';
+  initPrintButtons();
+  document.addEventListener('astro:page-load', () => initPrintButtons());
+</script>

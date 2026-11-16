@@ -1594,3 +1594,52 @@ a.post-row:hover .post-title {
     radial-gradient(farthest-side at 100% 50%, rgb(0 0 0 / 0.28), transparent) right center / 0.75rem 100% no-repeat scroll,
     var(--color-bg-card);
 }
+
+/* T9b - /evidencias y dossier imprimible */
+.evidence-table-wrap {
+  overflow-x: auto;
+}
+.evidence-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+.evidence-table th,
+.evidence-table td {
+  padding: 0.75rem 1rem 0.75rem 0;
+  border-bottom: 1px solid var(--color-bg-border);
+  text-align: left;
+  vertical-align: top;
+}
+.evidence-table th {
+  color: var(--color-text-title);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.evidence-table a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.evidence-table tr:target {
+  background: var(--color-bg-soft);
+}
+@media print {
+  .palette-backdrop,
+  .modal-backdrop,
+  [data-announcement],
+  nav,
+  .skip-link {
+    display: none !important;
+  }
+  .evidence-table th,
+  .evidence-table td {
+    color: #000 !important;
+    border-color: #999 !important;
+  }
+  .evidence-table a::after {
+    content: ' (' attr(href) ')';
+    font-size: 0.8em;
+  }
+}

@@ -13,6 +13,7 @@
     "icons": "node scripts/gen-icons.mjs",
     "css:promptmaster": "tailwindcss -i scripts/promptmaster-tailwind/input.css -o public/projects/promptmaster/tailwind.css --minify",
     "astro": "astro",
+    "check:credentials": "node scripts/check-credential-links.mjs",
     "test": "vitest run",
     "verify": "node scripts/verify.mjs"
   },

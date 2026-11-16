@@ -50,6 +50,10 @@ const settingsUrl = api(`/api/settings.php?lang=${lang}`);
           {t('hero.cta.linkedin')}
         </a>
       </div>
+      <a href={`mailto:${SITE.social.email}`} class="hero-mail">
+        <Icon name="mail" class="h-4 w-4 shrink-0" />
+        {SITE.social.email}
+      </a>
     </div>
 
     <EvidenceCard lang={lang} />

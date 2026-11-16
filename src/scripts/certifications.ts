@@ -231,7 +231,7 @@ export function initCerts(): void {
     const text = document.createElement('span');
     text.className = 'min-w-0';
     const name = document.createElement('span');
-    name.className = 'cert-name block truncate text-sm font-semibold text-text-title';
+    name.className = 'cert-name block text-sm font-semibold text-text-title';
     name.textContent = c.name || '';
     const issuer = document.createElement('span');
     issuer.className = 'block truncate text-xs text-text-muted';

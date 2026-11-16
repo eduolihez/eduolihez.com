@@ -1757,3 +1757,79 @@ a.post-row:hover .post-title {
     align-items: stretch;
   }
 }
+
+/* T16 */
+.hero-mail {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  margin-top: 0.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  color: var(--text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.hero-mail:hover {
+  color: var(--text-title);
+  text-decoration-thickness: 2px;
+}
+/* Certificaciones: titulo a 2 lineas en vez de truncar. */
+.cert-row .cert-name {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+/* Objetivos tactiles >= 44 px (sin tocar el aspecto de escritorio). */
+@media (max-width: 1023px), (pointer: coarse) {
+  .ev-id,
+  .ev-verify {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding-block: 0;
+  }
+}
+.skills-ref {
+  /* Area tactil >= 44 px sin cambiar la maqueta (enlace dentro de un parrafo). */
+  position: relative;
+}
+.skills-ref::after {
+  content: '';
+  position: absolute;
+  inset: -0.8rem -0.25rem;
+}
+.post-toc a {
+  display: block;
+}
+.post-author-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1.25rem;
+}
+.post-author-links a,
+.post-author-links button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.post-author-links a:hover,
+.post-author-links button:hover {
+  color: var(--color-accent-hover);
+}
+/* Indice: numeros alineados con las lineas envueltas. */
+.post-toc li::marker {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (min-width: 1024px) {
+  .hero-mail {
+    display: none;
+  }
+}

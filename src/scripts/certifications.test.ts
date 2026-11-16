@@ -1,4 +1,6 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { initCerts, safeUrl, issuerInitials, DEFAULT_LIMIT } from './certifications';
 
 function setupGrid() {
@@ -418,5 +420,15 @@ describe('safeUrl() (Certifications)', () => {
 
   it('bloquea esquemas ejecutables', () => {
     expect(safeUrl('javascript:alert(1)')).toBe('');
+  });
+});
+
+describe('T16: titulo de certificacion sin truncate', () => {
+  it('el nombre no lleva la clase truncate (el CSS aplica line-clamp 2)', () => {
+    document.body.innerHTML = '<div id="x"></div>';
+    const src = readFileSync(join(process.cwd(), 'src/components/CertRow.astro'), 'utf8');
+    const js = readFileSync(join(process.cwd(), 'src/scripts/certifications.ts'), 'utf8');
+    expect(src).not.toMatch(/cert-name[^"]*truncate/);
+    expect(js).not.toMatch(/cert-name[^']*truncate/);
   });
 });

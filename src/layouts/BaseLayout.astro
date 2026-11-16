@@ -16,7 +16,6 @@ import '../styles/global.css';
  * se publica; escribirla a mano se romperia en la siguiente compilacion.
  */
 import interWoff2 from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
-import monoWoff2 from '@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2?url';
 import Seo from '../components/Seo.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
@@ -99,7 +98,6 @@ const t = useTranslations(lang);
     {/* crossorigin es obligatorio en la precarga de fuentes, incluso siendo
         del mismo origen: sin el, el navegador descarga el archivo dos veces. */}
     <link rel="preload" href={interWoff2} as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href={monoWoff2} as="font" type="font/woff2" crossorigin />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="apple-touch-icon" href="/img/apple-touch-icon.png" />

@@ -21,6 +21,8 @@ import { relatedPosts } from '../lib/related';
 import { blogPostPath } from '../data/soc-profile';
 import { authorByline, socAlternates } from '../data/soc-profile';
 import type { Lang } from '../i18n/ui';
+import { useTranslations, localeBase } from '../i18n/utils';
+import { SITE } from '../config';
 
 interface Props {
   post: PostDetail;
@@ -34,6 +36,8 @@ const byline = authorByline[(lang as Lang) in authorByline ? (lang as Lang) : 'e
 const socHref = socAlternates[(lang as Lang) in socAlternates ? (lang as Lang) : 'es'];
 const L: Lang = (lang as Lang) in authorByline ? (lang as Lang) : 'es';
 const related = relatedPosts(post, await fetchAllPostSummaries(L));
+const t = useTranslations(L);
+const contactHref = `${localeBase(L)}#contacto`;
 const moreTitle = { es: 'Sigue leyendo', en: 'Keep reading', ca: 'Continua llegint' }[L];
 // Solo portada propia: la generada repite el titulo que ya se ve en el <h1>.
 const cover = safeUrl(post.cover_url);
@@ -161,5 +165,16 @@ const showToc = toc.length >= 3;
         </aside>
       )
     }
+
+    <aside class="post-author mt-12 border-t border-bg-border pt-8" aria-labelledby="post-author-title">
+      <h2 id="post-author-title" class="mb-2 text-xl font-bold text-text-title">{t('post.author.title')}</h2>
+      <p class="max-w-[44rem] text-text-muted">{t('post.author.body')}</p>
+      <ul class="post-author-links mt-3">
+        <li><a href={socHref}>{t('post.author.profile')}</a></li>
+        <li><button type="button" data-cv-open aria-haspopup="dialog" aria-controls="cv-modal">{t('hero.cta.cv')}</button></li>
+        <li><a href={SITE.social.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
+        <li><a href={contactHref}>{t('post.author.contact')}</a></li>
+      </ul>
+    </aside>
   </div>
 </article>

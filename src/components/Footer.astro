@@ -55,7 +55,7 @@ const iconLinkClass =
       <a href={base} class="inline-flex min-h-11 items-center rounded-md font-display text-base font-bold tracking-tight text-text-title">
         EO&nbsp;<span class="text-accent">//</span> <span class="ml-1 font-medium text-text-muted">security</span>
       </a>
-      <p class="mt-3 max-w-sm text-text-muted">{SITE.jobTitle}</p>
+      <p class="mt-3 max-w-sm text-text-muted">{t('hero.role')}</p>
 
       <p class="mt-4 flex items-center gap-2 font-mono text-xs text-text-muted">
         <Icon name="location" class="h-3.5 w-3.5 shrink-0 text-text-faint" />
@@ -137,12 +137,12 @@ const iconLinkClass =
       <p>
         &copy; {year} {SITE.shortName}
         <span aria-hidden="true">·</span>
-        <a href={aboutPath} class="transition hover:text-accent">{t('footer.aboutSite')}</a>
+        <a href={aboutPath} class="inline-flex min-h-11 items-center transition hover:text-accent">{t('footer.aboutSite')}</a>
         <span aria-hidden="true">·</span>
-        <a href={socAlternates[lang]} class="transition hover:text-accent">{socProfile[lang].breadcrumb}</a>
+        <a href={socAlternates[lang]} class="inline-flex min-h-11 items-center transition hover:text-accent">{socProfile[lang].breadcrumb}</a>
         <span aria-hidden="true">·</span>
         {/* Reabre el aviso de cookies (consent.ts); sin JS lleva a la explicacion. */}
-        <a href={aboutPath} data-consent-open aria-controls="consent-banner" class="transition hover:text-accent">{t('footer.cookies')}</a>
+        <a href={aboutPath} data-consent-open aria-controls="consent-banner" class="inline-flex min-h-11 items-center transition hover:text-accent">{t('footer.cookies')}</a>
       </p>
       <div class="flex items-center gap-5">
         <button

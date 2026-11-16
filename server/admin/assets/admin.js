@@ -19,7 +19,8 @@
  *   [data-select-on-click] -> selecciona el texto del campo al hacer clic.
  *   #sidebar-open-btn / #sidebar-close-btn / #sidebar-overlay -> abren y
  *                        cierran el cajon lateral movil (clase .open en
- *                        #admin-sidebar y en el overlay).
+ *                        #admin-sidebar y en el overlay); Esc, trampa de
+ *                        foco, aria-expanded y foco de vuelta al boton.
  *   nav.section-nav     -> marca con aria-current="true" el ancla de la
  *                        seccion visible (IntersectionObserver).
  */
@@ -33,17 +34,76 @@
     var overlay = document.getElementById('sidebar-overlay');
     var sidebar = document.getElementById('admin-sidebar');
 
+    var FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+    function isOpen() {
+      return !!(sidebar && sidebar.classList.contains('open'));
+    }
+
+    function focusables() {
+      var all = sidebar ? sidebar.querySelectorAll(FOCUSABLE) : [];
+      var out = [];
+      for (var i = 0; i < all.length; i++) {
+        if (!all[i].hidden && all[i].getAttribute('aria-hidden') !== 'true') out.push(all[i]);
+      }
+      return out;
+    }
+
     function toggleSidebar(state) {
-      if (sidebar && overlay) {
-        sidebar.classList.toggle('open', state);
-        overlay.classList.toggle('open', state);
-        document.body.style.overflow = state ? 'hidden' : '';
+      if (!sidebar || !overlay) return;
+      var wasOpen = isOpen();
+      sidebar.classList.toggle('open', state);
+      overlay.classList.toggle('open', state);
+      document.body.style.overflow = state ? 'hidden' : '';
+      if (openBtn) openBtn.setAttribute('aria-expanded', state ? 'true' : 'false');
+      if (state) {
+        var f = focusables();
+        if (f.length) f[0].focus();
+      } else if (wasOpen && openBtn) {
+        openBtn.focus();
       }
     }
 
-    if (openBtn) openBtn.addEventListener('click', function () { toggleSidebar(true); });
+    if (openBtn) {
+      openBtn.setAttribute('aria-expanded', isOpen() ? 'true' : 'false');
+      openBtn.addEventListener('click', function () { toggleSidebar(true); });
+    }
     if (closeBtn) closeBtn.addEventListener('click', function () { toggleSidebar(false); });
     if (overlay) overlay.addEventListener('click', function () { toggleSidebar(false); });
+
+    // Esc cierra y Tab / Shift+Tab ciclan dentro del cajon mientras esta abierto.
+    document.addEventListener('keydown', function (ev) {
+      if (!isOpen()) return;
+      if (ev.key === 'Escape') {
+        ev.preventDefault();
+        toggleSidebar(false);
+        return;
+      }
+      if (ev.key !== 'Tab') return;
+      var f = focusables();
+      if (!f.length) return;
+      var first = f[0];
+      var last = f[f.length - 1];
+      var active = document.activeElement;
+      var inside = sidebar.contains(active);
+      if (ev.shiftKey && (active === first || !inside)) {
+        ev.preventDefault();
+        last.focus();
+      } else if (!ev.shiftKey && (active === last || !inside)) {
+        ev.preventDefault();
+        first.focus();
+      }
+    });
+  }
+
+  // Desplaza horizontalmente el scroller para que el enlace quede a la vista,
+  // sin mover la pagina (scrollIntoView tambien desplazaria la ventana).
+  function revealInScroller(scroller, el) {
+    if (!scroller || !el || scroller.scrollWidth <= scroller.clientWidth) return;
+    var s = scroller.getBoundingClientRect();
+    var r = el.getBoundingClientRect();
+    if (r.left < s.left) scroller.scrollLeft += r.left - s.left;
+    else if (r.right > s.right) scroller.scrollLeft += r.right - s.right;
   }
 
   // --- Indice de secciones: marca la seccion visible ------------------------
@@ -76,6 +136,7 @@
         if (k === current) byId[k].setAttribute('aria-current', 'true');
         else byId[k].removeAttribute('aria-current');
       }
+      revealInScroller(nav, byId[current]);
     }
     var observer = new IntersectionObserver(function (entries) {
       for (var n = 0; n < entries.length; n++) {

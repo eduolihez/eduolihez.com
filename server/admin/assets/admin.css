@@ -1153,4 +1153,11 @@
 
 /* Grafico diario/semanal: periodo anterior como linea discontinua superpuesta. */
 .chart .bar-stack { position: relative; width: 100%; display: flex; align-items: flex-end; }
-.chart .bar-prev { position: absolute; left: 0; right: 0; bottom: 0; border-top: 2px dashed var(--faint); pointer-events: none; z-index: 1; }
+.chart .bar-prev { position: absolute; left: 0; right: 0; bottom: 0; border-top: 2px dashed var(--text); box-shadow: 0 -2px 0 var(--on-accent); pointer-events: none; z-index: 1; }
+/* Doble trazo: --text (>=3:1 contra --card) y --on-accent (>=3:1 contra la barra
+   --accent), en ambos temas; la linea se distingue sobre la barra y sobre la tarjeta. */
+
+/* Etiquetas de los extremos alineadas hacia dentro: centradas en una columna
+   estrecha desbordaban 1-7 px por la derecha y daban scroll interno en .chart. */
+.chart .col:last-child .tick, .chart .col:last-child .val { align-self: flex-end; }
+.chart .col:first-child .tick, .chart .col:first-child .val { align-self: flex-start; }

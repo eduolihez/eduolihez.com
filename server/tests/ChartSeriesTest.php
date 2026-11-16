@@ -98,4 +98,30 @@ final class ChartSeriesTest extends TestCase
         );
         $this->assertSame('X: 0 visitas en total.', chart_aria_label('X', 0, null));
     }
+
+    public function testWeekWindowDays(): void
+    {
+        $this->assertSame(91, week_window_days(90));
+        $this->assertSame(371, week_window_days(365));
+        $this->assertSame(7, week_window_days(0));
+    }
+
+    public function testWeekBucketKeyCoincideConWeekBuckets(): void
+    {
+        [$keys] = week_buckets(365, '2026-11-16');
+        $expected = [0 => 0, 6 => 0, 7 => 1, 363 => 51, 364 => 52, 365 => 52];
+        foreach ($expected as $daysAgo => $k) {
+            $this->assertSame($k, week_bucket_key($daysAgo), "DATEDIFF $daysAgo");
+            $this->assertContains(week_bucket_key($daysAgo), $keys);
+        }
+        // El dia mas antiguo de la ventana alineada cae en el ultimo tramo, no en uno parcial extra.
+        $this->assertContains(week_bucket_key(week_window_days(365) - 1), $keys);
+        $this->assertNotContains(week_bucket_key(week_window_days(365)), $keys);
+        $this->assertSame(0, week_bucket_key(-3));
+    }
+
+    public function testMetricDeltaActualCeroConPrevio(): void
+    {
+        $this->assertSame('<span class="delta down">-100%</span>', metric_delta_badge(0.0, 40.0));
+    }
 }

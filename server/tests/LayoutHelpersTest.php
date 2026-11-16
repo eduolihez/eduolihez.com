@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class LayoutHelpersTest extends TestCase
 {
-    private const HELPERS = ['filter_bar', 'section_nav', 'card_open', 'card_close', 'bar_row'];
+    private const HELPERS = ['filter_bar', 'section_nav', 'card_open', 'card_close', 'bar_row', 'safe_link_href'];
 
     public static function setUpBeforeClass(): void
     {
@@ -92,5 +92,24 @@ final class LayoutHelpersTest extends TestCase
             '<span><a href="https://x.test/?a=1&amp;b=2" target="_blank" rel="noopener">/p</a></span>',
             $this->barRow('/p', 'https://x.test/?a=1&b=2')
         );
+    }
+
+    public function testSafeLinkHref(): void
+    {
+        $this->assertTrue(safe_link_href('/blog/x'));
+        $this->assertTrue(safe_link_href('https://eduolihez.com/'));
+        $this->assertTrue(safe_link_href('HTTP://x.test'));
+        $this->assertFalse(safe_link_href(''));
+        $this->assertFalse(safe_link_href('//evil.test'));
+        $this->assertFalse(safe_link_href('javascript:alert(1)'));
+        $this->assertFalse(safe_link_href('blog/x'));
+        $this->assertFalse(safe_link_href('ftp://x.test'));
+    }
+
+    public function testBarRowConHrefNoSeguroNoEnlaza(): void
+    {
+        $html = $this->barRow('/p', 'javascript:alert(1)');
+        $this->assertStringNotContainsString('<a ', $html);
+        $this->assertStringNotContainsString('javascript', $html);
     }
 }

@@ -73,6 +73,7 @@ function q_rows(string $sql, array $params = []): array
         $st->execute($params);
         return $st->fetchAll();
     } catch (Throwable $e) {
+        admin_log_error('analytics q_rows', $e);
         return [];
     }
 }
@@ -113,6 +114,7 @@ function q_int(string $sql, array $params = []): int
         $st->execute($params);
         return (int) $st->fetchColumn();
     } catch (Throwable $e) {
+        admin_log_error('analytics q_int', $e);
         return 0;
     }
 }
@@ -196,31 +198,35 @@ $yesterday = count($daily) >= 2
 // --- Serie del grafico: diaria hasta 60 dias, semanal en 90d/365d, con el
 // periodo anterior desplazado al tramo equivalente (marca superpuesta).
 $chartWeekly = chart_uses_weeks($days);
+// Ventanas alineadas a dias naturales (base CURDATE en filtro y clave, igual
+// para el periodo actual y el anterior): sin tramos parciales en los bordes.
 if ($chartWeekly) {
     [$chartKeys, $chartLabels] = week_buckets($days, date('Y-m-d'));
+    $span = week_window_days($days); // semanas completas: n * 7 dias
     $chartRows = q_rows(
         "SELECT FLOOR(DATEDIFF(CURDATE(), DATE(visited_at)) / 7) AS k, COUNT(*) AS c, COUNT(DISTINCT ip_hash) AS u
-         FROM visits WHERE $botFilter AND visited_at > (NOW() - INTERVAL ? DAY)
+         FROM visits WHERE $botFilter AND visited_at >= (CURDATE() - INTERVAL ? DAY)
          GROUP BY k",
-        [$days]
+        [$span - 1]
     );
     $chartPrevRows = q_rows(
         "SELECT FLOOR((DATEDIFF(CURDATE(), DATE(visited_at)) - ?) / 7) AS k, COUNT(*) AS c
          FROM visits WHERE $botFilter
-           AND visited_at <= (NOW() - INTERVAL ? DAY) AND visited_at > (NOW() - INTERVAL ? DAY)
+           AND visited_at >= (CURDATE() - INTERVAL ? DAY) AND visited_at < (CURDATE() - INTERVAL ? DAY)
          GROUP BY k",
-        [$days, $days, $days * 2]
+        [$span, 2 * $span - 1, $span - 1]
     );
 } else {
     $chartKeys   = array_column($daily, 'd');
     $chartLabels = array_map(static fn(string $d): string => date('d/m', strtotime($d)), $chartKeys);
     $chartRows   = array_map(static fn(array $r): array => ['k' => $r['d'], 'c' => $r['c'], 'u' => $r['u']], $daily);
+    // Dia D del periodo anterior -> clave D + $chartDays (con 24 h: ayer -> hoy).
     $chartPrevRows = q_rows(
         "SELECT DATE(visited_at + INTERVAL ? DAY) AS k, COUNT(*) AS c
          FROM visits WHERE $botFilter
-           AND visited_at <= (NOW() - INTERVAL ? DAY) AND visited_at > (NOW() - INTERVAL ? DAY)
+           AND visited_at >= (CURDATE() - INTERVAL ? DAY) AND visited_at < (CURDATE() - INTERVAL ? DAY)
          GROUP BY k",
-        [$chartDays, $chartDays, $chartDays * 2]
+        [$chartDays, 2 * $chartDays - 1, $chartDays - 1]
     );
 }
 $chartSeries = build_chart_series($chartKeys, $chartLabels, $chartRows, $chartPrevRows);
@@ -367,16 +373,19 @@ $prevAvg = q_rows(
 $prevDuration = isset($prevAvg['dur']) ? (float) $prevAvg['dur'] : null;
 $prevScroll   = isset($prevAvg['scr']) ? (float) $prevAvg['scr'] : null;
 
-$avgDuration = (float) (q_rows(
+$avgDurationRaw = (q_rows(
     "SELECT AVG(duration_s) AS v FROM visits
      WHERE $botFilter AND duration_s IS NOT NULL AND visited_at > (NOW() - INTERVAL ? DAY)",
     [$days]
-)[0]['v'] ?? 0);
-$avgScroll = (float) (q_rows(
+)[0]['v'] ?? null);
+$avgScrollRaw = (q_rows(
     "SELECT AVG(scroll_pct) AS v FROM visits
      WHERE $botFilter AND scroll_pct IS NOT NULL AND visited_at > (NOW() - INTERVAL ? DAY)",
     [$days]
-)[0]['v'] ?? 0);
+)[0]['v'] ?? null);
+// null = sin medidas en el rango (no hay delta); 0.0 si hay medidas a cero.
+$avgDuration = (float) ($avgDurationRaw ?? 0);
+$avgScroll   = (float) ($avgScrollRaw ?? 0);
 
 // Paginas de entrada / salida: primer y ultimo "hit" de cada sesion. Un solo
 // GROUP BY por session_id calcula ambos extremos a la vez (antes eran dos
@@ -632,11 +641,11 @@ page_header(
       <div class="lbl">Rebote<br><span class="faint">sesiones de una sola página</span></div>
     </div>
     <div class="card stat">
-      <div class="num cyan"><?= $avgDuration >= 60 ? sprintf('%d:%02d', (int) ($avgDuration / 60), (int) $avgDuration % 60) : round($avgDuration) . 's' ?><?= metric_delta_badge($avgDuration > 0 ? $avgDuration : null, $prevDuration) ?></div>
+      <div class="num cyan"><?= $avgDuration >= 60 ? sprintf('%d:%02d', (int) ($avgDuration / 60), (int) $avgDuration % 60) : round($avgDuration) . 's' ?><?= metric_delta_badge($avgDurationRaw !== null ? $avgDuration : null, $prevDuration) ?></div>
       <div class="lbl">Duración media<br><span class="faint">tiempo visible en pantalla</span></div>
     </div>
     <div class="card stat">
-      <div class="num violet"><?= round($avgScroll) ?>%<?= metric_delta_badge($avgScroll > 0 ? $avgScroll : null, $prevScroll) ?></div>
+      <div class="num violet"><?= round($avgScroll) ?>%<?= metric_delta_badge($avgScrollRaw !== null ? $avgScroll : null, $prevScroll) ?></div>
       <div class="lbl">Scroll medio<br><span class="faint">profundidad alcanzada</span></div>
     </div>
   </div>
@@ -645,7 +654,7 @@ page_header(
     <?php /* Con 24 h el grafico diario seria una sola barra: va la franja horaria. */ ?>
     <?= $hourCardHtml ?>
   <?php else: ?>
-  <?= card_open($chartWeekly ? 'Visitas por semana' : 'Visitas por día', $chartWeekly ? $days . ' días, por semanas' : '') ?>
+  <?= card_open($chartWeekly ? 'Visitas por semana' : 'Visitas por día', $chartWeekly ? count($chartKeys) . ' semanas completas' : '') ?>
     <?php if (!array_sum(array_column($chartSeries, 'c'))): ?>
       <div class="empty">Sin datos de visitas en este rango.</div>
     <?php else: ?>

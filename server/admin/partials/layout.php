@@ -122,7 +122,8 @@ function admin_header(string $title, string $active = ''): void
     $navGroups  = space_nav($space, $counts);
     $activeZone = zone_for_page($space, $active);
 
-    // Barra inferior (< 1024 px): hasta 4 accesos + "Mas" (abre el cajon).
+    // Barra inferior (max-width: 1023.98px en admin.css, .bottom-nav): hasta 4
+    // accesos + "Mas" (abre el cajon).
     $bottomNav    = bottom_nav($navGroups, $active, $activeZone);
     $spaceOptions = space_options($appsRows);
     $spaceLabel   = $space;
@@ -474,11 +475,17 @@ function status_tile(string $label, string $value, string $state = 'neutral'): v
  * Fila de barra horizontal con etiqueta y valor. $href (opcional): la
  * etiqueta enlaza ahi en pestana nueva (p. ej. la URL publica de una ruta).
  */
+/** Enlace aceptable para bar_row: ruta absoluta del sitio (/x, no //) o http(s)://. */
+function safe_link_href(string $href): bool
+{
+    return (bool) preg_match('#^(/(?!/)|https?://)#i', $href);
+}
+
 function bar_row(string $label, int $value, int $max, string $color = '', string $suffix = '', string $href = ''): void
 {
     $pct = $max > 0 ? max(1, (int) round(($value / $max) * 100)) : 0;
     $labelHtml = e($label);
-    if ($href !== '') {
+    if (safe_link_href($href)) {
         $labelHtml = '<a href="' . e($href) . '" target="_blank" rel="noopener">' . $labelHtml . '</a>';
     }
     echo '<div class="barline">'

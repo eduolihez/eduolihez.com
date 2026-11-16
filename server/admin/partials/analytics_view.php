@@ -208,3 +208,19 @@ function chart_series_max(array $series): int
     }
     return $max;
 }
+
+/** Dias de la ventana semanal: semanas completas que cubren $days (n * 7). */
+function week_window_days(int $days): int
+{
+    return max(1, (int) ceil($days / 7)) * 7;
+}
+
+/**
+ * Clave de tramo semanal de una visita hecha hace $daysAgo dias naturales
+ * (DATEDIFF(CURDATE(), DATE(visited_at))). Espejo exacto de la expresion SQL
+ * FLOOR(DATEDIFF(...) / 7) de analytics.php; coincide con week_buckets().
+ */
+function week_bucket_key(int $daysAgo): int
+{
+    return intdiv(max(0, $daysAgo), 7);
+}

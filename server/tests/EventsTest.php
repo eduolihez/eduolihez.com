@@ -19,7 +19,7 @@ final class EventsTest extends TestCase
     public static function validNamesProvider(): array
     {
         return [
-            'cv_download' => ['cv_download', null],
+            'cv_open' => ['cv_open', null],
             'outbound' => ['outbound', 'github.com'],
             'lang_switch' => ['lang_switch', 'ca'],
             'theme_toggle' => ['theme_toggle', 'dark'],
@@ -31,13 +31,13 @@ final class EventsTest extends TestCase
     public function testInvalidName(): void
     {
         $this->assertNull(normalize_event(['name' => 'hack', 'path' => '/']));
-        $this->assertNull(normalize_event(['name' => 'CV_DOWNLOAD', 'path' => '/']));
+        $this->assertNull(normalize_event(['name' => 'CV_OPEN', 'path' => '/']));
         $this->assertNull(normalize_event(['path' => '/']));
     }
 
     public function testEmptyTargetBecomesNull(): void
     {
-        $this->assertNull(normalize_event(['name' => 'cv_download', 'target' => '', 'path' => '/'])['target']);
+        $this->assertNull(normalize_event(['name' => 'cv_open', 'target' => '', 'path' => '/'])['target']);
         $this->assertNull(normalize_event(['name' => 'theme_toggle', 'path' => '/'])['target']);
         $this->assertNull(normalize_event(['name' => 'theme_toggle', 'target' => '', 'path' => '/'])['target']);
     }
@@ -62,7 +62,7 @@ final class EventsTest extends TestCase
             'lang vacio' => ['lang_switch', ''],
             'lang mayus' => ['lang_switch', 'EN'],
             'theme fuera' => ['theme_toggle', 'blue'],
-            'cv con target' => ['cv_download', 'x'],
+            'cv con target' => ['cv_open', 'x'],
             'contact con target' => ['contact_submit', 'x'],
             'not_found con target' => ['not_found', 'x'],
             'target array' => ['outbound', ['a.com']],
@@ -121,5 +121,28 @@ final class EventsTest extends TestCase
         $this->assertNull(normalize_event(['name' => 1]));
         $this->assertNull(normalize_event(['name' => null]));
         $this->assertNull(normalize_event([]));
+    }
+
+    public function testEventCapWithSession(): void
+    {
+        $this->assertFalse(event_over_cap(0, 0, '0123456789abcdef'));
+        $this->assertFalse(event_over_cap(299, 19, '0123456789abcdef'));
+        $this->assertTrue(event_over_cap(50, 20, '0123456789abcdef'));
+        $this->assertTrue(event_over_cap(300, 0, '0123456789abcdef'));
+    }
+
+    public function testEventCapWithoutSession(): void
+    {
+        $this->assertFalse(event_over_cap(100, 29, null));
+        $this->assertTrue(event_over_cap(100, 30, null));
+        $this->assertTrue(event_over_cap(300, 0, null));
+    }
+
+    public function testPrivacyOptOut(): void
+    {
+        $this->assertFalse(event_privacy_opt_out([]));
+        $this->assertFalse(event_privacy_opt_out(['HTTP_DNT' => '0', 'HTTP_SEC_GPC' => '0']));
+        $this->assertTrue(event_privacy_opt_out(['HTTP_DNT' => '1']));
+        $this->assertTrue(event_privacy_opt_out(['HTTP_SEC_GPC' => '1']));
     }
 }

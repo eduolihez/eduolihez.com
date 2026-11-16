@@ -26,6 +26,8 @@ require_once __DIR__ . '/../lib/mail_template.php'; // pura: plantilla del aviso
 require_once __DIR__ . '/../lib/db_retry.php'; // pura: reintento de conexion con $connect/$sleep inyectables
 require_once __DIR__ . '/../lib/visitor.php'; // pura: visitor_id opt-in (tarea 11)
 require_once __DIR__ . '/../lib/sitemap.php'; // pura: entradas de /sitemap-posts.xml (sin db())
+require_once __DIR__ . '/../lib/events.php'; // pura: validacion y topes de eventos de analitica
+require_once __DIR__ . '/../lib/analytics_report.php'; // pura: lectura por post y deteccion de tabla ausente
 require_once __DIR__ . '/../lab/next.php'; // pura: solo lab_safe_next(), sin sesion ni cabeceras
 // Partials del panel admin SIN dependencias (puros: sin auth.php/db.php/sesion).
 // layout.php NO va aqui: requiere auth.php y mataria el proceso de PHPUnit.

@@ -21,8 +21,9 @@
  * Defensas (todas silenciosas: la analitica nunca debe estorbar al visitante):
  *   - Solo se aceptan rutas con formato de URL interna (nada de basura de 255
  *     caracteres inventada por un bot para inflar la tabla).
- *   - Tope de visitas por visitante y minuto (config: visit_max_per_minute).
- *     Solo cuenta INSERTs (accion "hit"): un "beat" nunca inserta fila, asi
+ *   - Tope de visitas por visitante y minuto (config: visit_max_per_minute),
+ *     no aplicado a "event" (tiene topes propios en site_events, ver
+ *     event_over_cap() en lib/events.php). Solo cuenta INSERTs (accion "hit"): un "beat" nunca inserta fila, asi
  *     que no puede hacer crecer este contador. Por eso el UPDATE de "beat"
  *     exige ademas "AND ip_hash = ?": solo puede tocar un hit_id que el
  *     mismo ip_hash haya creado, y crear ese hit_id ya paso por este tope.
@@ -133,8 +134,9 @@ try {
     // Anti-flood: tope por visitante y minuto. Solo cuenta INSERTs (accion
     // "hit"); ver comentario al inicio del archivo sobre por que "beat" no
     // necesita su propio contador.
+    // "event" no entra aqui: sus filas van a site_events y tienen su tope.
     $maxPerMin = (int) (config()['security']['visit_max_per_minute'] ?? 30);
-    if ($maxPerMin > 0) {
+    if ($action !== 'event' && $maxPerMin > 0) {
         $cap = db()->prepare(
             'SELECT COUNT(*) FROM visits
              WHERE ip_hash = ? AND visited_at > (NOW() - INTERVAL 1 MINUTE)'
@@ -175,20 +177,26 @@ try {
 
     // --- action=event: evento validado (lib/events.php) en site_events -----
     if ($action === 'event') {
+        // DNT/GPC tambien en servidor (el cliente ya no envia), solo para
+        // eventos: hit/beat siguen como estaban.
+        if (event_privacy_opt_out($_SERVER)) {
+            no_content();
+        }
         $ev = normalize_event($input);
         if ($ev === null) {
             no_content();
         }
         try {
             // site_events no guarda ip_hash (privacidad), asi que el tope es
-            // global por minuto y, si hay session_id, por sesion.
+            // global por minuto, por sesion y, sin session_id, un cupo bajo
+            // comun a todos los anonimos (<=> con NULL cuenta las filas NULL).
             $capEv = db()->prepare(
                 'SELECT COUNT(*), SUM(session_id <=> ?) FROM site_events
                  WHERE created_at > (NOW() - INTERVAL 1 MINUTE)'
             );
             $capEv->execute([$ev['session_id']]);
             [$total, $mine] = $capEv->fetch(PDO::FETCH_NUM);
-            if ((int) $total >= 300 || ($ev['session_id'] !== null && (int) $mine >= 20)) {
+            if (event_over_cap((int) $total, (int) $mine, $ev['session_id'])) {
                 no_content();
             }
 

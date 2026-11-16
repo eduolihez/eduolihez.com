@@ -4,8 +4,11 @@ import {
   isValidEvent,
   trackEvent,
   trackNotFound,
+  trackCvOpen,
   registerEventListeners,
+  CV_DEDUPE_MS,
 } from './events';
+import { CV_OPEN_EVENT } from './cvModal';
 
 function setNav(dnt: string | null, gpc: boolean | undefined): void {
   Object.defineProperty(navigator, 'doNotTrack', { value: dnt, configurable: true, writable: true });
@@ -23,9 +26,9 @@ const HERE = 'eduolihez.com';
 describe('classifyClick()', () => {
   beforeEach(() => document.documentElement.removeAttribute('data-theme'));
 
-  it('cv_download en [data-cv-open] (tambien desde un hijo)', () => {
+  it('cv_open en [data-cv-open] (tambien desde un hijo)', () => {
     const el = mount('<button data-cv-open><span id="t">CV</span></button>');
-    expect(classifyClick(el, HERE)).toEqual({ name: 'cv_download' });
+    expect(classifyClick(el, HERE)).toEqual({ name: 'cv_open' });
   });
 
   it('outbound: hostname en minusculas sin www.', () => {
@@ -73,7 +76,7 @@ describe('classifyClick()', () => {
 
 describe('isValidEvent()', () => {
   it('acepta sin target y con target valido', () => {
-    expect(isValidEvent({ name: 'cv_download' }, '/')).toBe(true);
+    expect(isValidEvent({ name: 'cv_open' }, '/')).toBe(true);
     expect(isValidEvent({ name: 'outbound', target: 'a-b.example.com' }, '/')).toBe(true);
   });
   it('descarta target invalido, path largo o vacio', () => {
@@ -82,6 +85,13 @@ describe('isValidEvent()', () => {
     expect(isValidEvent({ name: 'outbound', target: '' }, '/')).toBe(false);
     expect(isValidEvent({ name: 'not_found' }, '/' + 'a'.repeat(120))).toBe(false);
     expect(isValidEvent({ name: 'not_found' }, '')).toBe(false);
+  });
+  it('descarta paths que el servidor rechaza (misma regex)', () => {
+    expect(isValidEvent({ name: 'not_found' }, '/en/a_b-c.d/')).toBe(true);
+    expect(isValidEvent({ name: 'not_found' }, '/caf%C3%A9/')).toBe(false);
+    expect(isValidEvent({ name: 'not_found' }, '/café/')).toBe(false);
+    expect(isValidEvent({ name: 'not_found' }, '/a b')).toBe(false);
+    expect(isValidEvent({ name: 'not_found' }, 'blog')).toBe(false);
   });
 });
 
@@ -101,6 +111,9 @@ describe('envio de eventos', () => {
   });
 
   const body = (i = 0) => JSON.parse(fetchMock.mock.calls[i][1].body as string);
+  /** Envios de not_found (analytics.ts tambien escucha page-load y manda hits). */
+  const notFoundSends = () =>
+    fetchMock.mock.calls.filter((c) => JSON.parse(c[1].body as string).name === 'not_found').length;
 
   it('trackEvent envia action/name/target/path/session_id', () => {
     trackEvent({ name: 'outbound', target: 'github.com' });
@@ -110,15 +123,15 @@ describe('envio de eventos', () => {
   });
 
   it('omite target cuando no aplica', () => {
-    trackEvent({ name: 'cv_download' });
+    trackEvent({ name: 'cv_open' });
     expect('target' in body()).toBe(false);
   });
 
   it('no envia con DNT ni con GPC', () => {
     setNav('1', undefined);
-    trackEvent({ name: 'cv_download' });
+    trackEvent({ name: 'cv_open' });
     setNav(null, true);
-    trackEvent({ name: 'cv_download' });
+    trackEvent({ name: 'cv_open' });
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
@@ -131,7 +144,7 @@ describe('envio de eventos', () => {
     fetchMock.mockImplementation(() => {
       throw new Error('boom');
     });
-    expect(() => trackEvent({ name: 'cv_download' })).not.toThrow();
+    expect(() => trackEvent({ name: 'cv_open' })).not.toThrow();
   });
 
   it('click y submit delegados: un envio por accion, aunque se registre dos veces', () => {
@@ -164,5 +177,56 @@ describe('envio de eventos', () => {
     mount('<section id="t"></section>');
     trackNotFound();
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('not_found: DOMContentLoaded + astro:page-load en la misma 404 envian una sola vez', () => {
+    mount('<section id="t"></section>');
+    trackNotFound(); // rearma
+    mount('<section id="t" data-error-page="404"></section>');
+    document.dispatchEvent(new Event('DOMContentLoaded'));
+    document.dispatchEvent(new Event('astro:page-load'));
+    expect(notFoundSends()).toBe(1);
+
+    // Tras pasar por una pagina normal, una nueva visita a la 404 si cuenta.
+    fetchMock.mockClear();
+    mount('<section id="t"></section>');
+    document.dispatchEvent(new Event('astro:page-load'));
+    mount('<section id="t" data-error-page="404"></section>');
+    document.dispatchEvent(new Event('astro:page-load'));
+    expect(notFoundSends()).toBe(1);
+  });
+
+  describe('cv_open (clic y paleta)', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2026-01-01T00:00:00Z'));
+    });
+    afterEach(() => vi.useRealTimers());
+
+    it('clic en [data-cv-open] envia cv_open', () => {
+      vi.setSystemTime(Date.now() + 10 * CV_DEDUPE_MS);
+      mount('<button id="t" data-cv-open>CV</button>').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      expect(body()).toMatchObject({ name: 'cv_open' });
+    });
+
+    it('CV_OPEN_EVENT (paleta) envia cv_open', () => {
+      vi.setSystemTime(Date.now() + 20 * CV_DEDUPE_MS);
+      document.dispatchEvent(new CustomEvent(CV_OPEN_EVENT));
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      expect(body()).toMatchObject({ name: 'cv_open' });
+    });
+
+    it('clic + evento de la misma apertura cuentan una vez; pasada la ventana, otra', () => {
+      vi.setSystemTime(Date.now() + 30 * CV_DEDUPE_MS);
+      mount('<button id="t" data-cv-open>CV</button>').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      document.dispatchEvent(new CustomEvent(CV_OPEN_EVENT));
+      trackCvOpen();
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+
+      vi.setSystemTime(Date.now() + CV_DEDUPE_MS);
+      document.dispatchEvent(new CustomEvent(CV_OPEN_EVENT));
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+    });
   });
 });

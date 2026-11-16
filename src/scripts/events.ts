@@ -6,12 +6,15 @@
  * Envia POST /api/visit.php {action:"event", name, target?, path, session_id}.
  * Con DNT/GPC no se envia nada. Nunca se leen datos de formularios.
  *
- * Decision cv_download: el CvModal NO tiene enlace de descarga al PDF (solo
- * LinkedIn y email), asi que apertura y descarga no son distinguibles; se
- * cuenta el clic en [data-cv-open] (la intencion de descargar el CV).
+ * cv_open: el CvModal NO tiene enlace de descarga al PDF (solo LinkedIn y
+ * email), asi que se cuenta la apertura del modal: clic en [data-cv-open] o
+ * CV_OPEN_EVENT (paleta). Hoy no se solapan (la paleta no usa [data-cv-open]),
+ * pero un guard simetrico de CV_DEDUPE_MS evita contar dos veces la misma
+ * apertura si algun dia llegan ambas.
  */
 import { hasPrivacySignal, type PrivacyNav } from './consent';
 import { getOrCreateSessionId, send } from './analytics';
+import { CV_OPEN_EVENT } from './cvModal';
 
 export interface ClassifiedEvent {
   name: string;
@@ -21,6 +24,10 @@ export interface ClassifiedEvent {
 const TARGET_RE = /^[a-z0-9.-]{1,80}$/;
 const LANGS = ['es', 'en', 'ca'];
 const MAX_PATH = 120;
+/** Misma regex de ruta que el servidor (lib/events.php). */
+const PATH_RE = /^\/[a-zA-Z0-9/_\-.]*$/;
+/** Ventana en la que una segunda apertura del CV se considera la misma. */
+export const CV_DEDUPE_MS = 1000;
 
 /** Hostname en minusculas sin "www.". */
 function cleanHost(host: string): string {
@@ -34,7 +41,7 @@ function cleanHost(host: string): string {
 export function classifyClick(target: Element | null, here: string): ClassifiedEvent | null {
   if (!target || typeof target.closest !== 'function') return null;
 
-  if (target.closest('[data-cv-open]')) return { name: 'cv_download' };
+  if (target.closest('[data-cv-open]')) return { name: 'cv_open' };
 
   if (target.closest('[data-theme-toggle]')) {
     const theme = document.documentElement.dataset.theme;
@@ -61,9 +68,9 @@ export function classifyClick(target: Element | null, here: string): ClassifiedE
   return { name: 'outbound', target: host };
 }
 
-/** Evento valido para el servidor (target ^[a-z0-9.-]{1,80}$, path <= 120). */
+/** Evento valido para el servidor (target ^[a-z0-9.-]{1,80}$, path <= 120 con su regex). */
 export function isValidEvent(ev: ClassifiedEvent, path: string): boolean {
-  if (path.length === 0 || path.length > MAX_PATH) return false;
+  if (path.length === 0 || path.length > MAX_PATH || !PATH_RE.test(path)) return false;
   return ev.target === undefined || TARGET_RE.test(ev.target);
 }
 
@@ -83,10 +90,21 @@ export function trackEvent(ev: ClassifiedEvent): void {
   }
 }
 
+let lastCvOpenAt = -Infinity;
+
+/** cv_open con dedupe: dos aperturas en menos de CV_DEDUPE_MS cuentan una. */
+export function trackCvOpen(): void {
+  const now = Date.now();
+  if (now - lastCvOpenAt < CV_DEDUPE_MS) return;
+  lastCvOpenAt = now;
+  trackEvent({ name: 'cv_open' });
+}
+
 function onClick(e: Event): void {
   try {
     const ev = classifyClick(e.target as Element | null, location.hostname);
-    if (ev) trackEvent(ev);
+    if (ev?.name === 'cv_open') trackCvOpen();
+    else if (ev) trackEvent(ev);
   } catch {
     /* silencioso */
   }
@@ -103,10 +121,22 @@ function onSubmit(e: Event): void {
   }
 }
 
-/** Pagina 404 (marcada en ErrorPage.astro): envia not_found con la ruta rota. */
+let lastNotFoundPath: string | null = null;
+
+/**
+ * Pagina 404 (marcada en ErrorPage.astro): envia not_found con la ruta rota.
+ * Se llama en DOMContentLoaded y en astro:page-load; un solo envio por ruta
+ * (se rearma al pasar por una pagina que no es 404).
+ */
 export function trackNotFound(): void {
   try {
-    if (document.querySelector('[data-error-page="404"]')) trackEvent({ name: 'not_found' });
+    if (!document.querySelector('[data-error-page="404"]')) {
+      lastNotFoundPath = null;
+      return;
+    }
+    if (location.pathname === lastNotFoundPath) return;
+    lastNotFoundPath = location.pathname;
+    trackEvent({ name: 'not_found' });
   } catch {
     /* silencioso */
   }
@@ -120,6 +150,7 @@ export function registerEventListeners(): boolean {
   registered = true;
   document.addEventListener('click', onClick);
   document.addEventListener('submit', onSubmit);
+  document.addEventListener(CV_OPEN_EVENT, trackCvOpen);
   document.addEventListener('DOMContentLoaded', trackNotFound);
   document.addEventListener('astro:page-load', trackNotFound);
   return true;

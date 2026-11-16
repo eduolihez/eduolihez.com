@@ -32,14 +32,13 @@ const home = lang === 'es' ? '/' : `/${lang}/`;
     <div class="container-page max-w-4xl">
       <a
         href={home}
-        class="group mb-8 inline-flex items-center gap-2 font-mono text-xs text-text-muted transition hover:text-accent"
+        class="group mb-8 inline-flex min-h-11 items-center gap-2 font-mono text-xs text-text-muted transition hover:text-accent"
       >
         <span class="transition-transform group-hover:-translate-x-1">&larr;</span> {p.back}
       </a>
 
       <div class="reveal mb-12">
-        <p class="section-kicker">{p.kicker}</p>
-        <h1 class="mb-5 text-3xl font-bold tracking-tight text-text sm:text-5xl">{p.h1}</h1>
+        <h1 class="page-title">{p.h1}</h1>
         <p class="max-w-3xl text-base leading-relaxed text-text sm:text-lg">{p.answer}</p>
       </div>
 
@@ -78,8 +77,8 @@ const home = lang === 'es' ? '/' : `/${lang}/`;
       )}
 
       <div class="flex flex-wrap gap-3">
-        <a href={`${home}#contacto`} class="btn-primary">{p.ctaContact}</a>
-        <a href={home} class="btn-ghost">{p.ctaHome}</a>
+        <a href={`${home}#contacto`} class="btn-primary min-h-11">{p.ctaContact}</a>
+        <a href={home} class="btn-ghost min-h-11">{p.ctaHome}</a>
       </div>
     </div>
   </section>

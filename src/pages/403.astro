@@ -1,85 +1,17 @@
 ---
-/**
- * Página 403 (Acceso Denegado).
- * Astro la compila a /403/index.html, que el .htaccess sirve como página de error.
- */
-import BaseLayout from '../layouts/BaseLayout.astro';
+/** Pagina 403. Marcado compartido en ErrorPage.astro. */
+import ErrorPage from '../components/ErrorPage.astro';
+const actions = [{ href: '/', label: 'Back to home' }, { href: '/#contacto', label: 'Contact' }];
 ---
 
-<BaseLayout
+<ErrorPage
+  code="403"
+  status="FORBIDDEN"
   title="403 · Access denied"
   description="You do not have permission to view this resource."
-  lang="en"
   path="/403/"
-  withFaq={false}
-  noindex={true}
+  heading="You do not have access to this page"
+  summary="This area is restricted. If you are the administrator, sign in first. If you think this is a mistake, get in touch."
+  actions={actions}
 >
-  <section class="container-page flex min-h-[75vh] flex-col items-center justify-center gap-10 py-12 lg:flex-row lg:gap-16">
-    <!-- Lado Izquierdo: Número de Error Gigante -->
-    <div class="text-center lg:text-left lg:w-1/3">
-      <h1 class="font-mono text-7xl font-bold tracking-tight text-danger sm:text-8xl">
-        403
-      </h1>
-      <h2 class="mt-4 text-2xl font-bold tracking-tight text-text sm:text-3xl uppercase font-mono">
-        FORBIDDEN
-      </h2>
-      <p class="mt-2 text-sm leading-relaxed text-text-muted max-w-xs mx-auto lg:mx-0">
-        Access to this directory or resource is explicitly restricted.
-      </p>
-    </div>
-
-    <!-- Lado Derecho: Terminal -->
-    <div class="w-full max-w-lg lg:w-2/3">
-      <div class="rounded-lg border border-danger/20 bg-bg-soft p-6 shadow-2xl md:p-8">
-        <div class="mb-6 flex items-center justify-between border-b border-bg-border pb-4">
-          <div class="flex items-center gap-2">
-            <span class="h-3.5 w-3.5 rounded-full bg-danger animate-pulse-dot" aria-hidden="true"></span>
-            <span class="font-mono text-xs font-semibold text-danger">ACCESS_DENIED</span>
-          </div>
-          <span class="font-mono text-xs text-text-faint">apache_error.log</span>
-        </div>
-
-        <div class="font-mono text-sm leading-relaxed">
-          <p class="text-text-muted">
-            <span class="text-danger">$</span> curl -sI https://eduolihez.com/lib/db.php
-          </p>
-          <p class="mt-2 text-danger font-bold">
-            STATUS: 403 FORBIDDEN (ACCESS DENIED)
-          </p>
-          <p class="mt-4 text-text">
-            <span class="text-danger font-bold">[!] SECURITY ALERT:</span>
-            This path is not meant to be opened in a browser. Apache denies the whole directory, so the file is never handed to PHP, and never to you.
-          </p>
-          
-          <div class="mt-6 rounded-sm border border-danger/20 bg-danger/5 p-4 text-xs text-danger">
-            <div class="grid grid-cols-3 gap-y-1 font-semibold">
-              <span>Status:</span>
-              <span class="col-span-2 text-text">403 Forbidden</span>
-              <span>Denied by:</span>
-              <span class="col-span-2 text-text">Apache, with Require all denied</span>
-              <span>Protecting:</span>
-              <span class="col-span-2 text-text">PHP that is only ever included from code, never opened by URL</span>
-              <span>Source:</span>
-              <span class="col-span-2 text-text">server/lib/.htaccess</span>
-            </div>
-          </div>
-
-          <div class="mt-6 flex flex-col gap-2">
-            <span class="text-xs text-text-faint"># What you can do:</span>
-            <span class="text-xs text-text-muted">1. If you are the administrator, sign in first.</span>
-            <span class="text-xs text-text-muted">2. If you believe this is a mistake, get in touch.</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="mt-8 text-center lg:text-left">
-        <a href="/" class="btn-primary">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left mr-1 inline-block" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
-          </svg>
-          Back to home
-        </a>
-      </div>
-    </div>
-  </section>
-</BaseLayout>
+</ErrorPage>

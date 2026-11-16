@@ -27,145 +27,71 @@ interface Props {
   contactHref: string;
 }
 const { lang, labels, contactHref } = Astro.props;
-
-/** Clases de color por bloque. Se escriben enteras para que Tailwind las vea. */
-const tones = {
-  accent: 'bg-accent/10 border-accent/20 text-accent',
-  cyan: 'bg-cyan/10 border-cyan/20 text-cyan',
-  violet: 'bg-violet/10 border-violet/20 text-violet',
-} as const;
-/** Solo el color de texto, para el check delante de cada punto de la lista. */
-const checkTones = {
-  accent: 'text-accent',
-  cyan: 'text-cyan',
-  violet: 'text-violet',
-} as const;
-
-/** Mismos umbrales que usa el propio Lighthouse para colorear sus 4 categorias
- * (90+ verde, 50-89 ambar, <50 rojo) -- no se inventa una escala nueva. */
-function scoreTone(score: number): string {
-  if (score >= 90) return 'border-accent/20 bg-accent/10 text-accent';
-  if (score >= 50) return 'border-warn/20 bg-warn/10 text-warn';
-  return 'border-danger/20 bg-danger/10 text-danger';
-}
 ---
 
 <!-- Resumen del stack -->
-<div class="reveal mb-16 overflow-hidden rounded-xl border border-bg-border bg-bg-card">
-  <p
-    class="border-b border-bg-border bg-bg-soft/50 px-6 py-3 font-mono text-xs font-semibold uppercase tracking-wider text-text-muted"
-  >
-    {labels.stackTitle}
-  </p>
-  <dl class="divide-y divide-bg-border">
+<section class="reveal about-block">
+  <h2 class="about-h2">{labels.stackTitle}</h2>
+  <dl class="spec-list">
     {
       stackRows.map((row) => (
-        <div class="flex flex-col gap-1 px-6 py-3 sm:flex-row sm:items-baseline sm:gap-6">
-          <dt class="w-36 shrink-0 font-mono text-xs uppercase tracking-wider text-text-faint">
-            {pick(row.label, lang)}
-          </dt>
-          <dd class="text-sm text-text">{row.value}</dd>
+        <div class="spec-row">
+          <dt class="spec-term spec-term--meta">{pick(row.label, lang)}</dt>
+          <dd class="spec-desc">{row.value}</dd>
         </div>
       ))
     }
   </dl>
-</div>
+</section>
 
-<!-- Bloques tecnicos -->
-<div class="space-y-8">
-  {
-    techSections.map((section) => (
-      <section class="reveal rounded-xl border border-bg-border bg-bg-card p-6 sm:p-8">
-        <div class="mb-5 flex items-start gap-4">
-          <div
-            class={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border ${tones[section.tone]}`}
-          >
-            <Icon name={section.icon} class="h-5 w-5" />
+<!-- Bloques tecnicos: cada control con el motivo y el archivo que lo prueba -->
+{
+  techSections.map((section) => (
+    <section class="reveal about-block">
+      <h2 class="about-h2">{pick(section.title, lang)}</h2>
+      <p class="about-intro">{pick(section.intro, lang)}</p>
+      <dl class="spec-list">
+        {section.items.map((item) => (
+          <div class="spec-row">
+            <dt class="spec-term">{pick(item.term, lang)}</dt>
+            <dd class="spec-desc">
+              {pick(item.detail, lang)}
+              {item.source && (
+                <code class="spec-source">{item.source}</code>
+              )}
+            </dd>
           </div>
-          <div class="min-w-0">
-            <p class="font-mono text-xs uppercase tracking-wider text-text-faint">
-              {section.num} / {pick(section.title, lang)}
-            </p>
-            <p class="mt-1.5 text-sm leading-relaxed text-text-muted">
-              {pick(section.intro, lang)}
-            </p>
-          </div>
-        </div>
+        ))}
+      </dl>
+    </section>
+  ))
+}
 
-        <ul class="space-y-4 border-t border-bg-border pt-5">
-          {section.items.map((item) => (
-            <li class="flex gap-3">
-              {/* Checklist, no prosa suelta: esta pagina es la prueba de que
-                  cada control existe, asi que debe leerse como una lista
-                  verificada antes de leer una sola palabra. */}
-              <Icon
-                name="check"
-                class={`h-4 w-4 shrink-0 translate-y-0.5 ${checkTones[section.tone]}`}
-              />
-              <div class="min-w-0">
-                <p class="text-sm font-semibold text-text">{pick(item.term, lang)}</p>
-                <p class="mt-1 text-sm leading-relaxed text-text-muted">{pick(item.detail, lang)}</p>
-                {item.source && (
-                  <p class="mt-1.5">
-                    <code class="rounded-sm bg-bg-soft px-1.5 py-0.5 font-mono text-[11px] text-text-faint">
-                      {item.source}
-                    </code>
-                  </p>
-                )}
-              </div>
-            </li>
-          ))}
-        </ul>
-      </section>
-    ))
-  }
-</div>
+<p class="reveal about-note">{labels.sourceNote}</p>
 
-<p class="reveal mt-6 text-center text-xs leading-relaxed text-text-faint">
-  {labels.sourceNote}
-</p>
-
-<!-- Rendimiento -->
-<div class="reveal mt-16 rounded-xl border border-bg-border bg-bg-card p-8">
-  <h2
-    class="mb-6 text-center font-mono text-sm font-semibold uppercase tracking-wider text-text"
-  >
-    {labels.metricsTitle}
-  </h2>
-
-  <div class="grid grid-cols-2 gap-6 text-center sm:grid-cols-4">
+<!-- Rendimiento: foto de un momento, datos de about-tech.ts -->
+<section class="reveal about-block">
+  <h2 class="about-h2">{labels.metricsTitle}</h2>
+  <dl class="spec-list">
     {
       labels.metrics.map((name, i) => (
-        <div class="flex flex-col items-center">
-          <div class={`flex h-20 w-20 items-center justify-center rounded-full border font-mono text-xl font-bold ${scoreTone(pagespeedScores.values[i])}`}>
-            {pagespeedScores.values[i]}
-          </div>
-          <span class="mt-2 text-xs font-medium text-text">{name}</span>
+        <div class="spec-row">
+          <dt class="spec-term">{name}</dt>
+          <dd class="spec-desc"><span class="spec-score">{pagespeedScores.values[i]}</span> / 100</dd>
         </div>
       ))
     }
-  </div>
-
-  <p class="mt-6 text-center text-[11px] leading-relaxed text-text-faint">
-    {labels.metricsNote}
-  </p>
-</div>
+  </dl>
+  <p class="about-note">{labels.metricsNote}</p>
+</section>
 
 <!-- Acciones -->
-<div class="reveal mt-12 flex flex-col items-center justify-center gap-4 sm:flex-row">
-  <a
-    href={SITE.githubRepo}
-    target="_blank"
-    rel="noopener noreferrer"
-    class="btn-primary flex w-full items-center justify-center gap-2 text-xs font-semibold sm:w-auto"
-  >
+<div class="reveal about-actions">
+  <a href={SITE.githubRepo} target="_blank" rel="noopener noreferrer" class="btn-primary about-btn">
     <Icon name="github" class="h-4 w-4" />
     {labels.ctaCode}
   </a>
-  <a
-    href={contactHref}
-    class="btn-ghost flex w-full items-center justify-center gap-2 text-xs font-semibold sm:w-auto"
-  >
+  <a href={contactHref} class="btn-ghost about-btn">
     <Icon name="mail" class="h-4 w-4" />
     {labels.ctaContact}
   </a>

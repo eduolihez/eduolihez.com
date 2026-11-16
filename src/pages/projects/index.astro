@@ -141,17 +141,16 @@ const itemList = {
     <div class="container-page max-w-4xl">
       <a
         href="/"
-        class="group mb-8 inline-flex items-center gap-2 font-mono text-xs text-text-muted transition hover:text-accent"
+        class="group mb-8 inline-flex min-h-11 items-center gap-2 font-mono text-xs text-text-muted transition hover:text-accent"
       >
         <span class="transition-transform group-hover:-translate-x-1">&larr;</span> Volver al inicio
       </a>
 
       <div class="reveal mb-14">
-        <p class="section-kicker">Laboratorio</p>
-        <h1 class="mb-4 text-3xl font-bold tracking-tight text-text sm:text-5xl">
+        <h1 class="page-title">
           Proyectos publicados
         </h1>
-        <p class="max-w-2xl text-base leading-relaxed text-text-muted sm:text-lg">
+        <p class="page-lede">
           Desarrollos propios de principio a fin: herramientas de seguridad, extensiones de
           navegador y plataformas ciudadanas. La mayoría tiene su propia web en este dominio;
           Blue Team Hub vive en su propio sitio (GitHub Pages) y se enlaza desde aquí.
@@ -165,39 +164,39 @@ const itemList = {
       >
         <button
           type="button"
-          class="static-filter-btn px-4 py-1.5 text-xs font-semibold rounded-lg bg-accent text-bg transition duration-200 border border-accent shadow-xs cursor-pointer"
+          class="static-filter-btn min-h-11 px-4 py-1.5 text-sm font-semibold rounded-lg bg-accent text-bg transition duration-200 border border-accent cursor-pointer"
           data-filter="all"
         >
           Todos
         </button>
         <button
           type="button"
-          class="static-filter-btn px-4 py-1.5 text-xs font-semibold rounded-lg bg-bg-soft/40 text-text-muted transition duration-200 border border-bg-border/60 hover:bg-bg-card hover:text-text shadow-xs cursor-pointer"
+          class="static-filter-btn min-h-11 px-4 py-1.5 text-sm font-semibold rounded-lg bg-bg-soft/40 text-text-muted transition duration-200 border border-bg-border/60 hover:bg-bg-card hover:text-text cursor-pointer"
           data-filter="open-source"
         >
           Open Source
         </button>
         <button
           type="button"
-          class="static-filter-btn px-4 py-1.5 text-xs font-semibold rounded-lg bg-bg-soft/40 text-text-muted transition duration-200 border border-bg-border/60 hover:bg-bg-card hover:text-text shadow-xs cursor-pointer"
+          class="static-filter-btn min-h-11 px-4 py-1.5 text-sm font-semibold rounded-lg bg-bg-soft/40 text-text-muted transition duration-200 border border-bg-border/60 hover:bg-bg-card hover:text-text cursor-pointer"
           data-filter="in-development"
         >
           En Desarrollo
         </button>
         <button
           type="button"
-          class="static-filter-btn px-4 py-1.5 text-xs font-semibold rounded-lg bg-bg-soft/40 text-text-muted transition duration-200 border border-bg-border/60 hover:bg-bg-card hover:text-text shadow-xs cursor-pointer"
+          class="static-filter-btn min-h-11 px-4 py-1.5 text-sm font-semibold rounded-lg bg-bg-soft/40 text-text-muted transition duration-200 border border-bg-border/60 hover:bg-bg-card hover:text-text cursor-pointer"
           data-filter="private-code"
         >
           Código Privado
         </button>
       </div>
 
-      <ul class="grid gap-5 sm:grid-cols-2">
+      <ul class="grid gap-x-10 gap-y-6 sm:grid-cols-2">
         {
           projects.map((p) => (
             <li 
-              class="reveal flex flex-col rounded-xl border border-bg-border bg-bg-card p-6 transition hover:border-accent/40 project-card-item"
+              class="reveal flex flex-col border-t border-bg-border pt-6 pb-4 project-card-item"
               data-badges={p.badges.join(',')}
             >
               <div class="mb-3 flex items-baseline justify-between gap-3">
@@ -211,7 +210,7 @@ const itemList = {
                     {p.href.startsWith('http') && <span aria-hidden="true"> &#8599;</span>}
                   </a>
                 </h2>
-                <span class="shrink-0 font-mono text-[11px] text-text-faint">{p.lang}</span>
+                <span class="shrink-0 font-mono text-xs text-text-faint">{p.lang}</span>
               </div>
               
               {p.badges && p.badges.length > 0 && (
@@ -219,21 +218,21 @@ const itemList = {
                   {p.badges.map((b) => {
                     if (b === 'open-source') {
                       return (
-                        <span class="rounded-sm bg-oss/10 px-2 py-0.5 text-[10px] font-semibold text-oss border border-oss/20">
+                        <span class="rounded-sm bg-oss/10 px-2 py-0.5 text-xs font-semibold text-oss border border-oss/20">
                           Open Source
                         </span>
                       );
                     }
                     if (b === 'in-development') {
                       return (
-                        <span class="rounded-sm bg-wip/10 px-2 py-0.5 text-[10px] font-semibold text-wip border border-wip/20">
+                        <span class="rounded-sm bg-wip/10 px-2 py-0.5 text-xs font-semibold text-wip border border-wip/20">
                           En Desarrollo
                         </span>
                       );
                     }
                     if (b === 'private-code') {
                       return (
-                        <span class="rounded-sm bg-closed/10 px-2 py-0.5 text-[10px] font-semibold text-closed border border-closed/20">
+                        <span class="rounded-sm bg-closed/10 px-2 py-0.5 text-xs font-semibold text-closed border border-closed/20">
                           Código Privado
                         </span>
                       );
@@ -243,13 +242,13 @@ const itemList = {
                 </div>
               )}
 
-              <p class="mb-3 font-mono text-xs uppercase tracking-wider text-accent">
+              <p class="mb-3 text-sm font-semibold text-text">
                 {p.tagline}
               </p>
               <p class="mb-5 text-sm leading-relaxed text-text-muted">{p.summary}</p>
               <ul class="mt-auto flex flex-wrap gap-1.5">
                 {p.stack.map((s) => (
-                  <li class="rounded-sm border border-bg-border bg-bg-soft/20 px-1.5 py-0.5 font-mono text-[11px] text-text-muted">
+                  <li class="rounded-sm border border-bg-border bg-bg-soft/20 px-1.5 py-0.5 font-mono text-xs text-text-muted">
                     {s}
                   </li>
                 ))}

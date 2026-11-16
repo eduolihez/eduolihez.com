@@ -1,90 +1,17 @@
 ---
-/**
- * Página 500 (Error Interno del Servidor).
- * Astro la compila a /500.html en la raíz, que el .htaccess sirve como página de error.
- */
-import BaseLayout from '../layouts/BaseLayout.astro';
+/** Pagina 500. Marcado compartido en ErrorPage.astro. */
+import ErrorPage from '../components/ErrorPage.astro';
+const actions = [{ href: '/', label: 'Back to home' }, { href: '/blog/', label: 'Search the blog' }, { href: '/#contacto', label: 'Contact' }];
 ---
 
-<BaseLayout
+<ErrorPage
+  code="500"
+  status="INTERNAL_SERVER_ERROR"
   title="500 · Server error"
   description="An internal server error occurred."
-  lang="en"
   path="/500/"
-  withFaq={false}
-  noindex={true}
+  heading="Something failed on the server"
+  summary="The request was valid but the server could not complete it. Wait a moment and reload. If it keeps happening, let me know."
+  actions={actions}
 >
-  <section class="container-page flex min-h-[75vh] flex-col items-center justify-center gap-10 py-12 lg:flex-row lg:gap-16">
-    <!-- Lado Izquierdo: Número de Error Gigante -->
-    <div class="text-center lg:text-left lg:w-1/3">
-      <h1 class="font-mono text-7xl font-bold tracking-tight text-danger sm:text-8xl">
-        500
-      </h1>
-      <h2 class="mt-4 text-2xl font-bold tracking-tight text-text sm:text-3xl uppercase font-mono">
-        SERVER_ERROR
-      </h2>
-      <p class="mt-2 text-sm leading-relaxed text-text-muted max-w-xs mx-auto lg:mx-0">
-        The server logged an unexpected, critical fault.
-      </p>
-    </div>
-
-    <!-- Lado Derecho: Terminal -->
-    <div class="w-full max-w-lg lg:w-2/3">
-      <div class="rounded-lg border border-danger/25 bg-bg-soft p-6 shadow-2xl md:p-8">
-        <div class="mb-6 flex items-center justify-between border-b border-bg-border pb-4">
-          <div class="flex items-center gap-2">
-            <span class="relative flex h-3 w-3">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-danger opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-3 w-3 bg-danger"></span>
-            </span>
-            <span class="font-mono text-xs font-bold text-danger">CRITICAL_SYSTEM_ERR</span>
-          </div>
-          <span class="font-mono text-xs text-text-faint">php_error.log</span>
-        </div>
-
-        <div class="font-mono text-sm leading-relaxed">
-          <p class="text-text-muted">
-            <span class="text-danger">$</span> curl -sI https://eduolihez.com/api/posts.php
-          </p>
-          <p class="mt-2 text-danger font-bold">
-            HTTP/1.1 500 Internal Server Error
-          </p>
-          <p class="mt-4 text-text">
-            <span class="text-danger font-bold">[!] EXECUTION FAILURE (500):</span>
-            The server hit an unexpected fault and could not complete the request. This usually means maintenance work, a service that went down, or a configuration error.
-          </p>
-          
-          <div class="mt-6 rounded-sm border border-danger/20 bg-danger/5 p-4 text-xs text-danger">
-            <div class="grid grid-cols-3 gap-y-1 font-semibold">
-              <span>Shown to you:</span>
-              <span class="col-span-2 text-text">Nothing. No stack trace, no file paths, no SQL</span>
-              <span>Logged:</span>
-              <span class="col-span-2 text-text">Server side only, to the hosting error log</span>
-              <span>Why:</span>
-              <span class="col-span-2 text-text">A PHP warning can leak absolute paths or credentials</span>
-              <span>Still up:</span>
-              <span class="col-span-2 text-text">Every static page. Only /api/*.php is involved</span>
-              <span>Source:</span>
-              <span class="col-span-2 text-text">server/lib/bootstrap.php</span>
-            </div>
-          </div>
-
-          <div class="mt-6 flex flex-col gap-2">
-            <span class="text-xs text-text-faint"># What you can do:</span>
-            <span class="text-xs text-text-muted">1. Wait a moment and refresh the page.</span>
-            <span class="text-xs text-text-muted">2. If it persists, I am already aware of it and looking into it.</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="mt-8 text-center lg:text-left">
-        <a href="/" class="btn-primary">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left mr-1 inline-block" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
-          </svg>
-          Back to home
-        </a>
-      </div>
-    </div>
-  </section>
-</BaseLayout>
+</ErrorPage>

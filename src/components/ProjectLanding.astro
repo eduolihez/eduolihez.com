@@ -68,12 +68,11 @@ const topFeatures = app.features.slice(0, 3);
           height="80"
           class="h-20 w-20 rounded-2xl border border-bg-border bg-bg-card object-contain p-3"
         />
-        <span class="absolute -bottom-2 -right-2 flex h-7 w-7 items-center justify-center rounded-full border-2 border-bg bg-accent text-ink">
+        <span class="absolute -bottom-2 -right-2 flex h-7 w-7 items-center justify-center rounded-full border-2 border-bg bg-mark text-on-mark">
           <Icon name="check" class="h-4 w-4" />
         </span>
       </div>
-      <p class="section-kicker text-accent">{t.installed}</p>
-      <h1 class="mb-4 text-4xl font-bold tracking-tight text-text sm:text-6xl">{app.name}</h1>
+      <h1 class="page-title">{app.name}</h1>
       <p class="max-w-xl text-base leading-relaxed text-text-muted sm:text-lg">
         <strong class="text-text">{app.name}</strong> {t.heroSuffix}
         {' '}{pick(app.tagline, lang)}
@@ -85,7 +84,6 @@ const topFeatures = app.features.slice(0, 3);
 <section class="border-b border-bg-border bg-bg-soft py-20 sm:py-28">
   <div class="container-page max-w-4xl">
     <div class="reveal mb-12 text-center">
-      <p class="section-kicker">{app.name}</p>
       <h2 class="section-title">{t.quickStart}</h2>
     </div>
 
@@ -93,7 +91,7 @@ const topFeatures = app.features.slice(0, 3);
       {
         app.howItWorks.map((step, i) => (
           <li class="text-center">
-            <span class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full border border-accent/30 bg-accent/10 font-mono text-lg font-semibold text-accent">
+            <span class="mx-auto mb-3 block font-mono text-lg font-semibold tabular-nums text-accent">
               {i + 1}
             </span>
             <h3 class="mb-2 text-base font-semibold text-text">{pick(step.title, lang)}</h3>
@@ -108,17 +106,14 @@ const topFeatures = app.features.slice(0, 3);
 <section class="border-b border-bg-border py-20 sm:py-28">
   <div class="container-page max-w-4xl">
     <div class="reveal mb-12 text-center">
-      <p class="section-kicker">{app.name}</p>
       <h2 class="section-title">{t.highlights}</h2>
     </div>
 
     <ul class="reveal grid gap-6 sm:grid-cols-3">
       {
         topFeatures.map((f) => (
-          <li class="card p-6 text-center">
-            <span class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl border border-bg-border bg-bg text-accent">
-              <Icon name={f.icon} class="h-5 w-5" />
-            </span>
+          <li class="border-t border-bg-border pt-5 text-center">
+            <Icon name={f.icon} class="mx-auto mb-3 h-5 w-5 text-accent" />
             <h3 class="mb-2 text-base font-semibold text-text">{pick(f.title, lang)}</h3>
             <p class="text-sm leading-relaxed text-text-muted">{pick(f.description, lang)}</p>
           </li>
@@ -131,7 +126,6 @@ const topFeatures = app.features.slice(0, 3);
 <section class="py-20 sm:py-28">
   <div class="container-page max-w-2xl text-center">
     <div class="reveal mb-8">
-      <p class="section-kicker">{t.rate}</p>
       <h2 class="section-title">
         {lang === 'en' ? 'Enjoying it so far?' : '¿Te está siendo útil?'}
       </h2>
@@ -140,19 +134,19 @@ const topFeatures = app.features.slice(0, 3);
     <div class="reveal mb-10 flex flex-wrap justify-center gap-3">
       {
         app.links.chromeWebStore && (
-          <a href={app.links.chromeWebStore} class="btn-primary" target="_blank" rel="noopener noreferrer">
+          <a href={app.links.chromeWebStore} class="btn-primary min-h-11" target="_blank" rel="noopener noreferrer">
             <Icon name="store" class="h-4 w-4" /> {t.chrome}
           </a>
         )
       }
       {
         app.links.firefoxAddons && (
-          <a href={app.links.firefoxAddons} class="btn-ghost" target="_blank" rel="noopener noreferrer">
+          <a href={app.links.firefoxAddons} class="btn-ghost min-h-11" target="_blank" rel="noopener noreferrer">
             <Icon name="external" class="h-4 w-4" /> {t.firefox}
           </a>
         )
       }
-      <a href={moreHref} class="btn-ghost">
+      <a href={moreHref} class="btn-ghost min-h-11">
         <Icon name="shield" class="h-4 w-4" /> {t.more}
       </a>
     </div>

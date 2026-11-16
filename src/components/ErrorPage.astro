@@ -1,0 +1,57 @@
+---
+/**
+ * <ErrorPage /> - Una sola idea por pagina de error: que paso y que hacer.
+ * Mismo layout para 400/403/404/410/500: una columna estrecha centrada. El
+ * codigo HTTP va como metadato en mono al pie, no como cartel gigante.
+ * Texto en ingles: son paginas de error servidas por Apache, sin selector de
+ * idioma (igual que antes del rediseno).
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+interface Action {
+  href: string;
+  label: string;
+}
+interface Props {
+  code: string;
+  /** Nombre corto del estado HTTP (metadato, mono). */
+  status: string;
+  title: string;
+  description: string;
+  /** Titular visible (h1). */
+  heading: string;
+  /** Que paso. */
+  summary: string;
+  /** Que hacer: la primera accion es la principal. */
+  actions: Action[];
+  path: string;
+}
+const { code, status, title, description, heading, summary, actions, path } = Astro.props;
+const [primary, ...rest] = actions;
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  lang="en"
+  path={path}
+  withFaq={false}
+  noindex={true}
+>
+  <section class="error-page container-page">
+    <div class="error-page__body">
+      <h1 class="error-page__title">{heading}</h1>
+      <p class="error-page__summary">{summary}</p>
+      <div class="error-page__actions">
+        <a href={primary.href} class="btn-primary error-page__btn">{primary.label}</a>
+        {rest.map((a) => <a href={a.href} class="btn-ghost error-page__btn">{a.label}</a>)}
+      </div>
+      <p class="error-page__meta">
+        <span>HTTP {code}</span>
+        <span aria-hidden="true">/</span>
+        <span>{status}</span>
+        <slot />
+      </p>
+    </div>
+  </section>
+</BaseLayout>

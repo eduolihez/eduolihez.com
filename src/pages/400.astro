@@ -1,77 +1,17 @@
 ---
-/**
- * Página 400 (Petición Incorrecta).
- * Astro la compila a /400/index.html, que el .htaccess sirve como página de error.
- */
-import BaseLayout from '../layouts/BaseLayout.astro';
+/** Pagina 400. Marcado compartido en ErrorPage.astro. */
+import ErrorPage from '../components/ErrorPage.astro';
+const actions = [{ href: '/', label: 'Back to home' }, { href: '/blog/', label: 'Search the blog' }, { href: '/#contacto', label: 'Contact' }];
 ---
 
-<BaseLayout
+<ErrorPage
+  code="400"
+  status="BAD_REQUEST"
   title="400 · Bad request"
   description="The server could not process this request."
-  lang="en"
   path="/400/"
-  withFaq={false}
-  noindex={true}
+  heading="That request could not be processed"
+  summary="Something in the address or in the data your browser sent was not valid. Check the URL and try again, or clear this site's cookies."
+  actions={actions}
 >
-  <section class="container-page flex min-h-[75vh] flex-col items-center justify-center gap-10 py-12 lg:flex-row lg:gap-16">
-    <!-- Lado Izquierdo: Número de Error Gigante -->
-    <div class="text-center lg:text-left lg:w-1/3">
-      <h1 class="font-mono text-7xl font-bold tracking-tight text-danger sm:text-8xl">
-        400
-      </h1>
-      <h2 class="mt-4 text-2xl font-bold tracking-tight text-text sm:text-3xl uppercase font-mono">
-        BAD_REQUEST
-      </h2>
-      <p class="mt-2 text-sm leading-relaxed text-text-muted max-w-xs mx-auto lg:mx-0">
-        The server found a malformed or invalid syntax in the incoming request.
-      </p>
-    </div>
-
-    <!-- Lado Derecho: Terminal -->
-    <div class="w-full max-w-lg lg:w-2/3">
-      <div class="rounded-lg border border-bg-border bg-bg-soft p-6 shadow-2xl md:p-8">
-        <div class="mb-6 flex items-center justify-between border-b border-bg-border pb-4">
-          <div class="flex items-center gap-2">
-            <span class="h-3.5 w-3.5 rounded-full bg-danger" aria-hidden="true"></span>
-            <span class="font-mono text-xs font-semibold text-danger">MALFORMED_REQUEST</span>
-          </div>
-          <span class="font-mono text-xs text-text-faint">system_error.log</span>
-        </div>
-
-        <div class="font-mono text-sm leading-relaxed">
-          <p class="text-text-muted">
-            <span class="text-accent">$</span> curl -I https://eduolihez.com/invalid-request
-          </p>
-          <p class="mt-2 text-danger">
-            HTTP/1.1 400 Bad Request
-          </p>
-          <p class="mt-4 text-text">
-            <span class="text-accent font-bold">[!] PROTOCOL ERROR:</span>
-            The request your browser sent carries invalid headers, corrupted cookies, or a format the server does not accept.
-          </p>
-          
-          <div class="mt-6 rounded-sm border border-danger/20 bg-danger/5 p-3 text-xs text-text-muted">
-            <span class="block font-semibold text-danger mb-1">Technical diagnosis:</span>
-            <span>Code: 400_BAD_REQUEST // Origin: Client_Header_Error // Severity: LOW</span>
-          </div>
-
-          <div class="mt-6 flex flex-col gap-2">
-            <span class="text-xs text-text-faint"># What you can do:</span>
-            <span class="text-xs text-text-muted">1. Clear your browser cookies and cache.</span>
-            <span class="text-xs text-text-muted">2. Check the URL and its parameters.</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="mt-8 text-center lg:text-left">
-        <a href="/" class="btn-primary">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left mr-1 inline-block" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
-          </svg>
-          Back to home
-        </a>
-      </div>
-    </div>
-  </section>
-</BaseLayout>
+</ErrorPage>

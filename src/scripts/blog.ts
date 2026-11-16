@@ -67,6 +67,10 @@ function isoDate(raw: string): string {
   return Number.isNaN(d.getTime()) ? '' : d.toISOString();
 }
 
+/** Clases de los botones de filtro (mismo patron que Proyectos; activo = tinta invertida). */
+const FILTER_BASE = 'blog-filter-btn project-filter-btn';
+const FILTER_ACTIVE = 'is-active';
+
 interface Post {
   id: number;
   title: string;
@@ -98,7 +102,6 @@ export function initBlogList(): void {
   const loadingMsg = grid.dataset.loading || '';
   const emptyMsg = grid.dataset.empty || '';
   const errorMsg = grid.dataset.error || '';
-  const readMore = grid.dataset.readmore || '';
   const lang = grid.dataset.lang || 'es';
   const detailBase = grid.dataset.detail || '/blog/post/';
   const allLabel = filters?.dataset.all || 'All';
@@ -128,7 +131,7 @@ export function initBlogList(): void {
         status?.classList.add('hidden');
         grid.classList.remove('hidden');
 
-        posts.forEach((post) => grid.appendChild(card(post, { lang, readMore, detailBase })));
+        posts.forEach((post) => grid.appendChild(card(post, { lang, detailBase })));
 
         // Las tarjetas nacen despues de que initReveal() haya observado el DOM,
         // asi que se marcan visibles a mano en lugar de quedarse en opacidad 0.
@@ -160,15 +163,14 @@ function initTagFilters(filters: HTMLElement, grid: HTMLElement, posts: Post[], 
   );
   if (categories.length === 0) return;
 
-  const baseClass =
-    'blog-filter-btn px-4 py-1.5 text-xs font-semibold rounded-lg border transition duration-200 cursor-pointer';
-  const activeClass = 'bg-accent text-bg border-accent';
-  const inactiveClass = 'bg-bg-soft/40 text-text-muted border-bg-border/60 hover:bg-bg-card hover:text-text';
+  const baseClass = FILTER_BASE;
+  const activeClass = FILTER_ACTIVE;
+  const inactiveClass = '';
 
   const makeButton = (label: string, filterValue: string, active: boolean): HTMLButtonElement => {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = `${baseClass} ${active ? activeClass : inactiveClass}`;
+    btn.className = `${baseClass} ${active ? activeClass : inactiveClass}`.trim();
     btn.dataset.filter = filterValue;
     btn.textContent = label;
     return btn;
@@ -184,9 +186,9 @@ function initTagFilters(filters: HTMLElement, grid: HTMLElement, posts: Post[], 
     if (!btn) return;
 
     filters.querySelectorAll('.blog-filter-btn').forEach((b) => {
-      b.className = `${baseClass} ${inactiveClass}`;
+      b.className = `${baseClass} ${inactiveClass}`.trim();
     });
-    btn.className = `${baseClass} ${activeClass}`;
+    btn.className = `${baseClass} ${activeClass}`.trim();
 
     const value = btn.dataset.filter || 'all';
     grid.querySelectorAll<HTMLElement>('article[data-category]').forEach((cardEl) => {
@@ -208,19 +210,18 @@ export function initStaticBlogFilters(): void {
   const grid = document.getElementById('blog-grid');
   if (!filters || !grid) return;
 
-  const baseClass =
-    'blog-filter-btn cursor-pointer rounded-lg border px-4 py-1.5 text-xs font-semibold transition duration-200';
-  const activeClass = 'border-accent bg-accent text-bg';
-  const inactiveClass = 'border-bg-border/60 bg-bg-soft/40 text-text-muted hover:bg-bg-card hover:text-text';
+  const baseClass = FILTER_BASE;
+  const activeClass = FILTER_ACTIVE;
+  const inactiveClass = '';
 
   filters.addEventListener('click', (e) => {
     const btn = (e.target as HTMLElement).closest('.blog-filter-btn') as HTMLButtonElement | null;
     if (!btn) return;
 
     filters.querySelectorAll('.blog-filter-btn').forEach((b) => {
-      b.className = `${baseClass} ${inactiveClass}`;
+      b.className = `${baseClass} ${inactiveClass}`.trim();
     });
-    btn.className = `${baseClass} ${activeClass}`;
+    btn.className = `${baseClass} ${activeClass}`.trim();
 
     const value = btn.dataset.filter || 'all';
     grid.querySelectorAll<HTMLElement>('article[data-category]').forEach((cardEl) => {
@@ -232,7 +233,7 @@ export function initStaticBlogFilters(): void {
 /** Tarjeta de UN articulo. Construida con nodos, nunca con innerHTML. */
 function card(
   post: Post,
-  opts: { lang: string; readMore: string; detailBase: string },
+  opts: { lang: string; detailBase: string },
 ): HTMLElement {
   // Antes: `${detailBase}?slug=${slug}`. La query string solo servia una
   // unica plantilla vacia para los N articulos (ver src/lib/posts.ts); ahora
@@ -242,39 +243,14 @@ function card(
   // .htaccess, pero un enlace nuevo no debe depender de esa redireccion.
   const href = `${opts.detailBase}${encodeURIComponent(post.slug || '')}/`;
 
+  // Fila editorial, sin portada decorativa (mismo marcado que las paginas
+  // estaticas ES/CA): meta en mono + titulo (su enlace cubre la fila) + extracto.
   const article = document.createElement('article');
-  article.className =
-    'group reveal flex flex-col overflow-hidden rounded-xl border border-bg-border bg-bg-card shadow-xs transition hover:-translate-y-1 hover:border-bg-border-hover hover:shadow-md';
+  article.className = 'blog-entry';
   if (post.category) article.dataset.category = post.category;
 
-  // --- Portada ---
-  // Fallback a la portada generada (ver src/lib/cover.ts) cuando el
-  // articulo no tiene cover_url propio: antes las 13 tarjetas mostraban el
-  // mismo icono "</>", ahora cada una lleva su propio titulo y etiquetas.
-  const coversBase = opts.detailBase.replace('/blog/post/', '/blog/covers/');
-  const cover = safeUrl(post.cover_url) || `${coversBase}${encodeURIComponent(post.slug || '')}.png`;
-  const coverLink = document.createElement('a');
-  coverLink.href = href;
-  coverLink.className = 'block overflow-hidden';
-  coverLink.setAttribute('aria-hidden', 'true');
-  coverLink.tabIndex = -1;
-
-  const img = document.createElement('img');
-  img.src = cover;
-  img.alt = '';
-  img.loading = 'lazy';
-  img.decoding = 'async';
-  img.className =
-    'h-48 w-full object-cover transition-transform duration-500 group-hover:scale-105';
-  coverLink.appendChild(img);
-  article.appendChild(coverLink);
-
-  // --- Cuerpo ---
-  const body = document.createElement('div');
-  body.className = 'flex flex-1 flex-col p-5';
-
   const meta = document.createElement('p');
-  meta.className = 'mb-2 flex items-center gap-2 font-mono text-xs text-text-muted';
+  meta.className = 'blog-entry-meta';
 
   const time = document.createElement('time');
   time.dateTime = isoDate(post.published_at).slice(0, 10);
@@ -282,71 +258,50 @@ function card(
   meta.appendChild(time);
 
   if (post.read_minutes) {
-    const sep = document.createElement('span');
-    sep.setAttribute('aria-hidden', 'true');
-    sep.textContent = '·';
-    meta.appendChild(sep);
     const read = document.createElement('span');
     read.textContent = `${post.read_minutes} min`;
     meta.appendChild(read);
   }
-  body.appendChild(meta);
+  if (post.category) {
+    const cat = document.createElement('span');
+    cat.textContent = post.category;
+    meta.appendChild(cat);
+  }
+  article.appendChild(meta);
+
+  const body = document.createElement('div');
+  body.className = 'min-w-0';
 
   const h2 = document.createElement('h2');
-  h2.className =
-    'mb-3 text-lg font-bold leading-snug text-text-title transition group-hover:text-accent';
+  h2.className = 'blog-entry-title font-bold';
   const titleLink = document.createElement('a');
   titleLink.href = href;
+  titleLink.className = 'blog-entry-link';
   titleLink.textContent = post.title || '';
   h2.appendChild(titleLink);
   body.appendChild(h2);
 
   const summary = document.createElement('p');
-  summary.className = 'mb-4 line-clamp-3 text-sm text-text-muted';
+  summary.className = 'blog-entry-summary';
   summary.textContent = post.summary || '';
   body.appendChild(summary);
-
-  if (post.tags?.length) {
-    body.appendChild(tagList(post.tags, 3));
-  }
-
-  const footer = document.createElement('div');
-  footer.className = 'mt-auto';
-  const more = document.createElement('a');
-  more.href = href;
-  more.className =
-    'inline-flex items-center gap-1 text-sm font-semibold text-accent transition hover:text-accent-hover';
-  more.textContent = `${opts.readMore} →`;
-  footer.appendChild(more);
-  body.appendChild(footer);
 
   article.appendChild(body);
   return article;
 }
 
-/**
- * Lista de etiquetas. `limit` recorta en la tarjeta del listado, donde cinco
- * etiquetas parten la maqueta; en el detalle se muestran todas.
- */
-function tagList(tags: string[], limit = 0): HTMLElement {
+/** Lista de etiquetas del detalle del articulo (todas, sin recorte). */
+function tagList(tags: string[]): HTMLElement {
   const ul = document.createElement('ul');
-  ul.className = 'mb-4 flex flex-wrap gap-1.5';
-  const shown = limit > 0 ? tags.slice(0, limit) : tags;
+  ul.className = 'flex flex-wrap gap-1.5';
 
-  shown.forEach((tag) => {
+  tags.forEach((tag) => {
     const li = document.createElement('li');
     li.className =
-      'rounded-sm border border-bg-border px-1.5 py-0.5 font-mono text-[10px] text-text-faint';
+      'rounded-sm border border-bg-border px-1.5 py-0.5 font-mono text-xs text-text-muted';
     li.textContent = tag;
     ul.appendChild(li);
   });
-
-  if (limit > 0 && tags.length > limit) {
-    const li = document.createElement('li');
-    li.className = 'px-1 py-0.5 font-mono text-[10px] text-text-faint';
-    li.textContent = `+${tags.length - limit}`;
-    ul.appendChild(li);
-  }
   return ul;
 }
 

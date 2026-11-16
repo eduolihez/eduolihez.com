@@ -13,7 +13,6 @@ function setupGrid(overrides: Partial<Record<string, string>> = {}) {
       data-loading="Cargando"
       data-empty="No hay articulos"
       data-error="Error al cargar"
-      data-readmore="Leer mas"
       data-lang="es"
       data-detail="/blog/post/"
     ></div>
@@ -77,6 +76,35 @@ describe('initBlogList()', () => {
     expect(grid.classList.contains('hidden')).toBe(false);
     const status = document.getElementById('blog-status');
     expect(status?.classList.contains('hidden')).toBe(true);
+  });
+
+  it('la fila lleva fecha, minutos y categoria en el meta, y el enlace del titulo', async () => {
+    const grid = setupGrid();
+    mockFetchOnce({
+      ok: true,
+      json: () => Promise.resolve([{ ...samplePost, read_minutes: 7, category: 'Automatización' }]),
+    });
+
+    initBlogList();
+    await vi.waitFor(() => expect(grid.children.length).toBeGreaterThan(0));
+
+    const meta = grid.querySelectorAll('.blog-entry-meta > *');
+    expect([...meta].map((n) => n.tagName)).toEqual(['TIME', 'SPAN', 'SPAN']);
+    expect(meta[1].textContent).toBe('7 min');
+    expect(meta[2].textContent).toBe('Automatización');
+    const link = grid.querySelector<HTMLAnchorElement>('h2 .blog-entry-link')!;
+    expect(link.getAttribute('href')).toBe('/blog/post/deteccion-phishing-python/');
+    expect(grid.querySelector('img')).toBeNull();
+  });
+
+  it('sin minutos ni categoria el meta solo lleva la fecha', async () => {
+    const grid = setupGrid();
+    mockFetchOnce({ ok: true, json: () => Promise.resolve([samplePost]) });
+
+    initBlogList();
+    await vi.waitFor(() => expect(grid.children.length).toBeGreaterThan(0));
+
+    expect(grid.querySelectorAll('.blog-entry-meta > *').length).toBe(1);
   });
 
   it('muestra el estado vacio cuando la API devuelve un array vacio', async () => {
@@ -166,7 +194,7 @@ describe('initStaticBlogFilters()', () => {
   function setupStaticGrid() {
     document.body.innerHTML = `
       <div id="blog-filters">
-        <button type="button" class="blog-filter-btn border-accent bg-accent text-bg" data-filter="all">Todos</button>
+        <button type="button" class="blog-filter-btn project-filter-btn is-active" data-filter="all">Todos</button>
         <button type="button" class="blog-filter-btn border-bg-border/60" data-filter="python">python</button>
         <button type="button" class="blog-filter-btn border-bg-border/60" data-filter="soc">soc</button>
       </div>
@@ -211,9 +239,9 @@ describe('initStaticBlogFilters()', () => {
     const pythonBtn = document.querySelector<HTMLButtonElement>('[data-filter="python"]')!;
     pythonBtn.click();
 
-    expect(pythonBtn.className).toContain('bg-accent');
+    expect(pythonBtn.className).toContain('is-active');
     const allBtn = document.querySelector<HTMLButtonElement>('[data-filter="all"]')!;
-    expect(allBtn.className).not.toContain('bg-accent');
+    expect(allBtn.className).not.toContain('is-active');
   });
 
   it('ignora clicks fuera de un boton de filtro', () => {

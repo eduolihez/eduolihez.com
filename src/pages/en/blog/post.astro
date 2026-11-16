@@ -47,7 +47,7 @@ const apiUrl = api('/api/post.php');
     <div class="container-page max-w-3xl">
       <a
         href="/en/blog/"
-        class="group mb-8 inline-flex items-center gap-2 font-mono text-xs text-text-muted transition hover:text-accent"
+        class="group mb-8 inline-flex min-h-11 items-center gap-2 font-mono text-xs text-text-muted transition hover:text-accent"
       >
         <span class="transition-transform group-hover:-translate-x-1">&larr;</span> {t('blog.back')}
       </a>
@@ -62,11 +62,11 @@ const apiUrl = api('/api/post.php');
       <!-- Content (filled in by blog.ts) -->
       <div id="post-content-container" class="hidden">
         <header class="mb-8">
-          <div class="mb-3 flex items-center gap-3">
+          <div class="post-head-meta mb-3">
             <time id="post-date" class="font-mono text-xs text-text-muted"></time>
-            <span id="post-read" class="hidden font-mono text-xs text-text-faint"></span>
+            <span id="post-read" class="hidden font-mono text-xs text-text-muted"></span>
             <span
-              class="rounded-sm border border-bg-border px-1.5 py-0.5 font-mono text-[10px] uppercase text-text-faint"
+              class="rounded-sm border border-bg-border px-1.5 py-0.5 font-mono text-xs uppercase text-text-muted"
               >EN</span
             >
           </div>
@@ -77,7 +77,7 @@ const apiUrl = api('/api/post.php');
           </h1>
           <p
             id="post-summary"
-            class="border-l-2 border-accent pl-4 text-base italic text-text-muted"
+            class="post-lead"
           >
           </p>
           <div id="post-tags" class="mt-4 hidden"></div>
@@ -92,7 +92,7 @@ const apiUrl = api('/api/post.php');
           />
         </div>
 
-        <div id="post-body" class="prose max-w-none leading-relaxed text-text"></div>
+        <div id="post-body" class="prose text-text"></div>
       </div>
     </div>
   </article>

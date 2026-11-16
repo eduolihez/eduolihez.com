@@ -712,106 +712,6 @@
   }
 }
 
-/* ===========================================================================
-   Contenido de un articulo del blog (#post-body).
-
-   El cuerpo llega como HTML desde el panel, asi que las etiquetas que se
-   escriben ahi (h2, listas, pre, code...) no llevan clases de Tailwind y sin
-   estas reglas saldrian sin ningun formato. Estaba repetido con <style
-   is:global> en las tres paginas de detalle; aqui esta una sola vez.
-   =========================================================================== */
-.prose h2 {
-  margin-top: 2rem;
-  margin-bottom: 1rem;
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--color-text-title);
-}
-.prose h3 {
-  margin-top: 1.5rem;
-  margin-bottom: 0.75rem;
-  /* 1.125rem es el escalon Title del sistema; antes era 1.2rem, un valor
-     suelto que no estaba en ninguna escala. */
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: var(--color-text-title);
-}
-.prose p {
-  margin-bottom: 1.25rem;
-}
-.prose ul,
-.prose ol {
-  margin-bottom: 1.25rem;
-  padding-left: 1.5rem;
-  list-style: revert;
-}
-.prose li {
-  margin-bottom: 0.5rem;
-}
-.prose img {
-  height: auto;
-  max-width: 100%;
-  border-radius: 0.5rem;
-}
-.prose code {
-  padding: 0.2rem 0.4rem;
-  border-radius: 0.25rem;
-  background: var(--color-bg-card);
-  font-family: var(--font-mono);
-  font-size: 0.9em;
-}
-.prose pre {
-  margin-bottom: 1.25rem;
-  overflow-x: auto;
-  padding: 1rem;
-  border: 1px solid var(--color-bg-border);
-  border-radius: 0.5rem;
-  background: var(--color-bg-card);
-}
-.prose pre code {
-  padding: 0;
-  background: transparent;
-}
-.prose a {
-  color: var(--color-accent);
-  text-decoration: underline;
-}
-.prose a:hover {
-  color: var(--color-accent-hover);
-}
-.prose blockquote {
-  margin-bottom: 1.25rem;
-  padding-left: 1rem;
-  border-left: 2px solid var(--color-bg-border);
-  color: var(--color-text-muted);
-  font-style: italic;
-}
-.prose table {
-  display: block;
-  margin-bottom: 1.25rem;
-  overflow-x: auto;
-  border-collapse: collapse;
-  font-size: 0.875rem;
-  font-variant-numeric: tabular-nums;
-}
-.prose th,
-.prose td {
-  padding: 0.5rem 1rem;
-  border-bottom: 1px solid var(--color-bg-border);
-  text-align: left;
-  white-space: nowrap;
-}
-.prose th {
-  color: var(--color-text-title);
-  font-weight: 600;
-}
-.prose td {
-  color: var(--color-text-muted);
-}
-.prose tbody tr:hover {
-  background: var(--color-bg-card);
-}
-
 /* T2 - Shell "Expediente": paleta y modales sobrios (sin blur decorativo, sin
    halo de color, una sola familia cromatica, objetivos >= 44 px). Sobrescribe
    reglas de arriba; admin.css tiene su propia copia (T7a la sincroniza). */
@@ -1216,4 +1116,269 @@ a.post-row:hover .post-title {
 }
 #certs-filter-container::-webkit-scrollbar {
   display: none;
+}
+
+/* T5 - Blog "Expediente": indice editorial y lectura de un articulo.
+   Sin display en .blog-list: el estado "hidden" de blog.ts sigue mandando. */
+.blog-list {
+  border-top: 1px solid var(--color-bg-border);
+}
+.blog-entry {
+  position: relative;
+  display: grid;
+  gap: 0.375rem 2rem;
+  padding: 1.25rem 0.5rem;
+  border-bottom: 1px solid var(--color-bg-border);
+}
+.blog-entry.hidden {
+  display: none;
+}
+@media (min-width: 640px) {
+  .blog-entry {
+    grid-template-columns: 11rem minmax(0, 1fr);
+  }
+}
+.blog-entry:hover {
+  background-color: var(--color-bg-card);
+}
+.blog-entry-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.125rem 0.5rem;
+  align-content: flex-start;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.25rem;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+@media (min-width: 640px) {
+  .blog-entry-meta {
+    flex-direction: column;
+    padding-top: 0.25rem;
+  }
+}
+.blog-entry-title {
+  font-size: 1.125rem;
+  line-height: 1.4;
+  color: var(--color-text-title);
+}
+/* El enlace del titulo cubre toda la fila (objetivo >= 44 px, sin enlaces anidados). */
+.blog-entry-link {
+  text-decoration: none;
+}
+.blog-entry-link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+.blog-entry:hover .blog-entry-link {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.blog-entry-summary {
+  margin-top: 0.375rem;
+  max-width: 44rem;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+}
+.blog-entry-tags {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+#blog-status {
+  min-height: 10rem;
+}
+
+/* Cabecera del articulo */
+.post-head-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+.post-lead {
+  max-width: 44rem;
+  font-size: 1.125rem;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+}
+.post-toc {
+  max-width: 44rem;
+  margin-bottom: 2rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--color-bg-border);
+  border-radius: 0.5rem;
+  background: var(--color-bg-card);
+}
+.post-toc ol {
+  list-style: decimal;
+  padding-left: 1.25rem;
+}
+.post-toc a {
+  display: inline-block;
+  padding: 0.5rem 0;
+  min-height: 2.75rem;
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.post-toc a:hover {
+  color: var(--color-accent-hover);
+}
+.post-related a {
+  display: inline-block;
+  padding: 0.5rem 0;
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Cuerpo del articulo (HTML de la BD). Medida ~65 caracteres, interlineado 1.7. */
+.prose {
+  max-width: 37rem;
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  overflow-wrap: break-word;
+}
+.prose > * {
+  max-width: 100%;
+}
+.prose h2 {
+  margin-top: 3rem;
+  margin-bottom: 0.875rem;
+  font-size: 1.625rem;
+  line-height: 1.25;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-text-title);
+  scroll-margin-top: 5rem;
+}
+.prose h3 {
+  margin-top: 2.25rem;
+  margin-bottom: 0.625rem;
+  font-size: 1.25rem;
+  line-height: 1.35;
+  font-weight: 650;
+  color: var(--color-text-title);
+}
+.prose h4 {
+  margin-top: 1.75rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--color-text-title);
+}
+.prose p {
+  margin-bottom: 1.25rem;
+}
+.prose ul,
+.prose ol {
+  margin-bottom: 1.25rem;
+  padding-left: 1.5rem;
+  list-style: revert;
+}
+.prose li {
+  margin-bottom: 0.5rem;
+}
+.prose li > ul,
+.prose li > ol {
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+}
+.prose strong {
+  color: var(--color-text-title);
+}
+.prose img {
+  height: auto;
+  max-width: 100%;
+  border-radius: 0.5rem;
+}
+.prose :not(pre) > code {
+  padding: 0.125rem 0.375rem;
+  border: 1px solid var(--color-bg-border);
+  border-radius: 0.25rem;
+  background: var(--color-bg-card);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  overflow-wrap: anywhere;
+}
+.prose pre {
+  margin-bottom: 1.5rem;
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 1rem 1.125rem;
+  border: 1px solid var(--color-bg-border);
+  border-radius: 0.5rem;
+  background: var(--color-bg-card);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  tab-size: 2;
+}
+.prose pre code {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-size: inherit;
+  white-space: pre;
+}
+.prose a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.prose a:hover {
+  color: var(--color-accent-hover);
+}
+.prose blockquote {
+  margin-bottom: 1.25rem;
+  padding: 0.25rem 0 0.25rem 1rem;
+  border-left: 1px solid var(--color-text-faint);
+  color: var(--color-text-muted);
+}
+.prose hr {
+  margin: 2.5rem 0;
+  border: 0;
+  border-top: 1px solid var(--color-bg-border);
+}
+/* Tabla: el scroll es de la tabla, no de la pagina. */
+.prose table {
+  display: block;
+  max-width: 100%;
+  margin-bottom: 1.5rem;
+  overflow-x: auto;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+}
+.prose th,
+.prose td {
+  padding: 0.625rem 1rem;
+  border-bottom: 1px solid var(--color-bg-border);
+  text-align: left;
+  vertical-align: top;
+}
+.prose th {
+  white-space: nowrap;
+  color: var(--color-text-title);
+  font-weight: 600;
+}
+.prose td {
+  color: var(--color-text-muted);
+}
+.prose tbody tr:hover {
+  background: var(--color-bg-card);
+}
+.prose pre:focus-visible,
+.prose table:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }

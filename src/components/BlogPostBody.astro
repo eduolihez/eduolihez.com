@@ -39,19 +39,32 @@ const L: Lang = (lang as Lang) in authorByline ? (lang as Lang) : 'es';
 const related = relatedPosts(post, await fetchAllPostSummaries(L));
 const moreTitle = { es: 'Sigue leyendo', en: 'Keep reading', ca: 'Continua llegint' }[L];
 const cover = safeUrl(post.cover_url) || `${coversBase}${post.slug}.png`;
+
+// Indice (TOC) solo con >= 3 secciones, sin JS: se anaden ids a los <h2> sin
+// atributos del cuerpo (el texto no cambia) y se enlaza a ellos con anclas.
+const tocTitle = { es: 'Contenido', en: 'Contents', ca: 'Continguts' }[L];
+const decode = (v: string) =>
+  v.replace(/<[^>]*>/g, '').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").trim();
+const toc: { id: string; text: string }[] = [];
+const bodyHtml = (post.content || '').replace(/<h2>(.*?)<\/h2>/gs, (_m, inner: string) => {
+  const id = `seccion-${toc.length + 1}`;
+  toc.push({ id, text: decode(inner) });
+  return `<h2 id="${id}">${inner}</h2>`;
+});
+const showToc = toc.length >= 3;
 ---
 
 <article class="border-b border-bg-border bg-bg-soft py-20 sm:py-28">
   <div class="container-page max-w-3xl">
     <a
       href={backHref}
-      class="group mb-8 inline-flex items-center gap-2 font-mono text-xs text-text-muted transition hover:text-accent"
+      class="group mb-8 inline-flex min-h-11 items-center gap-2 font-mono text-xs text-text-muted transition hover:text-accent"
     >
       <span class="transition-transform group-hover:-translate-x-1">&larr;</span> {backLabel}
     </a>
 
     <header class="mb-8">
-      <div class="mb-3 flex items-center gap-3">
+      <div class="post-head-meta mb-3">
         <time
           class="font-mono text-xs text-text-muted"
           datetime={post.published_at.replace(' ', 'T').slice(0, 10)}
@@ -61,13 +74,21 @@ const cover = safeUrl(post.cover_url) || `${coversBase}${post.slug}.png`;
         {
           post.read_minutes ? (
             <>
-              <span aria-hidden="true" class="text-text-faint">·</span>
-              <span class="font-mono text-xs text-text-faint">{post.read_minutes} min</span>
+              <span aria-hidden="true">·</span>
+              <span>{post.read_minutes} min</span>
+            </>
+          ) : null
+        }
+        {
+          post.category ? (
+            <>
+              <span aria-hidden="true">·</span>
+              <span>{post.category}</span>
             </>
           ) : null
         }
         <span
-          class="rounded-sm border border-bg-border px-1.5 py-0.5 font-mono text-[10px] uppercase text-text-faint"
+          class="rounded-sm border border-bg-border px-1.5 py-0.5 font-mono text-xs uppercase text-text-muted"
         >
           {lang}
         </span>
@@ -75,7 +96,7 @@ const cover = safeUrl(post.cover_url) || `${coversBase}${post.slug}.png`;
       <h1 class="mb-4 text-3xl font-bold leading-tight text-text-title sm:text-4xl">
         {post.title}
       </h1>
-      <p class="border-l-2 border-accent pl-4 text-base italic text-text-muted">
+      <p class="post-lead">
         {post.summary}
       </p>
       <p class="mt-4 text-sm text-text-muted">
@@ -85,7 +106,7 @@ const cover = safeUrl(post.cover_url) || `${coversBase}${post.slug}.png`;
         post.tags?.length > 0 && (
           <ul class="mt-4 flex flex-wrap gap-1.5">
             {post.tags.map((tag) => (
-              <li class="rounded-sm border border-bg-border px-1.5 py-0.5 font-mono text-[10px] text-text-faint">
+              <li class="rounded-sm border border-bg-border px-1.5 py-0.5 font-mono text-xs text-text-muted">
                 {tag}
               </li>
             ))}
@@ -111,16 +132,31 @@ const cover = safeUrl(post.cover_url) || `${coversBase}${post.slug}.png`;
       )
     }
 
-    <div class="prose max-w-none leading-relaxed text-text" set:html={post.content} />
+    {
+      showToc && (
+        <nav class="post-toc" aria-label={tocTitle}>
+          <p class="mb-1 font-bold text-text-title">{tocTitle}</p>
+          <ol>
+            {toc.map((item) => (
+              <li>
+                <a href={`#${item.id}`}>{item.text}</a>
+              </li>
+            ))}
+          </ol>
+        </nav>
+      )
+    }
+
+    <div class="prose text-text" set:html={bodyHtml} />
 
     {
       related.length > 0 && (
-        <aside class="mt-12 border-t border-bg-border pt-8">
+        <aside class="post-related mt-12 border-t border-bg-border pt-8">
           <h2 class="mb-4 text-xl font-bold text-text-title">{moreTitle}</h2>
-          <ul class="list-disc space-y-2 pl-5">
+          <ul class="list-disc space-y-1 pl-5">
             {related.map((r) => (
               <li>
-                <a href={blogPostPath(L, r.slug)} class="text-accent hover:underline">{r.title}</a>
+                <a href={blogPostPath(L, r.slug)}>{r.title}</a>
               </li>
             ))}
           </ul>

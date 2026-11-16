@@ -51,7 +51,7 @@ const posts = await fetchLatestPostSummaries(lang, 3);
         <div class="border-t border-bg-border">
           {posts.map((post) => {
             const href = `${basePath}${encodeURIComponent(post.slug)}/`;
-            const minutes = (post as { read_minutes?: number }).read_minutes;
+            const minutes = post.read_minutes;
             return (
               <a href={href} class="post-row group">
                 <time

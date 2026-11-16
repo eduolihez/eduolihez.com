@@ -30,7 +30,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { useTranslations } from '../../i18n/utils';
 import { SITE } from '../../config';
 import { fetchAllPostSummaries, isoDate } from '../../lib/posts';
-import { formatDate, safeUrl } from '../../scripts/blog';
+import { formatDate } from '../../scripts/blog';
 
 const lang = 'es';
 const t = useTranslations(lang);
@@ -75,32 +75,31 @@ const blogIndex = {
     <div class="container-page">
       <a
         href="/"
-        class="group mb-8 inline-flex items-center gap-2 font-mono text-xs text-text-muted transition hover:text-accent"
+        class="group mb-8 inline-flex min-h-11 items-center gap-2 font-mono text-xs text-text-muted transition hover:text-accent"
       >
         <span class="transition-transform group-hover:-translate-x-1">&larr;</span> Volver al inicio
       </a>
 
       <div class="reveal mb-12 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p class="section-kicker">Divulgación técnica</p>
           <h1 class="section-title">{t('blog.title')}</h1>
           <p class="section-subtitle">{t('blog.subtitle')}</p>
         </div>
         <a
           href="/blog/rss.xml"
-          class="inline-flex items-center gap-1.5 rounded-md border border-bg-border px-3 py-1.5 font-mono text-xs text-text-muted transition hover:border-accent/40 hover:text-accent"
+          class="inline-flex min-h-11 items-center gap-1.5 rounded-md border border-bg-border px-3 py-1.5 font-mono text-xs text-text-muted transition hover:border-accent/40 hover:text-accent"
         >
           RSS
         </a>
       </div>
 
-      {posts.length === 0 && <p class="text-sm text-text-muted">{t('blog.empty')}</p>}
+      {posts.length === 0 && <p class="status-panel" data-state="empty">{t('blog.empty')}</p>}
 
       {categories.length > 0 && (
         <div id="blog-filters" class="mb-8 flex flex-wrap gap-2" data-all="Todos">
           <button
             type="button"
-            class="blog-filter-btn cursor-pointer rounded-lg border px-4 py-1.5 text-xs font-semibold transition duration-200 border-accent bg-accent text-bg"
+            class="blog-filter-btn project-filter-btn is-active"
             data-filter="all"
           >
             Todos
@@ -108,7 +107,7 @@ const blogIndex = {
           {categories.map((category) => (
             <button
               type="button"
-              class="blog-filter-btn cursor-pointer rounded-lg border border-bg-border/60 bg-bg-soft/40 px-4 py-1.5 text-xs font-semibold text-text-muted transition duration-200 hover:bg-bg-card hover:text-text"
+              class="blog-filter-btn project-filter-btn"
               data-filter={category}
             >
               {category}
@@ -117,47 +116,24 @@ const blogIndex = {
         </div>
       )}
 
-      <div id="blog-grid" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {/* Lista editorial sin portadas decorativas (las portadas generadas solo
+          repiten el título): fecha, minutos y categoría en mono; el enlace del
+          título cubre la fila entera. */}
+      <div id="blog-grid" class="blog-list">
         {posts.map((post) => {
           const href = `/blog/post/${encodeURIComponent(post.slug || '')}/`;
-          const cover = safeUrl(post.cover_url) || `/blog/covers/${encodeURIComponent(post.slug || '')}.png`;
           return (
-            <article
-              class="group reveal flex flex-col overflow-hidden rounded-xl border border-bg-border bg-bg-card shadow-xs transition hover:-translate-y-1 hover:border-bg-border-hover hover:shadow-md"
-              data-category={post.category || undefined}
-            >
-              <a href={href} class="block overflow-hidden" aria-hidden="true" tabindex="-1">
-                {/* width/height + aspect-ratio: el navegador reserva el hueco antes
-                    de que la imagen cargue, así que la cuadrícula ya no da el salto
-                    de layout (CLS) que se medía al pintarla por JS tras el fetch.
-                    1200x630 es la relación real de la portada generada en
-                    src/lib/cover.ts -- con el contenedor a la misma proporción,
-                    object-cover ya no tiene que recortar nada en horizontal. */}
-                <img
-                  src={cover}
-                  alt=""
-                  width="1200"
-                  height="630"
-                  style="aspect-ratio: 1200 / 630"
-                  loading="lazy"
-                  decoding="async"
-                  class="w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-              </a>
-              <div class="flex flex-1 flex-col p-5">
-                <p class="mb-2 flex items-center gap-2 font-mono text-xs text-text-muted">
-                  <time datetime={isoDate(post.published_at).slice(0, 10)}>{formatDate(post.published_at, lang)}</time>
-                </p>
-                <h2 class="mb-2 text-lg font-bold leading-snug text-text-title transition group-hover:text-accent">
-                  <a href={href}>{post.title}</a>
+            <article class="blog-entry" data-category={post.category || undefined}>
+              <p class="blog-entry-meta">
+                <time datetime={isoDate(post.published_at).slice(0, 10)}>{formatDate(post.published_at, lang)}</time>
+                {post.read_minutes ? <span>{post.read_minutes} min</span> : null}
+                {post.category ? <span>{post.category}</span> : null}
+              </p>
+              <div class="min-w-0">
+                <h2 class="blog-entry-title font-bold">
+                  <a href={href} class="blog-entry-link">{post.title}</a>
                 </h2>
-                <p class="mb-4 line-clamp-3 flex-1 text-sm text-text-muted">{post.summary}</p>
-                <a
-                  href={href}
-                  class="mt-auto inline-flex items-center gap-1.5 text-sm font-semibold text-accent transition group-hover:gap-2.5"
-                >
-                  {t('blog.readMore')} →
-                </a>
+                <p class="blog-entry-summary">{post.summary}</p>
               </div>
             </article>
           );

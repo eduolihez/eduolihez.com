@@ -69,7 +69,7 @@ let currentModalCloseHandler: (() => void) | null = null;
 let escapeListenerBound = false;
 
 /** Tarjetas visibles antes de pulsar "Ver todos los proyectos". */
-const INITIAL_VISIBLE_COUNT = 7; // la ficha destacada ocupa dos columnas: 1 + 3 filas de 2
+const INITIAL_VISIBLE_COUNT = 7; // destacada a dos columnas (1) + 3 filas de 2 = 7 tarjetas
 
 function bindGlobalEscapeHandler(): void {
   if (escapeListenerBound) return;
@@ -312,7 +312,7 @@ export function initProjects(): void {
         const showMoreBtn = document.getElementById('projects-show-more');
         let activeFilter = 'all';
         // "Ver todos" / "Ver menos" alternan el limite inicial. Cambiar de
-        // filtro lo abre (limitar a 6 solo tiene sentido en la vista "todos").
+        // filtro lo abre (limitar a 7 solo tiene sentido en la vista "todos").
         let expanded = cards.length <= INITIAL_VISIBLE_COUNT;
         const labelMore = showMoreBtn?.dataset.labelMore ?? showMoreBtn?.textContent ?? '';
         const labelLess = showMoreBtn?.dataset.labelLess ?? labelMore;
@@ -334,7 +334,7 @@ export function initProjects(): void {
             card.classList.toggle('is-lead', visible && !leadSet);
             if (visible) leadSet = true;
           });
-          // Con 6 o menos coincidencias no hay nada que mostrar ni ocultar.
+          // Con 7 o menos coincidencias no hay nada que mostrar ni ocultar.
           showMoreWrap?.classList.toggle('hidden', matching <= INITIAL_VISIBLE_COUNT);
           if (showMoreBtn) {
             showMoreBtn.textContent = expanded ? labelLess : labelMore;
@@ -361,7 +361,7 @@ export function initProjects(): void {
             btn.classList.add('is-active');
             btn.setAttribute('aria-pressed', 'true');
 
-            // Cambiar de filtro tambien revela el resto: limitar a 6 solo
+            // Cambiar de filtro tambien revela el resto: limitar a 7 solo
             // tiene sentido en la vista "todos" sin filtrar.
             activeFilter = btn.getAttribute('data-filter') || 'all';
             expanded = true;

@@ -33,6 +33,8 @@ export interface PostSummary {
   category: string | null;
   lang: string;
   published_at: string;
+  /** Solo lo trae la API (lista y detalle); opcional en el tipo de resumen. */
+  read_minutes?: number;
 }
 
 export interface PostDetail extends PostSummary {

@@ -176,10 +176,10 @@ final class SpacesTest extends TestCase
         );
     }
 
-    public function testSpaceNavSiteTieneResumenYMensajes(): void
+    public function testSpaceNavSiteTieneHoyYMensajes(): void
     {
         $resumen = $this->navItem('site', 'index.php');
-        $this->assertSame('Resumen', $resumen['label']);
+        $this->assertSame('Hoy', $resumen['label']);
         $this->assertSame('index.php?space=site', $resumen['href']);
         $this->assertSame('grid', $resumen['icon']);
         $this->assertSame('', $resumen['badge']);

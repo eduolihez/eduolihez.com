@@ -14,7 +14,7 @@ function setupGrid() {
       data-labels='{"loading":"Cargando","empty":"Sin proyectos","error":"Error","details":"Ver detalles","demo":"Demo","repo":"Codigo","featured":"Destacado"}'
     ></div>
     <div id="projects-show-more-wrap" class="hidden">
-      <button id="projects-show-more" aria-expanded="false" data-label-more="Ver todos" data-label-less="Ver menos">Ver todos</button>
+      <button id="projects-show-more" aria-expanded="false" data-label-more="Ver más ({n})" data-label-less="Ver menos">Ver más</button>
     </div>
     <div id="project-modal" hidden>
       <img id="pm-image" class="hidden" />
@@ -202,160 +202,144 @@ describe('initProjects()', () => {
     expect(visible[0].textContent).toContain('OSS');
   });
 
-  describe('limite inicial de tarjetas ("ver todos")', () => {
+  describe('limite inicial y "Ver mas" progresivo', () => {
     function makeProjects(count: number) {
       return Array.from({ length: count }, (_, i) => ({ ...sampleProject, title: `Proyecto ${i + 1}` }));
     }
-
-    it('con 7 proyectos o menos, se ven todos y el boton "ver todos" queda oculto', async () => {
+    function mockMobile(matches: boolean) {
+      vi.stubGlobal('matchMedia', vi.fn().mockReturnValue({ matches }));
+    }
+    const visibleCount = (grid: HTMLElement) =>
+      Array.from(grid.querySelectorAll('article')).filter((c) => !c.classList.contains('hidden')).length;
+    const wrapHidden = () => document.getElementById('projects-show-more-wrap')?.classList.contains('hidden');
+    const btn = () => document.getElementById('projects-show-more')!;
+    async function load(count: number) {
       const grid = setupGrid();
-      mockFetchOnce({ ok: true, json: () => Promise.resolve(makeProjects(7)) });
+      mockFetchOnce({ ok: true, json: () => Promise.resolve(makeProjects(count)) });
+      initProjects();
+      await vi.waitFor(() => expect(grid.querySelectorAll('article').length).toBe(count));
+      return grid;
+    }
+
+    it('escritorio: con 5 o menos se ven todos y el boton queda oculto', async () => {
+      mockMobile(false);
+      const grid = await load(5);
+      expect(visibleCount(grid)).toBe(5);
+      expect(wrapHidden()).toBe(true);
+    });
+
+    it('escritorio: con mas de 5 se ven 5 y el boton muestra cuantas quedan', async () => {
+      mockMobile(false);
+      const grid = await load(9);
+      expect(visibleCount(grid)).toBe(5);
+      expect(wrapHidden()).toBe(false);
+      expect(btn().textContent).toBe('Ver más (4)');
+      expect(btn().getAttribute('aria-expanded')).toBe('false');
+    });
+
+    it('escritorio: cada pulsacion revela +6; en el ultimo lote pasa a "Ver menos"', async () => {
+      mockMobile(false);
+      const grid = await load(14);
+      expect(visibleCount(grid)).toBe(5);
+      expect(btn().textContent).toBe('Ver más (9)');
+      btn().click();
+      expect(visibleCount(grid)).toBe(11);
+      expect(btn().textContent).toBe('Ver más (3)');
+      expect(btn().getAttribute('aria-expanded')).toBe('false');
+      btn().click();
+      expect(visibleCount(grid)).toBe(14);
+      expect(btn().textContent).toBe('Ver menos');
+      expect(btn().getAttribute('aria-expanded')).toBe('true');
+      // Los ocultos nunca salen del DOM.
+      expect(grid.querySelectorAll('article').length).toBe(14);
+    });
+
+    it('"Ver menos" vuelve al limite inicial, hace scroll a la seccion y conserva el boton', async () => {
+      mockMobile(false);
+      const grid = await load(9);
+      document.body.insertAdjacentHTML('afterbegin', '<section id="proyectos"></section>');
+      const scroll = vi.fn();
+      document.getElementById('proyectos')!.scrollIntoView = scroll;
+      const b = btn();
+      b.click(); // 9 <= 5+6: todo visible
+      expect(b.textContent).toBe('Ver menos');
+      b.click();
+      expect(visibleCount(grid)).toBe(5);
+      expect(b.textContent).toBe('Ver más (4)');
+      expect(b.getAttribute('aria-expanded')).toBe('false');
+      expect(scroll).toHaveBeenCalledWith({ block: 'start' });
+      expect(btn()).toBe(b);
+    });
+
+    it('movil: limite inicial 3, lotes de 3', async () => {
+      mockMobile(true);
+      const grid = await load(8);
+      expect(visibleCount(grid)).toBe(3);
+      expect(btn().textContent).toBe('Ver más (5)');
+      btn().click();
+      expect(visibleCount(grid)).toBe(6);
+      expect(btn().textContent).toBe('Ver más (2)');
+      btn().click();
+      expect(visibleCount(grid)).toBe(8);
+      expect(btn().textContent).toBe('Ver menos');
+    });
+
+    it('movil: con 3 proyectos o menos no hay boton', async () => {
+      mockMobile(true);
+      await load(3);
+      expect(wrapHidden()).toBe(true);
+    });
+
+    it('colapsa ya las tarjetas de build sin esperar a la API y no duplica el manejador del boton', async () => {
+      mockMobile(true);
+      const grid = setupGrid();
+      grid.innerHTML = Array.from({ length: 6 }, (_, i) => `<article>Build ${i}</article>`).join('');
+      mockFetchOnce({ ok: true, json: () => Promise.resolve(makeProjects(6)) });
 
       initProjects();
-      await vi.waitFor(() => expect(grid.querySelectorAll('article').length).toBe(7));
+      expect(visibleCount(grid)).toBe(3);
 
-      const cards = Array.from(grid.querySelectorAll('article'));
-      expect(cards.every((c) => !c.classList.contains('hidden'))).toBe(true);
-      expect(document.getElementById('projects-show-more-wrap')?.classList.contains('hidden')).toBe(true);
+      await vi.waitFor(() => expect(grid.textContent).toContain('Proyecto 1'));
+      btn().click();
+      // Un solo manejador: un clic revela el lote (6 en total), no revela y contrae.
+      expect(visibleCount(grid)).toBe(6);
+      expect(btn().getAttribute('aria-expanded')).toBe('true');
     });
 
-    it('con mas de 7, solo se ven las 7 primeras y el boton "ver todos" aparece', async () => {
+    it('si la API devuelve lista vacia, el boton se oculta', async () => {
+      mockMobile(true);
       const grid = setupGrid();
-      mockFetchOnce({ ok: true, json: () => Promise.resolve(makeProjects(9)) });
+      grid.innerHTML = Array.from({ length: 6 }, () => '<article>Build</article>').join('');
+      mockFetchOnce({ ok: true, json: () => Promise.resolve([]) });
 
       initProjects();
-      await vi.waitFor(() => expect(grid.querySelectorAll('article').length).toBe(9));
-
-      const cards = Array.from(grid.querySelectorAll('article'));
-      const visible = cards.filter((c) => !c.classList.contains('hidden'));
-      expect(visible.length).toBe(7);
-      expect(document.getElementById('projects-show-more-wrap')?.classList.contains('hidden')).toBe(false);
+      await vi.waitFor(() => expect(grid.dataset.loaded).toBe('1'));
+      expect(wrapHidden()).toBe(true);
     });
 
-    describe('en movil (<768 px)', () => {
-      function mockMobile(matches: boolean) {
-        vi.stubGlobal('matchMedia', vi.fn().mockReturnValue({ matches }));
-      }
-
-      it('con 6 proyectos solo se ven 4 y el boton aparece; "ver todos" despliega los 6 (siguen en el DOM)', async () => {
-        mockMobile(true);
-        const grid = setupGrid();
-        mockFetchOnce({ ok: true, json: () => Promise.resolve(makeProjects(6)) });
-
-        initProjects();
-        await vi.waitFor(() => expect(grid.querySelectorAll('article').length).toBe(6));
-
-        const cards = Array.from(grid.querySelectorAll('article'));
-        expect(cards.filter((c) => !c.classList.contains('hidden')).length).toBe(4);
-        expect(document.getElementById('projects-show-more-wrap')?.classList.contains('hidden')).toBe(false);
-
-        document.getElementById('projects-show-more')?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-        expect(cards.every((c) => !c.classList.contains('hidden'))).toBe(true);
-      });
-
-      it('con 4 proyectos o menos no hay boton', async () => {
-        mockMobile(true);
-        const grid = setupGrid();
-        mockFetchOnce({ ok: true, json: () => Promise.resolve(makeProjects(4)) });
-
-        initProjects();
-        await vi.waitFor(() => expect(grid.querySelectorAll('article').length).toBe(4));
-
-        expect(document.getElementById('projects-show-more-wrap')?.classList.contains('hidden')).toBe(true);
-      });
-
-      it('colapsa ya las tarjetas de build sin esperar a la API y no duplica el manejador del boton', async () => {
-        mockMobile(true);
-        const grid = setupGrid();
-        grid.innerHTML = Array.from({ length: 6 }, (_, i) => `<article>Build ${i}</article>`).join('');
-        mockFetchOnce({ ok: true, json: () => Promise.resolve(makeProjects(6)) });
-
-        initProjects();
-        const before = Array.from(grid.querySelectorAll('article'));
-        expect(before.filter((c) => !c.classList.contains('hidden')).length).toBe(4);
-
-        await vi.waitFor(() => expect(grid.textContent).toContain('Proyecto 1'));
-        const btn = document.getElementById('projects-show-more')!;
-        btn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-        // Un solo manejador: un clic despliega (si estuviera duplicado volveria a contraer).
-        expect(btn.getAttribute('aria-expanded')).toBe('true');
-      });
-
-      it('si la API devuelve lista vacia, el boton se oculta', async () => {
-        mockMobile(true);
-        const grid = setupGrid();
-        grid.innerHTML = Array.from({ length: 6 }, () => '<article>Build</article>').join('');
-        mockFetchOnce({ ok: true, json: () => Promise.resolve([]) });
-
-        initProjects();
-        await vi.waitFor(() => expect(grid.dataset.loaded).toBe('1'));
-        expect(document.getElementById('projects-show-more-wrap')?.classList.contains('hidden')).toBe(true);
-      });
-
-      it('en escritorio (matchMedia no coincide) el limite sigue siendo 7', async () => {
-        mockMobile(false);
-        const grid = setupGrid();
-        mockFetchOnce({ ok: true, json: () => Promise.resolve(makeProjects(9)) });
-
-        initProjects();
-        await vi.waitFor(() => expect(grid.querySelectorAll('article').length).toBe(9));
-        const cards = Array.from(grid.querySelectorAll('article'));
-        expect(cards.filter((c) => !c.classList.contains('hidden')).length).toBe(7);
-      });
-    });
-
-    it('pulsar "ver todos" revela el resto y el boton pasa a "ver menos"', async () => {
-      const grid = setupGrid();
-      mockFetchOnce({ ok: true, json: () => Promise.resolve(makeProjects(9)) });
-
-      initProjects();
-      await vi.waitFor(() => expect(grid.querySelectorAll('article').length).toBe(9));
-
-      document.getElementById('projects-show-more')?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-
-      const cards = Array.from(grid.querySelectorAll('article'));
-      expect(cards.every((c) => !c.classList.contains('hidden'))).toBe(true);
-      const btn = document.getElementById('projects-show-more')!;
-      expect(document.getElementById('projects-show-more-wrap')?.classList.contains('hidden')).toBe(false);
-      expect(btn.textContent).toBe('Ver menos');
-      expect(btn.getAttribute('aria-expanded')).toBe('true');
-    });
-
-    it('pulsar "ver menos" vuelve a las 7 primeras y restaura "ver todos"', async () => {
-      const grid = setupGrid();
-      mockFetchOnce({ ok: true, json: () => Promise.resolve(makeProjects(9)) });
-
-      initProjects();
-      await vi.waitFor(() => expect(grid.querySelectorAll('article').length).toBe(9));
-
-      const btn = document.getElementById('projects-show-more')!;
-      btn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-      btn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-
-      const visible = Array.from(grid.querySelectorAll('article')).filter((c) => !c.classList.contains('hidden'));
-      expect(visible.length).toBe(7);
-      expect(btn.textContent).toBe('Ver todos');
-      expect(btn.getAttribute('aria-expanded')).toBe('false');
-    });
-
-    it('con un filtro activo, "ver menos" limita a 7 entre las tarjetas que coinciden', async () => {
+    it('con filtro cuenta solo las que coinciden y cambiar de filtro reinicia el limite', async () => {
+      mockMobile(false);
       const grid = setupGrid();
       document.body.insertAdjacentHTML(
         'beforeend',
-        '<button class="project-filter-btn" data-filter="open-source">OSS</button>',
+        '<button class="project-filter-btn" data-filter="open-source">OSS</button><button class="project-filter-btn" data-filter="all">Todos</button>',
       );
       // Las 3 primeras no coinciden: el limite cuenta solo las que si.
-      const projects = makeProjects(12).map((p, i) => ({ ...p, badges: i < 3 ? ['private-code'] : ['open-source'] }));
+      const projects = makeProjects(16).map((p, i) => ({ ...p, badges: i < 3 ? ['private-code'] : ['open-source'] }));
       mockFetchOnce({ ok: true, json: () => Promise.resolve(projects) });
-
       initProjects();
-      await vi.waitFor(() => expect(grid.querySelectorAll('article').length).toBe(12));
+      await vi.waitFor(() => expect(grid.querySelectorAll('article').length).toBe(16));
 
-      document.querySelector<HTMLButtonElement>('.project-filter-btn')!.click();
-      document.getElementById('projects-show-more')!.click(); // contraer
-      const visible = Array.from(grid.querySelectorAll('article')).filter((c) => !c.classList.contains('hidden'));
-      expect(visible.length).toBe(7);
-      expect(visible.every((c) => (c.getAttribute('data-badges') || '').includes('open-source'))).toBe(true);
+      const [oss, all] = Array.from(document.querySelectorAll<HTMLButtonElement>('.project-filter-btn'));
+      oss.click();
+      expect(visibleCount(grid)).toBe(5);
+      expect(btn().textContent).toBe('Ver más (8)');
+      expect(Array.from(grid.querySelectorAll('article')).filter((c) => !c.classList.contains('hidden')).every((c) => (c.getAttribute('data-badges') || '').includes('open-source'))).toBe(true);
+      btn().click();
+      expect(visibleCount(grid)).toBe(11);
+      all.click(); // reinicia
+      expect(visibleCount(grid)).toBe(5);
+      expect(btn().textContent).toBe('Ver más (11)');
     });
 
     it('los destacados van primero y la primera ficha visible es la principal (is-lead)', async () => {
@@ -430,28 +414,6 @@ describe('initProjects()', () => {
       await vi.waitFor(() => expect(grid.querySelectorAll('article').length).toBe(12));
       document.querySelector<HTMLButtonElement>('.project-filter-btn')!.click();
       expect(document.getElementById('projects-show-more-wrap')?.classList.contains('hidden')).toBe(true);
-    });
-
-    it('cambiar de filtro revela tarjetas mas alla del limite inicial de 6', async () => {
-      const grid = setupGrid();
-      document.body.insertAdjacentHTML(
-        'beforeend',
-        '<button class="project-filter-btn" data-filter="open-source">OSS</button>',
-      );
-      const projects = [
-        ...makeProjects(8).map((p) => ({ ...p, badges: ['open-source'] })),
-      ];
-      mockFetchOnce({ ok: true, json: () => Promise.resolve(projects) });
-
-      initProjects();
-      await vi.waitFor(() => expect(grid.querySelectorAll('article').length).toBe(8));
-
-      document
-        .querySelector<HTMLButtonElement>('.project-filter-btn[data-filter="open-source"]')!
-        .click();
-
-      const cards = Array.from(grid.querySelectorAll('article'));
-      expect(cards.every((c) => !c.classList.contains('hidden'))).toBe(true);
     });
   });
 

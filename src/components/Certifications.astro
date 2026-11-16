@@ -31,9 +31,9 @@ const apiUrl = api(`/api/certifications.php?lang=${lang}`);
 // cuanto carga (ver #certs-grid mas abajo) -- esto solo evita que un
 // rastreador sin JS vea el contenedor vacio.
 const ssrCerts = await fetchCertificationSummaries(lang);
-// Logos a 128 px (2x de la caja de 64 px) en WebP; image.domains en
+// Logos a 192 px (>3x de la caja de 56 px, nitidos en pantallas densas) en WebP; image.domains en
 // astro.config.mjs autoriza a images.credly.com.
-const LOGO_WIDTH = 128;
+const LOGO_WIDTH = 192;
 const logoMap = await buildLogoMap(ssrCerts, async (src) => {
   const img = await getImage({ src, inferSize: true, width: LOGO_WIDTH, format: 'webp' });
   return img.src;

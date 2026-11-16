@@ -34,6 +34,18 @@ interface Certification {
 /** Filas visibles antes de pulsar "Ver todas" (las destacadas). */
 export const DEFAULT_LIMIT = 8;
 
+/**
+ * Monograma del emisor (1-2 iniciales en mayusculas) para las certificaciones
+ * sin logo. Dos o mas palabras: iniciales de las dos primeras ("Trend Micro" ->
+ * "TM"); una sola: sus dos primeras letras ("Cisco" -> "CI").
+ */
+export function issuerInitials(issuer: string | undefined): string {
+  const words = (issuer || '').match(/[\p{L}\p{N}]+/gu) || [];
+  if (!words.length) return '·';
+  const letters = words.length > 1 ? words[0][0] + words[1][0] : words[0].slice(0, 2);
+  return letters.toUpperCase();
+}
+
 export function initCerts(): void {
   const grid = document.getElementById('certs-grid');
   const status = document.getElementById('certs-status');
@@ -57,42 +69,29 @@ export function initCerts(): void {
   let hasAnimatedOnce = false;
   let limit = DEFAULT_LIMIT;
 
-  /** Sello de credencial en SVG (mismo icono que el resto del sitio), en tono neutro. */
-  function sealIcon(): SVGSVGElement {
-    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('viewBox', '0 0 24 24');
-    svg.setAttribute('class', 'h-5 w-5 text-text-faint');
-    svg.setAttribute('aria-hidden', 'true');
-    const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    p.setAttribute('fill', 'currentColor');
-    p.setAttribute(
-      'd',
-      'M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V22l-4-2-4 2v-7.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7m0 2a5 5 0 0 0-5 5 5 5 0 0 0 5 5 5 5 0 0 0 5-5 5 5 0 0 0-5-5Z',
-    );
-    svg.appendChild(p);
-    return svg;
-  }
-
   /**
-   * Recuadro de insignia: la imagen real de Credly si existe, si no el sello
-   * neutro -- nunca una imagen inventada para las certificaciones que solo
-   * tienen PDF (Trend Micro, LinkedIn...).
+   * Recuadro de insignia: la imagen real de Credly si existe, si no el
+   * monograma del emisor -- nunca una imagen inventada para las certificaciones
+   * que solo tienen PDF (Trend Micro, LinkedIn...). Mismo marcado que CertRow.astro.
    */
-  function logoBox(logoUrl: string | undefined): HTMLSpanElement {
+  function logoBox(logoUrl: string | undefined, issuer: string | undefined): HTMLSpanElement {
     const box = document.createElement('span');
-    box.className =
-      'flex h-10 w-10 items-center justify-center overflow-hidden rounded-sm border border-bg-border bg-bg-soft';
     const logo = safeUrl(logoUrl);
     if (logo) {
+      box.className = 'cert-badge';
       const img = document.createElement('img');
       img.src = logos[logo] ?? logo;
       img.alt = '';
+      img.width = 56;
+      img.height = 56;
       img.loading = 'lazy';
       img.decoding = 'async';
-      img.className = 'h-full w-full object-contain p-1';
+      img.className = 'cert-badge-img';
       box.appendChild(img);
     } else {
-      box.appendChild(sealIcon());
+      box.className = 'cert-badge cert-badge--mono';
+      box.setAttribute('aria-hidden', 'true');
+      box.textContent = issuerInitials(issuer);
     }
     return box;
   }
@@ -218,7 +217,7 @@ export function initCerts(): void {
       (row as HTMLAnchorElement).rel = 'noopener noreferrer';
     }
 
-    row.appendChild(logoBox(c.logo_url));
+    row.appendChild(logoBox(c.logo_url, c.issuer));
 
     const text = document.createElement('span');
     text.className = 'min-w-0';

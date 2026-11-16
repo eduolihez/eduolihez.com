@@ -5,8 +5,8 @@
  * lo que ven buscadores y visitantes sin JS hasta que initCerts() la repinta.
  */
 import { safeUrl } from '../scripts/shared';
+import { issuerInitials } from '../scripts/certifications';
 import type { CertificationSummary } from '../lib/certifications';
-import Icon from './Icon.astro';
 
 interface Props {
   cert: CertificationSummary;
@@ -24,13 +24,13 @@ const Tag = link ? 'a' : 'div';
   rel={link ? 'noopener noreferrer' : undefined}
   class="cert-row"
 >
-  <span class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-sm border border-bg-border bg-bg-soft">
-    {logo ? (
-      <img src={logoMap[logo] ?? logo} alt="" width="40" height="40" loading="lazy" decoding="async" class="h-full w-full object-contain p-1" />
-    ) : (
-      <Icon name="award" class="h-5 w-5 text-text-faint" />
-    )}
-  </span>
+  {logo ? (
+    <span class="cert-badge">
+      <img src={logoMap[logo] ?? logo} alt="" width="56" height="56" loading="lazy" decoding="async" class="cert-badge-img" />
+    </span>
+  ) : (
+    <span class="cert-badge cert-badge--mono" aria-hidden="true">{issuerInitials(c.issuer)}</span>
+  )}
   <span class="min-w-0">
     <span class="cert-name block truncate text-sm font-semibold text-text-title">{c.name}</span>
     <span class="block truncate text-xs text-text-muted">{c.issuer}</span>

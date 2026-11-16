@@ -68,14 +68,16 @@ function badgeMeta(b: string, labels: ProjectLabels): { className: string; text:
 let currentModalCloseHandler: (() => void) | null = null;
 let escapeListenerBound = false;
 
-/** Tarjetas visibles antes de pulsar "Ver todos los proyectos". */
-const INITIAL_VISIBLE_COUNT = 7; // destacada a dos columnas (1) + 3 filas de 2 = 7 tarjetas
-/** En movil (una columna, <768 px) bastan 4: el resto sigue en el DOM, oculto. */
-const MOBILE_VISIBLE_COUNT = 4;
+/** Tarjetas visibles al inicio en escritorio: destacada a dos columnas (1) + 2 filas de 2 = 5. */
+export const INITIAL_VISIBLE_COUNT = 5;
+/** En movil (una columna, <768 px) bastan 3: el resto sigue en el DOM, oculto. */
+export const MOBILE_VISIBLE_COUNT = 3;
+/** Tarjetas que revela cada pulsacion de "Ver mas" (escritorio / movil). */
+export const BATCH_SIZE = 6;
+export const MOBILE_BATCH_SIZE = 3;
 
-function visibleLimit(): number {
-  const mobile = typeof window.matchMedia === 'function' && window.matchMedia('(max-width: 767px)').matches;
-  return mobile ? MOBILE_VISIBLE_COUNT : INITIAL_VISIBLE_COUNT;
+function isMobile(): boolean {
+  return typeof window.matchMedia === 'function' && window.matchMedia('(max-width: 767px)').matches;
 }
 
 function bindGlobalEscapeHandler(): void {
@@ -286,23 +288,27 @@ export function initProjects(): void {
 
   // Estado de visibilidad compartido entre el pintado de build (SSR) y el de la API.
   let activeFilter = 'all';
-  let expanded = false;
+  let shown = 0; // cuantas tarjetas que coinciden con el filtro se enseñan ahora
 
   /**
-   * Aplica el limite inicial ("Ver todos"/"Ver menos") y el filtro activo a las
-   * tarjetas que hay ahora mismo en el grid. Se llama dos veces como mucho: con
-   * las tarjetas de build (para que en movil tampoco haya 14 de golpe mientras
-   * llega la API) y con las de la API.
+   * Aplica el limite progresivo y el filtro activo a las tarjetas que hay ahora
+   * mismo en el grid. Se llama dos veces como mucho: con las tarjetas de build
+   * (para que en movil tampoco haya 14 de golpe mientras llega la API) y con las
+   * de la API. "Ver mas" revela otro lote cada vez; al enseñar todo pasa a
+   * "Ver menos", que vuelve al limite inicial.
    */
   function bindCards(): void {
     const cards = Array.from(grid.querySelectorAll<HTMLElement>('article'));
     const showMoreWrap = document.getElementById('projects-show-more-wrap');
     const showMoreBtn = document.getElementById('projects-show-more');
-    const limit = visibleLimit();
-    expanded = cards.length <= limit;
+    const mobile = isMobile();
+    const initial = mobile ? MOBILE_VISIBLE_COUNT : INITIAL_VISIBLE_COUNT;
+    const batch = mobile ? MOBILE_BATCH_SIZE : BATCH_SIZE;
+    shown = initial;
     const labelMore = showMoreBtn?.dataset.labelMore ?? showMoreBtn?.textContent ?? '';
     const labelLess = showMoreBtn?.dataset.labelLess ?? labelMore;
 
+    let remainingNow = 0;
     function applyVisibility(): void {
       // El limite cuenta las tarjetas que coinciden con el filtro, no su
       // posicion en la lista completa.
@@ -312,7 +318,7 @@ export function initProjects(): void {
         const badgesAttr = card.getAttribute('data-badges') || '';
         const badges = badgesAttr ? badgesAttr.split(',') : [];
         const matchesFilter = activeFilter === 'all' || badges.includes(activeFilter);
-        const withinLimit = expanded || matching < limit;
+        const withinLimit = matching < shown;
         if (matchesFilter) matching += 1;
         const visible = matchesFilter && withinLimit;
         card.classList.toggle('hidden', !visible);
@@ -320,25 +326,36 @@ export function initProjects(): void {
         card.classList.toggle('is-lead', visible && !leadSet);
         if (visible) leadSet = true;
       });
-      // Con `limit` o menos coincidencias no hay nada que mostrar ni ocultar.
-      showMoreWrap?.classList.toggle('hidden', matching <= limit);
+      const remaining = Math.max(0, matching - shown);
+      const expanded = remaining === 0;
+      // Con `initial` o menos coincidencias no hay nada que mostrar ni ocultar.
+      showMoreWrap?.classList.toggle('hidden', matching <= initial);
       if (showMoreBtn) {
-        showMoreBtn.textContent = expanded ? labelLess : labelMore;
+        showMoreBtn.textContent = expanded ? labelLess : labelMore.replace('{n}', String(remaining));
         showMoreBtn.setAttribute('aria-expanded', String(expanded));
       }
+      remainingNow = remaining;
     }
     applyVisibility();
-    applyVisibilityRef = applyVisibility;
+    applyVisibilityRef = () => {
+      shown = initial;
+      applyVisibility();
+    };
 
     if (showMoreBtn) {
       // onclick (no addEventListener): bindCards puede correr dos veces y no
       // debe duplicar el manejador.
       showMoreBtn.onclick = () => {
-        expanded = !expanded;
-        applyVisibility();
-        // Al contraer, la pagina se queda en el inicio de la seccion en vez
-        // de dejar al visitante perdido mas abajo.
-        if (!expanded) document.getElementById('proyectos')?.scrollIntoView?.({ block: 'start' });
+        if (remainingNow > 0) {
+          shown += batch;
+          applyVisibility();
+        } else {
+          shown = initial;
+          applyVisibility();
+          // Al contraer, la pagina se queda en el inicio de la seccion en vez
+          // de dejar al visitante perdido mas abajo.
+          document.getElementById('proyectos')?.scrollIntoView?.({ block: 'start' });
+        }
       };
     }
   }
@@ -391,10 +408,8 @@ export function initProjects(): void {
             btn.classList.add('is-active');
             btn.setAttribute('aria-pressed', 'true');
 
-            // Cambiar de filtro tambien revela el resto: limitar a 7 solo
-            // tiene sentido en la vista "todos" sin filtrar.
+            // Cambiar de filtro reinicia el limite progresivo.
             activeFilter = btn.getAttribute('data-filter') || 'all';
-            expanded = true;
             applyVisibilityRef();
           });
         });

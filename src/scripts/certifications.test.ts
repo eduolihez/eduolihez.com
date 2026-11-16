@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { initCerts, safeUrl, DEFAULT_LIMIT } from './certifications';
+import { initCerts, safeUrl, issuerInitials, DEFAULT_LIMIT } from './certifications';
 
 function setupGrid() {
   document.body.innerHTML = `
@@ -109,6 +109,42 @@ describe('initCerts()', () => {
     expect([...grid.querySelectorAll('img')].every((img) => img.alt === '')).toBe(true);
   });
 
+  it('con logo: insignia 56x56 con img decorativa; sin logo: monograma del emisor (ambas ramas)', async () => {
+    const grid = setupGrid();
+    mockFetchOnce({
+      ok: true,
+      json: () =>
+        Promise.resolve([
+          { ...sampleCert, logo_url: 'https://x.test/a.png' },
+          { ...sampleCert, issuer: 'Trend Micro', logo_url: '' },
+          { ...sampleCert, issuer: 'Cisco', logo_url: 'javascript:alert(1)' },
+        ]),
+    });
+
+    initCerts();
+    await vi.waitFor(() => expect(grid.querySelectorAll('.cert-row').length).toBe(3));
+
+    const [withLogo, mono, mono2] = Array.from(grid.querySelectorAll('.cert-row'));
+    const img = withLogo.querySelector('.cert-badge img')!;
+    expect(img.getAttribute('width')).toBe('56');
+    expect(img.getAttribute('height')).toBe('56');
+    expect((img as HTMLImageElement).loading).toBe('lazy');
+    expect(img.getAttribute('alt')).toBe('');
+    expect(withLogo.querySelector('.cert-badge--mono')).toBeNull();
+    expect(mono.querySelector('img')).toBeNull();
+    expect(mono.querySelector('.cert-badge--mono')?.textContent).toBe('TM');
+    expect(mono.querySelector('.cert-badge--mono')?.getAttribute('aria-hidden')).toBe('true');
+    expect(mono2.querySelector('.cert-badge--mono')?.textContent).toBe('CI');
+  });
+
+  it('issuerInitials: dos palabras, una palabra, vacio', () => {
+    expect(issuerInitials('Trend Micro')).toBe('TM');
+    expect(issuerInitials('tryhackme')).toBe('TR');
+    expect(issuerInitials('X')).toBe('X');
+    expect(issuerInitials('')).toBe('·');
+    expect(issuerInitials(undefined)).toBe('·');
+  });
+
   it('la fila es un enlace de verificacion solo si hay credential_url valida', async () => {
     const grid = setupGrid();
     mockFetchOnce({
@@ -141,7 +177,7 @@ describe('initCerts()', () => {
     await vi.waitFor(() => expect(grid.querySelector('.cert-row')).not.toBeNull());
 
     expect(grid.querySelector('img')).toBeNull();
-    expect(grid.querySelector('svg')).not.toBeNull();
+    expect(grid.querySelector('.cert-badge--mono')).not.toBeNull();
   });
 
   it('con filas ya pintadas en el build no muestra "cargando" ni las borra hasta tener datos', async () => {

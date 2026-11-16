@@ -118,6 +118,27 @@ function admin_header(string $title, string $active = ''): void
     }
 
     $navGroups    = space_nav($space, $counts);
+
+    // Barra inferior (< 1024 px): 4 destinos fijos + "Mas" (abre el cajon).
+    // Usa el href del menu del espacio si la pagina esta en el; si no, el del
+    // espacio del sitio (mensajes, blog y analitica viven ahi).
+    $navHref = static function (string $page, string $fallback) use ($navGroups): string {
+        foreach ($navGroups as $g) {
+            foreach ($g['items'] as $it) {
+                if ($it['page'] === $page) {
+                    return (string) $it['href'];
+                }
+            }
+        }
+        return $fallback;
+    };
+    $contentPages = ['posts.php', 'post-edit.php', 'projects.php', 'project-edit.php', 'certifications.php', 'cert-edit.php'];
+    $bottomNav = [
+        ['label' => 'Hoy', 'icon' => 'grid', 'href' => $navHref('index.php', 'index.php'), 'on' => $active === 'index.php'],
+        ['label' => 'Mensajes', 'icon' => 'mail', 'href' => $navHref('messages.php', 'messages.php?space=site'), 'on' => $active === 'messages.php', 'badge' => (int) ($counts['unread'] ?? 0)],
+        ['label' => 'Contenido', 'icon' => 'edit', 'href' => $navHref('posts.php', 'posts.php?space=site'), 'on' => in_array($active, $contentPages, true)],
+        ['label' => 'Analítica', 'icon' => 'chart', 'href' => $navHref('analytics.php', 'analytics.php'), 'on' => $active === 'analytics.php'],
+    ];
     $spaceOptions = space_options($appsRows);
     $spaceLabel   = $space;
     foreach ($spaceOptions as $opt) {
@@ -228,7 +249,7 @@ function admin_header(string $title, string $active = ''): void
           <p class="nav-group-label"><?= e($group['label']) ?></p>
         <?php endif; ?>
         <?php foreach ($group['items'] as $item): ?>
-          <a href="<?= e($item['href']) ?>" class="menu-item <?= $active === $item['page'] ? 'active' : '' ?>">
+          <a href="<?= e($item['href']) ?>" class="menu-item <?= $active === $item['page'] ? 'active' : '' ?>"<?= $active === $item['page'] ? ' aria-current="page"' : '' ?>>
             <span class="menu-icon"><?= nav_icon($item['icon']) ?></span>
             <span class="menu-label"><?= e($item['label']) ?></span>
             <?php if ($item['badge'] !== ''): ?>
@@ -275,15 +296,24 @@ function admin_header(string $title, string $active = ''): void
   <div class="main-content-wrapper">
     <header class="topbar">
       <div class="topbar-left">
-        <button id="sidebar-open-btn" class="sidebar-toggle-btn mobile-only" aria-label="Abrir menu">
-          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" /></svg>
-        </button>
         <span class="topbar-title"><?= e($title) ?></span>
       </div>
       <div class="topbar-right">
         <button type="button" data-palette-open class="topbar-kbd" aria-label="Abrir paleta de comandos" aria-keyshortcuts="Control+K Meta+K"><b aria-hidden="true">⌘</b><span aria-hidden="true">K</span></button>
       </div>
     </header>
+    <nav class="bottom-nav" aria-label="Navegación principal">
+      <?php foreach ($bottomNav as $b): ?>
+        <a href="<?= e($b['href']) ?>" class="bottom-nav-item<?= $b['on'] ? ' active' : '' ?>"<?= $b['on'] ? ' aria-current="page"' : '' ?>>
+          <span class="bottom-nav-icon"><?= nav_icon($b['icon']) ?><?php if (!empty($b['badge'])): ?><span class="bottom-nav-badge"><?= e((string) $b['badge']) ?></span><?php endif; ?></span>
+          <span class="bottom-nav-label"><?= e($b['label']) ?></span>
+        </a>
+      <?php endforeach; ?>
+      <button id="sidebar-open-btn" type="button" class="bottom-nav-item sidebar-toggle-btn mobile-only" aria-label="Abrir menu: más secciones" aria-controls="admin-sidebar">
+        <span class="bottom-nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" /></svg></span>
+        <span class="bottom-nav-label">Más</span>
+      </button>
+    </nav>
     <main>
 <?php
 }

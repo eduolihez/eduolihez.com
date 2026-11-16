@@ -365,68 +365,99 @@ $icoInbox   = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fi
 $icoClock   = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
 $icoShield  = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>';
 
-admin_header('Panel', 'index.php');
+admin_header('Hoy', 'index.php');
 show_flash();
 ?>
-<?php page_header('Hola, ' . current_admin() . ' 👋'); ?>
+<?php
+// "Hoy": primero lo que pide accion (solo con datos que esta pagina ya
+// calcula), luego metricas en una tabla compacta.
+$certsHidden = max(0, $certsTotal - $certs);
+$todo = [
+    ['n' => $unread, 'title' => 'Mensajes sin leer', 'sub' => number_format($msgTotal) . ' en total', 'href' => 'messages.php?space=site', 'cta' => 'Leer'],
+    ['n' => $postsDraft, 'title' => 'Borradores del blog', 'sub' => $postsVisible . ' entradas publicadas', 'href' => 'posts.php?space=site', 'cta' => 'Revisar'],
+    ['n' => $drafts, 'title' => 'Proyectos sin publicar', 'sub' => $published . ' publicados', 'href' => 'projects.php?space=site', 'cta' => 'Revisar'],
+    ['n' => $certsHidden, 'title' => 'Certificaciones ocultas', 'sub' => $certs . ' visibles', 'href' => 'certifications.php?space=site', 'cta' => 'Revisar'],
+];
+$pending = array_values(array_filter($todo, static fn(array $t): bool => $t['n'] > 0));
+$failedTxt = $failedLogins === null ? 'no disponible' : (string) $failedLogins;
+page_header('Hoy', 'Lo que pide atención ahora y cómo va la web.');
+?>
 
 <?php foreach ($warnings as [$type, $html]): ?>
   <div class="flash <?= $type === 'danger' ? 'err' : 'warn' ?>"><?= $html ?></div>
 <?php endforeach; ?>
 
-<?php h2_icon($icoTraffic, 'Trafico'); ?>
-<div class="grid4">
-  <div class="card stat">
-    <div class="num"><?= number_format($visitsToday) ?><?= delta_badge($visitsToday, $visitsYest) ?></div>
-    <div class="lbl">Visitas hoy<br><span class="faint">ayer: <?= number_format($visitsYest) ?></span></div>
-    <?= sparkline($sparkVisits) ?>
-  </div>
-  <div class="card stat">
-    <div class="num cyan"><?= number_format($visits7) ?><?= delta_badge($visits7, $visitsPrev7) ?></div>
-    <div class="lbl">Ultimos 7 dias<br><span class="faint">vs. 7 anteriores</span></div>
-    <?= sparkline(array_slice($sparkVisits, -7), 'cyan') ?>
-  </div>
-  <div class="card stat">
-    <div class="num violet"><?= number_format($uniques30) ?></div>
-    <div class="lbl">Visitantes unicos<br><span class="faint">ultimos 30 dias · tendencia 14 d</span></div>
-    <?= sparkline($sparkUniques, 'violet') ?>
-  </div>
-  <div class="card stat">
-    <div class="num"><?= number_format($visitsTotal) ?></div>
-    <div class="lbl">Visitas totales<br><span class="faint"><?= number_format($botsRecent) ?> bots filtrados (30 d)</span></div>
-  </div>
+<div class="row2">
+  <section aria-labelledby="hoy-pendiente">
+    <h2 id="hoy-pendiente">Pendiente</h2>
+    <div class="card p-0">
+      <?php if (!$pending): ?>
+        <p class="today-ok">Nada pendiente: no hay mensajes sin leer y todo el contenido está publicado.</p>
+      <?php else: ?>
+        <ul class="today-list">
+          <?php foreach ($pending as $t): ?>
+            <li class="today-item">
+              <span class="today-count<?= $t['href'] === 'messages.php?space=site' ? ' is-due' : '' ?>"><?= (int) $t['n'] ?></span>
+              <span class="today-text"><strong><?= e($t['title']) ?></strong><span><?= e($t['sub']) ?></span></span>
+              <a class="today-action" href="<?= e($t['href']) ?>"><?= e($t['cta']) ?></a>
+            </li>
+          <?php endforeach; ?>
+        </ul>
+      <?php endif; ?>
+    </div>
+  </section>
+
+  <section aria-labelledby="hoy-sistema">
+    <h2 id="hoy-sistema">Estado del sistema</h2>
+    <div class="card p-0">
+      <ul class="today-list">
+        <li class="today-item">
+          <span class="today-text"><strong>Accesos fallidos (7 d)</strong><span><?= $failedLogins === null ? 'La consulta falló: revisa la base de datos.' : ($failedLogins >= 20 ? 'Muchos intentos: revisa el origen.' : 'Dentro de lo normal.') ?></span></span>
+          <span class="meta"><?= e($failedTxt) ?></span>
+          <a class="today-action" href="security.php">Seguridad</a>
+        </li>
+        <li class="today-item">
+          <span class="today-text"><strong>Conexión</strong><span><?= $isHttps ? 'HTTPS activo.' : 'Sin HTTPS: entra siempre por https://' ?></span></span>
+          <span class="meta"><?= $isHttps ? 'https' : 'http' ?></span>
+        </li>
+        <li class="today-item">
+          <span class="today-text"><strong>Copia de seguridad</strong><span>Descárgala antes de cambios grandes.</span></span>
+          <a class="today-action" href="backup.php">Abrir</a>
+        </li>
+      </ul>
+    </div>
+  </section>
 </div>
 
-<div class="card">
-  <h3>Ultimos 14 dias</h3>
-  <div class="chart">
-    <?php foreach ($daily as $r): ?>
-      <?php $h = (int) round(((int) $r['c'] / $maxDay) * 120); ?>
-      <div class="col">
-        <div class="val"><?= (int) $r['c'] ?></div>
-        <div class="bar-v" style="height:<?= max(3, $h) ?>px" title="<?= e($r['d']) ?>: <?= (int) $r['c'] ?> visitas · <?= (int) $r['u'] ?> unicos"></div>
-        <div class="tick"><?= e(date('d/m', strtotime($r['d']))) ?></div>
-      </div>
-    <?php endforeach; ?>
-  </div>
-  <p class="hint">Solo visitas humanas: los bots y rastreadores se excluyen del conteo.
-    Detalle completo en <a href="analytics.php">Analitica</a>.</p>
+<h2>Métricas</h2>
+<div class="card p-0">
+  <table class="metrics-table">
+    <thead><tr><th scope="col">Métrica</th><th scope="col">Valor</th><th scope="col">Comparación</th></tr></thead>
+    <tbody>
+      <tr><td>Visitas hoy</td><td><?= number_format($visitsToday) ?></td><td class="muted">ayer <?= number_format($visitsYest) ?> <?= delta_badge($visitsToday, $visitsYest) ?></td></tr>
+      <tr><td>Visitas, 7 días</td><td><?= number_format($visits7) ?></td><td class="muted">7 anteriores <?= number_format($visitsPrev7) ?> <?= delta_badge($visits7, $visitsPrev7) ?></td></tr>
+      <tr><td>Visitantes únicos, 30 días</td><td><?= number_format($uniques30) ?></td><td class="muted">—</td></tr>
+      <tr><td>Visitas totales</td><td><?= number_format($visitsTotal) ?></td><td class="muted"><?= number_format($botsRecent) ?> bots filtrados (30 d)</td></tr>
+      <tr><td>Mensajes, 30 días</td><td><?= number_format($msg30) ?></td><td class="muted">30 anteriores <?= number_format($msgPrev30) ?> <?= delta_badge($msg30, $msgPrev30) ?></td></tr>
+    </tbody>
+  </table>
 </div>
+<p class="hint">Solo visitas humanas. Detalle completo en <a href="analytics.php">Analítica</a>.</p>
 
 <div class="row2">
   <div>
-    <h2>Canales de trafico <span class="faint" style="font-weight:500;">(30 d)</span></h2>
+    <h2>Canales de tráfico <span class="meta">30 d</span></h2>
     <div class="card">
-      <?php if (!$channels): ?><div class="empty">Sin datos de tráfico todavía.</div><?php endif; ?>
+      <?php if (!$channels): ?><div class="empty">Sin visitas en 30 días. Cuando lleguen, aquí verás de dónde vienen.</div><?php endif; ?>
       <?php foreach ($channels as $name => $c): ?>
         <?php bar_row((string) $name, $c, $maxChannel, 'green'); ?>
       <?php endforeach; ?>
     </div>
   </div>
   <div>
-    <h2>Dispositivos <span class="faint" style="font-weight:500;">(30 d)</span></h2>
+    <h2>Dispositivos <span class="meta">30 d</span></h2>
     <div class="card">
-      <?php if (!$deviceRows): ?><div class="empty">Sin datos de tráfico todavía.</div><?php endif; ?>
+      <?php if (!$deviceRows): ?><div class="empty">Sin visitas en 30 días.</div><?php endif; ?>
       <?php foreach ($deviceRows as $r): ?>
         <?php bar_row($deviceLabels[$r['k']] ?? $r['k'], (int) $r['c'], $maxDevice, 'violet'); ?>
       <?php endforeach; ?>
@@ -434,46 +465,9 @@ show_flash();
   </div>
 </div>
 
-<?php h2_icon($icoContent, 'Contenido'); ?>
-<div class="grid4">
-  <div class="card stat">
-    <div class="num"><?= $published ?></div>
-    <div class="lbl">Proyectos publicados<br><span class="faint"><?= $drafts ?> en borrador</span></div>
-  </div>
-  <div class="card stat">
-    <div class="num cyan"><?= $certs ?></div>
-    <div class="lbl">Certificaciones visibles<br><span class="faint"><?= $certsTotal ?> en total</span></div>
-  </div>
-  <div class="card stat">
-    <div class="num violet"><?= $postsVisible ?></div>
-    <div class="lbl">Entradas de blog<br><span class="faint"><?= $postsDraft ?> en borrador</span></div>
-  </div>
-</div>
-
-<?php h2_icon($icoInbox, 'Buzon'); ?>
-<div class="grid4">
-  <div class="card stat">
-    <div class="num <?= $unread > 0 ? 'warn' : '' ?>"><?= $unread ?></div>
-    <div class="lbl">Mensajes sin leer<br><span class="faint"><?= number_format($msgTotal) ?> en total</span></div>
-  </div>
-  <div class="card stat">
-    <div class="num violet"><?= $msg30 ?><?= delta_badge($msg30, $msgPrev30) ?></div>
-    <div class="lbl">Mensajes (30 dias)<br><span class="faint">vs. 30 anteriores</span></div>
-    <?= sparkline($msgSpark, 'violet') ?>
-  </div>
-  <div class="card stat">
-    <div class="num cyan"><?= $msgStarred ?></div>
-    <div class="lbl">Destacados<br><span class="faint">en bandeja de entrada</span></div>
-  </div>
-  <div class="card stat">
-    <div class="num"><?= $msgArchived ?></div>
-    <div class="lbl">Archivados<br><span class="faint">fuera de la bandeja</span></div>
-  </div>
-</div>
-
 <div class="row3">
   <div>
-    <h2>Ultimos mensajes</h2>
+    <h2>Últimos mensajes</h2>
     <div class="card p-0">
       <table>
         <tbody>
@@ -492,7 +486,7 @@ show_flash();
                 <?php endif; ?>
                 <div class="faint"><?= e($m['subject'] !== '' ? $m['subject'] : '(sin asunto)') ?></div>
               </td>
-              <td class="faint nowrap text-right"><?= e(ago($m['created_at'])) ?></td>
+              <td class="meta nowrap text-right"><?= e(ago($m['created_at'])) ?></td>
             </tr>
           <?php endforeach; ?>
         </tbody>

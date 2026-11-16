@@ -351,6 +351,28 @@ CREATE TABLE IF NOT EXISTS `visits` (
   KEY `idx_country` (`country`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Eventos de la analitica propia (descargas de CV, enlaces salientes, cambio
+-- de idioma/tema, envio de contacto, 404). Nombres validados por allowlist en
+-- server/lib/events.php.
+-- PRIVACIDAD: sin IP (ni hasheada) y sin user-agent en texto; solo `device` e
+-- `is_bot` derivados. session_id es el token de sessionStorage (muere con la
+-- pestana). Se purga sola: se borran los eventos de mas de 400 dias.
+CREATE TABLE IF NOT EXISTS `site_events` (
+  `id`         BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `name`       VARCHAR(24)  NOT NULL,
+  `target`     VARCHAR(80)  NULL,
+  `path`       VARCHAR(120) NOT NULL,
+  `lang`       CHAR(2)      NULL,
+  `session_id` CHAR(16)     NULL,
+  `country`    CHAR(2)      NULL,
+  `device`     VARCHAR(10)  NULL,
+  `is_bot`     TINYINT(1)   NOT NULL DEFAULT 0,
+  `created_at` DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_created` (`created_at`),
+  KEY `idx_name_time` (`name`, `created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Telemetria generica de las apps registradas en `apps` (arriba, seccion 1):
 -- instalaciones, errores, clics... lo que cada app quiera reportar. A
 -- diferencia de `visits` (forma fija, pagina vista de ESTE sitio), aqui el

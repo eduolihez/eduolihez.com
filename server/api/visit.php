@@ -7,6 +7,7 @@
  *
  * Dos acciones, seleccionadas por el campo "action" del body:
  *   - "hit" (o ausente, por compatibilidad): registra una pagina vista.
+ *   - "event": guarda un evento validado (lib/events.php) en site_events.
  *   - "beat": actualiza duration_s/scroll_pct de un "hit" ya insertado,
  *     localizandolo por hit_id. hit_id y session_id son tokens generados en
  *     el navegador (16 hex) que NO son identificadores persistentes: hit_id
@@ -35,6 +36,7 @@
 require_once __DIR__ . '/../lib/http.php';
 require_once __DIR__ . '/../lib/ua.php';
 require_once __DIR__ . '/../lib/visitor.php';
+require_once __DIR__ . '/../lib/events.php';
 
 apply_cors();
 
@@ -110,7 +112,8 @@ function resolve_app_id(string $slug): ?int
 }
 
 $input = read_json_body();
-$action = ($input['action'] ?? 'hit') === 'beat' ? 'beat' : 'hit';
+$rawAction = $input['action'] ?? 'hit';
+$action = in_array($rawAction, ['beat', 'event'], true) ? $rawAction : 'hit';
 
 $ua = mb_substr((string) ($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 255);
 
@@ -167,6 +170,59 @@ try {
              WHERE hit_id = ? AND ip_hash = ? ORDER BY id DESC LIMIT 1'
         );
         $stmt->execute([$duration, $scroll, $hitId, $ipHash]);
+        no_content();
+    }
+
+    // --- action=event: evento validado (lib/events.php) en site_events -----
+    if ($action === 'event') {
+        $ev = normalize_event($input);
+        if ($ev === null) {
+            no_content();
+        }
+        try {
+            // site_events no guarda ip_hash (privacidad), asi que el tope es
+            // global por minuto y, si hay session_id, por sesion.
+            $capEv = db()->prepare(
+                'SELECT COUNT(*), SUM(session_id <=> ?) FROM site_events
+                 WHERE created_at > (NOW() - INTERVAL 1 MINUTE)'
+            );
+            $capEv->execute([$ev['session_id']]);
+            [$total, $mine] = $capEv->fetch(PDO::FETCH_NUM);
+            if ((int) $total >= 300 || ($ev['session_id'] !== null && (int) $mine >= 20)) {
+                no_content();
+            }
+
+            $infoEv = ua_parse($ua);
+            $countryEv = strtoupper(mb_substr((string) ($_SERVER['HTTP_CF_IPCOUNTRY'] ?? ''), 0, 2));
+            $langEv = preg_match('#^/(en|ca)(/|$)#', $ev['path'], $mm) ? $mm[1] : 'es';
+            db()->prepare(
+                'INSERT INTO site_events
+                    (name, target, path, lang, session_id, country, device, is_bot, created_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())'
+            )->execute([
+                $ev['name'],
+                $ev['target'],
+                $ev['path'],
+                $langEv,
+                $ev['session_id'],
+                preg_match('/^[A-Z]{2}$/', $countryEv) ? $countryEv : null,
+                $infoEv['device'],
+                $infoEv['is_bot'] ? 1 : 0,
+            ]);
+        } catch (PDOException $e) {
+            // Tabla aun sin migrar (42S02 / 1146) u otro fallo: nunca 500.
+            error_log('visit.php event: ' . $e->getMessage());
+            no_content();
+        }
+
+        // Purga probabilistica (~1%) en su propio try: sin tabla no rompe nada.
+        if (random_int(1, 100) === 1) {
+            try {
+                db()->query('DELETE FROM site_events WHERE created_at < (NOW() - INTERVAL 400 DAY)');
+            } catch (Throwable $e) {
+                error_log('visit.php event purge: ' . $e->getMessage());
+            }
+        }
         no_content();
     }
 

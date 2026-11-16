@@ -22,7 +22,7 @@ if ($isEdit) {
     $stmt->execute([$id]);
     $row = $stmt->fetch();
     if (!$row) {
-        set_flash('err', 'Certificacion no encontrada.');
+        set_flash('err', 'Certificación no encontrada.');
         redirect('certifications.php');
     }
     $c = array_merge($c, $row);
@@ -62,7 +62,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     // "se cierra en origen".
     foreach ([
         'logo_url'       => 'La URL del logo',
-        'credential_url' => 'La URL de verificacion',
+        'credential_url' => 'La URL de verificación',
     ] as $field => $label) {
         if ($err = validate_public_url($c[$field], $label)) {
             $errors[] = $err;
@@ -125,7 +125,7 @@ if (!empty($errors)) {
     </div>
   </div>
 
-  <label for="credential_url">URL de verificacion</label>
+  <label for="credential_url">URL de verificación</label>
   <input type="url" id="credential_url" name="credential_url" maxlength="255" value="<?= e($c['credential_url']) ?>" placeholder="https://www.credly.com/...">
 
   <label for="logo_file">Logo (imagen)</label>
@@ -139,12 +139,12 @@ if (!empty($errors)) {
 
   <label for="logo_url" class="mt-2">...o URL del logo (opcional)</label>
   <input type="text" id="logo_url" name="logo_url" maxlength="255" value="<?= e($c['logo_url']) ?>" placeholder="/uploads/certs/logo.png">
-  <div class="hint">Si lo dejas vacio se muestra la inicial del emisor. Si pegas una URL externa,
+  <div class="hint">Si lo dejas vacío se muestra la inicial del emisor. Si pegas una URL externa,
   debe empezar por <code>https://</code> o por <code>/</code> (ruta interna).</div>
 
   <div class="row2">
     <div>
-      <label for="category">Categoria <span class="faint">(opcional)</span></label>
+      <label for="category">Categoría <span class="faint">(opcional)</span></label>
       <input type="text" id="category" name="category" maxlength="60" value="<?= e($c['category']) ?>" placeholder="Cloud Security">
     </div>
     <div>

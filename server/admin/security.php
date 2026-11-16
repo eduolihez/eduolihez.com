@@ -64,7 +64,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
             // la cookie, deja de servirle.
             session_regenerate_id(true);
             log_activity('password_change', 'admin_user', (int) $_SESSION['admin_id'], 'Contrasena actualizada');
-            set_flash('ok', 'Contrasena actualizada correctamente.');
+            set_flash('ok', 'Contraseña actualizada correctamente.');
             redirect('security.php');
         }
     }
@@ -128,14 +128,14 @@ $checks = [
     ['Modo debug desactivado', empty($cfg['debug']),
      'Con debug activo, cualquier error muestra rutas internas del servidor.'],
     ['Panel servido por HTTPS', $isHttps,
-     'Sin HTTPS, tu usuario y contrasena viajan en texto plano.'],
+     'Sin HTTPS, tu usuario y contraseña viajan en texto plano.'],
     ['setup.php eliminado del servidor', !is_file(__DIR__ . '/setup.php'),
      'Ya no puede crear usuarios, pero es un archivo innecesario expuesto.'],
     ['Sal de hasheo de IPs personalizada', $salt !== '' && !str_starts_with($salt, 'CAMBIA_ESTO') && strlen($salt) >= 24,
      'La sal debe ser larga y unica: protege las IPs de tus visitantes.'],
     ['Bloqueo por fuerza bruta activo', $maxAttempts > 0 && $maxAttempts <= 10,
      'Limita los intentos de acceso desde una misma IP.'],
-    ['Version de PHP soportada', version_compare(PHP_VERSION, '8.1', '>='),
+    ['Versión de PHP soportada', version_compare(PHP_VERSION, '8.1', '>='),
      'Las versiones antiguas dejan de recibir parches de seguridad.'],
     ['Confianza en proxy coherente con Cloudflare', !empty($cfg['security']['trust_proxy']),
      'Con Cloudflare delante, trust_proxy debe estar a true para ver la IP real del visitante.'],
@@ -159,7 +159,7 @@ show_flash();
   </div>
   <div class="card stat">
     <div class="num warn"><?= number_format($stats['fails_7d']) ?></div>
-    <div class="lbl">Intentos fallidos (7 dias)</div>
+    <div class="lbl">Intentos fallidos (7 días)</div>
   </div>
   <div class="card stat">
     <div class="num"><?= number_format($stats['ok_30d']) ?></div>
@@ -167,7 +167,7 @@ show_flash();
   </div>
 </div>
 
-<h2>Revision de la configuracion</h2>
+<h2>Revisión de la configuración</h2>
 <div class="card p-0">
   <table>
     <tbody>
@@ -188,7 +188,7 @@ show_flash();
 <p class="hint">Estas comprobaciones leen <code>server/config.php</code> y el entorno del servidor.
   Los valores se cambian en ese archivo por FTP.</p>
 
-<h2>Cambiar contrasena</h2>
+<h2>Cambiar contraseña</h2>
 <?php if ($pwErrors): ?>
   <div class="flash err"><?= e(implode(' ', $pwErrors)) ?></div>
 <?php endif; ?>
@@ -196,25 +196,25 @@ show_flash();
   <?= csrf_field() ?>
   <input type="hidden" name="action" value="password">
 
-  <label for="current_password">Contrasena actual</label>
+  <label for="current_password">Contraseña actual</label>
   <input type="password" id="current_password" name="current_password" required autocomplete="current-password">
 
-  <label for="new_password">Nueva contrasena</label>
+  <label for="new_password">Nueva contraseña</label>
   <input type="password" id="new_password" name="new_password" required minlength="12" autocomplete="new-password">
-  <div class="hint">Minimo 12 caracteres. Usa una frase larga o un gestor de contrasenas.</div>
+  <div class="hint">Mínimo 12 caracteres. Usa una frase larga o un gestor de contraseñas.</div>
 
-  <label for="confirm_password">Repite la nueva contrasena</label>
+  <label for="confirm_password">Repite la nueva contraseña</label>
   <input type="password" id="confirm_password" name="confirm_password" required minlength="12" autocomplete="new-password">
 
   <div style="margin-top:1.4rem;">
-    <button type="submit" class="btn">Actualizar contrasena</button>
+    <button type="submit" class="btn">Actualizar contraseña</button>
   </div>
 </form>
 
 <h2>IPs bloqueadas ahora mismo</h2>
 <div class="card p-0">
   <table>
-    <thead><tr><th>IP</th><th>Fallos</th><th>Ultimo intento</th><th class="text-right">Accion</th></tr></thead>
+    <thead><tr><th>IP</th><th>Fallos</th><th>Último intento</th><th class="text-right">Acción</th></tr></thead>
     <tbody>
       <?php if (!$blocked): ?>
         <tr><td colspan="4" class="empty">Ninguna IP bloqueada. Todo tranquilo.</td></tr>
@@ -241,7 +241,7 @@ show_flash();
 </div>
 <p class="hint">Una IP se bloquea tras <?= $maxAttempts ?> intentos fallidos y se libera
   sola pasados <?= $lockMinutes ?> minutos. Si te has bloqueado tu mismo desde otra red,
-  puedes desbloquearte aqui.</p>
+  puedes desbloquearte aquí.</p>
 
 <div class="toolbar" style="margin-top:1.75rem;">
   <h2 style="margin:0;">Intentos de acceso recientes</h2>
@@ -272,11 +272,11 @@ show_flash();
   </div>
 </div>
 
-<h2>Registro de auditoria</h2>
+<h2>Registro de auditoría</h2>
 <div class="card p-0">
   <div class="scroll-x">
     <table>
-      <thead><tr><th>Accion</th><th>Detalle</th><th>Usuario</th><th>IP</th><th>Cuando</th></tr></thead>
+      <thead><tr><th>Acción</th><th>Detalle</th><th>Usuario</th><th>IP</th><th>Cuando</th></tr></thead>
       <tbody>
         <?php if (!$activity): ?>
           <tr><td colspan="5" class="empty">Aún no hay acciones registradas. Se anotan a partir de ahora.</td></tr>
@@ -299,7 +299,7 @@ show_flash();
     </table>
   </div>
 </div>
-<p class="hint">Los registros de auditoria se conservan 365 dias y los intentos de
-  acceso 90; despues se purgan solos.</p>
+<p class="hint">Los registros de auditoría se conservan 365 días y los intentos de
+  acceso 90; después se purgan solos.</p>
 
 <?php admin_footer(); ?>

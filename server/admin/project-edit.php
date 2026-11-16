@@ -101,7 +101,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     foreach ([
         'image_url' => 'La URL de la imagen',
         'repo_url'  => 'La URL del repositorio',
-        'demo_url'  => 'La URL de la pagina del proyecto',
+        'demo_url'  => 'La URL de la página del proyecto',
         'store_url' => 'La URL de la tienda',
     ] as $field => $label) {
         if ($err = validate_public_url($p[$field], $label)) {
@@ -169,11 +169,11 @@ if (!empty($errors)) {
 
   <div class="row2">
     <div>
-      <label for="title_es">Titulo (ES) *</label>
+      <label for="title_es">Título (ES) *</label>
       <input type="text" id="title_es" name="title_es" required maxlength="150" value="<?= e($p['title_es']) ?>">
     </div>
     <div>
-      <label for="title_en">Titulo (EN)</label>
+      <label for="title_en">Título (EN)</label>
       <input type="text" id="title_en" name="title_en" maxlength="150" value="<?= e($p['title_en']) ?>">
     </div>
   </div>
@@ -191,11 +191,11 @@ if (!empty($errors)) {
 
   <div class="row2">
     <div>
-      <label for="description_es">Descripcion larga (ES) <span class="faint">(opcional)</span></label>
+      <label for="description_es">Descripción larga (ES) <span class="faint">(opcional)</span></label>
       <textarea id="description_es" name="description_es"><?= e($p['description_es']) ?></textarea>
     </div>
     <div>
-      <label for="description_en">Descripcion larga (EN) <span class="faint">(opcional)</span></label>
+      <label for="description_en">Descripción larga (EN) <span class="faint">(opcional)</span></label>
       <textarea id="description_en" name="description_en"><?= e($p['description_en']) ?></textarea>
     </div>
   </div>
@@ -211,7 +211,7 @@ if (!empty($errors)) {
 
   <label for="image_url" class="mt-2">...o URL de imagen (opcional)</label>
   <input type="text" id="image_url" name="image_url" maxlength="255" value="<?= e($p['image_url']) ?>" placeholder="/uploads/projects/mi-imagen.jpg">
-  <div class="hint">Si subes un archivo arriba, este campo se rellena solo. Tambien puedes pegar una URL externa: debe empezar por <code>https://</code> o por <code>/</code> (ruta interna).</div>
+  <div class="hint">Si subes un archivo arriba, este campo se rellena solo. También puedes pegar una URL externa: debe empezar por <code>https://</code> o por <code>/</code> (ruta interna).</div>
 
   <label for="stack">Stack tecnologico</label>
   <input type="text" id="stack" name="stack" value="<?= e($p['stack']) ?>" placeholder="Next.js, TypeScript, Tailwind">
@@ -253,8 +253,8 @@ if (!empty($errors)) {
       <input type="number" id="sort_order" name="sort_order" value="<?= (int) $p['sort_order'] ?>">
       <div class="hint">
         Ya no decide el orden en la web: la portada muestra primero los <strong>destacados</strong>
-        y despues por <strong>ultima actualizacion</strong> (mas reciente primero), automaticamente.
-        Este numero se conserva por si algun dia vuelve a hacer falta un orden curado a mano.
+        y después por <strong>última actualización</strong> (más reciente primero), automáticamente.
+        Este número se conserva por si algún día vuelve a hacer falta un orden curado a mano.
       </div>
     </div>
     <div>

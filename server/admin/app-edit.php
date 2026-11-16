@@ -91,7 +91,7 @@ if ($errors) {
   <label for="slug">Slug *</label>
   <input type="text" id="slug" name="slug" required maxlength="60"
          value="<?= e($a['slug']) ?>" placeholder="bloomgram" pattern="[a-z0-9-]+">
-  <div class="hint">Solo minusculas, numeros y guiones. Identifica la app en la URL del sub-dashboard.</div>
+  <div class="hint">Solo minúsculas, números y guiones. Identifica la app en la URL del sub-dashboard.</div>
 
   <label for="allowed_origins">Orígenes permitidos</label>
   <textarea id="allowed_origins" name="allowed_origins" rows="4"

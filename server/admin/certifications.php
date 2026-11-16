@@ -29,7 +29,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
                     db()->prepare('DELETE FROM certifications WHERE id = ?')->execute([$id]);
                     delete_upload($row['logo_url'] ?? null);
                     log_activity('delete', 'certification', $id, 'Certificacion: ' . $row['name']);
-                    set_flash('ok', 'Certificacion eliminada.');
+                    set_flash('ok', 'Certificación eliminada.');
                     break;
 
                 case 'toggle_visible':
@@ -77,7 +77,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
                     )->execute([$id]);
                     log_activity('create', 'certification', (int) db()->lastInsertId(),
                         'Duplicado de: ' . $row['name']);
-                    set_flash('ok', 'Certificacion duplicada (oculta). Editala para ajustarla.');
+                    set_flash('ok', 'Certificación duplicada (oculta). Edítala para ajustarla.');
                     break;
             }
         }
@@ -152,7 +152,7 @@ show_flash();
                 <div><span class="pill"><?= e($c['category']) ?></span></div>
               <?php endif; ?>
               <?php if (!empty($c['credential_url'])): ?>
-                <div class="faint" style="font-size:.75rem;">Con enlace de verificacion</div>
+                <div class="faint" style="font-size:.75rem;">Con enlace de verificación</div>
               <?php endif; ?>
             </td>
             <td role="cell" data-label="Emisor" class="muted"><?= e($c['issuer']) ?></td>
@@ -187,13 +187,13 @@ show_flash();
             <td role="cell" data-label="Acciones">
               <div class="actions justify-end">
                 <a class="btn ghost sm" href="cert-edit.php?id=<?= (int) $c['id'] ?>">Editar</a>
-                <form method="post" data-confirm="¿Duplicar esta certificacion?" class="d-inline">
+                <form method="post" data-confirm="¿Duplicar esta certificación?" class="d-inline">
                   <?= csrf_field() ?>
                   <input type="hidden" name="action" value="duplicate">
                   <input type="hidden" name="id" value="<?= (int) $c['id'] ?>">
                   <button type="submit" class="btn ghost sm">Duplicar</button>
                 </form>
-                <form method="post" data-confirm="¿Eliminar esta certificacion? Se borrara tambien su logo." class="d-inline">
+                <form method="post" data-confirm="¿Eliminar esta certificación? Se borrará también su logo." class="d-inline">
                   <?= csrf_field() ?>
                   <input type="hidden" name="action" value="delete">
                   <input type="hidden" name="id" value="<?= (int) $c['id'] ?>">

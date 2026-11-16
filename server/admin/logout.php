@@ -22,6 +22,6 @@ if (!$valid) {
     redirect('login.php');
 }
 
-log_activity('logout', 'admin_user', (int) ($_SESSION['admin_id'] ?? 0), 'Cierre de sesion');
+log_activity('logout', 'admin_user', (int) ($_SESSION['admin_id'] ?? 0), 'Cierre de sesión');
 logout_user();
 redirect('login.php');

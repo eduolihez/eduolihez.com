@@ -108,13 +108,13 @@ show_flash();
     </label>
   </div>
 
-  <h2>Analitica</h2>
+  <h2>Analítica</h2>
   <div class="card">
     <label class="checkline">
       <input type="checkbox" name="analytics_enabled" value="1" <?= $b('analytics_enabled', true) ? 'checked' : '' ?>>
       <span>
         <strong>Registrar visitas</strong>
-        <span class="hint">Guarda las visitas para la seccion Analitica (IP hasheada, sin
+        <span class="hint">Guarda las visitas para la sección Analítica (IP hasheada, sin
           cookies ni terceros). Si lo apagas, deja de registrarse nada nuevo; lo ya
           guardado se conserva.</span>
       </span>
@@ -127,8 +127,8 @@ show_flash();
       <input type="checkbox" name="announcement_on" value="1" <?= $b('announcement_on', false) ? 'checked' : '' ?>>
       <span>
         <strong>Mostrar el aviso en la web</strong>
-        <span class="hint">Aparece una franja fina arriba del todo, encima del menu.
-          Solo se muestra si ademas escribes un texto abajo.</span>
+        <span class="hint">Aparece una franja fina arriba del todo, encima del menú.
+          Solo se muestra si además escribes un texto abajo.</span>
       </span>
     </label>
 
@@ -157,7 +157,7 @@ show_flash();
     <label for="announcement_url">Enlace del aviso <span class="faint">(opcional)</span></label>
     <input type="text" id="announcement_url" name="announcement_url" maxlength="300"
            value="<?= e($v('announcement_url')) ?>" placeholder="https://www.linkedin.com/posts/... o /#proyectos">
-    <div class="hint">Debe empezar por <code>https://</code> o por <code>/</code>. Si lo dejas vacio,
+    <div class="hint">Debe empezar por <code>https://</code> o por <code>/</code>. Si lo dejas vacío,
       el aviso se muestra como texto sin enlace.</div>
   </div>
 
@@ -167,7 +167,7 @@ show_flash();
   </div>
 </form>
 
-<h2>Que NO se edita aqui</h2>
+<h2>Qué NO se edita aquí</h2>
 <div class="card p-0">
   <div class="scroll-x">
   <table>
@@ -185,7 +185,7 @@ show_flash();
     </tr>
     <tr>
       <th>Preguntas frecuentes (FAQ)</th>
-      <td class="muted"><code>src/data/faq.ts</code> — tambien alimentan el SEO y a las IAs.</td>
+      <td class="muted"><code>src/data/faq.ts</code> — también alimentan el SEO y a las IAs.</td>
     </tr>
     <tr>
       <th>Credenciales y seguridad</th>

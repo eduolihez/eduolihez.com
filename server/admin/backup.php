@@ -221,7 +221,7 @@ show_flash();
   <p class="muted" style="margin-top:0;">
     Genera un archivo <code>.json</code> con tus <strong>proyectos</strong>,
     <strong>certificaciones</strong> y <strong>ajustes</strong>. Guardalo en tu ordenador
-    o en la nube: si algo va mal en la base de datos, restauras desde aqui en 10 segundos.
+    o en la nube: si algo va mal en la base de datos, restauras desde aquí en 10 segundos.
   </p>
   <p class="hint">
     No incluye mensajes de contacto (datos personales de terceros: exportalos aparte
@@ -258,9 +258,9 @@ show_flash();
     </select>
     <div class="hint">Los ajustes siempre se sobrescriben con los de la copia.</div>
 
-    <label for="confirm_replace" class="mt-2">Confirmacion (solo si eliges "Reemplazar")</label>
+    <label for="confirm_replace" class="mt-2">Confirmación (solo si eliges "Reemplazar")</label>
     <input type="text" id="confirm_replace" name="confirm_replace" maxlength="20" placeholder="BORRAR" autocomplete="off">
-    <div class="hint">Si el modo es "Reemplazar", escribe <code>BORRAR</code> aqui para confirmar. En modo "Anadir" este campo no hace nada.</div>
+    <div class="hint">Si el modo es "Reemplazar", escribe <code>BORRAR</code> aquí para confirmar. En modo "Añadir" este campo no hace nada.</div>
 
     <div style="margin-top:1.4rem;">
       <button type="submit" class="btn">Restaurar copia</button>
@@ -278,10 +278,10 @@ show_flash();
     <tr>
       <th>Base de datos completa</th>
       <td class="muted">phpMyAdmin de CDMON → pestana <strong>Exportar</strong> → formato SQL.
-        Es la copia mas completa (incluye mensajes y analitica).</td>
+        Es la copia más completa (incluye mensajes y analítica).</td>
     </tr>
     <tr>
-      <th>Codigo fuente</th>
+      <th>Código fuente</th>
       <td class="muted">La carpeta del proyecto en tu PC. Subela a un repositorio privado
         de GitHub (<code>server/config.php</code> ya esta en <code>.gitignore</code>).</td>
     </tr>

@@ -129,8 +129,8 @@ if (($_GET['export'] ?? '') === 'csv') {
     );
     csv_download(
         'visitas-' . $days . 'd-' . date('Y-m-d') . '.csv',
-        ['Fecha', 'Pagina', 'Idioma', 'Referrer', 'Pais', 'Dispositivo', 'Navegador', 'SO', 'Bot',
-         'Duracion (s)', 'Scroll (%)', 'UTM origen', 'UTM medio', 'UTM campana', 'Viewport', 'Idioma navegador'],
+        ['Fecha', 'Página', 'Idioma', 'Referrer', 'País', 'Dispositivo', 'Navegador', 'SO', 'Bot',
+         'Duración (s)', 'Scroll (%)', 'UTM origen', 'UTM medio', 'UTM campaña', 'Viewport', 'Idioma navegador'],
         array_map(static fn(array $r): array => [
             $r['visited_at'], $r['path'], $r['lang'], $r['referrer'],
             $r['country'], $r['device'], $r['browser'], $r['os'],
@@ -389,7 +389,7 @@ admin_header('Analítica', 'analytics.php');
 <div class="grid4">
   <div class="card stat">
     <div class="num"><?= number_format($inRange) ?><?= delta_badge($inRange, $prevRange) ?></div>
-    <div class="lbl">Visitas (<?= $days === 1 ? '24 h' : $days . ' dias' ?>)<br><span class="faint">vs. periodo anterior</span></div>
+    <div class="lbl">Visitas (<?= $days === 1 ? '24 h' : $days . ' días' ?>)<br><span class="faint">vs. periodo anterior</span></div>
   </div>
   <div class="card stat">
     <div class="num cyan"><?= number_format($uniques) ?><?= delta_badge($uniques, $prevUniques) ?></div>
@@ -410,11 +410,11 @@ admin_header('Analítica', 'analytics.php');
 <div class="grid4">
   <div class="card stat">
     <div class="num"><?= $bounceRate ?>%</div>
-    <div class="lbl">Rebote<br><span class="faint">sesiones de una sola pagina</span></div>
+    <div class="lbl">Rebote<br><span class="faint">sesiones de una sola página</span></div>
   </div>
   <div class="card stat">
     <div class="num cyan"><?= $avgDuration >= 60 ? sprintf('%d:%02d', (int) ($avgDuration / 60), (int) $avgDuration % 60) : round($avgDuration) . 's' ?></div>
-    <div class="lbl">Duracion media<br><span class="faint">tiempo visible en pantalla</span></div>
+    <div class="lbl">Duración media<br><span class="faint">tiempo visible en pantalla</span></div>
   </div>
   <div class="card stat">
     <div class="num violet"><?= round($avgScroll) ?>%</div>
@@ -422,7 +422,7 @@ admin_header('Analítica', 'analytics.php');
   </div>
 </div>
 
-<h2>Visitas por dia</h2>
+<h2>Visitas por día</h2>
 <div class="card">
   <?php if (!array_sum(array_column($daily, 'c'))): ?>
     <div class="empty">Sin datos de visitas en este rango.</div>
@@ -438,7 +438,7 @@ admin_header('Analítica', 'analytics.php');
         </div>
       <?php endforeach; ?>
     </div>
-    <p class="hint">Pasa el raton por una barra para ver visitas y visitantes unicos de ese dia.</p>
+    <p class="hint">Pasa el ratón por una barra para ver visitas y visitantes únicos de ese día.</p>
   <?php endif; ?>
 </div>
 
@@ -459,7 +459,7 @@ admin_header('Analítica', 'analytics.php');
     </div>
   </div>
   <div>
-    <h2>Dia de la semana</h2>
+    <h2>Día de la semana</h2>
     <div class="card">
       <?php foreach ($dowNames as $i => $name): ?>
         <?php bar_row($name, $byDow[$i], $maxDow, 'violet'); ?>
@@ -478,11 +478,11 @@ admin_header('Analítica', 'analytics.php');
             $inRange > 0 ? round(($c / $inRange) * 100) . '%' : ''); ?>
       <?php endforeach; ?>
       <p class="hint">"IA / Chatbots" agrupa visitas llegadas desde ChatGPT, Claude, Perplexity,
-        Gemini y Copilot: es la senal de que las IAs te estan citando.</p>
+        Gemini y Copilot: es la señal de que las IAs te están citando.</p>
     </div>
   </div>
   <div>
-    <h2>Idioma de la pagina</h2>
+    <h2>Idioma de la página</h2>
     <div class="card">
       <?php if (!$langs): ?><div class="empty">Sin datos.</div><?php endif; ?>
       <?php foreach ($langs as $r): ?>
@@ -501,8 +501,8 @@ admin_header('Analítica', 'analytics.php');
       <?php foreach ($browserLangs as $r): ?>
         <?php bar_row($langLabels[$r['k']] ?? strtoupper((string) $r['k']), (int) $r['c'], $maxBroLang, ''); ?>
       <?php endforeach; ?>
-      <p class="hint">Idioma declarado por el navegador, no el de la pagina servida:
-        una demanda visible de un idioma que aun no ofreces se veria aqui.</p>
+      <p class="hint">Idioma declarado por el navegador, no el de la página servida:
+        una demanda visible de un idioma que aún no ofreces se vería aquí.</p>
     </div>
   </div>
   <div>
@@ -518,7 +518,7 @@ admin_header('Analítica', 'analytics.php');
 
 <div class="row2">
   <div>
-    <h2>Paginas de entrada</h2>
+    <h2>Páginas de entrada</h2>
     <div class="card">
       <?php if (!$entryPages): ?><div class="empty">Sin datos.</div><?php endif; ?>
       <?php foreach ($entryPages as $r): ?>
@@ -527,7 +527,7 @@ admin_header('Analítica', 'analytics.php');
     </div>
   </div>
   <div>
-    <h2>Paginas de salida</h2>
+    <h2>Páginas de salida</h2>
     <div class="card">
       <?php if (!$exitPages): ?><div class="empty">Sin datos.</div><?php endif; ?>
       <?php foreach ($exitPages as $r): ?>
@@ -539,7 +539,7 @@ admin_header('Analítica', 'analytics.php');
 
 <div class="row2">
   <div>
-    <h2>Paginas mas vistas</h2>
+    <h2>Páginas más vistas</h2>
     <div class="card">
       <?php if (!$topPages): ?><div class="empty">Sin datos.</div><?php endif; ?>
       <?php foreach ($topPages as $r): ?>
@@ -664,16 +664,16 @@ admin_header('Analítica', 'analytics.php');
   </div>
 </div>
 <p class="hint" style="margin-top:.5rem;">
-  Aqui veras a Googlebot, Bingbot y a los rastreadores de IA (GPTBot, ClaudeBot,
-  PerplexityBot...). Que aparezcan es buena senal: significa que te estan indexando.
+  Aquí verás a Googlebot, Bingbot y a los rastreadores de IA (GPTBot, ClaudeBot,
+  PerplexityBot...). Que aparezcan es buena señal: significa que te están indexando.
 </p>
 
 <p class="hint mt-3">
   <strong>Privacidad:</strong> las IPs se guardan hasheadas con sal (mas user-agent), no se
   usan cookies de seguimiento y no se comparte nada con terceros. Los referrers se almacenan
-  sin parametros de query. La sesion (rebote, entrada/salida) se identifica con un id que vive
+  sin parametros de query. La sesión (rebote, entrada/salida) se identifica con un id que vive
   solo en <code>sessionStorage</code> mientras la pestana esta abierta: no persiste, no se cruza
-  con otras visitas y no sale del navegador salvo para contar "estas paginas son la misma
+  con otras visitas y no sale del navegador salvo para contar "estas páginas son la misma
   visita". Compatible con RGPD sin banner de cookies.
 </p>
 

@@ -60,7 +60,7 @@ if (($_GET['export'] ?? '') === 'csv') {
 
     csv_download(
         'mensajes-' . date('Y-m-d') . '.csv',
-        ['ID', 'Nombre', 'Email', 'Asunto', 'Mensaje', 'IP', 'Leido', 'Destacado', 'Archivado', 'Fecha'],
+        ['ID', 'Nombre', 'Email', 'Asunto', 'Mensaje', 'IP', 'Leído', 'Destacado', 'Archivado', 'Fecha'],
         array_map(static fn(array $r): array => [
             $r['id'], $r['name'], $r['email'], $r['subject'], $r['message'], $r['ip_address'],
             $r['is_read'] ? 'si' : 'no',
@@ -100,7 +100,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
 
     if ($action === 'mark_all_read') {
         db()->query('UPDATE messages SET is_read = 1 WHERE is_read = 0 AND is_archived = 0');
-        log_activity('update', 'message', null, 'Marcar todo como leido');
+        log_activity('update', 'message', null, 'Marcar todo como leído');
         set_flash('ok', 'Todos los mensajes se han marcado como leidos.');
         redirect($back);
     }
@@ -130,7 +130,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
         }
     }
 
-    set_flash('err', 'No se selecciono ningun mensaje.');
+    set_flash('err', 'No se seleccionó ningún mensaje.');
     redirect($back);
 }
 
@@ -210,7 +210,7 @@ if ($viewId > 0) {
           <?= csrf_field() ?>
           <input type="hidden" name="action" value="unread">
           <input type="hidden" name="id" value="<?= (int) $m['id'] ?>">
-          <button class="btn ghost" type="submit">Marcar como no leido</button>
+          <button class="btn ghost" type="submit">Marcar como no leído</button>
         </form>
 
         <form method="post" class="d-inline">
@@ -329,11 +329,11 @@ show_flash();
       <form method="post" data-confirm="¿Marcar TODOS los mensajes como leidos?" class="d-inline">
         <?= csrf_field() ?>
         <input type="hidden" name="action" value="mark_all_read">
-        <button class="btn ghost sm" type="submit">Marcar todo como leido</button>
+        <button class="btn ghost sm" type="submit">Marcar todo como leído</button>
       </form>
     <?php endif; ?>
     <a class="btn ghost sm" href="<?= e(list_url($filter, $search)) ?>&amp;export=csv">Exportar CSV</a>
-<?php page_header('Buzon de contacto', '', ob_get_clean()); ?>
+<?php page_header('Buzón de contacto', '', ob_get_clean()); ?>
 
 <div class="tabs">
   <?php foreach ($tabs as $key => $label): ?>

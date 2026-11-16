@@ -51,7 +51,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>Configuracion inicial · Admin</title>
+<title>Configuración inicial · Admin</title>
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <link rel="stylesheet" href="assets/auth.css">
 </head>
@@ -65,17 +65,17 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
         <p style="margin:0;">Despues accede en <a href="login.php">login.php</a>.</p>
       </div>
     <?php else: ?>
-      <h1>Configuracion inicial</h1>
+      <h1>Configuración inicial</h1>
       <p class="sub">Crea tu usuario administrador. Este formulario se desactiva
-      automaticamente despues.</p>
+      automáticamente después.</p>
       <?php if ($error): ?><div class="err"><?= e($error) ?></div><?php endif; ?>
       <form method="post" autocomplete="off">
         <?= csrf_field() ?>
         <label for="username">Usuario</label>
         <input type="text" id="username" name="username" required minlength="3" autofocus>
-        <label for="password">Contrasena (min. 8)</label>
+        <label for="password">Contraseña (mín. 8)</label>
         <input type="password" id="password" name="password" required minlength="8">
-        <label for="confirm">Repite la contrasena</label>
+        <label for="confirm">Repite la contraseña</label>
         <input type="password" id="confirm" name="confirm" required minlength="8">
         <button type="submit">Crear administrador</button>
       </form>

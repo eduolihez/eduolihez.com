@@ -139,7 +139,7 @@ show_flash();
       <thead role="rowgroup">
         <tr role="row">
           <th role="columnheader" class="col-w56"></th>
-          <th role="columnheader">Titulo (ES)</th>
+          <th role="columnheader">Título (ES)</th>
           <th role="columnheader">Estado</th>
           <th role="columnheader">Destacado</th>
           <th role="columnheader">Orden</th>
@@ -215,7 +215,7 @@ show_flash();
                   <input type="hidden" name="id" value="<?= (int) $p['id'] ?>">
                   <button type="submit" class="btn ghost sm">Duplicar</button>
                 </form>
-                <form method="post" data-confirm="¿Eliminar este proyecto? Se borrara tambien su imagen." class="d-inline">
+                <form method="post" data-confirm="¿Eliminar este proyecto? Se borrará también su imagen." class="d-inline">
                   <?= csrf_field() ?>
                   <input type="hidden" name="action" value="delete">
                   <input type="hidden" name="id" value="<?= (int) $p['id'] ?>">
@@ -231,9 +231,9 @@ show_flash();
 </div>
 
 <p class="hint">
-  El orden de la web es automatico: primero los <strong>destacados</strong>, y dentro de
-  cada grupo el que se <strong>actualizo mas reciente</strong> primero. La columna "Orden"
-  y las flechas ↑ ↓ ya no cambian ese orden (se conservan por si algun dia vuelve a hacer
+  El orden de la web es automático: primero los <strong>destacados</strong>, y dentro de
+  cada grupo el que se <strong>actualizó más reciente</strong> primero. La columna "Orden"
+  y las flechas ↑ ↓ ya no cambian ese orden (se conservan por si algún día vuelve a hacer
   falta uno curado a mano) -- para mover un proyecto arriba, destacalo o edítalo y guarda.
 </p>
 

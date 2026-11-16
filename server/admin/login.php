@@ -58,7 +58,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     <?= csrf_field() ?>
     <label for="username">Usuario</label>
     <input type="text" id="username" name="username" required autofocus>
-    <label for="password">Contrasena</label>
+    <label for="password">Contraseña</label>
     <input type="password" id="password" name="password" required>
     <button type="submit">Entrar</button>
     <?php /* Absoluta a proposito: en admin.eduolihez.com (Worker de

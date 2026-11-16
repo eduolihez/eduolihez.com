@@ -351,7 +351,7 @@ $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
     || strtolower((string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '')) === 'https';
 if (!$isHttps) {
     $warnings[] = ['warn', 'Estas viendo el panel por <strong>HTTP sin cifrar</strong>. '
-        . 'Tu contrasena viaja en claro: entra siempre por https://'];
+        . 'Tu contraseña viaja en claro: entra siempre por https://'];
 }
 if ($failedLogins >= 20) {
     $warnings[] = ['warn', "Se han registrado <strong>{$failedLogins} intentos de acceso fallidos</strong> "
@@ -495,7 +495,7 @@ page_header('Hoy', 'Lo que pide atención ahora y cómo va la web.');
   </div>
 
   <div>
-    <h2>Paginas mas vistas <span class="faint" style="font-weight:500;">(30 d)</span></h2>
+    <h2>Páginas más vistas <span class="faint" style="font-weight:500;">(30 d)</span></h2>
     <div class="card">
       <?php if (!$topPages): ?>
         <div class="empty">Sin datos de visitas todavía.</div>
@@ -513,7 +513,7 @@ page_header('Hoy', 'Lo que pide atención ahora y cómo va la web.');
         <tbody>
           <tr>
             <td>
-              <div class="faint">Ultimo proyecto</div>
+              <div class="faint">Último proyecto</div>
               <?php if ($lastProject): ?>
                 <a href="projects.php"><?= e((string) $lastProject['t']) ?></a>
               <?php else: ?>
@@ -524,7 +524,7 @@ page_header('Hoy', 'Lo que pide atención ahora y cómo va la web.');
           </tr>
           <tr>
             <td>
-              <div class="faint">Ultima certificacion</div>
+              <div class="faint">Última certificación</div>
               <?php if ($lastCert): ?>
                 <a href="certifications.php"><?= e((string) $lastCert['t']) ?></a>
               <?php else: ?>
@@ -535,7 +535,7 @@ page_header('Hoy', 'Lo que pide atención ahora y cómo va la web.');
           </tr>
           <tr>
             <td>
-              <div class="faint">Ultima entrada de blog</div>
+              <div class="faint">Última entrada de blog</div>
               <?php if ($lastPost): ?>
                 <a href="posts.php"><?= e((string) $lastPost['t']) ?></a>
               <?php else: ?>
@@ -550,7 +550,7 @@ page_header('Hoy', 'Lo que pide atención ahora y cómo va la web.');
   </div>
 </div>
 
-<h2>Accesos rapidos</h2>
+<h2>Accesos rápidos</h2>
 <div class="card">
   <div class="actions">
     <a class="btn" href="project-edit.php">+ Nuevo proyecto</a>
@@ -635,7 +635,7 @@ page_header('Hoy', 'Lo que pide atención ahora y cómo va la web.');
               'neutral'
           );
           status_tile(
-              'Registros de auditoria',
+              'Registros de auditoría',
               number_format(count_of('SELECT COUNT(*) FROM activity_log')),
               'neutral'
           );

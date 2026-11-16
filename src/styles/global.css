@@ -1088,6 +1088,7 @@
   --text-muted: #b4c0d2;
   --text-faint: #9aa8bd;
   --accent: #8fb0ff;
+  --accent-hover: #b3c9ff;
   color: var(--text);
 }
 .hero-ink ::selection {

@@ -1579,3 +1579,18 @@ a.post-row:hover .post-title {
 .certs-more[open] > .certs-more-summary {
   color: var(--color-text-muted);
 }
+
+/* T9b - Post: contraste de tablas y pista de scroll en codigo (sin JS) */
+.prose td {
+  /* --text sobre --bg-soft >= 7:1 (muted rondaba el minimo). */
+  color: var(--color-text);
+}
+.prose pre {
+  /* Sombras de borde que solo aparecen cuando hay contenido oculto (scroll). */
+  background:
+    linear-gradient(to right, var(--color-bg-card) 30%, transparent) left center / 2rem 100% no-repeat local,
+    linear-gradient(to left, var(--color-bg-card) 30%, transparent) right center / 2rem 100% no-repeat local,
+    radial-gradient(farthest-side at 0 50%, rgb(0 0 0 / 0.28), transparent) left center / 0.75rem 100% no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%, rgb(0 0 0 / 0.28), transparent) right center / 0.75rem 100% no-repeat scroll,
+    var(--color-bg-card);
+}

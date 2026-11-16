@@ -30,15 +30,13 @@ interface Props {
 }
 
 const { post, lang, backHref, backLabel } = Astro.props;
-// Fallback a la portada generada (ver src/lib/cover.ts) cuando el articulo
-// no tiene cover_url propio en la base de datos.
-const coversBase = lang === 'es' ? '/blog/covers/' : `/${lang}/blog/covers/`;
 const byline = authorByline[(lang as Lang) in authorByline ? (lang as Lang) : 'es'];
 const socHref = socAlternates[(lang as Lang) in socAlternates ? (lang as Lang) : 'es'];
 const L: Lang = (lang as Lang) in authorByline ? (lang as Lang) : 'es';
 const related = relatedPosts(post, await fetchAllPostSummaries(L));
 const moreTitle = { es: 'Sigue leyendo', en: 'Keep reading', ca: 'Continua llegint' }[L];
-const cover = safeUrl(post.cover_url) || `${coversBase}${post.slug}.png`;
+// Solo portada propia: la generada repite el titulo que ya se ve en el <h1>.
+const cover = safeUrl(post.cover_url);
 
 // Indice (TOC) solo con >= 3 secciones, sin JS: se anaden ids a los <h2> sin
 // atributos del cuerpo (el texto no cambia) y se enlaza a ellos con anclas.
@@ -55,7 +53,7 @@ const showToc = toc.length >= 3;
 ---
 
 <article class="border-b border-bg-border bg-bg-soft py-20 sm:py-28">
-  <div class="container-page max-w-3xl">
+  <div class="container-page">
     <a
       href={backHref}
       class="group mb-8 inline-flex min-h-11 items-center gap-2 font-mono text-xs text-text-muted transition hover:text-accent"

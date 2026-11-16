@@ -12,6 +12,7 @@
 require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/partials/layout.php';
 require_once __DIR__ . '/../lib/ua.php';
+require_once __DIR__ . '/../lib/analytics_report.php';
 require_login();
 
 // --- Rango de fechas: lista blanca, nunca se interpola valor del usuario ----
@@ -344,6 +345,75 @@ $viewports = q_rows(
     [$days]
 );
 
+// --- Lectura por post (sobre visits) -----------------------------------------
+// Rutas /blog/<slug>/ (+ /en y /ca); los indices /blog/ no casan.
+$readingRows = q_rows(
+    "SELECT path, COUNT(*) AS c, COUNT(scroll_pct) AS scroll_n,
+            SUM(scroll_pct >= " . READING_DEEP_SCROLL . ") AS deep,
+            AVG(duration_s) AS dur, AVG(scroll_pct) AS scr
+     FROM visits
+     WHERE $botFilter AND path REGEXP '^(/(en|ca))?/blog/[^/]+/?$'
+       AND visited_at > (NOW() - INTERVAL ? DAY)
+     GROUP BY path ORDER BY c DESC LIMIT 20",
+    [$days]
+);
+$reading = [];
+foreach ($readingRows as $r) {
+    $reading[] = ['path' => (string) $r['path']] + reading_summary(
+        (int) $r['c'],
+        (int) $r['scroll_n'],
+        (int) $r['deep'],
+        $r['dur'] === null ? null : (float) $r['dur'],
+        $r['scr'] === null ? null : (float) $r['scr']
+    );
+}
+
+// --- Eventos y 404 (site_events) ---------------------------------------------
+// La tabla puede no existir aun (migracion pendiente): q_rows() se traga el
+// error y no distingue "vacio" de "falta la tabla", asi que aqui se captura
+// aparte. La tabla no tiene app_id: solo se filtra por bots y rango.
+$eventsMissing = false;
+$eventTotals = $eventTargets = $notFound = [];
+$evBot = $withBots ? '1=1' : 'is_bot = 0';
+try {
+    $evQ = static function (string $sql, array $params = []): array {
+        $st = db()->prepare($sql);
+        $st->execute($params);
+        return $st->fetchAll();
+    };
+    $eventTotals = $evQ(
+        "SELECT name, COUNT(*) AS c, COUNT(DISTINCT session_id) AS s FROM site_events
+         WHERE $evBot AND created_at > (NOW() - INTERVAL ? DAY)
+         GROUP BY name ORDER BY c DESC",
+        [$days]
+    );
+    $eventTargets = $evQ(
+        "SELECT name, target, COUNT(*) AS c FROM site_events
+         WHERE $evBot AND name IN ('outbound','lang_switch','theme_toggle')
+           AND target IS NOT NULL AND target <> ''
+           AND created_at > (NOW() - INTERVAL ? DAY)
+         GROUP BY name, target ORDER BY name, c DESC",
+        [$days]
+    );
+    $notFound = $evQ(
+        "SELECT path, COUNT(*) AS c, MAX(created_at) AS last_at FROM site_events
+         WHERE $evBot AND name = 'not_found' AND created_at > (NOW() - INTERVAL ? DAY)
+         GROUP BY path ORDER BY c DESC, last_at DESC LIMIT 20",
+        [$days]
+    );
+} catch (Throwable $e) {
+    $eventsMissing = true;
+    $eventTotals = $eventTargets = $notFound = [];
+}
+$targetsByName = [];
+foreach ($eventTargets as $r) {
+    $targetsByName[$r['name']][] = $r;
+}
+$eventLabels = [
+    'outbound' => 'Enlaces salientes (host)', 'lang_switch' => 'Cambio de idioma',
+    'theme_toggle' => 'Cambio de tema',
+];
+
 $maxPage = max_count($topPages);
 $maxRef  = max_count($topRefs);
 $maxCty  = max_count($countries);
@@ -642,6 +712,101 @@ if ($hasVisitorCol):
     </div>
   </div>
 </div>
+
+<h2>Lectura por post</h2>
+<div class="card p-0">
+  <div class="scroll-x">
+    <table>
+      <thead><tr><th>Post</th><th class="text-right">Visitas</th><th class="text-right">Tiempo medio</th><th class="text-right">Scroll medio</th><th class="text-right">Llega al 90 %</th></tr></thead>
+      <tbody>
+        <?php if (!$reading): ?>
+          <tr><td colspan="5" class="empty">Sin visitas a posts en este rango.</td></tr>
+        <?php endif; ?>
+        <?php foreach ($reading as $r): ?>
+          <tr>
+            <td style="word-break:break-all;"><?= e($r['path']) ?></td>
+            <td class="text-right"><?= (int) $r['visits'] ?></td>
+            <td class="text-right"><?= $r['avg_duration'] === null ? '—' : e($r['avg_duration'] . 's') ?></td>
+            <td class="text-right"><?= $r['avg_scroll'] === null ? '—' : e($r['avg_scroll'] . '%') ?></td>
+            <td class="text-right"><?php if ($r['few']): ?><span class="faint">pocos datos</span><?php elseif ($r['deep_pct'] === null): ?>—<?php else: ?><?= e($r['deep_pct'] . '%') ?><?php endif; ?></td>
+          </tr>
+        <?php endforeach; ?>
+      </tbody>
+    </table>
+  </div>
+</div>
+<p class="hint" style="margin-top:.5rem;">
+  El % es sobre las visitas con scroll medido. Con menos de <?= READING_MIN_VISITS ?> visitas se marca
+  «pocos datos» para no dar un porcentaje engañoso.
+</p>
+
+<h2>Eventos</h2>
+<?php if ($eventsMissing): ?>
+  <div class="card"><div class="empty">Aún no hay datos de eventos (falta aplicar la migración).</div></div>
+<?php else: ?>
+  <div class="row2">
+    <div>
+      <div class="card p-0">
+        <div class="scroll-x">
+          <table>
+            <thead><tr><th>Evento</th><th class="text-right">Total</th><th class="text-right">Sesiones</th></tr></thead>
+            <tbody>
+              <?php if (!$eventTotals): ?>
+                <tr><td colspan="3" class="empty">Sin eventos en este rango.</td></tr>
+              <?php endif; ?>
+              <?php foreach ($eventTotals as $r): ?>
+                <tr>
+                  <td><?= e((string) $r['name']) ?></td>
+                  <td class="text-right"><?= (int) $r['c'] ?></td>
+                  <td class="text-right"><?= (int) $r['s'] ?></td>
+                </tr>
+              <?php endforeach; ?>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <?php if (!$targetsByName): ?><div class="empty">Sin desglose por destino.</div><?php endif; ?>
+        <?php foreach ($eventLabels as $evName => $evLabel): ?>
+          <?php if (empty($targetsByName[$evName])) { continue; } ?>
+          <p class="hint"><strong><?= e($evLabel) ?></strong></p>
+          <?php $maxT = max_count($targetsByName[$evName]); ?>
+          <?php foreach ($targetsByName[$evName] as $r): ?>
+            <?php bar_row((string) $r['target'], (int) $r['c'], $maxT, 'green'); ?>
+          <?php endforeach; ?>
+        <?php endforeach; ?>
+      </div>
+    </div>
+  </div>
+<?php endif; ?>
+
+<h2>Páginas 404</h2>
+<div class="card p-0">
+  <div class="scroll-x">
+    <table>
+      <thead><tr><th>Ruta</th><th class="text-right">Veces</th><th class="text-right">Última vez</th></tr></thead>
+      <tbody>
+        <?php if ($eventsMissing): ?>
+          <tr><td colspan="3" class="empty">Aún no hay datos de eventos (falta aplicar la migración).</td></tr>
+        <?php elseif (!$notFound): ?>
+          <tr><td colspan="3" class="empty">Sin 404 registrados en este rango.</td></tr>
+        <?php endif; ?>
+        <?php foreach ($notFound as $r): ?>
+          <tr>
+            <td style="word-break:break-all;"><?= e((string) $r['path']) ?></td>
+            <td class="text-right"><?= (int) $r['c'] ?></td>
+            <td class="text-right"><?= e(fdate((string) $r['last_at'])) ?></td>
+          </tr>
+        <?php endforeach; ?>
+      </tbody>
+    </table>
+  </div>
+</div>
+<p class="hint" style="margin-top:.5rem;">
+  Enlaces rotos o URLs antiguas que llegan a la página de error: candidatas a redirigir.
+</p>
 
 <h2>Atribucion (UTM)</h2>
 <div class="card p-0">

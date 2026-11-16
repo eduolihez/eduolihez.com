@@ -353,6 +353,19 @@ export const techSections: TechSection[] = [
       },
       {
         term: {
+          es: 'Qué clics se cuentan, y qué nunca se guarda',
+          en: 'Which clicks are counted, and what is never stored',
+          ca: 'Quins clics es compten, i què no es desa mai',
+        },
+        detail: {
+          es: 'Además de las visitas se cuentan seis cosas: abrir el CV, un clic en un enlace externo (solo el dominio de destino), el cambio de idioma, el cambio de tema, el envío del formulario de contacto y las páginas 404. Del formulario solo se anota que se envió, nunca lo que escribiste. De los enlaces no se guarda el texto ni la URL completa. Estos eventos no usan cookies. Con Do Not Track o Global Privacy Control activados no se envía ninguno.',
+          en: 'Besides pageviews, six things are counted: opening the CV, a click on an external link (destination domain only), a language switch, a theme switch, a contact form submission and 404 pages. For the form, only the fact that it was sent is recorded, never what you wrote. For links, neither the link text nor the full URL is stored. These events use no cookies. With Do Not Track or Global Privacy Control on, none is sent.',
+          ca: "A més de les visites es compten sis coses: obrir el CV, un clic en un enllaç extern (només el domini de destí), el canvi d'idioma, el canvi de tema, l'enviament del formulari de contacte i les pàgines 404. Del formulari només s'anota que s'ha enviat, mai el que has escrit. Dels enllaços no es desa ni el text ni l'URL completa. Aquests esdeveniments no fan servir galetes. Amb Do Not Track o Global Privacy Control activats no se n'envia cap.",
+        },
+        source: 'src/scripts/events.ts',
+      },
+      {
+        term: {
           es: 'Del referrer se descarta la query',
           en: 'Query strings are dropped from the referrer',
           ca: 'Del referrer es descarta la query',
@@ -376,6 +389,18 @@ export const techSections: TechSection[] = [
           ca: "Les visites s'esborren als 400 dies, els intents de login als 90 i el registre d'auditoria a l'any. La purga va incorporada al mateix flux, sense dependre d'un cron que ningú no recorda revisar.",
         },
         source: 'server/api/visit.php',
+      },
+      {
+        term: {
+          es: 'Cloudflare delante del sitio',
+          en: 'Cloudflare in front of the site',
+          ca: 'Cloudflare davant del lloc',
+        },
+        detail: {
+          es: 'El sitio pasa por Cloudflare como proxy, que puede dar estadísticas agregadas sin cookies. Esta web no incluye ningún script de analítica de Cloudflare.',
+          en: 'The site is served through Cloudflare as a proxy, which can provide aggregate statistics without cookies. This site includes no Cloudflare analytics script.',
+          ca: 'El lloc passa per Cloudflare com a proxy, que pot donar estadístiques agregades sense galetes. Aquesta web no inclou cap script d\'analítica de Cloudflare.',
+        },
       },
     ],
   },

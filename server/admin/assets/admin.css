@@ -783,10 +783,10 @@
       width: 270px;
       transform: translateX(-100%);
       transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: var(--shadow-drawer);
     }
     .sidebar.open {
       transform: translateX(0);
+      box-shadow: var(--shadow-drawer);
     }
     .mobile-only {
       display: flex;
@@ -951,7 +951,12 @@
     .btn.icon { min-width: 44px; }
     button.pill { min-height: 44px; padding-inline: 0.85rem; }
     .tabs a { min-height: 44px; display: inline-flex; align-items: center; }
+    /* T12: enlaces sueltos en tablas y notas, y el atajo ⌘K, a 44 px de alto. */
+    td > a, .hint a, .today-ok a, .topbar-kbd { display: inline-flex; align-items: center; min-height: 44px; min-width: 44px; }
+    .topbar-kbd { min-width: 44px; justify-content: center; }
   }
+  /* Contador junto al titulo: --muted (no --faint) para llegar a 4.5:1 sobre el fondo de pagina. */
+  h1 .page-title-meta, h2 .faint, .tabs .faint { color: var(--muted); }
   @media (max-width: 767.98px) {
     .card:has(> .scroll-x > table.stack) { background: none; border: 0; box-shadow: none; padding: 0; }
     .scroll-x:has(> table.stack) { border: 0; background: none; overflow: visible; }

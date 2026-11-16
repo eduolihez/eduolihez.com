@@ -116,6 +116,11 @@ $input = read_json_body();
 $rawAction = $input['action'] ?? 'hit';
 $action = in_array($rawAction, ['beat', 'event'], true) ? $rawAction : 'hit';
 
+// DNT/GPC tambien en servidor (el cliente ya no envia): vale para hit, beat y event.
+if (event_privacy_opt_out($_SERVER)) {
+    no_content();
+}
+
 $ua = mb_substr((string) ($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 255);
 
 // Hash de la IP con sal + user-agent (privacidad). El UA entra en el hash
@@ -177,11 +182,6 @@ try {
 
     // --- action=event: evento validado (lib/events.php) en site_events -----
     if ($action === 'event') {
-        // DNT/GPC tambien en servidor (el cliente ya no envia), solo para
-        // eventos: hit/beat siguen como estaban.
-        if (event_privacy_opt_out($_SERVER)) {
-            no_content();
-        }
         $ev = normalize_event($input);
         if ($ev === null) {
             no_content();

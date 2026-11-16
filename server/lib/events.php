@@ -83,7 +83,7 @@ function event_over_cap(int $total, int $mine, ?string $sessionId): bool
     return $mine >= ($sessionId === null ? EVENT_CAP_NO_SESSION : EVENT_CAP_SESSION);
 }
 
-/** DNT: 1 o Sec-GPC: 1 en la peticion: el evento no se guarda. */
+/** DNT: 1 o Sec-GPC: 1 en la peticion: no se guarda nada (hit, beat ni event). */
 function event_privacy_opt_out(array $server): bool
 {
     return ($server['HTTP_DNT'] ?? '') === '1' || ($server['HTTP_SEC_GPC'] ?? '') === '1';

@@ -1,8 +1,6 @@
 name: "Analisis de seguridad"
 
 on:
-  push:
-    branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
   schedule:

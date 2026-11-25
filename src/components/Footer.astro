@@ -9,6 +9,7 @@ import type { Lang } from '../i18n/ui';
 import { SITE } from '../config';
 import Icon from './Icon.astro';
 import { socAlternates, socProfile } from '../data/soc-profile';
+import { privacyPaths, privacyMeta } from '../data/privacy';
 
 interface Props {
   lang: Lang;
@@ -141,8 +142,10 @@ const iconLinkClass =
         <span aria-hidden="true">·</span>
         <a href={socAlternates[lang]} class="inline-flex min-h-11 items-center transition hover:text-accent">{socProfile[lang].breadcrumb}</a>
         <span aria-hidden="true">·</span>
-        {/* Reabre el aviso de cookies (consent.ts); sin JS lleva a la explicacion. */}
-        <a href={aboutPath} data-consent-open aria-controls="consent-banner" class="inline-flex min-h-11 items-center transition hover:text-accent">{t('footer.cookies')}</a>
+        <a href={privacyPaths[lang]} class="inline-flex min-h-11 items-center transition hover:text-accent">{privacyMeta.footerLabel[lang]}</a>
+        <span aria-hidden="true">·</span>
+        {/* Reabre el aviso de cookies (consent.ts); sin JS lleva a la politica de privacidad. */}
+        <a href={`${privacyPaths[lang]}#cookies`} data-consent-open aria-controls="consent-banner" class="inline-flex min-h-11 items-center transition hover:text-accent">{t('footer.cookies')}</a>
       </p>
       <div class="flex items-center gap-5">
         <button

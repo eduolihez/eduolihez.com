@@ -1,0 +1,71 @@
+---
+/**
+ * <PrivacyPolicy /> - Pagina de politica de privacidad (es/en/ca).
+ *
+ * El texto vive en src/data/privacy.ts; las tres paginas solo eligen idioma,
+ * asi que no pueden descompasarse. Va dentro de BaseLayout.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { privacyMeta, privacySections, privacyPaths, PRIVACY_UPDATED } from '../data/privacy';
+import { localeBase } from '../i18n/utils';
+import type { Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const updated = new Date(`${PRIVACY_UPDATED}T00:00:00Z`).toLocaleDateString(
+  lang === 'es' ? 'es-ES' : lang === 'ca' ? 'ca-ES' : 'en-GB',
+  { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' },
+);
+---
+
+<BaseLayout
+  title={privacyMeta.title[lang]}
+  description={privacyMeta.description[lang]}
+  lang={lang}
+  path={privacyPaths[lang]}
+  withFaq={false}
+  alternates={privacyPaths}
+  breadcrumbName={privacyMeta.breadcrumb[lang]}
+>
+  <section class="border-b border-bg-border py-20 sm:py-28">
+    <div class="container-page max-w-3xl">
+      <a
+        href={localeBase(lang)}
+        class="group mb-8 inline-flex min-h-11 items-center gap-2 font-mono text-xs text-text-muted transition hover:text-accent"
+      >
+        <span class="transition-transform group-hover:-translate-x-1">&larr;</span> {privacyMeta.back[lang]}
+      </a>
+
+      <div class="reveal mb-12">
+        <h1 class="page-title">{privacyMeta.h1[lang]}</h1>
+        <p class="page-lede">{privacyMeta.lede[lang]}</p>
+        <p class="mt-4 font-mono text-xs text-text-faint">
+          {privacyMeta.updatedLabel[lang]}: <time datetime={PRIVACY_UPDATED}>{updated}</time>
+        </p>
+      </div>
+
+      <div class="space-y-10">
+        {
+          privacySections.map((s) => (
+            <section id={s.id} aria-labelledby={`${s.id}-h`} class="scroll-mt-24">
+              <h2 id={`${s.id}-h`} class="font-display text-xl font-semibold text-text-title">
+                {s.title[lang]}
+              </h2>
+              {s.body?.map((p) => <p class="mt-3 leading-relaxed text-text-muted">{p[lang]}</p>)}
+              {s.list && (
+                <ul class="mt-3 list-disc space-y-3 pl-5 leading-relaxed text-text-muted marker:text-accent">
+                  {s.list.map((li) => (
+                    <li>{li[lang]}</li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</BaseLayout>

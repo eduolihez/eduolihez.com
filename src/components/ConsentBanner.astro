@@ -9,14 +9,15 @@
  */
 import { useTranslations } from '../i18n/utils';
 import type { Lang } from '../i18n/ui';
+import { privacyPaths } from '../data/privacy';
 
 interface Props {
   lang: Lang;
 }
 const { lang } = Astro.props;
 const t = useTranslations(lang);
-const aboutPath =
-  lang === 'en' ? '/en/about-this-website/' : lang === 'ca' ? '/ca/sobre-aquesta-web/' : '/sobre-esta-web/';
+// "Mas detalles" lleva a la politica de privacidad, seccion de cookies.
+const aboutPath = `${privacyPaths[lang]}#cookies`;
 const btn =
   'inline-flex min-h-11 flex-1 items-center justify-center rounded-lg border border-bg-border bg-bg-soft px-4 text-sm font-semibold text-text-title transition hover:border-accent hover:text-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:flex-none';
 ---

@@ -9,6 +9,10 @@ y el versionado usa cuatro números (`MAJOR.MINOR.PATCH.MICRO`).
 
 ### Added
 
+- **Política de privacidad** en `/privacy/`, `/en/privacy/` y
+  `/ca/privacitat/`. El texto vive en `src/data/privacy.ts` (una sola fuente
+  para los tres idiomas) y se enlaza desde el pie, el aviso de cookies, el
+  sitemap y `llms.txt`.
 - **Espacios en el panel admin.** El panel trabaja por espacio: `Global`
   (por defecto) o una app registrada. Hay un selector de espacio en la
   cabecera y el menú lateral cambia según el espacio activo. El espacio se

@@ -137,6 +137,21 @@ const translatedGroups: { paths: Record<'es' | 'en' | 'ca', string>; lastmod: st
     ]),
   },
   {
+    // "Politica de privacidad".
+    paths: {
+      es: '/privacy/',
+      en: '/en/privacy/',
+      ca: '/ca/privacitat/',
+    },
+    lastmod: gitLastMod([
+      'src/pages/privacy.astro',
+      'src/pages/en/privacy.astro',
+      'src/pages/ca/privacitat.astro',
+      'src/components/PrivacyPolicy.astro',
+      'src/data/privacy.ts',
+    ]),
+  },
+  {
     // "Analista SOC en Barcelona".
     paths: {
       es: '/analista-soc-barcelona/',

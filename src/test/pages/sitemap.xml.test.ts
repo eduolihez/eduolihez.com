@@ -64,3 +64,14 @@ describe('GET /sitemap.xml', () => {
     expect(body).toContain('<loc>https://eduolihez.com/apps/nowait/</loc>');
   });
 });
+
+describe('GET /sitemap.xml - politica de privacidad', () => {
+  it('declara /privacy/ con hreflang es/en/ca', async () => {
+    const body = await GET({} as APIContext).text();
+    const start = body.indexOf('<loc>https://eduolihez.com/privacy/</loc>');
+    expect(start).toBeGreaterThan(-1);
+    const entry = body.slice(start, start + 600);
+    expect(entry).toContain('hreflang="en" href="https://eduolihez.com/en/privacy/"');
+    expect(entry).toContain('hreflang="ca" href="https://eduolihez.com/ca/privacitat/"');
+  });
+});

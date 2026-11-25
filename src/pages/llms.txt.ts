@@ -84,6 +84,7 @@ Paginas principales:
 - [SOC analyst in Barcelona](${SITE.domain}${socAlternates.en}): same profile in English.
 - [Analista SOC a Barcelona i Badalona](${SITE.domain}${socAlternates.ca}): el mateix perfil en català.
 - [Sobre esta web](${SITE.domain}/sobre-esta-web/): decisiones técnicas y de seguridad de este sitio.
+- [Política de privacidad](${SITE.domain}/privacy/): qué datos recoge la web, cuánto tiempo y cómo ejercer tus derechos.
 - [Proyectos](${SITE.domain}/projects/): índice de los proyectos publicados.
 - [Blog](${SITE.domain}/blog/): notas técnicas de ciberseguridad.
 - [Blog en texto plano](${SITE.domain}/llms-blog.txt): texto íntegro de los artículos.
@@ -322,6 +323,9 @@ ${faqBlock}
 - ${SITE.domain}/sobre-esta-web/ — Cómo está construida esta web (español)
 - ${SITE.domain}/en/about-this-website/ — Cómo está construida esta web (inglés)
 - ${SITE.domain}/ca/sobre-aquesta-web/ — Cómo está construida esta web (catalán)
+- ${SITE.domain}/privacy/ — Política de privacidad (español)
+- ${SITE.domain}/en/privacy/ — Privacy policy (inglés)
+- ${SITE.domain}/ca/privacitat/ — Política de privacitat (catalán)
 - ${SITE.domain}/sitemap.xml — Mapa del sitio (páginas fijas)
 - ${SITE.domain}/llms-blog.txt — El TEXTO ÍNTEGRO de todos los artículos, en
   texto plano. Útil para resumir o citar varios artículos de una vez.

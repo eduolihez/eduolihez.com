@@ -126,3 +126,12 @@ describe('GET /llms.txt', () => {
     expect(body).not.toMatch(unaccented);
   });
 });
+
+describe('GET /llms.txt - politica de privacidad', () => {
+  it('lista la politica en los tres idiomas', async () => {
+    const body = await GET({} as APIContext).text();
+    expect(body).toContain('https://eduolihez.com/privacy/');
+    expect(body).toContain('https://eduolihez.com/en/privacy/');
+    expect(body).toContain('https://eduolihez.com/ca/privacitat/');
+  });
+});
